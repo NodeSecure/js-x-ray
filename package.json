@@ -17,7 +17,18 @@
     "type": "git",
     "url": "git+https://github.com/fraxken/js-x-ray.git"
   },
-  "keywords": [],
+  "keywords": [
+      "ast",
+      "nsecure",
+      "nodesecure",
+      "analysis",
+      "dependencies",
+      "security"
+  ],
+  "files": [
+      "src",
+      "index.d.ts"
+  ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
   "bugs": {

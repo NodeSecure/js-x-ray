@@ -27,6 +27,7 @@ declare namespace JSXRay {
     }
 
     export function searchRuntimeDependencies(str: string, options?: RuntimeOptions): Report;
+    export function generateWarning(kind?: string, loc?: { start?: number, end?: number });
 }
 
 export = JSXRay;

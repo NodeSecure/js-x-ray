@@ -1,9 +1,24 @@
 "use strict";
 
+// CONSTANTS
+const kSymTry = Symbol("kSymTry");
+
 class ASTDeps {
     constructor() {
-        this.isInTryStmt = false;
+        Object.defineProperty(this, kSymTry, { value: false, writable: true });
         this.dependencies = Object.create(null);
+    }
+
+    get isInTryStmt() {
+        return this[kSymTry];
+    }
+
+    set isInTryStmt(value) {
+        if (typeof value !== "boolean") {
+            throw new TypeError("value must be a boolean!");
+        }
+
+        this[kSymTry] = value;
     }
 
     removeByName(name) {

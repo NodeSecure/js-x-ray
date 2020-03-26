@@ -12,43 +12,29 @@ const ASTDeps = require("./src/ASTDeps");
 // CONSTANTS
 const kMainModuleStr = "process.mainModule.";
 
-function warn(kind = "unsafe-import", { start, end }) {
+function generateWarning(kind = "unsafe-import", { start, end = start }) {
     return { kind, start, end };
 }
 
-/**
- * @typedef {object} ASTSummary
- * @property {ASTDeps} dependencies
- * @property {any[]} warnings
- * @property {boolean} isOneLineRequire
- */
-
-/**
- * @function searchRuntimeDependencies
- * @description Parse a script, get an AST and search for require occurence!
- * @param {!string} str file content (encoded as utf-8)
- * @param {object} [options]
- * @param {boolean} [options.module=false] enable sourceType module
- * @returns {ASTSummary}
- */
 function searchRuntimeDependencies(str, options = Object.create(null)) {
     const { module = false } = options;
+
+    // Function variables
     const identifiers = new Map();
     const dependencies = new ASTDeps();
     const warnings = [];
 
-    if (str.charAt(0) === "#") {
-        // eslint-disable-next-line
-        str = str.slice(str.indexOf("\n"));
-    }
-    const { body } = meriyah.parseScript(str, {
-        next: true,
-        module: Boolean(module),
-        loc: true
+    // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
+    // Example: #!/usr/bin/env node
+    const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
+    const { body } = meriyah.parseScript(strToAnalyze, {
+        next: true, loc: true, module: Boolean(module)
     });
 
+    // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
         enter(node) {
+            // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
             if (node.type === "TryStatement") {
                 dependencies.isInTryStmt = true;
             }
@@ -56,9 +42,11 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 dependencies.isInTryStmt = false;
             }
 
+            // Search for literal Regex (or Regex Object constructor).
+            // then we use the safe-regex package to detect whether or not regex is safe!
             if (helpers.isLiteralRegex(node)) {
                 if (!safeRegex(node.regex.pattern)) {
-                    warnings.push(warn("unsafe-regex", node.loc));
+                    warnings.push(generateWarning("unsafe-regex", node.loc));
                 }
             }
             else if (helpers.isRegexConstructor(node)) {
@@ -66,10 +54,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 const pattern = helpers.isLiteralRegex(arg) ? arg.regex.pattern : arg.value;
 
                 if (!safeRegex(pattern)) {
-                    warnings.push(warn("unsafe-regex", node.loc));
+                    warnings.push(generateWarning("unsafe-regex", node.loc));
                 }
             }
 
+            // In case we are matching a Variable, save it in identifiers
+            // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
                 identifiers.set(node.id.name, node.init.value);
             }
@@ -81,7 +71,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         dependencies.add(identifiers.get(arg.name));
                     }
                     else {
-                        warnings.push(warn("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", node.loc));
                     }
                 }
                 else if (arg.type === "Literal") {
@@ -90,7 +80,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 else if (arg.type === "ArrayExpression") {
                     const value = helpers.arrExprToString(arg.elements, identifiers);
                     if (value.trim() === "") {
-                        warnings.push(warn("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", node.loc));
                     }
                     else {
                         dependencies.add(value);
@@ -99,16 +89,17 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 else if (arg.type === "BinaryExpression" && arg.operator === "+") {
                     const value = helpers.concatBinaryExpr(arg, identifiers);
                     if (value === null) {
-                        warnings.push(warn("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", node.loc));
                     }
                     else {
                         dependencies.add(value);
                     }
                 }
                 else {
-                    warnings.push(warn("unsafe-import", node.loc));
+                    warnings.push(generateWarning("unsafe-import", node.loc));
                 }
             }
+            // if we are dealing with an ESM import declaration (easier than require ^^)
             else if (module && node.type === "ImportDeclaration") {
                 const source = node.source;
 
@@ -116,8 +107,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                     dependencies.add(source.value);
                 }
             }
+            // searching for "process.mainModule" pattern (kMainModuleStr)
             else if (node.type === "MemberExpression") {
+                // retrieve the member name, like: foo.bar.hello
+                // in our case we are searching for process.mainModule.*
                 const memberName = helpers.getMemberExprName(node);
+
                 if (memberName.startsWith(kMainModuleStr)) {
                     dependencies.add(memberName.slice(kMainModuleStr.length));
                 }
@@ -132,4 +127,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     };
 }
 
-module.exports = { searchRuntimeDependencies };
+module.exports = {
+    searchRuntimeDependencies,
+    generateWarning
+};
