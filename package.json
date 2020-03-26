@@ -1,0 +1,57 @@
+{
+  "name": "js-x-ray",
+  "version": "1.0.0",
+  "description": "JavaScript AST XRay analysis",
+  "main": "index.js",
+  "engines": {
+    "node": ">=12.12.0"
+  },
+  "scripts": {
+    "eslint": "eslint src test",
+    "eslint-fix": "npm run eslint -- --fix",
+    "prepublishOnly": "pkg-ok",
+    "test": "npm run test-only && npm run eslint",
+    "test-only": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fraxken/js-x-ray.git"
+  },
+  "keywords": [],
+  "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fraxken/js-x-ray/issues"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ],
+    "collectCoverageFrom": [
+      "index.js",
+      "**/src/**/*.js"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/test/fixtures/"
+    ]
+  },
+  "homepage": "https://github.com/fraxken/js-x-ray#readme",
+  "dependencies": {
+    "estree-walker": "^2.0.1",
+    "meriyah": "^1.9.9",
+    "safe-regex": "^2.1.1"
+  },
+  "devDependencies": {
+    "@slimio/eslint-config": "^4.0.0",
+    "@slimio/is": "^1.5.1",
+    "@types/node": "^12.12.31",
+    "eslint": "^6.8.0",
+    "jest": "^25.2.3",
+    "pkg-ok": "^2.3.1"
+  }
+}
