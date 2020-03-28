@@ -34,3 +34,16 @@ test("delete values from ASTDeps instance", () => {
     deps.removeByName("boo");
     expect(deps.size).toStrictEqual(0);
 });
+
+test("isIntryStmt must be a boolean!", () => {
+    expect.assertions(2);
+    const deps = new ASTDeps();
+
+    try {
+        deps.isInTryStmt = 1;
+    }
+    catch (error) {
+        expect(error.name).toStrictEqual("TypeError");
+        expect(error.message).toStrictEqual("value must be a boolean!");
+    }
+});

@@ -13,6 +13,7 @@ const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
 // Payloads
 const trycatch = readFileSync(join(FIXTURE_PATH, "try-catch.js"), "utf-8");
 const esm = readFileSync(join(FIXTURE_PATH, "esm.js"), "utf-8");
+const unsafeRegex = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
 
 test("should return runtime dependencies for one.js", () => {
     const { dependencies, warnings } = searchRuntimeDependencies(`
@@ -78,6 +79,15 @@ test("should support runtime analysis of ESM and return http", () => {
     expect(warnings.length).toStrictEqual(0);
     expect([...dependencies]).toStrictEqual(["http"]);
 });
+
+test("should detect two unsafe regex", () => {
+    const { warnings } = searchRuntimeDependencies(unsafeRegex, { module: false });
+
+    expect(warnings.length).toStrictEqual(2);
+    expect(warnings[0].kind === "unsafe-regex").toBe(true);
+    expect(warnings[1].kind === "unsafe-regex").toBe(true);
+});
+
 
 test("should detect that http is under a TryStatement", () => {
     const { dependencies: deps } = searchRuntimeDependencies(trycatch);

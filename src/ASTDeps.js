@@ -27,10 +27,14 @@ class ASTDeps {
         }
     }
 
-    add(depName) {
-        this.dependencies[depName] = {
+    add(depName, loc = null) {
+        const dep = {
             inTry: this.isInTryStmt
         };
+        if (loc !== null) {
+            dep.loc = loc;
+        }
+        this.dependencies[depName] = dep;
     }
 
     get size() {

@@ -12,8 +12,16 @@ const ASTDeps = require("./src/ASTDeps");
 // CONSTANTS
 const kMainModuleStr = "process.mainModule.";
 
-function generateWarning(kind = "unsafe-import", { start, end = start }) {
-    return { kind, start, end };
+function generateWarning(kind = "unsafe-import", options) {
+    const { location, file = null, value = null } = options;
+    const { start, end = start } = location;
+
+    const result = { kind, file, start, end };
+    if (value !== null) {
+        result.value = value;
+    }
+
+    return result;
 }
 
 function searchRuntimeDependencies(str, options = Object.create(null)) {
@@ -44,17 +52,15 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
 
             // Search for literal Regex (or Regex Object constructor).
             // then we use the safe-regex package to detect whether or not regex is safe!
-            if (helpers.isLiteralRegex(node)) {
-                if (!safeRegex(node.regex.pattern)) {
-                    warnings.push(generateWarning("unsafe-regex", node.loc));
-                }
+            if (helpers.isLiteralRegex(node) && !safeRegex(node.regex.pattern)) {
+                warnings.push(generateWarning("unsafe-regex", { location: node.loc, value: node.regex.pattern }));
             }
             else if (helpers.isRegexConstructor(node)) {
                 const arg = node.arguments[0];
                 const pattern = helpers.isLiteralRegex(arg) ? arg.regex.pattern : arg.value;
 
                 if (!safeRegex(pattern)) {
-                    warnings.push(generateWarning("unsafe-regex", node.loc));
+                    warnings.push(generateWarning("unsafe-regex", { location: node.loc, value: pattern }));
                 }
             }
 
@@ -68,44 +74,40 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 const arg = node.arguments[0];
                 if (arg.type === "Identifier") {
                     if (identifiers.has(arg.name)) {
-                        dependencies.add(identifiers.get(arg.name));
+                        dependencies.add(identifiers.get(arg.name), { location: node.loc });
                     }
                     else {
-                        warnings.push(generateWarning("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                 }
                 else if (arg.type === "Literal") {
-                    dependencies.add(arg.value);
+                    dependencies.add(arg.value, { location: node.loc });
                 }
                 else if (arg.type === "ArrayExpression") {
                     const value = helpers.arrExprToString(arg.elements, identifiers);
                     if (value.trim() === "") {
-                        warnings.push(generateWarning("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
-                        dependencies.add(value);
+                        dependencies.add(value, { location: node.loc });
                     }
                 }
                 else if (arg.type === "BinaryExpression" && arg.operator === "+") {
                     const value = helpers.concatBinaryExpr(arg, identifiers);
                     if (value === null) {
-                        warnings.push(generateWarning("unsafe-import", node.loc));
+                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
-                        dependencies.add(value);
+                        dependencies.add(value, { location: node.loc });
                     }
                 }
                 else {
-                    warnings.push(generateWarning("unsafe-import", node.loc));
+                    warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                 }
             }
             // if we are dealing with an ESM import declaration (easier than require ^^)
-            else if (module && node.type === "ImportDeclaration") {
-                const source = node.source;
-
-                if (source.type === "Literal") {
-                    dependencies.add(source.value);
-                }
+            else if (module && node.type === "ImportDeclaration" && node.source.type === "Literal") {
+                dependencies.add(node.source.value, { location: node.loc });
             }
             // searching for "process.mainModule" pattern (kMainModuleStr)
             else if (node.type === "MemberExpression") {
@@ -114,7 +116,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 const memberName = helpers.getMemberExprName(node);
 
                 if (memberName.startsWith(kMainModuleStr)) {
-                    dependencies.add(memberName.slice(kMainModuleStr.length));
+                    dependencies.add(memberName.slice(kMainModuleStr.length), { location: node.loc });
                 }
             }
         }
