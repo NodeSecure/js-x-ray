@@ -74,14 +74,14 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 const arg = node.arguments[0];
                 if (arg.type === "Identifier") {
                     if (identifiers.has(arg.name)) {
-                        dependencies.add(identifiers.get(arg.name), { location: node.loc });
+                        dependencies.add(identifiers.get(arg.name), node.loc);
                     }
                     else {
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                 }
                 else if (arg.type === "Literal") {
-                    dependencies.add(arg.value, { location: node.loc });
+                    dependencies.add(arg.value, node.loc);
                 }
                 else if (arg.type === "ArrayExpression") {
                     const value = helpers.arrExprToString(arg.elements, identifiers);
@@ -89,7 +89,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
-                        dependencies.add(value, { location: node.loc });
+                        dependencies.add(value, node.loc);
                     }
                 }
                 else if (arg.type === "BinaryExpression" && arg.operator === "+") {
@@ -98,7 +98,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
-                        dependencies.add(value, { location: node.loc });
+                        dependencies.add(value, node.loc);
                     }
                 }
                 else {
@@ -107,7 +107,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
             }
             // if we are dealing with an ESM import declaration (easier than require ^^)
             else if (module && node.type === "ImportDeclaration" && node.source.type === "Literal") {
-                dependencies.add(node.source.value, { location: node.loc });
+                dependencies.add(node.source.value, node.loc);
             }
             // searching for "process.mainModule" pattern (kMainModuleStr)
             else if (node.type === "MemberExpression") {
@@ -116,7 +116,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 const memberName = helpers.getMemberExprName(node);
 
                 if (memberName.startsWith(kMainModuleStr)) {
-                    dependencies.add(memberName.slice(kMainModuleStr.length), { location: node.loc });
+                    dependencies.add(memberName.slice(kMainModuleStr.length), node.loc);
                 }
             }
         }

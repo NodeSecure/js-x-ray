@@ -27,12 +27,12 @@ class ASTDeps {
         }
     }
 
-    add(depName, loc = null) {
+    add(depName, location = null) {
         const dep = {
             inTry: this.isInTryStmt
         };
-        if (loc !== null) {
-            dep.loc = loc;
+        if (location !== null) {
+            dep.location = location;
         }
         this.dependencies[depName] = dep;
     }
