@@ -24,11 +24,36 @@ function generateWarning(kind = "unsafe-import", options) {
     return result;
 }
 
+function walkCallExpression(nodeToWalk) {
+    const dependencies = new Set();
+
+    walk(nodeToWalk, {
+        enter(node) {
+            if (node.type !== "CallExpression") {
+                return;
+            }
+
+            switch (helpers.getMemberExprName(node.callee)) {
+                case "Buffer.from": {
+                    const depName = helpers.arrExprToString(node.arguments[0]);
+                    if (depName.trim() !== "") {
+                        dependencies.add(depName);
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    return [...dependencies];
+}
+
 function searchRuntimeDependencies(str, options = Object.create(null)) {
     const { module = false } = options;
 
     // Function variables
     const identifiers = new Map();
+    const identifiersLength = new Set();
     const dependencies = new ASTDeps();
     const warnings = [];
 
@@ -67,7 +92,18 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
             // In case we are matching a Variable, save it in identifiers
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
-                identifiers.set(node.id.name, node.init.value);
+                if (node.init.type === "Literal") {
+                    identifiersLength.add(node.id.name.length);
+                    identifiers.set(node.id.name, node.init.value);
+                }
+                else if (node.init.type === "Identifier" && (node.init.name === "require" || node.init.name === "process")) {
+                    warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                }
+            }
+
+            // Add the identifier length of functions!
+            else if (helpers.isFunctionDeclarator(node)) {
+                identifiersLength.add(node.id.name.length);
             }
 
             if (!module && (helpers.isRequireStatment(node) || helpers.isRequireResolve(node))) {
@@ -101,6 +137,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                     }
                 }
+                else if (arg.type === "CallExpression") {
+                    walkCallExpression(arg.callee)
+                        .forEach((depName) => dependencies.add(depName, node.loc));
+
+                    warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                }
                 else {
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                 }
@@ -122,9 +164,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
         }
     });
 
+    const idsLengthAvg = ([...identifiersLength].reduce((prev, curr) => prev + curr, 0) / identifiersLength.size);
+
     return {
         dependencies,
         warnings,
+        idsLengthAvg,
         isOneLineRequire: !module && body.length === 1 && dependencies.size === 1
     };
 }

@@ -18,16 +18,16 @@
     "url": "git+https://github.com/fraxken/js-x-ray.git"
   },
   "keywords": [
-      "ast",
-      "nsecure",
-      "nodesecure",
-      "analysis",
-      "dependencies",
-      "security"
+    "ast",
+    "nsecure",
+    "nodesecure",
+    "analysis",
+    "dependencies",
+    "security"
   ],
   "files": [
-      "src",
-      "index.d.ts"
+    "src",
+    "index.d.ts"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
@@ -62,6 +62,7 @@
     "@slimio/is": "^1.5.1",
     "@types/node": "^12.12.31",
     "eslint": "^6.8.0",
+    "is-minified-code": "^2.0.0",
     "jest": "^25.2.3",
     "pkg-ok": "^2.3.1"
   }

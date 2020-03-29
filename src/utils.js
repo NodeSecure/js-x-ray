@@ -30,7 +30,16 @@ function isLiteralRegex(node) {
 function isVariableDeclarator(node) {
     if (node.type !== "VariableDeclarator" ||
         node.init === null ||
-        node.init.type !== "Literal" ||
+        node.id.type !== "Identifier") {
+        return false;
+    }
+
+    return true;
+}
+
+function isFunctionDeclarator(node) {
+    if (node.type !== "FunctionDeclaration" ||
+        node.id === null ||
         node.id.type !== "Identifier") {
         return false;
     }
@@ -40,8 +49,10 @@ function isVariableDeclarator(node) {
 
 function arrExprToString(elements, identifiers = null) {
     let ret = "";
+    const isArrayExpr = typeof elements === "object" && Reflect.has(elements, "elements");
+    const localElements = isArrayExpr ? elements.elements : elements;
 
-    for (const row of elements) {
+    for (const row of localElements) {
         if (row.type === "Literal") {
             const value = Number(row.value);
             ret += Number.isNaN(value) ? row.value : String.fromCharCode(value);
@@ -120,6 +131,7 @@ module.exports = {
     isRequireResolve,
     isRequireStatment,
     isLiteralRegex,
+    isFunctionDeclarator,
     isRegexConstructor,
     isVariableDeclarator,
     concatBinaryExpr,
