@@ -53,6 +53,7 @@
   },
   "homepage": "https://github.com/fraxken/js-x-ray#readme",
   "dependencies": {
+    "builtins": "^3.0.1",
     "estree-walker": "^2.0.1",
     "meriyah": "^1.9.9",
     "safe-regex": "^2.1.1"

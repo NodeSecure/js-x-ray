@@ -24,17 +24,20 @@ declare namespace JSXRay {
         value?: string | null
     }
 
-    interface Warning {
+    interface BaseWarning {
         file: string | null;
-        kind: "unsafe-import" | "unsafe-regex" | "ast-error";
-        value?: string;
+        kind: "unsafe-import" | "unsafe-regex" | "ast-error" | "hexa-value" | "short-ids";
+        value: string;
         start: { line: number; column: number };
         end: { line: number; column: number };
     }
 
+    type Warning<T extends BaseWarning> = T extends { kind: "ast-error" | "hexa-value" | "unsafe-regex" } ? T : Omit<T, "value">;
+
     interface Report {
         dependencies: ASTDeps;
         warnings: Warning[];
+        idsLengthAvg: number;
         isOneLineRequire: boolean;
     }
 

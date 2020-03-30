@@ -4,6 +4,7 @@
 const { walk } = require("estree-walker");
 const meriyah = require("meriyah");
 const safeRegex = require("safe-regex");
+const builtins = require("builtins");
 
 // Require Internal Dependencies
 const helpers = require("./src/utils");
@@ -11,6 +12,7 @@ const ASTDeps = require("./src/ASTDeps");
 
 // CONSTANTS
 const kMainModuleStr = "process.mainModule.";
+const kNodeDeps = new Set(builtins());
 
 function generateWarning(kind = "unsafe-import", options) {
     const { location, file = null, value = null } = options;
@@ -67,6 +69,20 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
         enter(node) {
+            // Check all literal values
+            if (node.type === "Literal") {
+                if (/^[0-9A-Fa-f]{4,}$/g.test(node.value) && typeof node.value === "string") {
+                    const value = Buffer.from(node.value, "hex").toString();
+                    if (kNodeDeps.has(value)) {
+                        dependencies.add(value, node.loc);
+                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                    }
+                    else {
+                        warnings.push(generateWarning("hexa-value", { location: node.loc, value }));
+                    }
+                }
+            }
+
             // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
             if (node.type === "TryStatement") {
                 dependencies.isInTryStmt = true;
@@ -98,6 +114,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 }
                 else if (node.init.type === "Identifier" && (node.init.name === "require" || node.init.name === "process")) {
                     warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                }
+                else if (node.init.type === "MemberExpression") {
+                    const [value] = helpers.getMemberExprName(node.init).split(".", 1);
+                    if (value === "require" || value === "process") {
+                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
+                    }
                 }
             }
 
@@ -165,6 +187,9 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     });
 
     const idsLengthAvg = ([...identifiersLength].reduce((prev, curr) => prev + curr, 0) / identifiersLength.size);
+    if (idsLengthAvg <= 2) {
+        warnings.push(generateWarning("short-ids", { location: { start: { line: 0, column: 0 } } }));
+    }
 
     return {
         dependencies,
