@@ -37,9 +37,17 @@ function walkCallExpression(nodeToWalk) {
 
             switch (helpers.getMemberExprName(node.callee)) {
                 case "Buffer.from": {
-                    const depName = helpers.arrExprToString(node.arguments[0]);
-                    if (depName.trim() !== "") {
-                        dependencies.add(depName);
+                    const [element, convert] = node.arguments;
+
+                    if (element.type === "ArrayExpression") {
+                        const depName = helpers.arrExprToString(node.arguments[0]);
+                        if (depName.trim() !== "") {
+                            dependencies.add(depName);
+                        }
+                    }
+                    else if (element.type === "Literal" && convert.type === "Literal" && convert.value === "hex") {
+                        const value = Buffer.from(element.value, "hex").toString();
+                        dependencies.add(value);
                     }
                     break;
                 }
@@ -164,6 +172,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         .forEach((depName) => dependencies.add(depName, node.loc));
 
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                    this.skip();
                 }
                 else {
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
