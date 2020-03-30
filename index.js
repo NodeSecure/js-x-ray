@@ -196,8 +196,8 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     });
 
     const idsLengthAvg = ([...identifiersLength].reduce((prev, curr) => prev + curr, 0) / identifiersLength.size);
-    if (idsLengthAvg <= 2) {
-        warnings.push(generateWarning("short-ids", { location: { start: { line: 0, column: 0 } } }));
+    if (idsLengthAvg <= 1) {
+        warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: { start: { line: 0, column: 0 } } }));
     }
 
     return {
