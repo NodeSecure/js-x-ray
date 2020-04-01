@@ -59,11 +59,12 @@ function walkCallExpression(nodeToWalk) {
 }
 
 function searchRuntimeDependencies(str, options = Object.create(null)) {
-    const { module = false } = options;
+    const { module = false, isMinified = false } = options;
 
     // Function variables
     const identifiers = new Map();
-    const identifiersLength = new Set();
+    const identifiersLength = [];
+    const suspectScores = [];
     const dependencies = new ASTDeps();
     const warnings = [];
 
@@ -79,7 +80,15 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
         enter(node) {
             // Check all literal values
             if (node.type === "Literal") {
-                if (/^[0-9A-Fa-f]{4,}$/g.test(node.value) && typeof node.value === "string") {
+                const valueType = typeof node.value === "string";
+                if (valueType === "string") {
+                    const score = helpers.strSuspectScore(node.value);
+                    if (score !== 0) {
+                        suspectScores.push(score);
+                    }
+                }
+
+                if (/^[0-9A-Fa-f]{4,}$/g.test(node.value) && valueType === "string") {
                     const value = Buffer.from(node.value, "hex").toString();
                     if (kNodeDeps.has(value)) {
                         dependencies.add(value, node.loc);
@@ -116,16 +125,16 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
             // In case we are matching a Variable, save it in identifiers
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
+                identifiersLength.push(node.id.name.length);
                 if (node.init.type === "Literal") {
-                    identifiersLength.add(node.id.name.length);
                     identifiers.set(node.id.name, node.init.value);
                 }
-                else if (node.init.type === "Identifier" && (node.init.name === "require" || node.init.name === "process")) {
+                else if (node.init.type === "Identifier" && node.init.name === "require") {
                     warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
                 }
                 else if (node.init.type === "MemberExpression") {
-                    const [value] = helpers.getMemberExprName(node.init).split(".", 1);
-                    if (value === "require" || value === "process") {
+                    const value = helpers.getMemberExprName(node.init);
+                    if (value.startsWith("require") || value.startsWith("process.mainModule")) {
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
                 }
@@ -133,7 +142,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
 
             // Add the identifier length of functions!
             else if (helpers.isFunctionDeclarator(node)) {
-                identifiersLength.add(node.id.name.length);
+                identifiersLength.push(node.id.name.length);
             }
 
             if (!module && (helpers.isRequireStatment(node) || helpers.isRequireResolve(node))) {
@@ -195,15 +204,21 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
         }
     });
 
-    const idsLengthAvg = ([...identifiersLength].reduce((prev, curr) => prev + curr, 0) / identifiersLength.size);
-    if (idsLengthAvg <= 1) {
+    const idsLengthAvg = (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
+    const stringScore = (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
+    if (!isMinified && idsLengthAvg <= 1.5) {
         warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: { start: { line: 0, column: 0 } } }));
+    }
+
+    if (stringScore >= 4) {
+        warnings.push(generateWarning("suspicious-string", { value: stringScore, location: { start: { line: 0, column: 0 } } }));
     }
 
     return {
         dependencies,
         warnings,
         idsLengthAvg,
+        stringScore,
         isOneLineRequire: !module && body.length === 1 && dependencies.size === 1
     };
 }

@@ -16,6 +16,7 @@ declare class ASTDeps {
 declare namespace JSXRay {
     interface RuntimeOptions {
         module?: boolean;
+        isMinified?: boolean;
     }
 
     interface WarningOptions {
@@ -24,20 +25,22 @@ declare namespace JSXRay {
         value?: string | null
     }
 
+    type kindWithValue = "ast-error" | "hexa-value" | "unsafe-regex" | "short-ids" | "suspicious-string";
     interface BaseWarning {
         file: string | null;
-        kind: "unsafe-import" | "unsafe-regex" | "ast-error" | "hexa-value" | "short-ids";
+        kind: "unsafe-import" | kindWithValue;
         value: string;
         start: { line: number; column: number };
         end: { line: number; column: number };
     }
 
-    type Warning<T extends BaseWarning> = T extends { kind: "ast-error" | "hexa-value" | "unsafe-regex" } ? T : Omit<T, "value">;
+    type Warning<T extends BaseWarning> = T extends { kind: kindWithValue } ? T : Omit<T, "value">;
 
     interface Report {
         dependencies: ASTDeps;
         warnings: Warning[];
         idsLengthAvg: number;
+        stringScore: number;
         isOneLineRequire: boolean;
     }
 

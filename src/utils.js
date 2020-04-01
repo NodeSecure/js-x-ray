@@ -127,7 +127,28 @@ function getMemberExprName(node) {
     return name;
 }
 
+function strCharDiversity(str) {
+    return new Set([...str]).size;
+}
+
+function strSuspectScore(str) {
+    if (str.length < 45) {
+        return 0;
+    }
+
+    const includeSpace = str.includes(" ");
+    const includeSpaceAtStart = includeSpace ? str.slice(0, 45).includes(" ") : false;
+    let suspectScore = includeSpaceAtStart ? 0 : 1;
+    if (str.length > 200) {
+        suspectScore += 1;
+    }
+
+    return strCharDiversity(str) >= 70 ? suspectScore + 2 : suspectScore;
+}
+
 module.exports = {
+    strCharDiversity,
+    strSuspectScore,
     isRequireResolve,
     isRequireStatment,
     isLiteralRegex,
