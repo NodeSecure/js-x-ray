@@ -79,16 +79,8 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     walk(body, {
         enter(node) {
             // Check all literal values
-            if (node.type === "Literal") {
-                const valueType = typeof node.value === "string";
-                if (valueType === "string") {
-                    const score = helpers.strSuspectScore(node.value);
-                    if (score !== 0) {
-                        suspectScores.push(score);
-                    }
-                }
-
-                if (/^[0-9A-Fa-f]{4,}$/g.test(node.value) && valueType === "string") {
+            if (node.type === "Literal" && typeof node.value === "string") {
+                if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
                     const value = Buffer.from(node.value, "hex").toString();
                     if (kNodeDeps.has(value)) {
                         dependencies.add(value, node.loc);
@@ -96,6 +88,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                     }
                     else {
                         warnings.push(generateWarning("hexa-value", { location: node.loc, value }));
+                    }
+                }
+                else {
+                    const score = helpers.strSuspectScore(node.value);
+                    if (score !== 0) {
+                        suspectScores.push(score);
                     }
                 }
             }
@@ -113,7 +111,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
             if (helpers.isLiteralRegex(node) && !safeRegex(node.regex.pattern)) {
                 warnings.push(generateWarning("unsafe-regex", { location: node.loc, value: node.regex.pattern }));
             }
-            else if (helpers.isRegexConstructor(node)) {
+            else if (helpers.isRegexConstructor(node) && node.arguments.length > 0) {
                 const arg = node.arguments[0];
                 const pattern = helpers.isLiteralRegex(arg) ? arg.regex.pattern : arg.value;
 
@@ -205,12 +203,13 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     });
 
     const idsLengthAvg = (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
-    const stringScore = (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
+    const stringScore = suspectScores.length === 0 ?
+        0 : (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
     if (!isMinified && idsLengthAvg <= 1.5) {
         warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: { start: { line: 0, column: 0 } } }));
     }
 
-    if (stringScore >= 4) {
+    if (stringScore >= 3) {
         warnings.push(generateWarning("suspicious-string", { value: stringScore, location: { start: { line: 0, column: 0 } } }));
     }
 
