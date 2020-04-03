@@ -11,10 +11,6 @@ function isRequireResolve(node) {
     return node.callee.object.name === "require" && node.callee.property.name === "resolve";
 }
 
-function isRequireStatment(node) {
-    return node.type === "CallExpression" && node.callee.name === "require";
-}
-
 function isRegexConstructor(node) {
     if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
         return false;
@@ -54,13 +50,15 @@ function arrExprToString(elements, identifiers = null) {
 
     for (const row of localElements) {
         if (row.type === "Literal") {
+            if (row.value === "") {
+                continue;
+            }
+
             const value = Number(row.value);
             ret += Number.isNaN(value) ? row.value : String.fromCharCode(value);
         }
-        else if (row.type === "Identifier" && identifiers !== null) {
-            if (identifiers.has(row.name)) {
-                ret += identifiers.get(row.name);
-            }
+        else if (row.type === "Identifier" && identifiers !== null && identifiers.has(row.name)) {
+            ret += identifiers.get(row.name);
         }
     }
 
@@ -140,7 +138,7 @@ function strSuspectScore(str) {
     const includeSpaceAtStart = includeSpace ? str.slice(0, 45).includes(" ") : false;
     let suspectScore = includeSpaceAtStart ? 0 : 1;
     if (str.length > 200) {
-        suspectScore += 1;
+        suspectScore += Math.floor(str.length / 750);
     }
 
     return strCharDiversity(str) >= 70 ? suspectScore + 2 : suspectScore;
@@ -150,7 +148,6 @@ module.exports = {
     strCharDiversity,
     strSuspectScore,
     isRequireResolve,
-    isRequireStatment,
     isLiteralRegex,
     isFunctionDeclarator,
     isRegexConstructor,

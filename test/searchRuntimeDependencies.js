@@ -14,6 +14,7 @@ const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
 const trycatch = readFileSync(join(FIXTURE_PATH, "try-catch.js"), "utf-8");
 const esm = readFileSync(join(FIXTURE_PATH, "esm.js"), "utf-8");
 const unsafeRegex = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
+const suspectString = readFileSync(join(FIXTURE_PATH, "suspect-string.js"), "utf-8");
 
 test("should return runtime dependencies for one.js", () => {
     const { dependencies, warnings } = searchRuntimeDependencies(`
@@ -58,6 +59,68 @@ test("should return isSuspect = true for three.js", () => {
     expect([...dependencies]).toStrictEqual([]);
 });
 
+test("should parse hexa value", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        const boo = "796f6f6f6c6f";
+        const foo = "68747470";
+    `);
+
+    expect(warnings.length).toStrictEqual(2);
+    expect([...dependencies]).toStrictEqual(["http"]);
+});
+
+test("should parse the Buffer.from call with an Array Expr", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        const px = require.resolve(
+            Buffer.from([100, 108, 45, 116, 97, 114]).toString()
+        );
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect([...dependencies]).toStrictEqual(["dl-tar"]);
+});
+
+test("should parse the Buffer.from call with an hexa value", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        const px = require.resolve(
+            Buffer.from("646c2d746172", "hex").toString()
+        );
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect([...dependencies]).toStrictEqual(["dl-tar"]);
+});
+
+test("should return an unsafe assign for a memberExpr", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        const r = require.resolve;
+        r("http");
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect([...dependencies]).toStrictEqual(["http"]);
+});
+
+test("should succesfully follow the require stmt", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        const r = require;
+        const b = r;
+        b("http");
+    `);
+
+    expect(warnings.length).toStrictEqual(2);
+    expect([...dependencies]).toStrictEqual(["http"]);
+});
+
+test("should succesfully follow the require stmt", () => {
+    const { dependencies, warnings } = searchRuntimeDependencies(`
+        require(["", ""]);
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect([...dependencies]).toStrictEqual([]);
+});
+
 test("should return runtime dependencies for five.js", () => {
     const { dependencies, warnings } = searchRuntimeDependencies(`
     const foo = "bar";
@@ -71,6 +134,13 @@ test("should return runtime dependencies for five.js", () => {
 
     expect(warnings.length).toStrictEqual(0);
     expect([...dependencies]).toStrictEqual(["http", "net-tcp", "barworld", "hello", "util"]);
+});
+
+test("should support runtime analysis of ESM and return http", () => {
+    const { warnings, stringScore } = searchRuntimeDependencies(suspectString);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect(stringScore).toStrictEqual(7);
 });
 
 test("should support runtime analysis of ESM and return http", () => {

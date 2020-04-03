@@ -67,6 +67,11 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     const suspectScores = [];
     const dependencies = new ASTDeps();
     const warnings = [];
+    const requireIdentifiers = new Set(["require"]);
+    function isRequireIdentifiers(node) {
+        return node.type === "CallExpression" && requireIdentifiers.has(node.callee.name);
+    }
+
 
     // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
     // Example: #!/usr/bin/env node
@@ -127,12 +132,14 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 if (node.init.type === "Literal") {
                     identifiers.set(node.id.name, node.init.value);
                 }
-                else if (node.init.type === "Identifier" && node.init.name === "require") {
+                else if (node.init.type === "Identifier" && requireIdentifiers.has(node.init.name)) {
+                    requireIdentifiers.add(node.id.name);
                     warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
                 }
                 else if (node.init.type === "MemberExpression") {
                     const value = helpers.getMemberExprName(node.init);
                     if (value.startsWith("require") || value.startsWith("process.mainModule")) {
+                        requireIdentifiers.add(node.id.name);
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
                 }
@@ -143,22 +150,17 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 identifiersLength.push(node.id.name.length);
             }
 
-            if (!module && (helpers.isRequireStatment(node) || helpers.isRequireResolve(node))) {
+            if (!module && (isRequireIdentifiers(node) || helpers.isRequireResolve(node))) {
                 const arg = node.arguments[0];
                 if (arg.type === "Identifier") {
-                    if (identifiers.has(arg.name)) {
-                        dependencies.add(identifiers.get(arg.name), node.loc);
-                    }
-                    else {
-                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
-                    }
+                    dependencies.add(identifiers.get(arg.name), node.loc);
                 }
                 else if (arg.type === "Literal") {
                     dependencies.add(arg.value, node.loc);
                 }
                 else if (arg.type === "ArrayExpression") {
-                    const value = helpers.arrExprToString(arg.elements, identifiers);
-                    if (value.trim() === "") {
+                    const value = helpers.arrExprToString(arg.elements, identifiers).trim();
+                    if (value === "") {
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
@@ -205,7 +207,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     const idsLengthAvg = (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
     const stringScore = suspectScores.length === 0 ?
         0 : (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
-    if (!isMinified && idsLengthAvg <= 1.5) {
+    if (!isMinified && identifiersLength.length > 5 && idsLengthAvg <= 1.5) {
         warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: { start: { line: 0, column: 0 } } }));
     }
 
