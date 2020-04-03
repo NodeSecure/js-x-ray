@@ -5,7 +5,7 @@ const { readFileSync } = require("fs");
 const { join } = require("path");
 
 // Require Internal Dependencies
-const { searchRuntimeDependencies } = require("..");
+const { runASTAnalysis } = require("..");
 
 // CONSTANTS
 const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
@@ -17,7 +17,7 @@ const unsafeRegex = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8")
 const suspectString = readFileSync(join(FIXTURE_PATH, "suspect-string.js"), "utf-8");
 
 test("should return runtime dependencies for one.js", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
     const http = require("http");
     const net = require("net");
     const fs = require("fs").promises;
@@ -36,7 +36,7 @@ test("should return runtime dependencies for one.js", () => {
 });
 
 test("should return runtime dependencies for two.js", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`const myVar = "ht";
+    const { dependencies, warnings } = runASTAnalysis(`const myVar = "ht";
     require(myVar + "tp");
     require("eve" + "nt" + "s");
     `);
@@ -46,7 +46,7 @@ test("should return runtime dependencies for two.js", () => {
 });
 
 test("should return isSuspect = true for three.js", () => {
-    const { dependencies, warnings, isOneLineRequire } = searchRuntimeDependencies(`
+    const { dependencies, warnings, isOneLineRequire } = runASTAnalysis(`
         function evil() {
             return "http";
         }
@@ -60,7 +60,7 @@ test("should return isSuspect = true for three.js", () => {
 });
 
 test("should parse hexa value", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         const boo = "796f6f6f6c6f";
         const foo = "68747470";
     `);
@@ -70,7 +70,7 @@ test("should parse hexa value", () => {
 });
 
 test("should parse the Buffer.from call with an Array Expr", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         const px = require.resolve(
             Buffer.from([100, 108, 45, 116, 97, 114]).toString()
         );
@@ -81,7 +81,7 @@ test("should parse the Buffer.from call with an Array Expr", () => {
 });
 
 test("should parse the Buffer.from call with an hexa value", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         const px = require.resolve(
             Buffer.from("646c2d746172", "hex").toString()
         );
@@ -92,7 +92,7 @@ test("should parse the Buffer.from call with an hexa value", () => {
 });
 
 test("should return an unsafe assign for a memberExpr", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         const r = require.resolve;
         r("http");
     `);
@@ -102,7 +102,7 @@ test("should return an unsafe assign for a memberExpr", () => {
 });
 
 test("should succesfully follow the require stmt", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         const r = require;
         const b = r;
         b("http");
@@ -113,7 +113,7 @@ test("should succesfully follow the require stmt", () => {
 });
 
 test("should succesfully follow the require stmt", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
         require(["", ""]);
     `);
 
@@ -122,7 +122,7 @@ test("should succesfully follow the require stmt", () => {
 });
 
 test("should return runtime dependencies for five.js", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(`
+    const { dependencies, warnings } = runASTAnalysis(`
     const foo = "bar";
 
     require.resolve("http");
@@ -137,21 +137,21 @@ test("should return runtime dependencies for five.js", () => {
 });
 
 test("should support runtime analysis of ESM and return http", () => {
-    const { warnings, stringScore } = searchRuntimeDependencies(suspectString);
+    const { warnings, stringScore } = runASTAnalysis(suspectString);
 
     expect(warnings.length).toStrictEqual(1);
     expect(stringScore).toStrictEqual(7);
 });
 
 test("should support runtime analysis of ESM and return http", () => {
-    const { dependencies, warnings } = searchRuntimeDependencies(esm, { module: true });
+    const { dependencies, warnings } = runASTAnalysis(esm, { module: true });
 
     expect(warnings.length).toStrictEqual(0);
     expect([...dependencies]).toStrictEqual(["http"]);
 });
 
 test("should detect two unsafe regex", () => {
-    const { warnings } = searchRuntimeDependencies(unsafeRegex, { module: false });
+    const { warnings } = runASTAnalysis(unsafeRegex, { module: false });
 
     expect(warnings.length).toStrictEqual(2);
     expect(warnings[0].kind === "unsafe-regex").toBe(true);
@@ -160,14 +160,14 @@ test("should detect two unsafe regex", () => {
 
 
 test("should detect that http is under a TryStatement", () => {
-    const { dependencies: deps } = searchRuntimeDependencies(trycatch);
+    const { dependencies: deps } = runASTAnalysis(trycatch);
 
     expect(Reflect.has(deps.dependencies, "http")).toStrictEqual(true);
     expect(deps.dependencies.http.inTry).toStrictEqual(true);
 });
 
 test("should return isOneLineRequire true for a one liner CJS export", () => {
-    const { dependencies, isOneLineRequire } = searchRuntimeDependencies("module.exports = require('foo');");
+    const { dependencies, isOneLineRequire } = runASTAnalysis("module.exports = require('foo');");
 
     expect(isOneLineRequire).toStrictEqual(true);
     expect([...dependencies]).toStrictEqual(["foo"]);

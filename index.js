@@ -26,6 +26,10 @@ function generateWarning(kind = "unsafe-import", options) {
     return result;
 }
 
+function rootLocation() {
+    return { start: { line: 0, column: 0 } };
+}
+
 function walkCallExpression(nodeToWalk) {
     const dependencies = new Set();
 
@@ -58,7 +62,7 @@ function walkCallExpression(nodeToWalk) {
     return [...dependencies];
 }
 
-function searchRuntimeDependencies(str, options = Object.create(null)) {
+function runASTAnalysis(str, options = Object.create(null)) {
     const { module = false, isMinified = false } = options;
 
     // Function variables
@@ -83,10 +87,14 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
         enter(node) {
-            // Check all literal values
+            // Check all 'string' Literal values
             if (node.type === "Literal" && typeof node.value === "string") {
+                // We are searching for value obfuscated as hex of a minimum lenght of 4.
                 if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
                     const value = Buffer.from(node.value, "hex").toString();
+
+                    // If the value we are retrieving is the name of a Node.js dependency,
+                    // then we add it to the dependencies list and we throw an unsafe-import at the current location.
                     if (kNodeDeps.has(value)) {
                         dependencies.add(value, node.loc);
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
@@ -95,6 +103,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         warnings.push(generateWarning("hexa-value", { location: node.loc, value }));
                     }
                 }
+                // Else we are checking all other string with our suspect method
                 else {
                     const score = helpers.strSuspectScore(node.value);
                     if (score !== 0) {
@@ -132,10 +141,13 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 if (node.init.type === "Literal") {
                     identifiers.set(node.id.name, node.init.value);
                 }
+                // Searching for someone who assign require to a variable, ex:
+                // const r = require
                 else if (node.init.type === "Identifier" && requireIdentifiers.has(node.init.name)) {
                     requireIdentifiers.add(node.id.name);
                     warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
                 }
+                // Same as before but for pattern like process.mainModule and require.resolve
                 else if (node.init.type === "MemberExpression") {
                     const value = helpers.getMemberExprName(node.init);
                     if (value.startsWith("require") || value.startsWith("process.mainModule")) {
@@ -150,14 +162,19 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                 identifiersLength.push(node.id.name.length);
             }
 
+            // Searching for all CJS require pattern (require, require.resolve).
             if (!module && (isRequireIdentifiers(node) || helpers.isRequireResolve(node))) {
                 const arg = node.arguments[0];
+
+                // const foo = "http"; require(foo);
                 if (arg.type === "Identifier") {
                     dependencies.add(identifiers.get(arg.name), node.loc);
                 }
+                // require("http")
                 else if (arg.type === "Literal") {
                     dependencies.add(arg.value, node.loc);
                 }
+                // require(["ht" + "tp"])
                 else if (arg.type === "ArrayExpression") {
                     const value = helpers.arrExprToString(arg.elements, identifiers).trim();
                     if (value === "") {
@@ -167,6 +184,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                     }
                 }
+                // require("ht" + "tp");
                 else if (arg.type === "BinaryExpression" && arg.operator === "+") {
                     const value = helpers.concatBinaryExpr(arg, identifiers);
                     if (value === null) {
@@ -176,6 +194,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                     }
                 }
+                // require(Buffer.from("...", "hex").toString());
                 else if (arg.type === "CallExpression") {
                     walkCallExpression(arg.callee)
                         .forEach((depName) => dependencies.add(depName, node.loc));
@@ -187,10 +206,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                 }
             }
+
             // if we are dealing with an ESM import declaration (easier than require ^^)
             else if (module && node.type === "ImportDeclaration" && node.source.type === "Literal") {
                 dependencies.add(node.source.value, node.loc);
             }
+
             // searching for "process.mainModule" pattern (kMainModuleStr)
             else if (node.type === "MemberExpression") {
                 // retrieve the member name, like: foo.bar.hello
@@ -207,12 +228,12 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
     const idsLengthAvg = (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
     const stringScore = suspectScores.length === 0 ?
         0 : (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
-    if (!isMinified && identifiersLength.length > 5 && idsLengthAvg <= 1.5) {
-        warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: { start: { line: 0, column: 0 } } }));
-    }
 
+    if (!isMinified && identifiersLength.length > 5 && idsLengthAvg <= 1.5) {
+        warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: rootLocation() }));
+    }
     if (stringScore >= 3) {
-        warnings.push(generateWarning("suspicious-string", { value: stringScore, location: { start: { line: 0, column: 0 } } }));
+        warnings.push(generateWarning("suspicious-string", { value: stringScore, location: rootLocation() }));
     }
 
     return {
@@ -225,6 +246,7 @@ function searchRuntimeDependencies(str, options = Object.create(null)) {
 }
 
 module.exports = {
-    searchRuntimeDependencies,
-    generateWarning
+    runASTAnalysis,
+    generateWarning,
+    rootLocation
 };
