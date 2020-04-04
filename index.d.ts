@@ -25,7 +25,7 @@ declare namespace JSXRay {
         value?: string | null
     }
 
-    type kindWithValue = "ast-error" | "hexa-value" | "unsafe-regex" | "short-ids" | "suspicious-string";
+    type kindWithValue = "ast-error" | "hexa-value" | "unsafe-regex" | "unsafe-stmt" | "short-ids" | "suspicious-string";
     interface BaseWarning {
         file: string | null;
         kind: "unsafe-import" | kindWithValue;

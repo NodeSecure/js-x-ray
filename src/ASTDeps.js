@@ -28,6 +28,9 @@ class ASTDeps {
     }
 
     add(depName, location = null) {
+        if (depName.trim() === "") {
+            return;
+        }
         const dep = {
             inTry: this.isInTryStmt
         };

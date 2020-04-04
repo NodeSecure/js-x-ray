@@ -11,8 +11,9 @@ const helpers = require("./src/utils");
 const ASTDeps = require("./src/ASTDeps");
 
 // CONSTANTS
-const kMainModuleStr = "process.mainModule.";
+const kMainModuleStr = "process.mainModule.require";
 const kNodeDeps = new Set(builtins());
+const kUnsafeCallee = new Set(["eval", "Function"]);
 
 function generateWarning(kind = "unsafe-import", options) {
     const { location, file = null, value = null } = options;
@@ -62,6 +63,21 @@ function walkCallExpression(nodeToWalk) {
     return [...dependencies];
 }
 
+function getRequirablePatterns(parts) {
+    const result = new Set();
+
+    for (const [id, path] of parts.entries()) {
+        if (path === "mainModule") {
+            result.add(`${id}.require`);
+        }
+        else if (path === "require") {
+            result.add(id);
+        }
+    }
+
+    return [...result];
+}
+
 function runASTAnalysis(str, options = Object.create(null)) {
     const { module = false, isMinified = false } = options;
 
@@ -71,9 +87,15 @@ function runASTAnalysis(str, options = Object.create(null)) {
     const suspectScores = [];
     const dependencies = new ASTDeps();
     const warnings = [];
-    const requireIdentifiers = new Set(["require"]);
+    const globalParts = new Map();
+    const requireIdentifiers = new Set(["require", "process.mainModule.require"]);
     function isRequireIdentifiers(node) {
-        return node.type === "CallExpression" && requireIdentifiers.has(node.callee.name);
+        if (node.type !== "CallExpression") {
+            return false;
+        }
+        const fullName = node.callee.type === "MemberExpression" ? helpers.getMemberExprName(node.callee) : node.callee.name;
+
+        return requireIdentifiers.has(fullName);
     }
 
 
@@ -87,6 +109,14 @@ function runASTAnalysis(str, options = Object.create(null)) {
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
         enter(node) {
+            if (Array.isArray(node)) {
+                return;
+            }
+
+            if (node.type === "CallExpression" && node.callee.type === "Identifier" && kUnsafeCallee.has(node.callee.name)) {
+                warnings.push(generateWarning("unsafe-stmt", { value: node.callee.name, location: node.loc }));
+            }
+
             // Check all 'string' Literal values
             if (node.type === "Literal" && typeof node.value === "string") {
                 // We are searching for value obfuscated as hex of a minimum lenght of 4.
@@ -138,19 +168,42 @@ function runASTAnalysis(str, options = Object.create(null)) {
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
                 identifiersLength.push(node.id.name.length);
+
                 if (node.init.type === "Literal") {
                     identifiers.set(node.id.name, node.init.value);
                 }
+
                 // Searching for someone who assign require to a variable, ex:
                 // const r = require
-                else if (node.init.type === "Identifier" && requireIdentifiers.has(node.init.name)) {
-                    requireIdentifiers.add(node.id.name);
-                    warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                else if (node.init.type === "Identifier") {
+                    if (kUnsafeCallee.has(node.init.name)) {
+                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                    }
+                    else if (requireIdentifiers.has(node.init.name)) {
+                        requireIdentifiers.add(node.id.name);
+                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                    }
+                    else if (helpers.isPartOfGlobal(node.init.name)) {
+                        globalParts.set(node.id.name, node.init.name);
+                        getRequirablePatterns(globalParts).forEach((name) => requireIdentifiers.add(name));
+                    }
                 }
+
                 // Same as before but for pattern like process.mainModule and require.resolve
                 else if (node.init.type === "MemberExpression") {
                     const value = helpers.getMemberExprName(node.init);
-                    if (value.startsWith("require") || value.startsWith("process.mainModule")) {
+                    const eachMembers = value.split(".");
+
+                    let hasMatch = false;
+                    if (globalParts.has(eachMembers[0]) || eachMembers.every((part) => helpers.isPartOfGlobal(part))) {
+                        globalParts.set(node.id.name, eachMembers.slice(1).join("."));
+                        hasMatch = true;
+                    }
+                    getRequirablePatterns(globalParts).forEach((name) => requireIdentifiers.add(name));
+
+                    if (hasMatch || value.startsWith("require") ||
+                        value.startsWith(kMainModuleStr) ||
+                        helpers.isRequireGlobalMemberExpr(value)) {
                         requireIdentifiers.add(node.id.name);
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
@@ -163,7 +216,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
 
             // Searching for all CJS require pattern (require, require.resolve).
-            if (!module && (isRequireIdentifiers(node) || helpers.isRequireResolve(node))) {
+            if (!module && (isRequireIdentifiers(node) || helpers.isRequireResolve(node) || helpers.isRequireMemberExpr(node))) {
                 const arg = node.arguments[0];
 
                 // const foo = "http"; require(foo);

@@ -130,7 +130,7 @@ test("should return runtime dependencies for five.js", () => {
     require([foo, "world"]);
     require([104,101,108,108,111]);
 
-    process["mainModule"]["util"];`);
+    process.mainModule.require("util");`);
 
     expect(warnings.length).toStrictEqual(0);
     expect([...dependencies]).toStrictEqual(["http", "net-tcp", "barworld", "hello", "util"]);

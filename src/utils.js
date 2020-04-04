@@ -2,6 +2,32 @@
 
 // CONSTANTS
 const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
+const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
+const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
+
+function isPartOfGlobal(value) {
+    return GLOBAL_PARTS.has(value);
+}
+
+function isGlobal(node) {
+    if (node.type !== "Identifier") {
+        return false;
+    }
+
+    return GLOBAL_IDENTIFIERS.has(node.name);
+}
+
+function isRequireGlobalMemberExpr(value) {
+    return [...GLOBAL_IDENTIFIERS].some((name) => value.startsWith(`${name}.process.mainModule.require`));
+}
+
+function isRequireMemberExpr(node) {
+    if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
+        return false;
+    }
+
+    return isRequireGlobalMemberExpr(getMemberExprName(node.callee));
+}
 
 function isRequireResolve(node) {
     if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
@@ -145,10 +171,14 @@ function strSuspectScore(str) {
 }
 
 module.exports = {
+    isGlobal,
     strCharDiversity,
     strSuspectScore,
+    isPartOfGlobal,
     isRequireResolve,
+    isRequireMemberExpr,
     isLiteralRegex,
+    isRequireGlobalMemberExpr,
     isFunctionDeclarator,
     isRegexConstructor,
     isVariableDeclarator,
