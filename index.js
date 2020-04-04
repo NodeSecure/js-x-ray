@@ -168,7 +168,12 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
                 // const foo = "http"; require(foo);
                 if (arg.type === "Identifier") {
-                    dependencies.add(identifiers.get(arg.name), node.loc);
+                    if (identifiers.has(arg.name)) {
+                        dependencies.add(identifiers.get(arg.name), node.loc);
+                    }
+                    else {
+                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                    }
                 }
                 // require("http")
                 else if (arg.type === "Literal") {
