@@ -38,7 +38,7 @@ declare namespace JSXRay {
 
     interface Report {
         dependencies: ASTDeps;
-        warnings: Warning[];
+        warnings: Warning<BaseWarning>[];
         idsLengthAvg: number;
         stringScore: number;
         isOneLineRequire: boolean;
@@ -52,7 +52,7 @@ declare namespace JSXRay {
     }
 
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-    export function generateWarning(kind?: string, options: WarningOptions);
+    export function generateWarning(kind?: string, options?: WarningOptions);
     export function rootLocation(): any;
 }
 

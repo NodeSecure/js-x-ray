@@ -30,11 +30,11 @@ require(Buffer.from("6673", "hex").toString());
 
 Then use js-x-ray to analyze the file:
 ```js
-const { searchRuntimeDependencies } = require("js-x-ray");
+const { runASTAnalysis } = require("js-x-ray");
 const { readFileSync } = require("fs");
 
 const str = readFileSync("./file.js", "utf-8");
-const { warnings, dependencies } = searchRuntimeDependencies(str);
+const { warnings, dependencies } = runASTAnalysis(str);
 
 const dependenciesName = [...dependencies];
 const inTryDeps = [...dependencies.getDependenciesInTryStatement()];
@@ -48,26 +48,7 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 ## API
 
-```ts
-interface BaseWarning {
-    file: string | null;
-    kind: "unsafe-import" | "unsafe-regex" | "ast-error" | "hexa-value" | "short-ids";
-    value: string;
-    start: { line: number; column: number };
-    end: { line: number; column: number };
-}
-
-type Warning<T extends BaseWarning> = T extends { kind: "ast-error" | "hexa-value" | "unsafe-regex" } ? T : Omit<T, "value">;
-
-interface Report {
-    dependencies: ASTDeps;
-    warnings: Warning[];
-    idsLengthAvg: number;
-    isOneLineRequire: boolean;
-}
-```
-
-### searchRuntimeDependencies(str: string, options?: RuntimeOptions): Report;
+### runASTAnalysis(str: string, options?: RuntimeOptions): Report;
 The method take a first argument which is the code you want to analyse. Only available options is `module` is tell if the code use ESM or CJS.
 
 ## License
