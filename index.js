@@ -76,7 +76,7 @@ function walkCallExpression(nodeToWalk) {
 }
 
 function runASTAnalysis(str, options = Object.create(null)) {
-    const { module = false, isMinified = false } = options;
+    const { module = true, isMinified = false } = options;
 
     // Function variables
     const dependencies = new ASTDeps();
@@ -224,7 +224,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
 
             // Searching for all CJS require pattern (require, require.resolve).
-            if (!module && (isRequireIdentifiers(node) || helpers.isRequireResolve(node) || helpers.isRequireMemberExpr(node))) {
+            if (isRequireIdentifiers(node) || helpers.isRequireResolve(node) || helpers.isRequireMemberExpr(node)) {
                 const arg = node.arguments[0];
 
                 // const foo = "http"; require(foo);
@@ -276,7 +276,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
 
             // if we are dealing with an ESM import declaration (easier than require ^^)
-            else if (module && node.type === "ImportDeclaration" && node.source.type === "Literal") {
+            else if (node.type === "ImportDeclaration" && node.source.type === "Literal") {
                 dependencies.add(node.source.value, node.loc);
             }
 
@@ -309,7 +309,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
         warnings,
         idsLengthAvg,
         stringScore,
-        isOneLineRequire: !module && body.length === 1 && dependencies.size === 1
+        isOneLineRequire: body.length === 1 && dependencies.size === 1
     };
 }
 
