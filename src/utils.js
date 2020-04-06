@@ -11,10 +11,14 @@ function* getIdLength(node) {
         yield node.name.length;
     }
     else if (node.type === "ArrayPattern") {
-        yield* node.elements.map((id) => id.name.length);
+        yield* node.elements
+            .filter((id) => id !== null && id !== void 0)
+            .map((id) => (id.type === "RestElement" ? id.argument.name : id.name).length);
     }
     else if (node.type === "ObjectPattern") {
-        yield* node.properties.map((property) => property.key.name.length);
+        yield* node.properties
+            .filter((property) => property !== null && property !== void 0)
+            .map((property) => (property.type === "RestElement" ? property.argument.name : property.key.name).length);
     }
 }
 
