@@ -27,11 +27,12 @@ class ASTDeps {
         }
     }
 
-    add(depName, location = null) {
+    add(depName, location = null, unsafe = false) {
         if (depName.trim() === "") {
             return;
         }
         const dep = {
+            unsafe,
             inTry: this.isInTryStmt
         };
         if (location !== null) {
@@ -46,7 +47,7 @@ class ASTDeps {
 
     * getDependenciesInTryStatement() {
         for (const [depName, props] of Object.entries(this.dependencies)) {
-            if (props.inTry === true) {
+            if (props.inTry === true && props.unsafe === false) {
                 yield depName;
             }
         }

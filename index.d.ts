@@ -46,6 +46,7 @@ declare namespace JSXRay {
 
     interface Dependencies {
         [depName: string]: {
+            unsafe: boolean;
             inTry: boolean;
             location?: SourceLocation;
         }

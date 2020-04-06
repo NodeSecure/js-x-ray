@@ -51,7 +51,8 @@ function walkCallExpression(nodeToWalk) {
                 return;
             }
 
-            switch (helpers.getMemberExprName(node.callee)) {
+            const fullName = node.callee.type === "MemberExpression" ? helpers.getMemberExprName(node.callee) : node.callee.name;
+            switch (fullName) {
                 case "Buffer.from": {
                     const [element, convert] = node.arguments;
 
@@ -205,10 +206,15 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
                 }
-                else if (helpers.isUnsafeCallee(node)) {
+                else if (helpers.isUnsafeCallee(node.init)) {
                     globalParts.set(node.id.name, "global");
                     GLOBAL_PARTS.add(node.id.name);
                     requireIdentifiers.add(`${node.id.name}.${kMainModuleStr}`);
+                }
+            }
+            else if (node.type === "VariableDeclaration") {
+                for (const variable of node.declarations) {
+                    identifiersLength.push(variable.id.name.length);
                 }
             }
 
@@ -257,7 +263,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 // require(Buffer.from("...", "hex").toString());
                 else if (arg.type === "CallExpression") {
                     walkCallExpression(arg)
-                        .forEach((depName) => dependencies.add(depName, node.loc));
+                        .forEach((depName) => dependencies.add(depName, node.loc, true));
 
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
 

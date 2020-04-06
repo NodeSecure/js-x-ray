@@ -15,6 +15,8 @@ const trycatch = readFileSync(join(FIXTURE_PATH, "try-catch.js"), "utf-8");
 const esm = readFileSync(join(FIXTURE_PATH, "esm.js"), "utf-8");
 const unsafeRegex = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
 const suspectString = readFileSync(join(FIXTURE_PATH, "suspect-string.js"), "utf-8");
+const advancedComputation = readFileSync(join(FIXTURE_PATH, "advanced-computation.js"), "utf-8");
+const shortIds = readFileSync(join(FIXTURE_PATH, "short-ids.js"), "utf-8");
 
 test("should return runtime dependencies for one.js", () => {
     const { dependencies, warnings } = runASTAnalysis(`
@@ -82,6 +84,18 @@ test("should parse the Buffer.from call with an Array Expr", () => {
 
 test("should parse the Buffer.from call with an hexa value", () => {
     const { dependencies, warnings } = runASTAnalysis(`
+        function unhex(r) {
+            return r;
+        }
+        const px = require.resolve(unhex("646c2d746172"));
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect([...dependencies]).toStrictEqual(["dl-tar"]);
+});
+
+test("should parse the Buffer.from call with an hexa value", () => {
+    const { dependencies, warnings } = runASTAnalysis(`
         const px = require.resolve(
             Buffer.from("646c2d746172", "hex").toString()
         );
@@ -121,6 +135,50 @@ test("should succesfully follow the require stmt", () => {
     expect([...dependencies]).toStrictEqual([]);
 });
 
+test("should detect unsafe eval statments", () => {
+    const { warnings } = runASTAnalysis(`
+        eval("this");
+        const g = eval("this");
+    `);
+
+    expect(warnings.length).toStrictEqual(2);
+    expect(warnings[0].kind).toStrictEqual("unsafe-stmt");
+    expect(warnings[1].kind).toStrictEqual("unsafe-stmt");
+});
+
+test("should detect unsafe Function statments", () => {
+    const { warnings } = runASTAnalysis(`
+        Function("return this")();
+        const g = Function("return this")();
+    `);
+
+    expect(warnings.length).toStrictEqual(2);
+    expect(warnings[0].kind).toStrictEqual("unsafe-stmt");
+    expect(warnings[1].kind).toStrictEqual("unsafe-stmt");
+});
+
+test("should detect unsafe-assign of eval", () => {
+    const { warnings } = runASTAnalysis(`
+        const e = eval;
+    `);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect(warnings[0].kind).toStrictEqual("unsafe-assign");
+});
+
+test("should be capable of following global parts", () => {
+    const { warnings, dependencies } = runASTAnalysis(`
+        const g = global.process;
+        const r = g.mainModule;
+        const c = r.require;
+        c("http");
+        r.require("fs");
+    `);
+
+    expect(warnings.length).toStrictEqual(4);
+    expect([...dependencies]).toStrictEqual(["http", "fs"]);
+});
+
 test("should return runtime dependencies for five.js", () => {
     const { dependencies, warnings } = runASTAnalysis(`
     const foo = "bar";
@@ -143,6 +201,13 @@ test("should support runtime analysis of ESM and return http", () => {
     expect(stringScore).toStrictEqual(7);
 });
 
+test("should be capable to follow hexa computation members expr", () => {
+    const { warnings, dependencies } = runASTAnalysis(advancedComputation);
+
+    expect(warnings.length).toStrictEqual(5);
+    expect([...dependencies]).toStrictEqual(["./test/data"]);
+});
+
 test("should support runtime analysis of ESM and return http", () => {
     const { dependencies, warnings } = runASTAnalysis(esm, { module: true });
 
@@ -158,6 +223,12 @@ test("should detect two unsafe regex", () => {
     expect(warnings[1].kind === "unsafe-regex").toBe(true);
 });
 
+test("should detect shorts ids!", () => {
+    const { warnings } = runASTAnalysis(shortIds);
+
+    expect(warnings.length).toStrictEqual(1);
+    expect(warnings[0].kind === "short-ids").toBe(true);
+});
 
 test("should detect that http is under a TryStatement", () => {
     const { dependencies: deps } = runASTAnalysis(trycatch);
@@ -172,3 +243,13 @@ test("should return isOneLineRequire true for a one liner CJS export", () => {
     expect(isOneLineRequire).toStrictEqual(true);
     expect([...dependencies]).toStrictEqual(["foo"]);
 });
+
+test("should be capable to follow require assign", () => {
+    const { dependencies } = runASTAnalysis(`
+        const b = require;
+        b("fs");
+    `);
+
+    expect([...dependencies]).toStrictEqual(["fs"]);
+});
+
