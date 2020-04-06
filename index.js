@@ -14,6 +14,7 @@ const ASTDeps = require("./src/ASTDeps");
 const kMainModuleStr = "process.mainModule.require";
 const kNodeDeps = new Set(builtins());
 const kUnsafeCallee = new Set(["eval", "Function"]);
+const { CONSTANTS: { GLOBAL_PARTS } } = helpers;
 
 function generateWarning(kind = "unsafe-import", options) {
     const { location, file = null, value = null } = options;
@@ -28,7 +29,7 @@ function generateWarning(kind = "unsafe-import", options) {
 }
 
 function rootLocation() {
-    return { start: { line: 0, column: 0 } };
+    return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
 
 function walkCallExpression(nodeToWalk) {
@@ -39,13 +40,23 @@ function walkCallExpression(nodeToWalk) {
             if (node.type !== "CallExpression") {
                 return;
             }
+            if (node.arguments.length === 0) {
+                return;
+            }
+
+            if (node.arguments[0].type === "Literal" && helpers.isHexValue(node.arguments[0].value)) {
+                dependencies.add(Buffer.from(node.arguments[0].value, "hex").toString());
+                this.skip();
+
+                return;
+            }
 
             switch (helpers.getMemberExprName(node.callee)) {
                 case "Buffer.from": {
                     const [element, convert] = node.arguments;
 
                     if (element.type === "ArrayExpression") {
-                        const depName = helpers.arrExprToString(node.arguments[0]);
+                        const depName = helpers.arrExprToString(element);
                         if (depName.trim() !== "") {
                             dependencies.add(depName);
                         }
@@ -63,32 +74,18 @@ function walkCallExpression(nodeToWalk) {
     return [...dependencies];
 }
 
-function getRequirablePatterns(parts) {
-    const result = new Set();
-
-    for (const [id, path] of parts.entries()) {
-        if (path === "mainModule") {
-            result.add(`${id}.require`);
-        }
-        else if (path === "require") {
-            result.add(id);
-        }
-    }
-
-    return [...result];
-}
-
 function runASTAnalysis(str, options = Object.create(null)) {
     const { module = false, isMinified = false } = options;
 
     // Function variables
-    const identifiers = new Map();
-    const identifiersLength = [];
-    const suspectScores = [];
     const dependencies = new ASTDeps();
-    const warnings = [];
+    const identifiers = new Map();
     const globalParts = new Map();
-    const requireIdentifiers = new Set(["require", "process.mainModule.require"]);
+    const warnings = [];
+    const suspectScores = [];
+    const identifiersLength = [];
+    const requireIdentifiers = new Set(["require", kMainModuleStr]);
+
     function isRequireIdentifiers(node) {
         if (node.type !== "CallExpression") {
             return false;
@@ -97,7 +94,6 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
         return requireIdentifiers.has(fullName);
     }
-
 
     // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
     // Example: #!/usr/bin/env node
@@ -109,11 +105,13 @@ function runASTAnalysis(str, options = Object.create(null)) {
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
         enter(node) {
+            // Skip the root of the AST.
             if (Array.isArray(node)) {
                 return;
             }
 
-            if (node.type === "CallExpression" && node.callee.type === "Identifier" && kUnsafeCallee.has(node.callee.name)) {
+            // Detect unsafe statement like eval("this") or Function("return this")();
+            if (helpers.isUnsafeCallee(node)) {
                 warnings.push(generateWarning("unsafe-stmt", { value: node.callee.name, location: node.loc }));
             }
 
@@ -164,7 +162,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 }
             }
 
-            // In case we are matching a Variable, save it in identifiers
+            // In case we are matching a Variable declaration, we have to save the identifier
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
                 identifiersLength.push(node.id.name.length);
@@ -183,30 +181,34 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         requireIdentifiers.add(node.id.name);
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
                     }
-                    else if (helpers.isPartOfGlobal(node.init.name)) {
+                    else if (GLOBAL_PARTS.has(node.init.name)) {
                         globalParts.set(node.id.name, node.init.name);
-                        getRequirablePatterns(globalParts).forEach((name) => requireIdentifiers.add(name));
+                        helpers.getRequirablePatterns(globalParts)
+                            .forEach((name) => requireIdentifiers.add(name));
                     }
                 }
 
                 // Same as before but for pattern like process.mainModule and require.resolve
                 else if (node.init.type === "MemberExpression") {
                     const value = helpers.getMemberExprName(node.init);
-                    const eachMembers = value.split(".");
+                    const members = value.split(".");
 
-                    let hasMatch = false;
-                    if (globalParts.has(eachMembers[0]) || eachMembers.every((part) => helpers.isPartOfGlobal(part))) {
-                        globalParts.set(node.id.name, eachMembers.slice(1).join("."));
-                        hasMatch = true;
+                    if (globalParts.has(members[0]) || members.every((part) => GLOBAL_PARTS.has(part))) {
+                        globalParts.set(node.id.name, members.slice(1).join("."));
+                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
-                    getRequirablePatterns(globalParts).forEach((name) => requireIdentifiers.add(name));
+                    helpers.getRequirablePatterns(globalParts)
+                        .forEach((name) => requireIdentifiers.add(name));
 
-                    if (hasMatch || value.startsWith("require") ||
-                        value.startsWith(kMainModuleStr) ||
-                        helpers.isRequireGlobalMemberExpr(value)) {
+                    if (helpers.isRequireStatement(value)) {
                         requireIdentifiers.add(node.id.name);
                         warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
                     }
+                }
+                else if (helpers.isUnsafeCallee(node)) {
+                    globalParts.set(node.id.name, "global");
+                    GLOBAL_PARTS.add(node.id.name);
+                    requireIdentifiers.add(`${node.id.name}.${kMainModuleStr}`);
                 }
             }
 
@@ -254,10 +256,12 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 }
                 // require(Buffer.from("...", "hex").toString());
                 else if (arg.type === "CallExpression") {
-                    walkCallExpression(arg.callee)
+                    walkCallExpression(arg)
                         .forEach((depName) => dependencies.add(depName, node.loc));
 
                     warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+
+                    // We skip walking the tree to avoid anymore warnings...
                     this.skip();
                 }
                 else {

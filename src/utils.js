@@ -4,21 +4,32 @@
 const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
 const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
+const kMainModuleStr = "process.mainModule.require";
 
-function isPartOfGlobal(value) {
-    return GLOBAL_PARTS.has(value);
-}
+function getRequirablePatterns(parts) {
+    const result = new Set();
 
-function isGlobal(node) {
-    if (node.type !== "Identifier") {
-        return false;
+    for (const [id, path] of parts.entries()) {
+        if (path === "process") {
+            result.add(`${id}.mainModule.require`);
+        }
+        else if (path === "mainModule") {
+            result.add(`${id}.require`);
+        }
+        else if (path.includes("require")) {
+            result.add(id);
+        }
     }
 
-    return GLOBAL_IDENTIFIERS.has(node.name);
+    return [...result];
 }
 
 function isRequireGlobalMemberExpr(value) {
-    return [...GLOBAL_IDENTIFIERS].some((name) => value.startsWith(`${name}.process.mainModule.require`));
+    return [...GLOBAL_IDENTIFIERS].some((name) => value.startsWith(`${name}.${kMainModuleStr}`));
+}
+
+function isRequireStatement(value) {
+    return value.startsWith("require") || value.startsWith(kMainModuleStr) || isRequireGlobalMemberExpr(value);
 }
 
 function isRequireMemberExpr(node) {
@@ -35,6 +46,23 @@ function isRequireResolve(node) {
     }
 
     return node.callee.object.name === "require" && node.callee.property.name === "resolve";
+}
+
+function isUnsafeCallee(node) {
+    if (node.type !== "CallExpression") {
+        return false;
+    }
+
+    if (node.callee.type === "Identifier") {
+        return node.callee.name === "eval";
+    }
+
+    if (node.callee.type !== "CallExpression") {
+        return false;
+    }
+    const callee = node.callee.callee;
+
+    return callee.type === "Identifier" && callee.name === "Function";
 }
 
 function isRegexConstructor(node) {
@@ -125,8 +153,13 @@ function concatBinaryExpr(node, identifiers) {
     return str;
 }
 
+function isHexValue(value) {
+    return typeof value === "string" && /^[0-9A-Fa-f]{4,}$/g.test(value);
+}
+
 function getMemberExprName(node) {
     let name = "";
+
     switch (node.object.type) {
         case "MemberExpression":
             name += getMemberExprName(node.object);
@@ -146,6 +179,20 @@ function getMemberExprName(node) {
         case "Literal":
             name += `.${node.property.value}`;
             break;
+        case "CallExpression": {
+            const args = node.property.arguments;
+            if (args.length > 0 && args[0].type === "Literal" && isHexValue(args[0].value)) {
+                name += `.${Buffer.from(args[0].value, "hex").toString()}`;
+            }
+            break;
+        }
+        case "BinaryExpression": {
+            const value = concatBinaryExpr(node.property);
+            if (value.trim() !== "") {
+                name += `.${value}`;
+            }
+            break;
+        }
     }
 
     return name;
@@ -171,10 +218,12 @@ function strSuspectScore(str) {
 }
 
 module.exports = {
-    isGlobal,
+    getRequirablePatterns,
     strCharDiversity,
     strSuspectScore,
-    isPartOfGlobal,
+    isHexValue,
+    isUnsafeCallee,
+    isRequireStatement,
     isRequireResolve,
     isRequireMemberExpr,
     isLiteralRegex,
@@ -184,5 +233,9 @@ module.exports = {
     isVariableDeclarator,
     concatBinaryExpr,
     arrExprToString,
-    getMemberExprName
+    getMemberExprName,
+    CONSTANTS: Object.freeze({
+        GLOBAL_IDENTIFIERS,
+        GLOBAL_PARTS
+    })
 };
