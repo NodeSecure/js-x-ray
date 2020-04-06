@@ -131,7 +131,7 @@ function arrExprToString(elements, identifiers = null) {
     return ret;
 }
 
-function concatBinaryExpr(node, identifiers) {
+function concatBinaryExpr(node, identifiers = new Set()) {
     const { left, right } = node;
     if (!BINARY_EXPR_TYPES.has(left.type) || !BINARY_EXPR_TYPES.has(right.type)) {
         return null;
@@ -200,7 +200,7 @@ function getMemberExprName(node) {
         }
         case "BinaryExpression": {
             const value = concatBinaryExpr(node.property);
-            if (value.trim() !== "") {
+            if (value !== null && value.trim() !== "") {
                 name += `.${value}`;
             }
             break;
