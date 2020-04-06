@@ -1,4 +1,10 @@
 # js-x-ray
+![version](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/fraxken/js-x-ray/master/package.json&query=$.version&label=Version)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/fraxken/js-x-ray/commit-activity)
+[![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/fraxken/js-x-ray/blob/master/LICENSE)
+![dep](https://img.shields.io/david/fraxken/js-x-ray)
+![size](https://img.shields.io/bundlephobia/min/js-x-ray)
+
 JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to make it easier to use and evolve the code over time.
 
 The goal is to quickly identify dangerous code and patterns for developers and researchers.
@@ -7,7 +13,8 @@ The goal is to quickly identify dangerous code and patterns for developers and r
 - Retrieve required dependencies and files.
 - Detect unsafe RegEx.
 - Get warnings when the AST Analysis as a problem or when not able to follow a statement.
-- Highlight common attack patterns.
+- Highlight common attack patterns and API usages.
+- Capable to follow the usage of globals.
 
 ## Getting Started
 
@@ -59,6 +66,7 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 | ast-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. |
 | unsafe-import | Unable to follow an import (require, require.resolve) statement/expr. |
 | unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDOS Attack |
+| unsafe-stmt | Usage of eval or Function("") |
 | hexa-value | An hex value has been detected in a Literal |
 | short-ids | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
 | suspicious-string | This mean that the suspicious score of all Literal is bigger than 3 |
@@ -83,6 +91,16 @@ interface Report {
     idsLengthAvg: number;
     stringScore: number;
     isOneLineRequire: boolean;
+}
+```
+
+### generateWarning(kind?: string, options?: WarningOptions) -> any
+
+```ts
+interface WarningOptions {
+    location: { start: number, end?: number }
+    file?: string | null,
+    value?: string | null
 }
 ```
 

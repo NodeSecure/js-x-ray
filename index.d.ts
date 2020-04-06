@@ -53,7 +53,7 @@ declare namespace JSXRay {
     }
 
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-    export function generateWarning(kind?: string, options?: WarningOptions);
+    export function generateWarning(kind?: string, options?: WarningOptions): any;
     export function rootLocation(): any;
 }
 
