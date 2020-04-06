@@ -96,6 +96,57 @@ function runASTAnalysis(str, options = Object.create(null)) {
         return requireIdentifiers.has(fullName);
     }
 
+    function checkVariableAssignment(node) {
+        identifiersLength.push(...helpers.getIdLength(node.id));
+        if (node.init === null || node.id.type !== "Identifier") {
+            return;
+        }
+
+        if (node.init.type === "Literal") {
+            identifiers.set(node.id.name, node.init.value);
+        }
+
+        // Searching for someone who assign require to a variable, ex:
+        // const r = require
+        else if (node.init.type === "Identifier") {
+            if (kUnsafeCallee.has(node.init.name)) {
+                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+            }
+            else if (requireIdentifiers.has(node.init.name)) {
+                requireIdentifiers.add(node.id.name);
+                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+            }
+            else if (GLOBAL_PARTS.has(node.init.name)) {
+                globalParts.set(node.id.name, node.init.name);
+                helpers.getRequirablePatterns(globalParts)
+                    .forEach((name) => requireIdentifiers.add(name));
+            }
+        }
+
+        // Same as before but for pattern like process.mainModule and require.resolve
+        else if (node.init.type === "MemberExpression") {
+            const value = helpers.getMemberExprName(node.init);
+            const members = value.split(".");
+
+            if (globalParts.has(members[0]) || members.every((part) => GLOBAL_PARTS.has(part))) {
+                globalParts.set(node.id.name, members.slice(1).join("."));
+                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
+            }
+            helpers.getRequirablePatterns(globalParts)
+                .forEach((name) => requireIdentifiers.add(name));
+
+            if (helpers.isRequireStatement(value)) {
+                requireIdentifiers.add(node.id.name);
+                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
+            }
+        }
+        else if (helpers.isUnsafeCallee(node.init)) {
+            globalParts.set(node.id.name, "global");
+            GLOBAL_PARTS.add(node.id.name);
+            requireIdentifiers.add(`${node.id.name}.${kMainModuleStr}`);
+        }
+    }
+
     // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
     // Example: #!/usr/bin/env node
     const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
@@ -165,56 +216,13 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
             // In case we are matching a Variable declaration, we have to save the identifier
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
-            if (helpers.isVariableDeclarator(node)) {
-                identifiersLength.push(...helpers.getIdLength(node.id));
-
-                if (node.init.type === "Literal" && node.id.type === "Identifier") {
-                    identifiers.set(node.id.name, node.init.value);
-                }
-
-                // Searching for someone who assign require to a variable, ex:
-                // const r = require
-                else if (node.init.type === "Identifier") {
-                    if (kUnsafeCallee.has(node.init.name)) {
-                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
-                    }
-                    else if (requireIdentifiers.has(node.init.name)) {
-                        requireIdentifiers.add(node.id.name);
-                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
-                    }
-                    else if (GLOBAL_PARTS.has(node.init.name)) {
-                        globalParts.set(node.id.name, node.init.name);
-                        helpers.getRequirablePatterns(globalParts)
-                            .forEach((name) => requireIdentifiers.add(name));
-                    }
-                }
-
-                // Same as before but for pattern like process.mainModule and require.resolve
-                else if (node.init.type === "MemberExpression") {
-                    const value = helpers.getMemberExprName(node.init);
-                    const members = value.split(".");
-
-                    if (globalParts.has(members[0]) || members.every((part) => GLOBAL_PARTS.has(part))) {
-                        globalParts.set(node.id.name, members.slice(1).join("."));
-                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
-                    }
-                    helpers.getRequirablePatterns(globalParts)
-                        .forEach((name) => requireIdentifiers.add(name));
-
-                    if (helpers.isRequireStatement(value)) {
-                        requireIdentifiers.add(node.id.name);
-                        warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
-                    }
-                }
-                else if (helpers.isUnsafeCallee(node.init)) {
-                    globalParts.set(node.id.name, "global");
-                    GLOBAL_PARTS.add(node.id.name);
-                    requireIdentifiers.add(`${node.id.name}.${kMainModuleStr}`);
-                }
+            if (node.type === "VariableDeclaration") {
+                node.declarations.forEach((variable) => checkVariableAssignment(variable));
             }
-            else if (node.type === "VariableDeclaration") {
-                for (const variable of node.declarations) {
-                    identifiersLength.push(...helpers.getIdLength(variable.id));
+            else if (node.type === "AssignmentExpression" && node.left.type === "MemberExpression") {
+                const assignName = helpers.getMemberExprName(node.left);
+                if (node.right.type === "Identifier" && requireIdentifiers.has(node.right.name)) {
+                    requireIdentifiers.add(assignName);
                 }
             }
 
@@ -293,7 +301,8 @@ function runASTAnalysis(str, options = Object.create(null)) {
         }
     });
 
-    const idsLengthAvg = (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
+    const idsLengthAvg = identifiersLength.length === 0 ?
+        0 : (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
     const stringScore = suspectScores.length === 0 ?
         0 : (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
 
@@ -309,7 +318,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
         warnings,
         idsLengthAvg,
         stringScore,
-        isOneLineRequire: body.length === 1 && dependencies.size === 1
+        isOneLineRequire: body.length <= 1 && dependencies.size <= 1
     };
 }
 

@@ -175,7 +175,7 @@ test("should be capable of following global parts", () => {
         r.require("fs");
     `);
 
-    expect(warnings.length).toStrictEqual(4);
+    expect(warnings.length).toStrictEqual(3);
     expect([...dependencies]).toStrictEqual(["http", "fs"]);
 });
 
