@@ -166,9 +166,9 @@ function runASTAnalysis(str, options = Object.create(null)) {
             // In case we are matching a Variable declaration, we have to save the identifier
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (helpers.isVariableDeclarator(node)) {
-                identifiersLength.push(node.id.name.length);
+                identifiersLength.push(...helpers.getIdLength(node.id));
 
-                if (node.init.type === "Literal") {
+                if (node.init.type === "Literal" && node.id.type === "Identifier") {
                     identifiers.set(node.id.name, node.init.value);
                 }
 
@@ -214,7 +214,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
             else if (node.type === "VariableDeclaration") {
                 for (const variable of node.declarations) {
-                    identifiersLength.push(variable.id.name.length);
+                    identifiersLength.push(...helpers.getIdLength(variable.id));
                 }
             }
 

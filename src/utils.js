@@ -6,6 +6,18 @@ const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "w
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
 const kMainModuleStr = "process.mainModule.require";
 
+function* getIdLength(node) {
+    if (node.type === "Identifier") {
+        yield node.name.length;
+    }
+    else if (node.type === "ArrayPattern") {
+        yield* node.elements.map((id) => id.name.length);
+    }
+    else if (node.type === "ObjectPattern") {
+        yield* node.properties.map((property) => property.key.name.length);
+    }
+}
+
 function getRequirablePatterns(parts) {
     const result = new Set();
 
@@ -218,6 +230,7 @@ function strSuspectScore(str) {
 }
 
 module.exports = {
+    getIdLength,
     getRequirablePatterns,
     strCharDiversity,
     strSuspectScore,
