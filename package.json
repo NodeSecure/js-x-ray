@@ -1,6 +1,6 @@
 {
   "name": "js-x-ray",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "JavaScript AST XRay analysis",
   "main": "index.js",
   "engines": {
