@@ -180,7 +180,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
-                    else {
+                    else if (!helpers.isSafeHexValue(node.value)) {
                         warnings.push(generateWarning("hexa-value", { location: node.loc, value: node.value }));
                     }
                 }

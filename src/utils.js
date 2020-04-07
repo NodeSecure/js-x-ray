@@ -3,6 +3,7 @@
 // CONSTANTS
 const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
 const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
+const SAFE_HEX_VALUE = new Set(["0123456789", "abcdef", "0123456789abcdef", "abcdef0123456789abcdef"]);
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
 const kMainModuleStr = "process.mainModule.require";
 
@@ -180,6 +181,10 @@ function isHexValue(value) {
     return typeof value === "string" && /^[0-9A-Fa-f]{4,}$/g.test(value);
 }
 
+function isSafeHexValue(rawValue) {
+    return SAFE_HEX_VALUE.has(rawValue);
+}
+
 function getMemberExprName(node) {
     let name = "";
 
@@ -246,6 +251,7 @@ module.exports = {
     strCharDiversity,
     strSuspectScore,
     isHexValue,
+    isSafeHexValue,
     isUnsafeCallee,
     isRequireStatement,
     isRequireResolve,
