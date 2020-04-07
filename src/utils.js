@@ -10,16 +10,17 @@ function* getIdLength(node) {
     if (node.type === "Identifier") {
         yield node.name.length;
     }
+    else if (node.type === "RestElement") {
+        yield node.argument.name.length;
+    }
+    else if (node.type === "AssignmentPattern") {
+        yield node.left.name.length;
+    }
     else if (node.type === "ArrayPattern") {
         yield* node.elements
             .filter((id) => id !== null && id !== void 0)
-            .map((id) => {
-                if (id.type === "AssignmentPattern") {
-                    return id.left.name.length;
-                }
-
-                return (id.type === "RestElement" ? id.argument.name : id.name).length;
-            });
+            .map((id) => [...getIdLength(id)])
+            .flat();
     }
     else if (node.type === "ObjectPattern") {
         yield* node.properties

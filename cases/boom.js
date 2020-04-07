@@ -1,2 +1,2 @@
-global.require = require;
-global['require']('fs');
+
+const { a: { b = 20 } } = { a: { b: 10 }}
