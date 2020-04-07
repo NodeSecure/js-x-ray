@@ -73,19 +73,19 @@ function isRequireResolve(node) {
 
 function isUnsafeCallee(node) {
     if (node.type !== "CallExpression") {
-        return false;
+        return [false, null];
     }
 
     if (node.callee.type === "Identifier") {
-        return node.callee.name === "eval";
+        return [node.callee.name === "eval", "eval"];
     }
 
     if (node.callee.type !== "CallExpression") {
-        return false;
+        return [false, null];
     }
     const callee = node.callee.callee;
 
-    return callee.type === "Identifier" && callee.name === "Function";
+    return [callee.type === "Identifier" && callee.name === "Function", "Function"];
 }
 
 function isRegexConstructor(node) {

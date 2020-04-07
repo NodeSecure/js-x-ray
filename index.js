@@ -140,7 +140,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
             }
         }
-        else if (helpers.isUnsafeCallee(node.init)) {
+        else if (helpers.isUnsafeCallee(node.init)[0]) {
             globalParts.set(node.id.name, "global");
             GLOBAL_PARTS.add(node.id.name);
             requireIdentifiers.add(`${node.id.name}.${kMainModuleStr}`);
@@ -163,8 +163,9 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
 
             // Detect unsafe statement like eval("this") or Function("return this")();
-            if (helpers.isUnsafeCallee(node)) {
-                warnings.push(generateWarning("unsafe-stmt", { value: node.callee.name, location: node.loc }));
+            const [inUnsafeCallee, calleeName] = helpers.isUnsafeCallee(node);
+            if (inUnsafeCallee) {
+                warnings.push(generateWarning("unsafe-stmt", { value: calleeName, location: node.loc }));
             }
 
             // Check all 'string' Literal values
