@@ -181,7 +181,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         warnings.push(generateWarning("unsafe-import", { location: node.loc }));
                     }
                     else {
-                        warnings.push(generateWarning("hexa-value", { location: node.loc, value }));
+                        warnings.push(generateWarning("hexa-value", { location: node.loc, value: node.value }));
                     }
                 }
                 // Else we are checking all other string with our suspect method
