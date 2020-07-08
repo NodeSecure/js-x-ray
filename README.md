@@ -7,7 +7,9 @@
 
 JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to make it easier to use and evolve the code over time.
 
-The goal is to quickly identify dangerous code and patterns for developers and researchers.
+The goal is to quickly identify dangerous code and patterns for developers and Security researchers.
+
+> Note: I have no particular background in security. I am more and more interested and passionate about static code analysis. But I would be particularly happy to know that my work can make a difference.
 
 ## Features
 - Retrieve required dependencies and files.
@@ -15,6 +17,11 @@ The goal is to quickly identify dangerous code and patterns for developers and r
 - Get warnings when the AST Analysis as a problem or when not able to follow a statement.
 - Highlight common attack patterns and API usages.
 - Capable to follow the usage of globals.
+
+## Goals
+The goal of the project is to be able to detect any suspicious JavaScript code. We are talking about suspicious code that has been maliciously added or injected.
+
+Most of the time hackers will try to hide the code as much as possible so that it is not easily found/understood... So the lib's job is to found patterns and habits that allow us to detect these malicious codes.
 
 ## Getting Started
 
@@ -59,7 +66,9 @@ console.log(warnings);
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
-## Warnings
+## Warnings Legends
+
+This section describe all the possible warnings returned by JSXRay.
 
 | name | description |
 | --- | --- |
