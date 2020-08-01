@@ -194,7 +194,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
             }
 
             // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
-            if (node.type === "TryStatement") {
+            if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
                 dependencies.isInTryStmt = true;
             }
             else if (node.type === "CatchClause") {
