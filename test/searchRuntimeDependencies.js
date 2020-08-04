@@ -5,7 +5,7 @@ const { readFileSync } = require("fs");
 const { join } = require("path");
 
 // Require Internal Dependencies
-const { runASTAnalysis } = require("..");
+const { runASTAnalysis, CONSTANTS: { Warnings } } = require("..");
 
 // CONSTANTS
 const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
@@ -223,11 +223,11 @@ test("should detect two unsafe regex", () => {
     expect(warnings[1].kind === "unsafe-regex").toBe(true);
 });
 
-test("should detect shorts ids!", () => {
+test("should detect short identifiers!", () => {
     const { warnings } = runASTAnalysis(shortIds);
 
     expect(warnings.length).toStrictEqual(1);
-    expect(warnings[0].kind === "short-ids").toBe(true);
+    expect(warnings[0].kind === "short-identifiers").toBe(true);
 });
 
 test("should detect that http is under a TryStatement", () => {

@@ -9,28 +9,13 @@ const builtins = require("builtins");
 // Require Internal Dependencies
 const helpers = require("./src/utils");
 const ASTDeps = require("./src/ASTDeps");
+const ASTStats = require("./src/ASTStats");
 
 // CONSTANTS
 const kMainModuleStr = "process.mainModule.require";
 const kNodeDeps = new Set(builtins());
 const kUnsafeCallee = new Set(["eval", "Function"]);
 const { CONSTANTS: { GLOBAL_PARTS } } = helpers;
-
-function generateWarning(kind = "unsafe-import", options) {
-    const { location, file = null, value = null } = options;
-    const { start, end = start } = location;
-
-    const result = { kind, file, start, end };
-    if (value !== null) {
-        result.value = value;
-    }
-
-    return result;
-}
-
-function rootLocation() {
-    return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
-}
 
 function walkCallExpression(nodeToWalk) {
     const dependencies = new Set();
@@ -80,11 +65,9 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
     // Function variables
     const dependencies = new ASTDeps();
+    const stats = new ASTStats();
     const identifiers = new Map();
     const globalParts = new Map();
-    const warnings = [];
-    const suspectScores = [];
-    const identifiersLength = [];
     const requireIdentifiers = new Set(["require", kMainModuleStr]);
 
     function isRequireIdentifiers(node) {
@@ -97,7 +80,6 @@ function runASTAnalysis(str, options = Object.create(null)) {
     }
 
     function checkVariableAssignment(node) {
-        identifiersLength.push(...helpers.getIdLength(node.id));
         if (node.init === null || node.id.type !== "Identifier") {
             return;
         }
@@ -110,11 +92,11 @@ function runASTAnalysis(str, options = Object.create(null)) {
         // const r = require
         else if (node.init.type === "Identifier") {
             if (kUnsafeCallee.has(node.init.name)) {
-                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                stats.addWarning(ASTStats.Warnings.unsafeAssign, node.init.name, node.loc);
             }
             else if (requireIdentifiers.has(node.init.name)) {
                 requireIdentifiers.add(node.id.name);
-                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value: node.init.name }));
+                stats.addWarning(ASTStats.Warnings.unsafeAssign, node.init.name, node.loc);
             }
             else if (GLOBAL_PARTS.has(node.init.name)) {
                 globalParts.set(node.id.name, node.init.name);
@@ -130,14 +112,14 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
             if (globalParts.has(members[0]) || members.every((part) => GLOBAL_PARTS.has(part))) {
                 globalParts.set(node.id.name, members.slice(1).join("."));
-                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
+                stats.addWarning(ASTStats.Warnings.unsafeAssign, value, node.loc);
             }
             helpers.getRequirablePatterns(globalParts)
                 .forEach((name) => requireIdentifiers.add(name));
 
             if (helpers.isRequireStatement(value)) {
                 requireIdentifiers.add(node.id.name);
-                warnings.push(generateWarning("unsafe-assign", { location: node.loc, value }));
+                stats.addWarning(ASTStats.Warnings.unsafeAssign, value, node.loc);
             }
         }
         else if (helpers.isUnsafeCallee(node.init)[0]) {
@@ -151,7 +133,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
     // Example: #!/usr/bin/env node
     const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
     const { body } = meriyah.parseScript(strToAnalyze, {
-        next: true, loc: true, module: Boolean(module)
+        next: true, loc: true, raw: true, module: Boolean(module)
     });
 
     // we walk each AST Nodes, this is a purely synchronous I/O
@@ -165,8 +147,9 @@ function runASTAnalysis(str, options = Object.create(null)) {
             // Detect unsafe statement like eval("this") or Function("return this")();
             const [inUnsafeCallee, calleeName] = helpers.isUnsafeCallee(node);
             if (inUnsafeCallee) {
-                warnings.push(generateWarning("unsafe-stmt", { value: calleeName, location: node.loc }));
+                stats.addWarning(ASTStats.Warnings.unsafeStmt, calleeName, node.loc);
             }
+            stats.doNodeAnalysis(node);
 
             // Check all 'string' Literal values
             if (node.type === "Literal" && typeof node.value === "string") {
@@ -178,18 +161,15 @@ function runASTAnalysis(str, options = Object.create(null)) {
                     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
                     if (kNodeDeps.has(value)) {
                         dependencies.add(value, node.loc);
-                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                        stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
                     else if (!helpers.isSafeHexValue(node.value)) {
-                        warnings.push(generateWarning("hexa-value", { location: node.loc, value: node.value }));
+                        stats.addWarning(ASTStats.Warnings.encodedLiteral, node.value, node.loc);
                     }
                 }
                 // Else we are checking all other string with our suspect method
                 else {
-                    const score = helpers.strSuspectScore(node.value);
-                    if (score !== 0) {
-                        suspectScores.push(score);
-                    }
+                    stats.analyzeLiteral(node);
                 }
             }
 
@@ -204,20 +184,21 @@ function runASTAnalysis(str, options = Object.create(null)) {
             // Search for literal Regex (or Regex Object constructor).
             // then we use the safe-regex package to detect whether or not regex is safe!
             if (helpers.isLiteralRegex(node) && !safeRegex(node.regex.pattern)) {
-                warnings.push(generateWarning("unsafe-regex", { location: node.loc, value: node.regex.pattern }));
+                stats.addWarning(ASTStats.Warnings.unsafeRegex, node.regex.pattern, node.loc);
             }
             else if (helpers.isRegexConstructor(node) && node.arguments.length > 0) {
                 const arg = node.arguments[0];
                 const pattern = helpers.isLiteralRegex(arg) ? arg.regex.pattern : arg.value;
 
                 if (!safeRegex(pattern)) {
-                    warnings.push(generateWarning("unsafe-regex", { location: node.loc, value: pattern }));
+                    stats.addWarning(ASTStats.Warnings.unsafeRegex, pattern, node.loc);
                 }
             }
 
             // In case we are matching a Variable declaration, we have to save the identifier
             // This allow the AST Analysis to retrieve required dependency when the stmt is mixed with variables.
             if (node.type === "VariableDeclaration") {
+                stats.analyzeVariableDeclaration(node);
                 node.declarations.forEach((variable) => checkVariableAssignment(variable));
             }
             else if (node.type === "AssignmentExpression" && node.left.type === "MemberExpression") {
@@ -225,11 +206,6 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 if (node.right.type === "Identifier" && requireIdentifiers.has(node.right.name)) {
                     requireIdentifiers.add(assignName);
                 }
-            }
-
-            // Add the identifier length of functions!
-            else if (helpers.isFunctionDeclarator(node)) {
-                identifiersLength.push(node.id.name.length);
             }
 
             // Searching for all CJS require pattern (require, require.resolve).
@@ -242,7 +218,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         dependencies.add(identifiers.get(arg.name), node.loc);
                     }
                     else {
-                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                        stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
                 }
                 // require("http")
@@ -253,7 +229,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 else if (arg.type === "ArrayExpression") {
                     const value = helpers.arrExprToString(arg.elements, identifiers).trim();
                     if (value === "") {
-                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                        stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
                     else {
                         dependencies.add(value, node.loc);
@@ -263,7 +239,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                 else if (arg.type === "BinaryExpression" && arg.operator === "+") {
                     const value = helpers.concatBinaryExpr(arg, identifiers);
                     if (value === null) {
-                        warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                        stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
                     else {
                         dependencies.add(value, node.loc);
@@ -274,13 +250,13 @@ function runASTAnalysis(str, options = Object.create(null)) {
                     walkCallExpression(arg)
                         .forEach((depName) => dependencies.add(depName, node.loc, true));
 
-                    warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                    stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
 
                     // We skip walking the tree to avoid anymore warnings...
                     this.skip();
                 }
                 else {
-                    warnings.push(generateWarning("unsafe-import", { location: node.loc }));
+                    stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                 }
             }
 
@@ -302,29 +278,19 @@ function runASTAnalysis(str, options = Object.create(null)) {
         }
     });
 
-    const idsLengthAvg = identifiersLength.length === 0 ?
-        0 : (identifiersLength.reduce((prev, curr) => prev + curr, 0) / identifiersLength.length);
-    const stringScore = suspectScores.length === 0 ?
-        0 : (suspectScores.reduce((prev, curr) => prev + curr, 0) / suspectScores.length);
-
-    if (!isMinified && identifiersLength.length > 5 && idsLengthAvg <= 1.5) {
-        warnings.push(generateWarning("short-ids", { value: idsLengthAvg, location: rootLocation() }));
-    }
-    if (stringScore >= 3) {
-        warnings.push(generateWarning("suspicious-string", { value: stringScore, location: rootLocation() }));
-    }
+    const { idsLengthAvg, stringScore, warnings } = stats.getResult(isMinified);
 
     return {
-        dependencies,
-        warnings,
-        idsLengthAvg,
-        stringScore,
+        dependencies, warnings, idsLengthAvg, stringScore,
         isOneLineRequire: body.length <= 1 && dependencies.size <= 1
     };
 }
 
 module.exports = {
     runASTAnalysis,
-    generateWarning,
-    rootLocation
+    generateWarning: helpers.generateWarning,
+    rootLocation: helpers.rootLocation,
+    CONSTANTS: {
+        Warnings: ASTStats.Warnings
+    }
 };

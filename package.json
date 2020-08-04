@@ -1,6 +1,6 @@
 {
   "name": "js-x-ray",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "description": "JavaScript AST XRay analysis",
   "main": "index.js",
   "engines": {
@@ -55,10 +55,13 @@
   "dependencies": {
     "builtins": "^3.0.1",
     "estree-walker": "^2.0.1",
+    "is-base64": "^1.1.0",
     "meriyah": "^1.9.9",
     "safe-regex": "^2.1.1"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
     "@slimio/eslint-config": "^4.0.0",
     "@slimio/is": "^1.5.1",
     "@types/node": "^12.12.31",

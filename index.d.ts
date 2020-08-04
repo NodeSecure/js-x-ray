@@ -52,9 +52,14 @@ declare namespace JSXRay {
         }
     }
 
+    interface Constants {
+        Warnings: Record<symbol, string>;
+    }
+
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
     export function generateWarning(kind?: string, options?: WarningOptions): any;
     export function rootLocation(): any;
+    export const CONSTANTS: Constants;
 }
 
 export = JSXRay;

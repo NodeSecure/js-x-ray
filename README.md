@@ -5,23 +5,24 @@
 ![dep](https://img.shields.io/david/fraxken/js-x-ray)
 ![size](https://img.shields.io/bundlephobia/min/js-x-ray)
 
-JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to make it easier to use and evolve the code over time.
+JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to enable better code evolution and allow better access to developers and researchers.
 
-The goal is to quickly identify dangerous code and patterns for developers and Security researchers.
+The goal is to quickly identify dangerous code and patterns for developers and Security researchers. Interpreting the results of this tool will still require you to have a set of security notions.
 
 > Note: I have no particular background in security. I am more and more interested and passionate about static code analysis. But I would be particularly happy to know that my work can make a difference.
 
-## Features
-- Retrieve required dependencies and files.
+## Goals
+The objective of the project is to successfully detect all potentially suspicious JavaScript codes.. The target is obviously codes that are added or injected for malicious purposes..
+
+Most of the time these hackers will try to hide the behaviour of their codes as much as possible to avoid being spotted or easily understood... The work of the library is to understand and analyze these patterns that will allow us to detect malicious code..
+
+## Features Highlight
+- Retrieve required dependencies and files for Node.js.
 - Detect unsafe RegEx.
 - Get warnings when the AST Analysis as a problem or when not able to follow a statement.
 - Highlight common attack patterns and API usages.
-- Capable to follow the usage of globals.
-
-## Goals
-The goal of the project is to be able to detect any suspicious JavaScript code. We are talking about suspicious code that has been maliciously added or injected.
-
-Most of the time hackers will try to hide the code as much as possible so that it is not easily found/understood... So the lib's job is to found patterns and habits that allow us to detect these malicious codes.
+- Capable to follow the usage of dangerous Node.js globals.
+- Detect obfuscated code and when possible the tool that has been used.
 
 ## Getting Started
 
@@ -34,6 +35,7 @@ $ yarn add js-x-ray
 ```
 
 ## Usage example
+
 Create a local `.js` file with the following content:
 ```js
 try  {
@@ -47,6 +49,8 @@ require(lib);
 require("util");
 require(Buffer.from("6673", "hex").toString());
 ```
+
+---
 
 Then use `js-x-ray` to run an analysis of the JavaScript code:
 ```js
@@ -66,6 +70,8 @@ console.log(warnings);
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
+> ⚠️ There is also a lot of suspicious code example in the root cases directory. Feel free to try the tool on these files.
+
 ## Warnings Legends
 
 This section describe all the possible warnings returned by JSXRay.
@@ -74,11 +80,15 @@ This section describe all the possible warnings returned by JSXRay.
 | --- | --- |
 | ast-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. |
 | unsafe-import | Unable to follow an import (require, require.resolve) statement/expr. |
-| unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDOS Attack |
-| unsafe-stmt | Usage of eval or Function("") |
-| hexa-value | An hex value has been detected in a Literal |
-| short-ids | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
-| suspicious-string | This mean that the suspicious score of all Literal is bigger than 3 |
+| unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDoS Attack |
+| unsafe-stmt | Usage of dangerous statement like `eval` or `Function("")` |
+| unsafe-assign | Assignment of a protected global like `process` or `require` |
+| encoded-literal | An encoded literal has been detected (it can be an hexa value, unicode sequence etc) |
+| short-identifiers | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
+| suspicious-literal | This mean that the sum of suspicious score of all Literals is bigger than 3. |
+| obfuscated-code | There's a very high probability that the code is obfuscated... |
+
+> 👀 Obfuscation patterns are documented in the [following G.Drive document](https://docs.google.com/document/d/11ZrfW0bDQ-kd7Gr_Ixqyk8p3TGvxckmhFH3Z8dFoPhY/edit?usp=sharing)
 
 ## API
 
@@ -103,7 +113,7 @@ interface Report {
 }
 ```
 
-### generateWarning(kind?: string, options?: WarningOptions) -> any
+### generateWarning(kind?: string, options?: WarningOptions) -> Warning
 
 ```ts
 interface WarningOptions {
@@ -112,6 +122,9 @@ interface WarningOptions {
     value?: string | null
 }
 ```
+
+### rootLocation()
+Return an empty location with all row and column set to zero.
 
 ## License
 MIT

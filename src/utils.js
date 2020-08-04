@@ -7,26 +7,28 @@ const SAFE_HEX_VALUE = new Set(["0123456789", "abcdef", "0123456789abcdef", "abc
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
 const kMainModuleStr = "process.mainModule.require";
 
-function* getIdLength(node) {
-    if (node.type === "Identifier") {
-        yield node.name.length;
-    }
-    else if (node.type === "RestElement") {
-        yield node.argument.name.length;
-    }
-    else if (node.type === "AssignmentPattern") {
-        yield node.left.name.length;
-    }
-    else if (node.type === "ArrayPattern") {
-        yield* node.elements
-            .filter((id) => id !== null && id !== void 0)
-            .map((id) => [...getIdLength(id)])
-            .flat();
-    }
-    else if (node.type === "ObjectPattern") {
-        yield* node.properties
-            .filter((property) => property !== null && property !== void 0)
-            .map((property) => (property.type === "RestElement" ? property.argument.name : property.key.name).length);
+function notNullOrUndefined(value) {
+    return value !== null && value !== void 0;
+}
+
+function* getIdName(node) {
+    switch (node.type) {
+        case "Identifier":
+            yield node.name;
+            break;
+        case "RestElement":
+            yield node.argument.name;
+            break;
+        case "AssignmentPattern":
+            yield node.left.name;
+            break;
+        case "ArrayPattern":
+            yield* node.elements.filter(notNullOrUndefined).map((id) => [...getIdName(id)]).flat();
+            break;
+        case "ObjectPattern":
+            yield* node.properties.filter(notNullOrUndefined)
+                .map((property) => (property.type === "RestElement" ? property.argument.name : property.key.name));
+            break;
     }
 }
 
@@ -245,8 +247,72 @@ function strSuspectScore(str) {
     return strCharDiversity(str) >= 70 ? suspectScore + 2 : suspectScore;
 }
 
+function generateWarning(kind = "unsafe-import", options) {
+    const { location, file = null, value = null } = options;
+    const { start, end = start } = location;
+
+    const result = { kind, file, start, end };
+    if (value !== null) {
+        result.value = value;
+    }
+
+    return result;
+}
+
+function rootLocation() {
+    return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
+}
+
+function commonStringStart(leftStr, rightStr) {
+    const minLen = leftStr.length > rightStr.length ? rightStr.length : leftStr.length;
+    let commonStr = "";
+
+    for (let id = 0; id < minLen; id++) {
+        if (leftStr.charAt(id) !== rightStr.charAt(id)) {
+            break;
+        }
+
+        commonStr += leftStr.charAt(id);
+    }
+
+    return commonStr === "" ? null : commonStr;
+}
+
+function commonPrefix(arr) {
+    const sortedArr = arr.slice().sort();
+    const prefix = new Map();
+
+    mainLoop: for (const value of sortedArr) {
+        for (const [cp, count] of prefix.entries()) {
+            const commonStr = commonStringStart(value, cp);
+            if (commonStr === null) {
+                continue;
+            }
+
+            if (commonStr === cp || commonStr.startsWith(cp)) {
+                prefix.set(cp, count + 1);
+            }
+            else if (cp.startsWith(commonStr)) {
+                prefix.delete(cp);
+                prefix.set(commonStr, count + 1);
+            }
+            continue mainLoop;
+        }
+
+        prefix.set(value, 1);
+    }
+
+    for (const [key, value] of prefix.entries()) {
+        if (value === 1) {
+            prefix.delete(key);
+        }
+    }
+
+    return Object.fromEntries(prefix);
+}
+
 module.exports = {
-    getIdLength,
+    getIdName,
     getRequirablePatterns,
     strCharDiversity,
     strSuspectScore,
@@ -264,6 +330,9 @@ module.exports = {
     concatBinaryExpr,
     arrExprToString,
     getMemberExprName,
+    generateWarning,
+    rootLocation,
+    commonPrefix,
     CONSTANTS: Object.freeze({
         GLOBAL_IDENTIFIERS,
         GLOBAL_PARTS
