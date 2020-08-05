@@ -260,7 +260,7 @@ class ASTStats {
     getResult(isMinified) {
         const [isObfuscated, kind] = this.analyzeIdentifierNames();
         if (isObfuscated) {
-            this.addWarning(kWarningsKinds.obfuscatedCode, kind || "N/A");
+            this.addWarning(kWarningsKinds.obfuscatedCode, kind || "unknown");
         }
 
         const identifiersLengthArr = this.#identifiers.map((value) => value.length);

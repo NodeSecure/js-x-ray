@@ -247,20 +247,28 @@ function strSuspectScore(str) {
     return strCharDiversity(str) >= 70 ? suspectScore + 2 : suspectScore;
 }
 
-function generateWarning(kind = "unsafe-import", options) {
-    const { location, file = null, value = null } = options;
+function rootLocation() {
+    return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
+}
+
+function toArrayLocation(location = rootLocation()) {
     const { start, end = start } = location;
 
-    const result = { kind, file, start, end };
-    if (value !== null) {
+    return [[start.line || 0, start.column || 0], [end.line || 0, end.column || 0]];
+}
+
+function generateWarning(kind = "unsafe-import", options) {
+    const { location, file = null, value = null } = options;
+
+    const result = { kind, location: toArrayLocation(location) };
+    if (notNullOrUndefined(file)) {
+        result.file = file;
+    }
+    if (notNullOrUndefined(value)) {
         result.value = value;
     }
 
     return result;
-}
-
-function rootLocation() {
-    return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
 
 function commonStringStart(leftStr, rightStr) {
@@ -331,6 +339,7 @@ module.exports = {
     arrExprToString,
     getMemberExprName,
     generateWarning,
+    toArrayLocation,
     rootLocation,
     commonPrefix,
     CONSTANTS: Object.freeze({

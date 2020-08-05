@@ -20,18 +20,25 @@ declare namespace JSXRay {
     }
 
     interface WarningOptions {
-        location: { start: number, end?: number }
-        file?: string | null,
-        value?: string | null
+        location: SourceLocation;
+        file?: string;
+        value?: string;
     }
 
-    type kindWithValue = "ast-error" | "hexa-value" | "unsafe-regex" | "unsafe-stmt" | "short-ids" | "suspicious-string";
+    type kindWithValue = "parsing-error"
+        | "encoded-literal"
+        | "unsafe-regex"
+        | "unsafe-stmt"
+        | "unsafe-assign"
+        | "short-identifiers"
+        | "suspicious-literal"
+        | "obfuscated-code";
+
     interface BaseWarning {
-        file: string | null;
         kind: "unsafe-import" | kindWithValue;
+        file?: string;
         value: string;
-        start: { line: number; column: number };
-        end: { line: number; column: number };
+        location: [[number, number], [number, number]];
     }
 
     type Warning<T extends BaseWarning> = T extends { kind: kindWithValue } ? T : Omit<T, "value">;
@@ -65,8 +72,8 @@ declare namespace JSXRay {
     }
 
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-    export function generateWarning(kind?: string, options?: WarningOptions): any;
-    export function rootLocation(): any;
+    export function generateWarning(kind: string, options?: WarningOptions): Warning<BaseWarning>;
+    export function rootLocation(): SourceLocation;
     export namespace CONSTANTS {
         export const Warnings: WarningsNames;
     }

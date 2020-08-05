@@ -1,10 +1,13 @@
 "use strict";
 
-const { generateWarning } = require("../");
+const { generateWarning, rootLocation } = require("../");
 
 test("generateWarning default kind must be 'unsafe-import'", () => {
-    const result = generateWarning(void 0, { location: { start: 10 } });
-    expect(result.file).toStrictEqual(null);
+    const root = rootLocation();
+    root.start.line = 5;
+
+    const result = generateWarning(void 0, { location: root });
+    expect(result.file).toStrictEqual(void 0);
     expect(result.kind).toStrictEqual("unsafe-import");
-    expect(result.end).toStrictEqual(10);
+    expect(result.location[0]).toStrictEqual([5, 0]);
 });

@@ -9,7 +9,7 @@ JavaScript AST analysis. This package has been created to export the [Node-Secur
 
 The goal is to quickly identify dangerous code and patterns for developers and Security researchers. Interpreting the results of this tool will still require you to have a set of security notions.
 
-> Note: I have no particular background in security. I am more and more interested and passionate about static code analysis. But I would be particularly happy to know that my work can make a difference.
+> 💖 I have no particular background in security. I'm simply becoming more and more interested and passionate about static code analysis. But I would be more than happy to learn that my work can help prevent potential future attacks (or leaks).
 
 ## Goals
 The objective of the project is to successfully detect all potentially suspicious JavaScript codes.. The target is obviously codes that are added or injected for malicious purposes..
@@ -72,7 +72,9 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > ⚠️ There is also a lot of suspicious code example in the root cases directory. Feel free to try the tool on these files.
 
-## Warnings Legends
+## Warnings Legends (v2.0+)
+
+> Node-secure versions equal or lower than 0.7.0 are no longer compatible with the warnings table below.
 
 This section describe all the possible warnings returned by JSXRay.
 
@@ -92,7 +94,8 @@ This section describe all the possible warnings returned by JSXRay.
 
 ## API
 
-### runASTAnalysis(str: string, options?: RuntimeOptions) -> Report
+<details><summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
+<br />
 
 ```ts
 interface RuntimeOptions {
@@ -112,19 +115,30 @@ interface Report {
     isOneLineRequire: boolean;
 }
 ```
+</details>
 
-### generateWarning(kind?: string, options?: WarningOptions) -> Warning
+<details><summary>generateWarning(kind: string, options?: WarningOptions): Warning</summary>
+<br />
+
+Generate a new Warning Object.
 
 ```ts
 interface WarningOptions {
-    location: { start: number, end?: number }
-    file?: string | null,
-    value?: string | null
+    location: Location;
+    file?: string;
+    value?: string;
 }
 ```
+</details>
 
-### rootLocation()
-Return an empty location with all row and column set to zero.
+<details><summary>rootLocation(): SourceLocation</summary>
+<br />
+
+Return a default SourceLocation with all row and column set to zero.
+```js
+{ start: { line: 0, column: 0 }, end: { line: 0, column: 0 } }
+```
+</details>
 
 ## License
 MIT
