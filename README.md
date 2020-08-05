@@ -78,7 +78,7 @@ This section describe all the possible warnings returned by JSXRay.
 
 | name | description |
 | --- | --- |
-| ast-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. |
+| parsing-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. |
 | unsafe-import | Unable to follow an import (require, require.resolve) statement/expr. |
 | unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDoS Attack |
 | unsafe-stmt | Usage of dangerous statement like `eval` or `Function("")` |

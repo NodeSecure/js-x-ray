@@ -291,6 +291,16 @@ module.exports = {
     generateWarning: helpers.generateWarning,
     rootLocation: helpers.rootLocation,
     CONSTANTS: {
-        Warnings: ASTStats.Warnings
+        Warnings: Object.freeze({
+            parsingError: "ast-error",
+            unsafeImport: "unsafe-import",
+            unsafeRegex: "unsafe-regex",
+            unsafeStmt: "unsafe-stmt",
+            unsafeAssign: "unsafe-assign",
+            encodedLiteral: "encoded-literal",
+            shortIdentifiers: "short-identifiers",
+            suspiciousLiteral: "suspicious-literal",
+            obfuscatedCode: "obfuscated-code"
+        })
     }
 };

@@ -52,14 +52,24 @@ declare namespace JSXRay {
         }
     }
 
-    interface Constants {
-        Warnings: Record<symbol, string>;
+    interface WarningsNames {
+        parsingError: "parsing-error",
+        unsafeImport: "unsafe-import",
+        unsafeStmt: "unsafe-stmt",
+        unsafeRegex: "unsafe-regex",
+        unsafeAssign: "unsafe-assign",
+        encodedLiteral: "encoded-literal",
+        shortIdentifiers: "short-identifiers",
+        suspiciousLiteral: "suspicious-literal",
+        obfuscatedCode: "obfuscated-code"
     }
 
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
     export function generateWarning(kind?: string, options?: WarningOptions): any;
     export function rootLocation(): any;
-    export const CONSTANTS: Constants;
+    export namespace CONSTANTS {
+        export const Warnings: WarningsNames;
+    }
 }
 
 export = JSXRay;

@@ -15,7 +15,7 @@ const kDictionaryStrParts = [
 ];
 
 const kWarningsKinds = Object.freeze({
-    astError: Symbol("ASTError"),
+    parsingError: Symbol("ParsingError"),
     unsafeImport: Symbol("UnsafeImport"),
     unsafeRegex: Symbol("UnsafeRegex"),
     unsafeStmt: Symbol("UnsafeStmt"),
@@ -27,7 +27,7 @@ const kWarningsKinds = Object.freeze({
 });
 
 const kWarningsNameStr = Object.freeze({
-    [kWarningsKinds.astError]: "ast-error",
+    [kWarningsKinds.parsingError]: "parsing-error",
     [kWarningsKinds.unsafeImport]: "unsafe-import",
     [kWarningsKinds.unsafeRegex]: "unsafe-regex",
     [kWarningsKinds.unsafeStmt]: "unsafe-stmt",

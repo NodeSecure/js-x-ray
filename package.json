@@ -48,7 +48,8 @@
     ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/test/fixtures/"
+      "/test/fixtures/",
+      "/test/utils/"
     ]
   },
   "homepage": "https://github.com/fraxken/js-x-ray#readme",
