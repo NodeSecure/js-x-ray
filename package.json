@@ -63,12 +63,12 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
-    "@slimio/eslint-config": "^4.0.0",
+    "@slimio/eslint-config": "^4.1.0",
     "@slimio/is": "^1.5.1",
-    "@types/node": "^12.12.31",
-    "eslint": "^6.8.0",
+    "@types/node": "^14.0.27",
+    "eslint": "^7.6.0",
     "is-minified-code": "^2.0.0",
-    "jest": "^25.2.3",
+    "jest": "^26.2.2",
     "pkg-ok": "^2.3.1"
   }
 }
