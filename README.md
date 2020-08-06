@@ -80,17 +80,17 @@ This section describe all the possible warnings returned by JSXRay.
 
 | name | description |
 | --- | --- |
-| parsing-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. |
+| parsing-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. If you encounter such an error, **please open an issue here**. |
 | unsafe-import | Unable to follow an import (require, require.resolve) statement/expr. |
-| unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDoS Attack |
-| unsafe-stmt | Usage of dangerous statement like `eval` or `Function("")` |
-| unsafe-assign | Assignment of a protected global like `process` or `require` |
-| encoded-literal | An encoded literal has been detected (it can be an hexa value, unicode sequence etc) |
+| unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDoS Attack. |
+| unsafe-stmt | Usage of dangerous statement like `eval()` or `Function("")`. |
+| unsafe-assign | Assignment of a protected global like `process` or `require`. |
+| encoded-literal | An encoded literal has been detected (it can be an hexa value, unicode sequence, base64 string etc) |
 | short-identifiers | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
 | suspicious-literal | This mean that the sum of suspicious score of all Literals is bigger than 3. |
 | obfuscated-code | There's a very high probability that the code is obfuscated... |
 
-> 👀 Obfuscation patterns are documented in the [following G.Drive document](https://docs.google.com/document/d/11ZrfW0bDQ-kd7Gr_Ixqyk8p3TGvxckmhFH3Z8dFoPhY/edit?usp=sharing)
+> 👀 More details on warnings and their implementations [here](./WARNINGS.md)
 
 ## API
 
