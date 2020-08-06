@@ -202,6 +202,7 @@ class ASTStats {
 
         for (const variableDeclarator of node.declarations) {
             this.#idtypes.variableDeclarator++;
+
             for (const name of helpers.getIdName(variableDeclarator.id)) {
                 this.#identifiers.push({ name, type: "variableDeclarator" });
             }

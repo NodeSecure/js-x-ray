@@ -27,7 +27,7 @@ function* getIdName(node) {
             break;
         case "ObjectPattern":
             yield* node.properties.filter(notNullOrUndefined)
-                .map((property) => (property.type === "RestElement" ? property.argument.name : property.key.name));
+                .map((property) => (property.type === "RestElement" ? property.argument.name : property.value.name));
             break;
     }
 }
