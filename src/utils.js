@@ -287,27 +287,41 @@ function commonStringStart(leftStr, rightStr) {
 }
 
 function commonPrefix(arr) {
-    const sortedArr = arr.slice().sort();
+    const sortedArr = arr.slice().map((value) => value.toLowerCase()).sort();
+    // console.log(sortedArr);
     const prefix = new Map();
 
-    mainLoop: for (const value of sortedArr) {
-        for (const [cp, count] of prefix.entries()) {
-            const commonStr = commonStringStart(value, cp);
+    mainLoop: for (const currentPrefix of sortedArr) {
+        const matchedItems = [];
+        if (!prefix.has(currentPrefix)) {
+            matchedItems.push({ commonPrefix: currentPrefix, commonStr: null });
+        }
+
+        for (const commonPrefix of prefix.keys()) {
+            const commonStr = commonStringStart(currentPrefix, commonPrefix);
             if (commonStr === null) {
                 continue;
             }
+            matchedItems.push({ commonPrefix, commonStr });
+        }
+        matchedItems.sort((left, right) => right.commonPrefix.length - left.commonPrefix.length);
 
-            if (commonStr === cp || commonStr.startsWith(cp)) {
-                prefix.set(cp, count + 1);
+        for (const { commonPrefix, commonStr } of matchedItems) {
+            if (commonStr === null) {
+                break;
             }
-            else if (cp.startsWith(commonStr)) {
-                prefix.delete(cp);
+
+            const count = prefix.get(commonPrefix);
+            if (commonStr === commonPrefix || commonStr.startsWith(commonPrefix)) {
+                prefix.set(commonPrefix, count + 1);
+            }
+            else if (commonPrefix.startsWith(commonStr)) {
                 prefix.set(commonStr, count + 1);
             }
             continue mainLoop;
         }
 
-        prefix.set(value, 1);
+        prefix.set(currentPrefix, 1);
     }
 
     for (const [key, value] of prefix.entries()) {

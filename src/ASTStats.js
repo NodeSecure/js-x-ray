@@ -13,6 +13,8 @@ const kDictionaryStrParts = [
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "0123456789"
 ];
+const kJSFuckMinimumDoubleUnaryExpr = 5;
+const kMinimumIdsCount = 5;
 
 const kWarningsKinds = Object.freeze({
     parsingError: Symbol("ParsingError"),
@@ -91,14 +93,15 @@ class ASTStats {
         this.warnings.push(helpers.generateWarning(warningName, { value, location }));
     }
 
-    isJJEncode(prefix) {
+    isJJEncode(prefixNames) {
         if (this.#counter.variableDeclarator > 0 || this.#counter.functionDeclaration > 0) {
             return false;
         }
 
-        for (const id of this.#identifiers) {
-            const charsCode = [...new Set([...id])];
-            if (charsCode.some((char) => !prefix.has(char))) {
+        for (const { name } of this.#identifiers) {
+            const charsCode = [...new Set([...name])];
+            console.log(charsCode);
+            if (charsCode.some((char) => !prefixNames.has(char))) {
                 return false;
             }
         }
@@ -112,7 +115,18 @@ class ASTStats {
             && this.#idtypes.property === 0
             && this.#idtypes.variableDeclarator === 0;
 
-        return hasZeroAssign && this.#counter.doubleUnaryArray >= 5;
+        return hasZeroAssign && this.#counter.doubleUnaryArray >= kJSFuckMinimumDoubleUnaryExpr;
+    }
+
+    isFreeJSObfuscator(prefix) {
+        const [pValue, pCount] = Object.entries(prefix).pop();
+        if (pCount !== this.#counter.identifiers) {
+            return false;
+        }
+
+        const regexStr = `^${escapeRegExp(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`;
+
+        return this.#identifiers.every(({ name }) => new RegExp(regexStr).test(name));
     }
 
     isObfuscatorIO() {
@@ -125,46 +139,53 @@ class ASTStats {
             || this.#counter.encodedArrayValue > 0
             || this.#hasDictionaryString;
 
+        // TODO: hasPrefixedIdentifiers only work for hexadecimal id names generator
         return this.#hasPrefixedIdentifiers && hasSomePatterns;
     }
 
+    calcAvgPrefixedIdentifiers(prefix) {
+        const valuesArr = Object.values(prefix).slice().sort((left, right) => left - right);
+        if (valuesArr.length === 0) {
+            return 0;
+        }
+        const nbOfPrefixedIds = valuesArr.length === 1 ? valuesArr.pop() : (valuesArr.pop() + valuesArr.pop());
+        const maxIds = this.#counter.identifiers - this.#idtypes.property;
+
+        return ((nbOfPrefixedIds / maxIds) * 100);
+    }
+
     analyzeIdentifierNames() {
+        const prefix = helpers.commonPrefix(this.#identifiers.map((value) => value.name));
+        const uPrefixNames = new Set(Object.keys(prefix));
+
         this.#counter.identifiers = this.#identifiers.length;
-
-        const commonPrefix = helpers.commonPrefix(this.#identifiers);
-        const prefix = new Set(Object.keys(commonPrefix));
-
-        if (this.#counter.identifiers > 4 && prefix.size > 0) {
-            const iterations = Object.values(commonPrefix).sort((left, right) => left - right);
-            const pCount = iterations.length === 1 ? iterations.pop() : (iterations.pop() + iterations.pop());
-            this.#hasPrefixedIdentifiers = ((pCount / this.#counter.identifiers) * 100) > 90;
+        if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
+            this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
         }
 
-        if (prefix.size === 0 && this.isJSFuck()) {
-            return [true, "jsfuck"];
-        }
-        if (prefix.size === 2 && this.isJJEncode(prefix)) {
-            return [true, "jjencode"];
-        }
-        if (prefix.size === 1) {
-            const [pValue, pCount] = Object.entries(commonPrefix).pop();
-            if (pCount === this.#counter.identifiers) {
-                const isFreeJSObfuscator = this.#identifiers
-                    .every((value) => new RegExp(`^${escapeRegExp(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`).test(value));
+        // console.log(prefix);
+        // console.log(this.#counter);
+        // console.log(this.#idtypes);
 
-                if (isFreeJSObfuscator) {
-                    return [true, "freejsobfuscator"];
-                }
-            }
+        let encoderName = null;
+        if (uPrefixNames.size === 0 && this.isJSFuck()) {
+            encoderName = "jsfuck";
         }
-        if (this.isObfuscatorIO()) {
-            return [true, "obfuscator.io"];
+        else if (uPrefixNames.size === 1 && this.isFreeJSObfuscator(prefix)) {
+            encoderName = "freejsobfuscator";
         }
-        if ((this.#counter.identifiers > 15 && this.#hasPrefixedIdentifiers) || this.#counter.encodedArrayValue > 0) {
-            return [true, null];
+        else if (uPrefixNames.size === 2 && this.isJJEncode(uPrefixNames)) {
+            encoderName = "jjencode";
+        }
+        else if (this.isObfuscatorIO()) {
+            encoderName = "obfuscator.io";
+        }
+        else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
+            || this.#counter.encodedArrayValue > 0) {
+            encoderName = "unknown";
         }
 
-        return [false, null];
+        return [encoderName !== null, encoderName];
     }
 
     analyzeVariableDeclaration(node) {
@@ -172,7 +193,9 @@ class ASTStats {
 
         for (const variableDeclarator of node.declarations) {
             this.#idtypes.variableDeclarator++;
-            this.#identifiers.push(...helpers.getIdName(variableDeclarator.id));
+            for (const name of helpers.getIdName(variableDeclarator.id)) {
+                this.#identifiers.push({ name, type: "variableDeclarator" });
+            }
         }
     }
 
@@ -181,7 +204,7 @@ class ASTStats {
             return;
         }
         this.#idtypes.functionDeclaration++;
-        this.#identifiers.push(node.id.name);
+        this.#identifiers.push({ name: node.id.name, type: "functionDeclaration" });
     }
 
     analyzeProperty(property) {
@@ -190,10 +213,14 @@ class ASTStats {
         }
 
         this.#idtypes.property++;
-        this.#identifiers.push(property.key.name);
+        this.#identifiers.push({ name: property.key.name, type: "property" });
     }
 
-    analyzeLiteral(node) {
+    analyzeLiteral(node, inArrayExpr = false) {
+        if (typeof node.value !== "string") {
+            return;
+        }
+
         const score = helpers.strSuspectScore(node.value);
         if (score !== 0) {
             this.literalScores.push(score);
@@ -205,31 +232,38 @@ class ASTStats {
                 this.#hasDictionaryString = true;
             }
         }
+
+        const hasHexadecimalSequence = /\\x[a-fA-F0-9]{2}/g.exec(node.raw) !== null;
+        const hasUnicodeSequence = /\\u[a-fA-F0-9]{4}/g.exec(node.raw) !== null;
+        const isBase64 = isStringBase64(node.value, { allowEmpty: false });
+
+        if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
+            if (inArrayExpr) {
+                this.#counter.encodedArrayValue++;
+            }
+            else {
+                this.addWarning(kWarningsKinds.encodedLiteral, node.value, node.loc);
+            }
+        }
     }
 
     analyzeArrayExpression(node) {
         for (const elem of node.elements) {
-            if (elem.type !== "Literal") {
-                continue;
-            }
-            const { value, raw } = elem;
-
-            const hasHexadecimalSequence = /\\x[a-fA-F0-9]{2}/g.exec(raw) !== null;
-            const hasUnicodeSequence = /\\u[a-fA-F0-9]{4}/g.exec(raw) !== null;
-            const isBase64 = isStringBase64(value, { allowEmpty: false });
-
-            if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
-                this.#counter.encodedArrayValue++;
+            if (elem.type === "Literal") {
+                this.analyzeLiteral(elem, true);
             }
         }
     }
 
     doNodeAnalysis(node) {
         switch (node.type) {
-            case "AssignmentExpression":
+            case "AssignmentExpression": {
                 this.#idtypes.assignExpr++;
-                this.#identifiers.push(...helpers.getIdName(node.left));
+                for (const name of helpers.getIdName(node.left)) {
+                    this.#identifiers.push({ name, type: "assignExpr" });
+                }
                 break;
+            }
             case "MemberExpression":
                 this.#counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
                 break;
@@ -263,7 +297,9 @@ class ASTStats {
             this.addWarning(kWarningsKinds.obfuscatedCode, kind || "unknown");
         }
 
-        const identifiersLengthArr = this.#identifiers.map((value) => value.length);
+        const identifiersLengthArr = this.#identifiers
+            .filter((value) => value.type !== "property").map((value) => value.name.length);
+
         const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
         if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
             this.addWarning(kWarningsKinds.shortIdentifiers, idsLengthAvg);
