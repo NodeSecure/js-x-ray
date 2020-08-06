@@ -2,6 +2,6 @@
     "extends": "@slimio/eslint-config",
     "rules": {
         "jsdoc/require-jsdoc": "off",
-        "require-atomic-updates": "off"
+        "lines-between-class-members": "off"
     }
 }

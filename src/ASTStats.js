@@ -1,4 +1,3 @@
-/* eslint-disable lines-between-class-members */
 "use strict";
 
 // Require Third-party Dependencies
