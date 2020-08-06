@@ -34,11 +34,12 @@ declare namespace JSXRay {
         | "suspicious-literal"
         | "obfuscated-code";
 
+    type WarningLocation = [[number, number], [number, number]];
     interface BaseWarning {
         kind: "unsafe-import" | kindWithValue;
         file?: string;
         value: string;
-        location: [[number, number], [number, number]];
+        location: WarningLocation | WarningLocation[];
     }
 
     type Warning<T extends BaseWarning> = T extends { kind: kindWithValue } ? T : Omit<T, "value">;

@@ -85,12 +85,22 @@ class ASTStats {
 
     constructor() {
         this.warnings = [];
+        this.handledEncodedLiteralValues = new Map();
         this.literalScores = [];
     }
 
     addWarning(symbol, value, location = helpers.rootLocation()) {
+        if (symbol === kWarningsKinds.encodedLiteral && this.handledEncodedLiteralValues.has(value)) {
+            const index = this.handledEncodedLiteralValues.get(value);
+            this.warnings[index].location.push(helpers.toArrayLocation(location));
+
+            return;
+        }
         const warningName = kWarningsNameStr[symbol];
         this.warnings.push(helpers.generateWarning(warningName, { value, location }));
+        if (symbol === kWarningsKinds.encodedLiteral) {
+            this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
+        }
     }
 
     isJJEncode(prefixNames) {
@@ -100,7 +110,6 @@ class ASTStats {
 
         for (const { name } of this.#identifiers) {
             const charsCode = [...new Set([...name])];
-            console.log(charsCode);
             if (charsCode.some((char) => !prefixNames.has(char))) {
                 return false;
             }
