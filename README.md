@@ -88,14 +88,14 @@ This section describe all the possible warnings returned by JSXRay.
 | encoded-literal | An encoded literal has been detected (it can be an hexa value, unicode sequence, base64 string etc) |
 | short-identifiers | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
 | suspicious-literal | This mean that the sum of suspicious score of all Literals is bigger than 3. |
-| obfuscated-code | There's a very high probability that the code is obfuscated... |
+| obfuscated-code (**experimental**) | There's a very high probability that the code is obfuscated... |
 
 > 👀 More details on warnings and their implementations [here](./WARNINGS.md)
 
 ## API
 
-<details><summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
-<br />
+<details>
+<summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
 
 ```ts
 interface RuntimeOptions {
@@ -115,10 +115,11 @@ interface Report {
     isOneLineRequire: boolean;
 }
 ```
+
 </details>
 
-<details><summary>generateWarning(kind: string, options?: WarningOptions): Warning</summary>
-<br />
+<details>
+<summary>generateWarning(kind: string, options?: WarningOptions): Warning< BaseWarning ></summary>
 
 Generate a new Warning Object.
 
@@ -129,15 +130,17 @@ interface WarningOptions {
     value?: string;
 }
 ```
+
 </details>
 
-<details><summary>rootLocation(): SourceLocation</summary>
-<br />
+<details>
+<summary>rootLocation(): SourceLocation</summary>
 
 Return a default SourceLocation with all row and column set to zero.
 ```js
 { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } }
 ```
+
 </details>
 
 ## License

@@ -164,10 +164,8 @@ class ASTStats {
 
     analyzeIdentifierNames() {
         this.#counter.identifiers = this.#identifiers.length;
-        console.log(this.#counter);
-        console.log(this.#idtypes);
-
         let encoderName = null;
+
         if (this.isJSFuck()) {
             encoderName = "jsfuck";
         }
@@ -177,7 +175,6 @@ class ASTStats {
         else {
             const prefix = helpers.commonPrefix(this.#identifiers.map((value) => value.name), "low");
             const uPrefixNames = new Set(Object.keys(prefix));
-            console.log(prefix);
 
             if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
                 this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
