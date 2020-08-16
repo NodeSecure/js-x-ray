@@ -104,23 +104,11 @@ function isLiteralRegex(node) {
 }
 
 function isVariableDeclarator(node) {
-    if (node.type !== "VariableDeclarator" ||
-        node.init === null ||
-        node.id.type !== "Identifier") {
-        return false;
-    }
-
-    return true;
+    return node.type !== "VariableDeclarator" || node.init === null || node.id.type !== "Identifier";
 }
 
 function isFunctionDeclarator(node) {
-    if (node.type !== "FunctionDeclaration" ||
-        node.id === null ||
-        node.id.type !== "Identifier") {
-        return false;
-    }
-
-    return true;
+    return node.type !== "FunctionDeclaration" || node.id === null || node.id.type !== "Identifier";
 }
 
 function arrExprToString(elements, identifiers = null) {
@@ -289,10 +277,12 @@ function commonStringStart(leftStr, rightStr) {
     return commonStr === "" ? null : commonStr;
 }
 
-function commonPrefix(arr) {
+function commonPrefix(arr, sort = "high") {
     const sortedArr = arr.slice().map((value) => value.toLowerCase()).sort();
-    // console.log(sortedArr);
     const prefix = new Map();
+    const sortingFn = sort === "high" ?
+        (left, right) => right.commonPrefix.length - left.commonPrefix.length :
+        (left, right) => left.commonPrefix.length - right.commonPrefix.length;
 
     mainLoop: for (const currentPrefix of sortedArr) {
         const matchedItems = [];
@@ -307,7 +297,7 @@ function commonPrefix(arr) {
             }
             matchedItems.push({ commonPrefix, commonStr });
         }
-        matchedItems.sort((left, right) => right.commonPrefix.length - left.commonPrefix.length);
+        matchedItems.sort(sortingFn);
 
         for (const { commonPrefix, commonStr } of matchedItems) {
             if (commonStr === null) {

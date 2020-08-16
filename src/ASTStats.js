@@ -14,6 +14,7 @@ const kDictionaryStrParts = [
 ];
 const kJSFuckMinimumDoubleUnaryExpr = 5;
 const kMinimumIdsCount = 5;
+const kJJRegularSymbols = new Set(["$", "_"]);
 
 const kWarningsKinds = Object.freeze({
     parsingError: Symbol("ParsingError"),
@@ -102,19 +103,22 @@ class ASTStats {
         }
     }
 
-    isJJEncode(prefixNames) {
+    isJJEncode() {
         if (this.#counter.variableDeclarator > 0 || this.#counter.functionDeclaration > 0) {
             return false;
         }
-
-        for (const { name } of this.#identifiers) {
-            const charsCode = [...new Set([...name])];
-            if (charsCode.some((char) => !prefixNames.has(char))) {
-                return false;
-            }
+        if (this.#idtypes.assignExpr > this.#idtypes.property) {
+            return false;
         }
 
-        return true;
+        const matchCount = this.#identifiers.filter(({ name }) => {
+            const charsCode = [...new Set([...name])];
+
+            return charsCode.every((char) => kJJRegularSymbols.has(char));
+        }).length;
+        const pourcent = ((matchCount / this.#identifiers.length) * 100);
+
+        return pourcent > 80;
     }
 
     isJSFuck() {
@@ -127,11 +131,7 @@ class ASTStats {
     }
 
     isFreeJSObfuscator(prefix) {
-        const [pValue, pCount] = Object.entries(prefix).pop();
-        if (pCount !== this.#counter.identifiers) {
-            return false;
-        }
-
+        const pValue = Object.keys(prefix).pop();
         const regexStr = `^${escapeRegExp(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`;
 
         return this.#identifiers.every(({ name }) => new RegExp(regexStr).test(name));
@@ -163,34 +163,36 @@ class ASTStats {
     }
 
     analyzeIdentifierNames() {
-        const prefix = helpers.commonPrefix(this.#identifiers.map((value) => value.name));
-        const uPrefixNames = new Set(Object.keys(prefix));
-
         this.#counter.identifiers = this.#identifiers.length;
-        if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
-            this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
-        }
-
-        // console.log(prefix);
-        // console.log(this.#counter);
-        // console.log(this.#idtypes);
+        console.log(this.#counter);
+        console.log(this.#idtypes);
 
         let encoderName = null;
-        if (uPrefixNames.size === 0 && this.isJSFuck()) {
+        if (this.isJSFuck()) {
             encoderName = "jsfuck";
         }
-        else if (uPrefixNames.size === 1 && this.isFreeJSObfuscator(prefix)) {
-            encoderName = "freejsobfuscator";
-        }
-        else if (uPrefixNames.size === 2 && this.isJJEncode(uPrefixNames)) {
+        else if (this.isJJEncode()) {
             encoderName = "jjencode";
         }
-        else if (this.isObfuscatorIO()) {
-            encoderName = "obfuscator.io";
-        }
-        else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
-            || this.#counter.encodedArrayValue > 0) {
-            encoderName = "unknown";
+        else {
+            const prefix = helpers.commonPrefix(this.#identifiers.map((value) => value.name), "low");
+            const uPrefixNames = new Set(Object.keys(prefix));
+            console.log(prefix);
+
+            if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
+                this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
+            }
+
+            if (uPrefixNames.size === 1 && this.isFreeJSObfuscator(prefix)) {
+                encoderName = "freejsobfuscator";
+            }
+            else if (this.isObfuscatorIO()) {
+                encoderName = "obfuscator.io";
+            }
+            else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
+                || this.#counter.encodedArrayValue > 0) {
+                encoderName = "unknown";
+            }
         }
 
         return [encoderName !== null, encoderName];
