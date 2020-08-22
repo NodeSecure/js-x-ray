@@ -11,6 +11,15 @@ function notNullOrUndefined(value) {
     return value !== null && value !== void 0;
 }
 
+function getPropertyIdName(node) {
+    if (node.type === "RestElement") {
+        return node.argument.name;
+    }
+    const isAssignmentPattern = Reflect.has(node.value, "type") && node.value.type === "AssignmentPattern";
+
+    return isAssignmentPattern ? node.value.left.name : node.value.name;
+}
+
 function* getIdName(node) {
     switch (node.type) {
         case "Identifier":
@@ -27,7 +36,7 @@ function* getIdName(node) {
             break;
         case "ObjectPattern":
             yield* node.properties.filter(notNullOrUndefined)
-                .map((property) => (property.type === "RestElement" ? property.argument.name : property.value.name));
+                .map((property) => getPropertyIdName(property));
             break;
     }
 }

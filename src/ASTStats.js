@@ -187,7 +187,7 @@ class ASTStats {
                 encoderName = "obfuscator.io";
             }
             else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
-                || this.#counter.encodedArrayValue > 0) {
+                && this.#counter.encodedArrayValue > 0) {
                 encoderName = "unknown";
             }
         }
@@ -202,6 +202,9 @@ class ASTStats {
             this.#idtypes.variableDeclarator++;
 
             for (const name of helpers.getIdName(variableDeclarator.id)) {
+                if (name === void 0) {
+                    console.log(JSON.stringify(variableDeclarator.id, null, 2));
+                }
                 this.#identifiers.push({ name, type: "variableDeclarator" });
             }
         }
@@ -216,7 +219,8 @@ class ASTStats {
     }
 
     analyzeProperty(property) {
-        if (property.key.type !== "Identifier") {
+        // TODO: handle SpreadElement
+        if (property.type !== "Property" || property.key.type !== "Identifier") {
             return;
         }
 
@@ -257,7 +261,7 @@ class ASTStats {
 
     analyzeArrayExpression(node) {
         for (const elem of node.elements) {
-            if (elem.type === "Literal") {
+            if (elem !== null && elem.type === "Literal") {
                 this.analyzeLiteral(elem, true);
             }
         }
