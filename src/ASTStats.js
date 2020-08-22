@@ -112,6 +112,9 @@ class ASTStats {
         }
 
         const matchCount = this.#identifiers.filter(({ name }) => {
+            if (!helpers.notNullOrUndefined(name)) {
+                return false;
+            }
             const charsCode = [...new Set([...name])];
 
             return charsCode.every((char) => kJJRegularSymbols.has(char));

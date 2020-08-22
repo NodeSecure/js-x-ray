@@ -11,15 +11,6 @@ function notNullOrUndefined(value) {
     return value !== null && value !== void 0;
 }
 
-function getPropertyIdName(node) {
-    if (node.type === "RestElement") {
-        return node.argument.name;
-    }
-    const isAssignmentPattern = Reflect.has(node.value, "type") && node.value.type === "AssignmentPattern";
-
-    return isAssignmentPattern ? node.value.left.name : node.value.name;
-}
-
 function* getIdName(node) {
     switch (node.type) {
         case "Identifier":
@@ -35,8 +26,7 @@ function* getIdName(node) {
             yield* node.elements.filter(notNullOrUndefined).map((id) => [...getIdName(id)]).flat();
             break;
         case "ObjectPattern":
-            yield* node.properties.filter(notNullOrUndefined)
-                .map((property) => getPropertyIdName(property));
+            yield* node.properties.filter(notNullOrUndefined).map((property) => [...getIdName(property)]).flat();
             break;
     }
 }
@@ -336,6 +326,7 @@ function commonPrefix(arr, sort = "high") {
 }
 
 module.exports = {
+    notNullOrUndefined,
     getIdName,
     getRequirablePatterns,
     strCharDiversity,
