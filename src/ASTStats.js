@@ -202,9 +202,6 @@ class ASTStats {
             this.#idtypes.variableDeclarator++;
 
             for (const name of helpers.getIdName(variableDeclarator.id)) {
-                if (name === void 0) {
-                    console.log(JSON.stringify(variableDeclarator.id, null, 2));
-                }
                 this.#identifiers.push({ name, type: "variableDeclarator" });
             }
         }
