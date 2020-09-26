@@ -230,7 +230,7 @@ class ASTStats {
     }
 
     analyzeLiteral(node, inArrayExpr = false) {
-        if (typeof node.value !== "string" || isSvg(node.value)) {
+        if (typeof node.value !== "string" || isSvg(node.value) || helpers.isSvgPath(node.value)) {
             return;
         }
 

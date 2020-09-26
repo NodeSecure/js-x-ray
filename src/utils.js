@@ -330,7 +330,17 @@ function commonPrefix(arr, sort = "high") {
     return Object.fromEntries(prefix);
 }
 
+function isSvgPath(str) {
+    if (typeof str !== "string") {
+        return false;
+    }
+    const trimStr = str.trim();
+
+    return /^[mzlhvcsqta]\s*[-+.0-9][^mlhvzcsqta]+/i.test(trimStr) && /[\dz]$/i.test(trimStr) && trimStr.length > 4;
+}
+
 module.exports = {
+    isSvgPath,
     notNullOrUndefined,
     getIdName,
     getRequirablePatterns,
