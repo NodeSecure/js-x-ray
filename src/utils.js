@@ -3,7 +3,7 @@
 // CONSTANTS
 const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
 const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
-const SAFE_HEX_VALUE = new Set(["0123456789", "abcdef", "0123456789abcdef", "abcdef0123456789abcdef"]);
+const SAFE_HEX_VALUE = new Set(["0123456789", "123456789", "abcdef", "0123456789abcdef", "abcdef0123456789abcdef"]);
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
 const kMainModuleStr = "process.mainModule.require";
 
@@ -171,7 +171,12 @@ function isHexValue(value) {
 }
 
 function isSafeHexValue(rawValue) {
-    return SAFE_HEX_VALUE.has(rawValue);
+    const uChars = new Set([...rawValue]);
+    if ((uChars.size === 1 && uChars.has("0")) || rawValue.length <= 4) {
+        return true;
+    }
+
+    return [...SAFE_HEX_VALUE].some((value) => value.startsWith(rawValue));
 }
 
 function getMemberExprName(node) {
