@@ -2,6 +2,7 @@
 
 // Require Third-party Dependencies
 const isStringBase64 = require("is-base64");
+const isSvg = require("is-svg");
 
 // Require Internal Dependencies
 const helpers = require("./utils");
@@ -229,7 +230,7 @@ class ASTStats {
     }
 
     analyzeLiteral(node, inArrayExpr = false) {
-        if (typeof node.value !== "string") {
+        if (typeof node.value !== "string" || isSvg(node.value)) {
             return;
         }
 

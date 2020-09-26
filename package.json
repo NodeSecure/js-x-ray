@@ -57,6 +57,7 @@
     "builtins": "^3.0.1",
     "estree-walker": "^2.0.1",
     "is-base64": "^1.1.0",
+    "is-svg": "^4.2.1",
     "meriyah": "^2.1.1",
     "safe-regex": "^2.1.1"
   },
