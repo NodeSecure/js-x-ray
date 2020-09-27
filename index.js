@@ -1,10 +1,12 @@
 "use strict";
 
+// Require Node.js Dependencies
+const repl = require("repl");
+
 // Require Third-party Dependencies
 const { walk } = require("estree-walker");
 const meriyah = require("meriyah");
 const safeRegex = require("safe-regex");
-const builtins = require("builtins");
 
 // Require Internal Dependencies
 const helpers = require("./src/utils");
@@ -13,7 +15,7 @@ const ASTStats = require("./src/ASTStats");
 
 // CONSTANTS
 const kMainModuleStr = "process.mainModule.require";
-const kNodeDeps = new Set(builtins());
+const kNodeDeps = new Set(repl.builtinModules);
 const kUnsafeCallee = new Set(["eval", "Function"]);
 const { CONSTANTS: { GLOBAL_PARTS } } = helpers;
 

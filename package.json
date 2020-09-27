@@ -54,7 +54,6 @@
   },
   "homepage": "https://github.com/fraxken/js-x-ray#readme",
   "dependencies": {
-    "builtins": "^3.0.1",
     "estree-walker": "^2.0.1",
     "is-base64": "^1.1.0",
     "is-svg": "^4.2.1",
