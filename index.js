@@ -87,7 +87,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
         }
 
         if (node.init.type === "Literal") {
-            identifiers.set(node.id.name, node.init.value);
+            identifiers.set(node.id.name, String(node.init.value));
         }
 
         // Searching for someone who assign require to a variable, ex:
