@@ -282,7 +282,7 @@ function commonStringStart(leftStr, rightStr) {
 }
 
 function commonPrefix(arr, sort = "high") {
-    const sortedArr = arr.slice().map((value) => value.toLowerCase()).sort();
+    const sortedArr = arr.slice().filter((value) => typeof value === "string").map((value) => value.toLowerCase()).sort();
     const prefix = new Map();
     const sortingFn = sort === "high" ?
         (left, right) => right.commonPrefix.length - left.commonPrefix.length :

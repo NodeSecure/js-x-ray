@@ -311,7 +311,7 @@ class ASTStats {
         }
 
         const identifiersLengthArr = this.#identifiers
-            .filter((value) => value.type !== "property").map((value) => value.name.length);
+            .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
 
         const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
         if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
