@@ -171,8 +171,7 @@ function isHexValue(value) {
 }
 
 function isSafeHexValue(rawValue) {
-    const uChars = new Set([...rawValue]);
-    if ((uChars.size === 1 && uChars.has("0")) || rawValue.length <= 4) {
+    if (/^[0-9]+$/g.test(rawValue) || rawValue.length <= 4) {
         return true;
     }
 

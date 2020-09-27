@@ -165,7 +165,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                         stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
-                    else if (!helpers.isSafeHexValue(node.value)) {
+                    else if (GLOBAL_PARTS.has(value) || !helpers.isSafeHexValue(node.value)) {
                         stats.addWarning(ASTStats.Warnings.encodedLiteral, node.value, node.loc);
                     }
                 }
