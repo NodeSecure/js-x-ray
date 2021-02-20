@@ -79,7 +79,8 @@ class ASTStats {
         computedMemberExpr: 0,
         memberExpr: 0,
         deepBinaryExpr: 0,
-        encodedArrayValue: 0
+        encodedArrayValue: 0,
+        morseLiteral: 0
     };
     #identifiers = [];
 
@@ -175,8 +176,12 @@ class ASTStats {
         else if (this.isJJEncode()) {
             encoderName = "jjencode";
         }
+        else if (this.#counter.morseLiteral === 36) {
+            encoderName = "morse";
+        }
         else {
-            const { prefix } = secString.Patterns.commonHexadecimalPrefix(
+            // TODO: also implement Dictionnary checkup
+            const { prefix, oneTimeOccurence } = secString.Patterns.commonHexadecimalPrefix(
                 this.#identifiers.map((value) => value.name)
             );
             const uPrefixNames = new Set(Object.keys(prefix));
@@ -184,6 +189,11 @@ class ASTStats {
             if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
                 this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
             }
+            // console.log(prefix);
+            // console.log(oneTimeOccurence);
+            // console.log(this.#hasPrefixedIdentifiers);
+            // console.log(this.#counter.identifiers);
+            // console.log(this.#counter.encodedArrayValue);
 
             if (uPrefixNames.size === 1 && this.isFreeJSObfuscator(prefix)) {
                 encoderName = "freejsobfuscator";
@@ -192,7 +202,7 @@ class ASTStats {
                 encoderName = "obfuscator.io";
             }
             else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
-                && this.#counter.encodedArrayValue > 0) {
+                && (oneTimeOccurence <= 3 || this.#counter.encodedArrayValue > 0)) {
                 encoderName = "unknown";
             }
         }
@@ -245,6 +255,10 @@ class ASTStats {
             if (isDictionaryStr) {
                 this.#hasDictionaryString = true;
             }
+        }
+
+        if (node.value.length <= 5 && /^[.-]+$/g.test(node.value)) {
+            this.#counter.morseLiteral++;
         }
 
         const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = secString.Literal.defaultAnalysis(node);
