@@ -190,7 +190,7 @@ test("should detect the suspicious string", () => {
     const { warnings, stringScore } = runASTAnalysis(suspectString);
 
     expect(getWarningKind(warnings)).toStrictEqual([Warnings.suspiciousLiteral].sort());
-    expect(stringScore).toStrictEqual(7);
+    expect(stringScore).toStrictEqual(8);
 });
 
 test("should be capable to follow hexa computation members expr", () => {

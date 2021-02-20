@@ -1,8 +1,7 @@
 "use strict";
 
 // Require Third-party Dependencies
-const isStringBase64 = require("is-base64");
-const isSvg = require("is-svg");
+const secString = require("sec-literal");
 
 // Require Internal Dependencies
 const helpers = require("./utils");
@@ -177,7 +176,9 @@ class ASTStats {
             encoderName = "jjencode";
         }
         else {
-            const prefix = helpers.commonPrefix(this.#identifiers.map((value) => value.name), "low");
+            const { prefix } = secString.Patterns.commonHexadecimalPrefix(
+                this.#identifiers.map((value) => value.name)
+            );
             const uPrefixNames = new Set(Object.keys(prefix));
 
             if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
@@ -230,11 +231,11 @@ class ASTStats {
     }
 
     analyzeLiteral(node, inArrayExpr = false) {
-        if (typeof node.value !== "string" || isSvg(node.value) || helpers.isSvgPath(node.value)) {
+        if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
             return;
         }
 
-        const score = helpers.strSuspectScore(node.value);
+        const score = secString.Utils.stringSuspicionScore(node.value);
         if (score !== 0) {
             this.literalScores.push(score);
         }
@@ -246,10 +247,7 @@ class ASTStats {
             }
         }
 
-        const hasHexadecimalSequence = /\\x[a-fA-F0-9]{2}/g.exec(node.raw) !== null;
-        const hasUnicodeSequence = /\\u[a-fA-F0-9]{4}/g.exec(node.raw) !== null;
-        const isBase64 = isStringBase64(node.value, { allowEmpty: false });
-
+        const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = secString.Literal.defaultAnalysis(node);
         if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
             if (inArrayExpr) {
                 this.#counter.encodedArrayValue++;

@@ -1,9 +1,11 @@
 "use strict";
 
+// Require Third-party Dependencies
+const { Hex } = require("sec-literal");
+
 // CONSTANTS
 const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
 const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
-const SAFE_HEX_VALUE = new Set(["0123456789", "123456789", "abcdef", "0123456789abcdef", "abcdef0123456789abcdef"]);
 const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
 const kMainModuleStr = "process.mainModule.require";
 
@@ -166,18 +168,6 @@ function concatBinaryExpr(node, identifiers = new Set()) {
     return str;
 }
 
-function isHexValue(value) {
-    return typeof value === "string" && /^[0-9A-Fa-f]{4,}$/g.test(value);
-}
-
-function isSafeHexValue(rawValue) {
-    if (/^[0-9]+$/g.test(rawValue) || rawValue.length <= 4) {
-        return true;
-    }
-
-    return [...SAFE_HEX_VALUE].some((value) => value.startsWith(rawValue));
-}
-
 function getMemberExprName(node) {
     let name = "";
 
@@ -202,7 +192,7 @@ function getMemberExprName(node) {
             break;
         case "CallExpression": {
             const args = node.property.arguments;
-            if (args.length > 0 && args[0].type === "Literal" && isHexValue(args[0].value)) {
+            if (args.length > 0 && args[0].type === "Literal" && Hex.isHex(args[0].value)) {
                 name += `.${Buffer.from(args[0].value, "hex").toString()}`;
             }
             break;
@@ -217,25 +207,6 @@ function getMemberExprName(node) {
     }
 
     return name;
-}
-
-function strCharDiversity(str) {
-    return new Set([...str]).size;
-}
-
-function strSuspectScore(str) {
-    if (str.length < 45) {
-        return 0;
-    }
-
-    const includeSpace = str.includes(" ");
-    const includeSpaceAtStart = includeSpace ? str.slice(0, 45).includes(" ") : false;
-    let suspectScore = includeSpaceAtStart ? 0 : 1;
-    if (str.length > 200) {
-        suspectScore += Math.floor(str.length / 750);
-    }
-
-    return strCharDiversity(str) >= 70 ? suspectScore + 2 : suspectScore;
 }
 
 function rootLocation() {
@@ -265,88 +236,10 @@ function generateWarning(kind, options) {
     return result;
 }
 
-function commonStringStart(leftStr, rightStr) {
-    const minLen = leftStr.length > rightStr.length ? rightStr.length : leftStr.length;
-    let commonStr = "";
-
-    for (let id = 0; id < minLen; id++) {
-        if (leftStr.charAt(id) !== rightStr.charAt(id)) {
-            break;
-        }
-
-        commonStr += leftStr.charAt(id);
-    }
-
-    return commonStr === "" ? null : commonStr;
-}
-
-function commonPrefix(arr, sort = "high") {
-    const sortedArr = arr.slice().filter((value) => typeof value === "string").map((value) => value.toLowerCase()).sort();
-    const prefix = new Map();
-    const sortingFn = sort === "high" ?
-        (left, right) => right.commonPrefix.length - left.commonPrefix.length :
-        (left, right) => left.commonPrefix.length - right.commonPrefix.length;
-
-    mainLoop: for (const currentPrefix of sortedArr) {
-        const matchedItems = [];
-        if (!prefix.has(currentPrefix)) {
-            matchedItems.push({ commonPrefix: currentPrefix, commonStr: null });
-        }
-
-        for (const commonPrefix of prefix.keys()) {
-            const commonStr = commonStringStart(currentPrefix, commonPrefix);
-            if (commonStr === null) {
-                continue;
-            }
-            matchedItems.push({ commonPrefix, commonStr });
-        }
-        matchedItems.sort(sortingFn);
-
-        for (const { commonPrefix, commonStr } of matchedItems) {
-            if (commonStr === null) {
-                break;
-            }
-
-            const count = prefix.get(commonPrefix);
-            if (commonStr === commonPrefix || commonStr.startsWith(commonPrefix)) {
-                prefix.set(commonPrefix, count + 1);
-            }
-            else if (commonPrefix.startsWith(commonStr)) {
-                prefix.set(commonStr, count + 1);
-            }
-            continue mainLoop;
-        }
-
-        prefix.set(currentPrefix, 1);
-    }
-
-    for (const [key, value] of prefix.entries()) {
-        if (value === 1) {
-            prefix.delete(key);
-        }
-    }
-
-    return Object.fromEntries(prefix);
-}
-
-function isSvgPath(str) {
-    if (typeof str !== "string") {
-        return false;
-    }
-    const trimStr = str.trim();
-
-    return /^[mzlhvcsqta]\s*[-+.0-9][^mlhvzcsqta]+/i.test(trimStr) && /[\dz]$/i.test(trimStr) && trimStr.length > 4;
-}
-
 module.exports = {
-    isSvgPath,
     notNullOrUndefined,
     getIdName,
     getRequirablePatterns,
-    strCharDiversity,
-    strSuspectScore,
-    isHexValue,
-    isSafeHexValue,
     isUnsafeCallee,
     isRequireStatement,
     isRequireResolve,
@@ -362,7 +255,6 @@ module.exports = {
     generateWarning,
     toArrayLocation,
     rootLocation,
-    commonPrefix,
     CONSTANTS: Object.freeze({
         GLOBAL_IDENTIFIERS,
         GLOBAL_PARTS

@@ -58,7 +58,8 @@
     "is-base64": "^1.1.0",
     "is-svg": "^4.2.1",
     "meriyah": "^2.1.1",
-    "safe-regex": "^2.1.1"
+    "safe-regex": "^2.1.1",
+    "sec-literal": "^1.0.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.10.4",

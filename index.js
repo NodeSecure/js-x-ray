@@ -7,6 +7,7 @@ const repl = require("repl");
 const { walk } = require("estree-walker");
 const meriyah = require("meriyah");
 const safeRegex = require("safe-regex");
+const { Hex } = require("sec-literal");
 
 // Require Internal Dependencies
 const helpers = require("./src/utils");
@@ -31,7 +32,7 @@ function walkCallExpression(nodeToWalk) {
                 return;
             }
 
-            if (node.arguments[0].type === "Literal" && helpers.isHexValue(node.arguments[0].value)) {
+            if (node.arguments[0].type === "Literal" && Hex.isHex(node.arguments[0].value)) {
                 dependencies.add(Buffer.from(node.arguments[0].value, "hex").toString());
                 this.skip();
 
@@ -135,7 +136,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
     // Example: #!/usr/bin/env node
     const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
     const { body } = meriyah.parseScript(strToAnalyze, {
-        next: true, loc: true, raw: true, module: Boolean(module)
+        next: true, loc: true, raw: true, module: Boolean(module), impliedStrict: true
     });
 
     // we walk each AST Nodes, this is a purely synchronous I/O
@@ -165,7 +166,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
                         dependencies.add(value, node.loc);
                         stats.addWarning(ASTStats.Warnings.unsafeImport, null, node.loc);
                     }
-                    else if (GLOBAL_PARTS.has(value) || !helpers.isSafeHexValue(node.value)) {
+                    else if (GLOBAL_PARTS.has(value) || !Hex.isSafe(node.value)) {
                         stats.addWarning(ASTStats.Warnings.encodedLiteral, node.value, node.loc);
                     }
                 }
