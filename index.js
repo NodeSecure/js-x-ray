@@ -265,6 +265,9 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
             // if we are dealing with an ESM import declaration (easier than require ^^)
             else if (node.type === "ImportDeclaration" && node.source.type === "Literal") {
+                if (node.source.value.startsWith("data:text/javascript;base64")) {
+                    stats.addWarning(ASTStats.Warnings.unsafeImport, node.source.value, node.loc);
+                }
                 dependencies.add(node.source.value, node.loc);
             }
 
