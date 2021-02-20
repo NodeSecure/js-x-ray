@@ -57,7 +57,7 @@
     "estree-walker": "^2.0.2",
     "is-base64": "^1.1.0",
     "is-svg": "^4.2.1",
-    "meriyah": "^2.1.1",
+    "meriyah": "^4.1.2",
     "safe-regex": "^2.1.1",
     "sec-literal": "^1.0.0"
   },
