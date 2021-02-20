@@ -176,7 +176,7 @@ class ASTStats {
         else if (this.isJJEncode()) {
             encoderName = "jjencode";
         }
-        else if (this.#counter.morseLiteral === 36) {
+        else if (this.#counter.morseLiteral >= 36) {
             encoderName = "morse";
         }
         else {
@@ -257,7 +257,7 @@ class ASTStats {
             }
         }
 
-        if (node.value.length <= 5 && /^[.-]+$/g.test(node.value)) {
+        if (/^[.-\s]+$/g.test(node.value)) {
             this.#counter.morseLiteral++;
         }
 
