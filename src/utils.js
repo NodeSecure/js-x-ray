@@ -3,11 +3,11 @@
 // Require Third-party Dependencies
 const { Hex } = require("sec-literal");
 
+// Require Internal Dependencies
+const constants = require("./constants");
+
 // CONSTANTS
-const BINARY_EXPR_TYPES = new Set(["Literal", "BinaryExpression", "Identifier"]);
-const GLOBAL_IDENTIFIERS = new Set(["global", "globalThis", "root", "GLOBAL", "window"]);
-const GLOBAL_PARTS = new Set([...GLOBAL_IDENTIFIERS, "process", "mainModule", "require"]);
-const kMainModuleStr = "process.mainModule.require";
+const kBinaryExprTypes = new Set(["Literal", "BinaryExpression", "Identifier"]);
 
 function notNullOrUndefined(value) {
     return value !== null && value !== void 0;
@@ -52,11 +52,14 @@ function getRequirablePatterns(parts) {
 }
 
 function isRequireGlobalMemberExpr(value) {
-    return [...GLOBAL_IDENTIFIERS].some((name) => value.startsWith(`${name}.${kMainModuleStr}`));
+    return [...constants.globalIdentifiers]
+        .some((name) => value.startsWith(`${name}.${constants.processMainModuleRequire}`));
 }
 
 function isRequireStatement(value) {
-    return value.startsWith("require") || value.startsWith(kMainModuleStr) || isRequireGlobalMemberExpr(value);
+    return value.startsWith("require") ||
+        value.startsWith(constants.processMainModuleRequire) ||
+        isRequireGlobalMemberExpr(value);
 }
 
 function isRequireMemberExpr(node) {
@@ -136,7 +139,7 @@ function arrExprToString(elements, identifiers = null) {
 
 function concatBinaryExpr(node, identifiers = new Set()) {
     const { left, right } = node;
-    if (!BINARY_EXPR_TYPES.has(left.type) || !BINARY_EXPR_TYPES.has(right.type)) {
+    if (!kBinaryExprTypes.has(left.type) || !kBinaryExprTypes.has(right.type)) {
         return null;
     }
     let str = "";
@@ -254,9 +257,5 @@ module.exports = {
     getMemberExprName,
     generateWarning,
     toArrayLocation,
-    rootLocation,
-    CONSTANTS: Object.freeze({
-        GLOBAL_IDENTIFIERS,
-        GLOBAL_PARTS
-    })
+    rootLocation
 };
