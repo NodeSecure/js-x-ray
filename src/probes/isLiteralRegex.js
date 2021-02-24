@@ -7,12 +7,12 @@ const { Warnings } = require("../ASTStats");
 // Require Third-party Dependencies
 const safeRegex = require("safe-regex");
 
-const breakOnMatch = false;
-
 // Search for Literal Regex.
 // then we use the safe-regex package to detect whether or not regex is safe!
 function validateNode(node) {
-    return [helpers.isLiteralRegex(node)];
+    return [
+        helpers.isLiteralRegex(node)
+    ];
 }
 
 function main(node, options) {
@@ -23,4 +23,6 @@ function main(node, options) {
     }
 }
 
-module.exports = { validateNode, main, breakOnMatch };
+module.exports = {
+    validateNode, main, breakOnMatch: false
+};

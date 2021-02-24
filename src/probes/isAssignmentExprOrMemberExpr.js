@@ -3,10 +3,11 @@
 // Require Internal Dependencies
 const helpers = require("../utils");
 
-const breakOnMatch = false;
-
+// Search for unsafe assignment and member expression like 'require.cache'
 function validateNode(node) {
-    return [node.type === "AssignmentExpression" && node.left.type === "MemberExpression"];
+    return [
+        node.type === "AssignmentExpression" && node.left.type === "MemberExpression"
+    ];
 }
 
 function main(node, options) {
@@ -18,4 +19,6 @@ function main(node, options) {
     }
 }
 
-module.exports = { validateNode, main, breakOnMatch };
+module.exports = {
+    validateNode, main, breakOnMatch: false
+};

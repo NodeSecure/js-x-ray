@@ -33,49 +33,9 @@ function* getIdName(node) {
     }
 }
 
-function getRequirablePatterns(parts) {
-    const result = new Set();
-
-    for (const [id, path] of parts.entries()) {
-        if (path === "process") {
-            result.add(`${id}.mainModule.require`);
-        }
-        else if (path === "mainModule") {
-            result.add(`${id}.require`);
-        }
-        else if (path.includes("require")) {
-            result.add(id);
-        }
-    }
-
-    return [...result];
-}
-
 function isRequireGlobalMemberExpr(value) {
     return [...constants.globalIdentifiers]
         .some((name) => value.startsWith(`${name}.${constants.processMainModuleRequire}`));
-}
-
-function isRequireStatement(value) {
-    return value.startsWith("require") ||
-        value.startsWith(constants.processMainModuleRequire) ||
-        isRequireGlobalMemberExpr(value);
-}
-
-function isRequireMemberExpr(node) {
-    if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
-        return false;
-    }
-
-    return isRequireGlobalMemberExpr(getMemberExprName(node.callee));
-}
-
-function isRequireResolve(node) {
-    if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
-        return false;
-    }
-
-    return node.callee.object.name === "require" && node.callee.property.name === "resolve";
 }
 
 function isUnsafeCallee(node) {
@@ -95,24 +55,8 @@ function isUnsafeCallee(node) {
     return [callee.type === "Identifier" && callee.name === "Function", "Function"];
 }
 
-function isRegexConstructor(node) {
-    if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
-        return false;
-    }
-
-    return node.callee.name === "RegExp";
-}
-
 function isLiteralRegex(node) {
     return node.type === "Literal" && Reflect.has(node, "regex");
-}
-
-function isVariableDeclarator(node) {
-    return node.type !== "VariableDeclarator" || node.init === null || node.id.type !== "Identifier";
-}
-
-function isFunctionDeclarator(node) {
-    return node.type !== "FunctionDeclaration" || node.id === null || node.id.type !== "Identifier";
 }
 
 function arrExprToString(elements, identifiers = null) {
@@ -242,16 +186,9 @@ function generateWarning(kind, options) {
 module.exports = {
     notNullOrUndefined,
     getIdName,
-    getRequirablePatterns,
     isUnsafeCallee,
-    isRequireStatement,
-    isRequireResolve,
-    isRequireMemberExpr,
-    isLiteralRegex,
     isRequireGlobalMemberExpr,
-    isFunctionDeclarator,
-    isRegexConstructor,
-    isVariableDeclarator,
+    isLiteralRegex,
     concatBinaryExpr,
     arrExprToString,
     getMemberExprName,

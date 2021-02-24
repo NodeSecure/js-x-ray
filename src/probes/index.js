@@ -28,9 +28,14 @@ const kSymBreak = Symbol.for("breakWalk");
 const kSymSkip = Symbol.for("skipWalk");
 
 function runOnProbes(node, analysis) {
-    for (const probe of kListOfProbes) {
-        const [isMatching, data = null] = probe.validateNode(node, analysis);
+    const breakedGroups = new Set();
 
+    for (const probe of kListOfProbes) {
+        if (breakedGroups.has(probe.breakGroup)) {
+            continue;
+        }
+
+        const [isMatching, data = null] = probe.validateNode(node, analysis);
         if (isMatching) {
             const result = probe.main(node, { analysis, data });
 
@@ -38,7 +43,13 @@ function runOnProbes(node, analysis) {
                 return "skip";
             }
             if (result === kSymBreak || probe.breakOnMatch) {
-                break;
+                const breakGroup = probe.breakGroup || null;
+                if (breakGroup === null) {
+                    break;
+                }
+                else {
+                    breakedGroups.add(breakGroup);
+                }
             }
         }
     }

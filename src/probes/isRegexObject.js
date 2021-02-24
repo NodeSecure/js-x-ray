@@ -7,12 +7,12 @@ const { Warnings } = require("../ASTStats");
 // Require Third-party Dependencies
 const safeRegex = require("safe-regex");
 
-const breakOnMatch = false;
-
 // Search for Regex Object constructor.
 // then we use the safe-regex package to detect whether or not regex is safe!
 function validateNode(node) {
-    return [helpers.isRegexConstructor(node) && node.arguments.length > 0];
+    return [
+        isRegexConstructor(node) && node.arguments.length > 0
+    ];
 }
 
 function main(node, options) {
@@ -26,4 +26,14 @@ function main(node, options) {
     }
 }
 
-module.exports = { validateNode, main, breakOnMatch };
+function isRegexConstructor(node) {
+    if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
+        return false;
+    }
+
+    return node.callee.name === "RegExp";
+}
+
+module.exports = {
+    validateNode, main, breakOnMatch: false
+};

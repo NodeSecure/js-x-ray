@@ -13,8 +13,6 @@ const { Warnings } = require("../ASTStats");
 // CONSTANTS
 const kNodeDeps = new Set(repl.builtinModules);
 
-const breakOnMatch = false;
-
 // Check all 'string' Literal values
 function validateNode(node) {
     return [
@@ -45,4 +43,6 @@ function main(node, options) {
     }
 }
 
-module.exports = { validateNode, main, breakOnMatch };
+module.exports = {
+    validateNode, main, breakOnMatch: false
+};

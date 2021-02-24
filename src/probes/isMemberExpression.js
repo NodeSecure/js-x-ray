@@ -4,11 +4,11 @@
 const helpers = require("../utils");
 const { processMainModuleRequire } = require("../constants");
 
-const breakOnMatch = true;
-
 // searching for "process.mainModule" pattern (processMainModuleRequire)
 function validateNode(node) {
-    return [node.type === "MemberExpression"];
+    return [
+        node.type === "MemberExpression"
+    ];
 }
 
 function main(node, options) {
@@ -25,4 +25,6 @@ function main(node, options) {
     // TODO: require.main ?
 }
 
-module.exports = { validateNode, main, breakOnMatch };
+module.exports = {
+    validateNode, main, breakOnMatch: true, breakGroup: "import"
+};
