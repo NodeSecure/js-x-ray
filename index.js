@@ -5,7 +5,6 @@ const { walk } = require("estree-walker");
 const meriyah = require("meriyah");
 
 // Require Internal Dependencies
-const helpers = require("./src/utils");
 const Analysis = require("./src/Analysis");
 
 function runASTAnalysis(str, options = Object.create(null)) {
@@ -36,7 +35,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
     });
 
     const dependencies = sastAnalysis.dependencies;
-    const { idsLengthAvg, stringScore, warnings } = sastAnalysis.stats.getResult(isMinified);
+    const { idsLengthAvg, stringScore, warnings } = sastAnalysis.getResult(isMinified);
     const isOneLineRequire = body.length <= 1 && dependencies.size <= 1;
 
     return {
@@ -46,8 +45,6 @@ function runASTAnalysis(str, options = Object.create(null)) {
 
 module.exports = {
     runASTAnalysis,
-    generateWarning: helpers.generateWarning,
-    rootLocation: helpers.rootLocation,
     CONSTANTS: {
         Warnings: Object.freeze({
             parsingError: "ast-error",

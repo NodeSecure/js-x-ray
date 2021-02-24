@@ -2,7 +2,7 @@
 
 // Require Internal Dependencies
 const helpers = require("../utils");
-const { Warnings } = require("../ASTStats");
+const { warnings } = require("../constants");
 
 // Detect unsafe statement like eval("this") or Function("return this")();
 function validateNode(node) {
@@ -12,7 +12,7 @@ function validateNode(node) {
 function main(node, options) {
     const { analysis, data: calleeName } = options;
 
-    analysis.stats.addWarning(Warnings.unsafeStmt, calleeName, node.loc);
+    analysis.addWarning(warnings.unsafeStmt, calleeName, node.loc);
 }
 
 module.exports = {

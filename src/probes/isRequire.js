@@ -3,7 +3,7 @@
 
 // Require Internal Dependencies
 const helpers = require("../utils");
-const { Warnings } = require("../ASTStats");
+const { warnings } = require("../constants");
 
 // Require Third-party Dependencies
 const { Hex } = require("sec-literal");
@@ -44,33 +44,32 @@ function isRequireIdentifiers(node, analysis) {
 
 function main(node, options) {
     const { analysis } = options;
-    const { dependencies, identifiers, stats } = analysis;
 
     const arg = node.arguments[0];
     switch (arg.type) {
         // const foo = "http"; require(foo);
         case "Identifier":
-            if (identifiers.has(arg.name)) {
-                dependencies.add(identifiers.get(arg.name), node.loc);
+            if (analysis.identifiers.has(arg.name)) {
+                analysis.dependencies.add(analysis.identifiers.get(arg.name), node.loc);
             }
             else {
-                stats.addWarning(Warnings.unsafeImport, null, node.loc);
+                analysis.addWarning(warnings.unsafeImport, null, node.loc);
             }
             break;
 
         // require("http")
         case "Literal":
-            dependencies.add(arg.value, node.loc);
+            analysis.dependencies.add(arg.value, node.loc);
             break;
 
         // require(["ht" + "tp"])
         case "ArrayExpression": {
-            const value = helpers.arrExprToString(arg.elements, identifiers).trim();
+            const value = helpers.arrExprToString(arg.elements, analysis.identifiers).trim();
             if (value === "") {
-                stats.addWarning(Warnings.unsafeImport, null, node.loc);
+                analysis.addWarning(warnings.unsafeImport, null, node.loc);
             }
             else {
-                dependencies.add(value, node.loc);
+                analysis.dependencies.add(value, node.loc);
             }
             break;
         }
@@ -81,12 +80,12 @@ function main(node, options) {
                 break;
             }
 
-            const value = helpers.concatBinaryExpr(arg, identifiers);
+            const value = helpers.concatBinaryExpr(arg, analysis.identifiers);
             if (value === null) {
-                stats.addWarning(Warnings.unsafeImport, null, node.loc);
+                analysis.addWarning(warnings.unsafeImport, null, node.loc);
             }
             else {
-                dependencies.add(value, node.loc);
+                analysis.dependencies.add(value, node.loc);
             }
             break;
         }
@@ -94,16 +93,16 @@ function main(node, options) {
         // require(Buffer.from("...", "hex").toString());
         case "CallExpression": {
             parseRequireCallExpression(arg)
-                .forEach((depName) => dependencies.add(depName, node.loc, true));
+                .forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
 
-            stats.addWarning(Warnings.unsafeImport, null, node.loc);
+            analysis.addWarning(warnings.unsafeImport, null, node.loc);
 
             // We skip walking the tree to avoid anymore warnings...
             return Symbol.for("skipWalk");
         }
 
         default:
-            stats.addWarning(Warnings.unsafeImport, null, node.loc);
+            analysis.addWarning(warnings.unsafeImport, null, node.loc);
     }
 }
 

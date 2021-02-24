@@ -3,7 +3,6 @@
 // Require Internal Dependencies
 const helpers = require("../utils");
 const constants = require("../constants");
-const { Warnings } = require("../ASTStats");
 
 // CONSTANTS
 const kUnsafeCallee = new Set(["eval", "Function"]);
@@ -19,7 +18,7 @@ function validateNode(node) {
 function main(mainNode, options) {
     const { analysis } = options;
 
-    analysis.stats.analyzeVariableDeclaration(mainNode);
+    analysis.analyzeVariableDeclaration(mainNode);
     for (const node of mainNode.declarations) {
         if (node.init === null || node.id.type !== "Identifier") {
             continue;
@@ -33,11 +32,11 @@ function main(mainNode, options) {
         // const r = require
         else if (node.init.type === "Identifier") {
             if (kUnsafeCallee.has(node.init.name)) {
-                analysis.stats.addWarning(Warnings.unsafeAssign, node.init.name, node.loc);
+                analysis.addWarning(constants.warnings.unsafeAssign, node.init.name, node.loc);
             }
             else if (analysis.requireIdentifiers.has(node.init.name)) {
                 analysis.requireIdentifiers.add(node.id.name);
-                analysis.stats.addWarning(Warnings.unsafeAssign, node.init.name, node.loc);
+                analysis.addWarning(constants.warnings.unsafeAssign, node.init.name, node.loc);
             }
             else if (constants.globalParts.has(node.init.name)) {
                 analysis.globalParts.set(node.id.name, node.init.name);
@@ -53,14 +52,14 @@ function main(mainNode, options) {
 
             if (analysis.globalParts.has(members[0]) || members.every((part) => constants.globalParts.has(part))) {
                 analysis.globalParts.set(node.id.name, members.slice(1).join("."));
-                analysis.stats.addWarning(Warnings.unsafeAssign, value, node.loc);
+                analysis.addWarning(constants.warnings.unsafeAssign, value, node.loc);
             }
             getRequirablePatterns(analysis.globalParts)
                 .forEach((name) => analysis.requireIdentifiers.add(name));
 
             if (isRequireStatement(value)) {
                 analysis.requireIdentifiers.add(node.id.name);
-                analysis.stats.addWarning(Warnings.unsafeAssign, value, node.loc);
+                analysis.addWarning(constants.warnings.unsafeAssign, value, node.loc);
             }
         }
         else if (helpers.isUnsafeCallee(node.init)[0]) {

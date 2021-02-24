@@ -2,7 +2,7 @@
 
 // Require Internal Dependencies
 const helpers = require("../utils");
-const { Warnings } = require("../ASTStats");
+const { warnings } = require("../constants");
 
 // Require Third-party Dependencies
 const safeRegex = require("safe-regex");
@@ -19,7 +19,7 @@ function main(node, options) {
     const { analysis } = options;
 
     if (!safeRegex(node.regex.pattern)) {
-        analysis.stats.addWarning(Warnings.unsafeRegex, node.regex.pattern, node.loc);
+        analysis.addWarning(warnings.unsafeRegex, node.regex.pattern, node.loc);
     }
 }
 

@@ -17,8 +17,21 @@ const globalIdentifiers = new Set(["global", "globalThis", "root", "GLOBAL", "wi
  */
 const globalParts = new Set([...globalIdentifiers, "process", "mainModule", "require"]);
 
+const warnings = Object.freeze({
+    parsingError: Symbol("ParsingError"),
+    unsafeImport: Symbol("UnsafeImport"),
+    unsafeRegex: Symbol("UnsafeRegex"),
+    unsafeStmt: Symbol("UnsafeStmt"),
+    unsafeAssign: Symbol("UnsafeAssign"),
+    encodedLiteral: Symbol("EncodedLiteral"),
+    shortIdentifiers: Symbol("ShortIdentifiers"),
+    suspiciousLiteral: Symbol("SuspiciousLiteral"),
+    obfuscatedCode: Symbol("ObfuscatedCode")
+});
+
 module.exports = {
     processMainModuleRequire,
     globalIdentifiers,
-    globalParts
+    globalParts,
+    warnings
 };
