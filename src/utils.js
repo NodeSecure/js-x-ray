@@ -180,10 +180,6 @@ function sum(arr = []) {
     return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
 }
 
-function escapeRegExp(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
-
 function rootLocation() {
     return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
@@ -222,7 +218,6 @@ module.exports = {
     getMemberExprName,
     walkBinaryExpression,
     sum,
-    escapeRegExp,
     generateWarning,
     toArrayLocation,
     rootLocation

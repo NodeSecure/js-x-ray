@@ -7,6 +7,7 @@ const secString = require("sec-literal");
 const helpers = require("./utils");
 const constants = require("./constants");
 const ASTDeps = require("./ASTDeps");
+const obfuscators = require("./obfuscators");
 const { runOnProbes } = require("./probes");
 
 // CONSTANTS
@@ -15,9 +16,7 @@ const kDictionaryStrParts = [
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "0123456789"
 ];
-const kJSFuckMinimumDoubleUnaryExpr = 5;
 const kMinimumIdsCount = 5;
-const kJJRegularSymbols = new Set(["$", "_"]);
 
 const kWarningsNameStr = Object.freeze({
     [constants.warnings.parsingError]: "parsing-error",
@@ -32,11 +31,11 @@ const kWarningsNameStr = Object.freeze({
 });
 
 class Analysis {
-    #hasDictionaryString = false;
-    #hasPrefixedIdentifiers = false;
-    #varkinds = { var: 0, let: 0, const: 0 };
-    #idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
-    #counter = {
+    hasDictionaryString = false;
+    hasPrefixedIdentifiers = false;
+    varkinds = { var: 0, let: 0, const: 0 };
+    idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
+    counter = {
         identifiers: 0,
         doubleUnaryArray: 0,
         computedMemberExpr: 0,
@@ -45,7 +44,7 @@ class Analysis {
         encodedArrayValue: 0,
         morseLiteral: 0
     };
-    #identifiers = [];
+    identifiersName = [];
 
     constructor() {
         this.dependencies = new ASTDeps();
@@ -53,6 +52,7 @@ class Analysis {
         this.identifiers = new Map();
         this.globalParts = new Map();
         this.handledEncodedLiteralValues = new Map();
+
         this.requireIdentifiers = new Set(["require", constants.processMainModuleRequire]);
         this.warnings = [];
         this.literalScores = [];
@@ -72,105 +72,54 @@ class Analysis {
         }
     }
 
-    isJJEncode() {
-        if (this.#counter.variableDeclarator > 0 || this.#counter.functionDeclaration > 0) {
-            return false;
-        }
-        if (this.#idtypes.assignExpr > this.#idtypes.property) {
-            return false;
-        }
-
-        const matchCount = this.#identifiers.filter(({ name }) => {
-            if (!helpers.notNullOrUndefined(name)) {
-                return false;
-            }
-            const charsCode = [...new Set([...name])];
-
-            return charsCode.every((char) => kJJRegularSymbols.has(char));
-        }).length;
-        const pourcent = ((matchCount / this.#identifiers.length) * 100);
-
-        return pourcent > 80;
-    }
-
-    isJSFuck() {
-        const hasZeroAssign = this.#idtypes.assignExpr === 0
-            && this.#idtypes.functionDeclaration === 0
-            && this.#idtypes.property === 0
-            && this.#idtypes.variableDeclarator === 0;
-
-        return hasZeroAssign && this.#counter.doubleUnaryArray >= kJSFuckMinimumDoubleUnaryExpr;
-    }
-
-    isFreeJSObfuscator(prefix) {
-        const pValue = Object.keys(prefix).pop();
-        const regexStr = `^${helpers.escapeRegExp(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`;
-
-        return this.#identifiers.every(({ name }) => new RegExp(regexStr).test(name));
-    }
-
-    isObfuscatorIO() {
-        if (this.#counter.memberExpr > 0) {
-            return false;
-        }
-
-        const hasSomePatterns = this.#counter.doubleUnaryArray > 0
-            || this.#counter.deepBinaryExpr > 0
-            || this.#counter.encodedArrayValue > 0
-            || this.#hasDictionaryString;
-
-        // TODO: hasPrefixedIdentifiers only work for hexadecimal id names generator
-        return this.#hasPrefixedIdentifiers && hasSomePatterns;
-    }
-
     calcAvgPrefixedIdentifiers(prefix) {
         const valuesArr = Object.values(prefix).slice().sort((left, right) => left - right);
         if (valuesArr.length === 0) {
             return 0;
         }
         const nbOfPrefixedIds = valuesArr.length === 1 ? valuesArr.pop() : (valuesArr.pop() + valuesArr.pop());
-        const maxIds = this.#counter.identifiers - this.#idtypes.property;
+        const maxIds = this.counter.identifiers - this.idtypes.property;
 
         return ((nbOfPrefixedIds / maxIds) * 100);
     }
 
     analyzeIdentifierNames() {
-        this.#counter.identifiers = this.#identifiers.length;
+        this.counter.identifiers = this.identifiersName.length;
         let encoderName = null;
 
-        if (this.isJSFuck()) {
+        if (obfuscators.jsfuck.verify(this)) {
             encoderName = "jsfuck";
         }
-        else if (this.isJJEncode()) {
+        else if (obfuscators.jjencode.verify(this)) {
             encoderName = "jjencode";
         }
-        else if (this.#counter.morseLiteral >= 36) {
+        else if (this.counter.morseLiteral >= 36) {
             encoderName = "morse";
         }
         else {
             // TODO: also implement Dictionnary checkup
             const { prefix, oneTimeOccurence } = secString.Patterns.commonHexadecimalPrefix(
-                this.#identifiers.map((value) => value.name)
+                this.identifiersName.map((value) => value.name)
             );
             const uPrefixNames = new Set(Object.keys(prefix));
 
-            if (this.#counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
-                this.#hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
+            if (this.counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
+                this.hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
             }
             // console.log(prefix);
             // console.log(oneTimeOccurence);
-            // console.log(this.#hasPrefixedIdentifiers);
-            // console.log(this.#counter.identifiers);
-            // console.log(this.#counter.encodedArrayValue);
+            // console.log(this.hasPrefixedIdentifiers);
+            // console.log(this.counter.identifiers);
+            // console.log(this.counter.encodedArrayValue);
 
-            if (uPrefixNames.size === 1 && this.isFreeJSObfuscator(prefix)) {
+            if (uPrefixNames.size === 1 && obfuscators.freejsobfuscator.verify(this, prefix)) {
                 encoderName = "freejsobfuscator";
             }
-            else if (this.isObfuscatorIO()) {
+            else if (obfuscators.obfuscatorio.verify(this)) {
                 encoderName = "obfuscator.io";
             }
-            else if ((this.#counter.identifiers > (kMinimumIdsCount * 3) && this.#hasPrefixedIdentifiers)
-                && (oneTimeOccurence <= 3 || this.#counter.encodedArrayValue > 0)) {
+            else if ((this.counter.identifiers > (kMinimumIdsCount * 3) && this.hasPrefixedIdentifiers)
+                && (oneTimeOccurence <= 3 || this.counter.encodedArrayValue > 0)) {
                 encoderName = "unknown";
             }
         }
@@ -179,13 +128,13 @@ class Analysis {
     }
 
     analyzeVariableDeclaration(node) {
-        this.#varkinds[node.kind]++;
+        this.varkinds[node.kind]++;
 
         for (const variableDeclarator of node.declarations) {
-            this.#idtypes.variableDeclarator++;
+            this.idtypes.variableDeclarator++;
 
             for (const name of helpers.getIdName(variableDeclarator.id)) {
-                this.#identifiers.push({ name, type: "variableDeclarator" });
+                this.identifiersName.push({ name, type: "variableDeclarator" });
             }
         }
     }
@@ -194,8 +143,8 @@ class Analysis {
         if (node.id === null || node.id.type !== "Identifier") {
             return;
         }
-        this.#idtypes.functionDeclaration++;
-        this.#identifiers.push({ name: node.id.name, type: "functionDeclaration" });
+        this.idtypes.functionDeclaration++;
+        this.identifiersName.push({ name: node.id.name, type: "functionDeclaration" });
     }
 
     analyzeProperty(property) {
@@ -204,8 +153,8 @@ class Analysis {
             return;
         }
 
-        this.#idtypes.property++;
-        this.#identifiers.push({ name: property.key.name, type: "property" });
+        this.idtypes.property++;
+        this.identifiersName.push({ name: property.key.name, type: "property" });
     }
 
     analyzeLiteral(node, inArrayExpr = false) {
@@ -218,21 +167,21 @@ class Analysis {
             this.literalScores.push(score);
         }
 
-        if (!this.#hasDictionaryString) {
+        if (!this.hasDictionaryString) {
             const isDictionaryStr = kDictionaryStrParts.every((word) => node.value.includes(word));
             if (isDictionaryStr) {
-                this.#hasDictionaryString = true;
+                this.hasDictionaryString = true;
             }
         }
 
         if (/^[.-\s]+$/g.test(node.value)) {
-            this.#counter.morseLiteral++;
+            this.counter.morseLiteral++;
         }
 
         const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = secString.Literal.defaultAnalysis(node);
         if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
             if (inArrayExpr) {
-                this.#counter.encodedArrayValue++;
+                this.counter.encodedArrayValue++;
             }
             else {
                 this.addWarning(constants.warnings.encodedLiteral, node.value, node.loc);
@@ -254,7 +203,7 @@ class Analysis {
             this.addWarning(constants.warnings.obfuscatedCode, kind || "unknown");
         }
 
-        const identifiersLengthArr = this.#identifiers
+        const identifiersLengthArr = this.identifiersName
             .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
 
         const [idsLengthAvg, stringScore] = [helpers.sum(identifiersLengthArr), helpers.sum(this.literalScores)];
@@ -280,14 +229,14 @@ class Analysis {
         const action = runOnProbes(node, this);
         switch (node.type) {
             case "AssignmentExpression": {
-                this.#idtypes.assignExpr++;
+                this.idtypes.assignExpr++;
                 for (const name of helpers.getIdName(node.left)) {
-                    this.#identifiers.push({ name, type: "assignExpr" });
+                    this.identifiersName.push({ name, type: "assignExpr" });
                 }
                 break;
             }
             case "MemberExpression":
-                this.#counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
+                this.counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
                 break;
             case "ArrayExpression":
                 this.analyzeArrayExpression(node);
@@ -300,13 +249,13 @@ class Analysis {
                 break;
             case "UnaryExpression":
                 if (node.argument.type === "UnaryExpression" && node.argument.argument.type === "ArrayExpression") {
-                    this.#counter.doubleUnaryArray++;
+                    this.counter.doubleUnaryArray++;
                 }
                 break;
             case "BinaryExpression": {
                 const [binaryExprDeepness, hasUnaryExpression] = helpers.walkBinaryExpression(node);
                 if (binaryExprDeepness >= 3 && hasUnaryExpression) {
-                    this.#counter.deepBinaryExpr++;
+                    this.counter.deepBinaryExpr++;
                 }
                 break;
             }
