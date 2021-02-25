@@ -18,8 +18,14 @@ function validateNode(node) {
 function main(mainNode, options) {
     const { analysis } = options;
 
-    analysis.analyzeVariableDeclaration(mainNode);
+    analysis.varkinds[mainNode.kind]++;
+
     for (const node of mainNode.declarations) {
+        analysis.idtypes.variableDeclarator++;
+        for (const name of helpers.getIdName(node.id)) {
+            analysis.identifiersName.push({ name, type: "variableDeclarator" });
+        }
+
         if (node.init === null || node.id.type !== "Identifier") {
             continue;
         }

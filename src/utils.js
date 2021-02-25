@@ -156,30 +156,6 @@ function getMemberExprName(node) {
     return name;
 }
 
-function walkBinaryExpression(expr, level = 1) {
-    const [lt, rt] = [expr.left.type, expr.right.type];
-    let hasUnaryExpression = lt === "UnaryExpression" || rt === "UnaryExpression";
-    let currentLevel = lt === "BinaryExpression" || rt === "BinaryExpression" ? level + 1 : level;
-
-    for (const currExpr of [expr.left, expr.right]) {
-        if (currExpr.type === "BinaryExpression") {
-            const [deepLevel, deepHasUnaryExpression] = walkBinaryExpression(currExpr, currentLevel);
-            if (deepLevel > currentLevel) {
-                currentLevel = deepLevel;
-            }
-            if (!hasUnaryExpression && deepHasUnaryExpression) {
-                hasUnaryExpression = true;
-            }
-        }
-    }
-
-    return [currentLevel, hasUnaryExpression];
-}
-
-function sum(arr = []) {
-    return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
-}
-
 function rootLocation() {
     return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
@@ -216,8 +192,6 @@ module.exports = {
     concatBinaryExpr,
     arrExprToString,
     getMemberExprName,
-    walkBinaryExpression,
-    sum,
     generateWarning,
     toArrayLocation,
     rootLocation

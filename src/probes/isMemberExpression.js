@@ -14,6 +14,8 @@ function validateNode(node) {
 function main(node, options) {
     const { analysis } = options;
 
+    analysis.counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
+
     // retrieve the member name, like: foo.bar.hello
     // in our case we are searching for process.mainModule.*
     const memberName = helpers.getMemberExprName(node);

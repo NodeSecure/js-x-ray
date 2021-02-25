@@ -10,6 +10,11 @@ const isAssignmentExprOrMemberExpr = require("./isAssignmentExprOrMemberExpr");
 const isRequire = require("./isRequire");
 const isImportDeclaration = require("./isImportDeclaration");
 const isMemberExpression = require("./isMemberExpression");
+const isArrayExpression = require("./isArrayExpression");
+const isFunctionDeclaration = require("./isFunctionDeclaration");
+const isAssignmentExpression = require("./isAssignmentExpression");
+const isObjectExpression = require("./isObjectExpression");
+const isUnaryExpression = require("./isUnaryExpression");
 
 // CONSTANTS
 const kListOfProbes = [
@@ -21,7 +26,12 @@ const kListOfProbes = [
     isAssignmentExprOrMemberExpr,
     isRequire,
     isImportDeclaration,
-    isMemberExpression
+    isMemberExpression,
+    isAssignmentExpression,
+    isObjectExpression,
+    isArrayExpression,
+    isFunctionDeclaration,
+    isUnaryExpression
 ];
 
 const kSymBreak = Symbol.for("breakWalk");

@@ -127,36 +127,6 @@ class Analysis {
         return [encoderName !== null, encoderName];
     }
 
-    analyzeVariableDeclaration(node) {
-        this.varkinds[node.kind]++;
-
-        for (const variableDeclarator of node.declarations) {
-            this.idtypes.variableDeclarator++;
-
-            for (const name of helpers.getIdName(variableDeclarator.id)) {
-                this.identifiersName.push({ name, type: "variableDeclarator" });
-            }
-        }
-    }
-
-    analyzeFunctionDeclarator(node) {
-        if (node.id === null || node.id.type !== "Identifier") {
-            return;
-        }
-        this.idtypes.functionDeclaration++;
-        this.identifiersName.push({ name: node.id.name, type: "functionDeclaration" });
-    }
-
-    analyzeProperty(property) {
-        // TODO: handle SpreadElement
-        if (property.type !== "Property" || property.key.type !== "Identifier") {
-            return;
-        }
-
-        this.idtypes.property++;
-        this.identifiersName.push({ name: property.key.name, type: "property" });
-    }
-
     analyzeLiteral(node, inArrayExpr = false) {
         if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
             return;
@@ -189,14 +159,6 @@ class Analysis {
         }
     }
 
-    analyzeArrayExpression(node) {
-        for (const elem of node.elements) {
-            if (elem !== null && elem.type === "Literal") {
-                this.analyzeLiteral(elem, true);
-            }
-        }
-    }
-
     getResult(isMinified) {
         const [isObfuscated, kind] = this.analyzeIdentifierNames();
         if (isObfuscated) {
@@ -206,7 +168,7 @@ class Analysis {
         const identifiersLengthArr = this.identifiersName
             .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
 
-        const [idsLengthAvg, stringScore] = [helpers.sum(identifiersLengthArr), helpers.sum(this.literalScores)];
+        const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
         if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
             this.addWarning(constants.warnings.shortIdentifiers, idsLengthAvg);
         }
@@ -226,43 +188,12 @@ class Analysis {
             this.dependencies.isInTryStmt = false;
         }
 
-        const action = runOnProbes(node, this);
-        switch (node.type) {
-            case "AssignmentExpression": {
-                this.idtypes.assignExpr++;
-                for (const name of helpers.getIdName(node.left)) {
-                    this.identifiersName.push({ name, type: "assignExpr" });
-                }
-                break;
-            }
-            case "MemberExpression":
-                this.counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
-                break;
-            case "ArrayExpression":
-                this.analyzeArrayExpression(node);
-                break;
-            case "FunctionDeclaration":
-                this.analyzeFunctionDeclarator(node);
-                break;
-            case "ObjectExpression":
-                node.properties.forEach((property) => this.analyzeProperty(property));
-                break;
-            case "UnaryExpression":
-                if (node.argument.type === "UnaryExpression" && node.argument.argument.type === "ArrayExpression") {
-                    this.counter.doubleUnaryArray++;
-                }
-                break;
-            case "BinaryExpression": {
-                const [binaryExprDeepness, hasUnaryExpression] = helpers.walkBinaryExpression(node);
-                if (binaryExprDeepness >= 3 && hasUnaryExpression) {
-                    this.counter.deepBinaryExpr++;
-                }
-                break;
-            }
-        }
-
-        return action;
+        return runOnProbes(node, this);
     }
+}
+
+function sum(arr = []) {
+    return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
 }
 
 Analysis.Warnings = constants.warnings;
