@@ -36,9 +36,9 @@ function isObfuscatedCode(analysis) {
         }
         // console.log(prefix);
         // console.log(oneTimeOccurence);
-        // console.log(this.hasPrefixedIdentifiers);
-        // console.log(this.counter.identifiers);
-        // console.log(this.counter.encodedArrayValue);
+        // console.log(analysis.hasPrefixedIdentifiers);
+        // console.log(analysis.counter.identifiers);
+        // console.log(analysis.counter.encodedArrayValue);
 
         if (uPrefixNames.size === 1 && freejsobfuscator.verify(analysis, prefix)) {
             encoderName = "freejsobfuscator";
@@ -46,10 +46,10 @@ function isObfuscatedCode(analysis) {
         else if (obfuscatorio.verify(analysis)) {
             encoderName = "obfuscator.io";
         }
-        else if ((analysis.counter.identifiers > (kMinimumIdsCount * 3) && analysis.hasPrefixedIdentifiers)
-            && (oneTimeOccurence <= 3 || analysis.counter.encodedArrayValue > 0)) {
-            encoderName = "unknown";
-        }
+        // else if ((analysis.counter.identifiers > (kMinimumIdsCount * 3) && analysis.hasPrefixedIdentifiers)
+        //     && (oneTimeOccurence <= 3 || analysis.counter.encodedArrayValue > 0)) {
+        //     encoderName = "unknown";
+        // }
     }
 
     return [encoderName !== null, encoderName];

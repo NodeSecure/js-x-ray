@@ -92,8 +92,8 @@ function main(node, options) {
 
         // require(Buffer.from("...", "hex").toString());
         case "CallExpression": {
-            parseRequireCallExpression(arg)
-                .forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
+            const { dependencies } = parseRequireCallExpression(arg);
+            dependencies.forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
 
             analysis.addWarning(warnings.unsafeImport, null, node.loc);
 
@@ -138,11 +138,21 @@ function parseRequireCallExpression(nodeToWalk) {
                     }
                     break;
                 }
+                case "require.resolve": {
+                    const [element] = node.arguments;
+
+                    if (element.type === "Literal") {
+                        dependencies.add(element.value);
+                    }
+                    break;
+                }
             }
         }
     });
 
-    return [...dependencies];
+    return {
+        dependencies: [...dependencies]
+    };
 }
 
 module.exports = {

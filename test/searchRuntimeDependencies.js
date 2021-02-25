@@ -64,6 +64,15 @@ test("should return the string value of the encoded hexadecimal literal", () => 
     expect([...dependencies]).toStrictEqual(["http"]);
 });
 
+test("should detect an unsafe import because of the usage of data:text/javascript", () => {
+    const { dependencies, warnings } = runASTAnalysis(`
+        import 'data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==';
+    `);
+
+    expect(getWarningKind(warnings)).toStrictEqual([Warnings.unsafeImport].sort());
+    expect([...dependencies]).toStrictEqual(["data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg=="]);
+});
+
 test("should be capable to reverse the CallExpression Buffer.from call with an ArrayExpression as first argument", () => {
     const { dependencies, warnings } = runASTAnalysis(`
         const px = require.resolve(

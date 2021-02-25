@@ -88,6 +88,7 @@ class Analysis {
             }
         }
 
+        // Searching for morse string like "--.- --.--."
         if (/^[.-\s]+$/g.test(node.value)) {
             this.counter.morseLiteral++;
         }
