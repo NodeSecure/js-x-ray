@@ -16,7 +16,6 @@ const kDictionaryStrParts = [
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "0123456789"
 ];
-const kMinimumIdsCount = 5;
 
 const kWarningsNameStr = Object.freeze({
     [constants.warnings.parsingError]: "parsing-error",
@@ -72,61 +71,6 @@ class Analysis {
         }
     }
 
-    calcAvgPrefixedIdentifiers(prefix) {
-        const valuesArr = Object.values(prefix).slice().sort((left, right) => left - right);
-        if (valuesArr.length === 0) {
-            return 0;
-        }
-        const nbOfPrefixedIds = valuesArr.length === 1 ? valuesArr.pop() : (valuesArr.pop() + valuesArr.pop());
-        const maxIds = this.counter.identifiers - this.idtypes.property;
-
-        return ((nbOfPrefixedIds / maxIds) * 100);
-    }
-
-    analyzeIdentifierNames() {
-        this.counter.identifiers = this.identifiersName.length;
-        let encoderName = null;
-
-        if (obfuscators.jsfuck.verify(this)) {
-            encoderName = "jsfuck";
-        }
-        else if (obfuscators.jjencode.verify(this)) {
-            encoderName = "jjencode";
-        }
-        else if (this.counter.morseLiteral >= 36) {
-            encoderName = "morse";
-        }
-        else {
-            // TODO: also implement Dictionnary checkup
-            const { prefix, oneTimeOccurence } = secString.Patterns.commonHexadecimalPrefix(
-                this.identifiersName.map((value) => value.name)
-            );
-            const uPrefixNames = new Set(Object.keys(prefix));
-
-            if (this.counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
-                this.hasPrefixedIdentifiers = this.calcAvgPrefixedIdentifiers(prefix) > 80;
-            }
-            // console.log(prefix);
-            // console.log(oneTimeOccurence);
-            // console.log(this.hasPrefixedIdentifiers);
-            // console.log(this.counter.identifiers);
-            // console.log(this.counter.encodedArrayValue);
-
-            if (uPrefixNames.size === 1 && obfuscators.freejsobfuscator.verify(this, prefix)) {
-                encoderName = "freejsobfuscator";
-            }
-            else if (obfuscators.obfuscatorio.verify(this)) {
-                encoderName = "obfuscator.io";
-            }
-            else if ((this.counter.identifiers > (kMinimumIdsCount * 3) && this.hasPrefixedIdentifiers)
-                && (oneTimeOccurence <= 3 || this.counter.encodedArrayValue > 0)) {
-                encoderName = "unknown";
-            }
-        }
-
-        return [encoderName !== null, encoderName];
-    }
-
     analyzeLiteral(node, inArrayExpr = false) {
         if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
             return;
@@ -160,7 +104,8 @@ class Analysis {
     }
 
     getResult(isMinified) {
-        const [isObfuscated, kind] = this.analyzeIdentifierNames();
+        this.counter.identifiers = this.identifiersName.length;
+        const [isObfuscated, kind] = obfuscators.isObfuscatedCode(this);
         if (isObfuscated) {
             this.addWarning(constants.warnings.obfuscatedCode, kind || "unknown");
         }
