@@ -89,7 +89,7 @@ class Analysis {
         }
 
         // Searching for morse string like "--.- --.--."
-        if (/^[.-\s]+$/g.test(node.value)) {
+        if (secString.Utils.isMorse(node.value)) {
             this.counter.morseLiteral++;
         }
 
