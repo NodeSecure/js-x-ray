@@ -71,27 +71,30 @@ class Analysis {
         }
     }
 
-    analyzeLiteral(node, inArrayExpr = false) {
-        if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
-            return;
-        }
-
-        const score = secString.Utils.stringSuspicionScore(node.value);
+    analyzeString(str) {
+        const score = secString.Utils.stringSuspicionScore(str);
         if (score !== 0) {
             this.literalScores.push(score);
         }
 
         if (!this.hasDictionaryString) {
-            const isDictionaryStr = kDictionaryStrParts.every((word) => node.value.includes(word));
+            const isDictionaryStr = kDictionaryStrParts.every((word) => str.includes(word));
             if (isDictionaryStr) {
                 this.hasDictionaryString = true;
             }
         }
 
         // Searching for morse string like "--.- --.--."
-        if (secString.Utils.isMorse(node.value)) {
+        if (secString.Utils.isMorse(str)) {
             this.counter.morseLiteral++;
         }
+    }
+
+    analyzeLiteral(node, inArrayExpr = false) {
+        if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
+            return;
+        }
+        this.analyzeString(node.value);
 
         const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = secString.Literal.defaultAnalysis(node);
         if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
