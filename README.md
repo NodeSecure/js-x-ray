@@ -121,30 +121,5 @@ interface Report {
 
 </details>
 
-<details>
-<summary>generateWarning(kind: string, options?: WarningOptions): Warning< BaseWarning ></summary>
-
-Generate a new Warning Object.
-
-```ts
-interface WarningOptions {
-    location: Location;
-    file?: string;
-    value?: string;
-}
-```
-
-</details>
-
-<details>
-<summary>rootLocation(): SourceLocation</summary>
-
-Return a default SourceLocation with all row and column set to zero.
-```js
-{ start: { line: 0, column: 0 }, end: { line: 0, column: 0 } }
-```
-
-</details>
-
 ## License
 MIT

@@ -9,7 +9,7 @@ declare class ASTDeps {
     getDependenciesInTryStatement(): IterableIterator<string>;
 
     public isInTryStmt: boolean;
-    public dependencies: JSXRay.Dependencies;
+    public dependencies: Record<string, JSXRay.Dependency>;
     public readonly size: number;
 }
 
@@ -17,12 +17,6 @@ declare namespace JSXRay {
     interface RuntimeOptions {
         module?: boolean;
         isMinified?: boolean;
-    }
-
-    interface WarningOptions {
-        location: SourceLocation;
-        file?: string;
-        value?: string;
     }
 
     type kindWithValue = "parsing-error"
@@ -52,13 +46,11 @@ declare namespace JSXRay {
         isOneLineRequire: boolean;
     }
 
-    interface Dependencies {
-        [depName: string]: {
-            unsafe: boolean;
-            inTry: boolean;
-            location?: SourceLocation;
-        }
-    }
+    interface Dependency {
+        unsafe: boolean;
+        inTry: boolean;
+        location?: SourceLocation;
+    };
 
     interface WarningsNames {
         parsingError: "parsing-error",
@@ -73,8 +65,7 @@ declare namespace JSXRay {
     }
 
     export function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-    export function generateWarning(kind: string, options?: WarningOptions): Warning<BaseWarning>;
-    export function rootLocation(): SourceLocation;
+
     export namespace CONSTANTS {
         export const Warnings: WarningsNames;
     }
