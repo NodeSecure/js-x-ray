@@ -26,6 +26,8 @@ class ASTDeps {
         if (depName.trim() === "") {
             return;
         }
+
+        const cleanDepName = depName.charAt(depName.length - 1) === "/" ? depName.slice(0, -1) : depName;
         const dep = {
             unsafe,
             inTry: this.isInTryStmt
@@ -33,7 +35,7 @@ class ASTDeps {
         if (location !== null) {
             dep.location = location;
         }
-        this.dependencies[depName] = dep;
+        this.dependencies[cleanDepName] = dep;
     }
 
     get size() {
