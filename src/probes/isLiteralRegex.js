@@ -24,5 +24,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isLiteralRegex",
     validateNode, main, breakOnMatch: false
 };

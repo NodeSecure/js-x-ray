@@ -36,5 +36,6 @@ function walkBinaryExpression(expr, level = 1) {
 }
 
 module.exports = {
+    name: "isBinaryExpression",
     validateNode, main, breakOnMatch: false
 };

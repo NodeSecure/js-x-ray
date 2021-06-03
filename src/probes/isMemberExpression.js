@@ -28,5 +28,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isMemberExpression",
     validateNode, main, breakOnMatch: true, breakGroup: "import"
 };

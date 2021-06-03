@@ -14,7 +14,7 @@ function runASTAnalysis(str, options = Object.create(null)) {
     // Example: #!/usr/bin/env node
     const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
     const { body } = meriyah.parseScript(strToAnalyze, {
-        next: true, loc: true, raw: true, module: Boolean(module), impliedStrict: true
+        next: true, loc: true, raw: true, module: Boolean(module)
     });
 
     const sastAnalysis = new Analysis();

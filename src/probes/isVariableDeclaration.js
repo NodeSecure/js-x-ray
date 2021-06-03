@@ -101,5 +101,6 @@ function getRequirablePatterns(parts) {
 }
 
 module.exports = {
+    name: "isVariableDeclaration",
     validateNode, main, breakOnMatch: false
 };

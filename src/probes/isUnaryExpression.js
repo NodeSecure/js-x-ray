@@ -15,5 +15,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isUnaryExpression",
     validateNode, main, breakOnMatch: false
 };

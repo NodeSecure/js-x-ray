@@ -35,5 +35,6 @@ function isRegexConstructor(node) {
 }
 
 module.exports = {
+    name: "isRegexObject",
     validateNode, main, breakOnMatch: false
 };

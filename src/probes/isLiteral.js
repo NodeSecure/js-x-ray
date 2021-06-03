@@ -44,5 +44,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isLiteral",
     validateNode, main, breakOnMatch: false
 };

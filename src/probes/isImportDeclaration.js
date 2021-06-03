@@ -23,5 +23,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isImportDeclaration",
     validateNode, main, breakOnMatch: true, breakGroup: "import"
 };

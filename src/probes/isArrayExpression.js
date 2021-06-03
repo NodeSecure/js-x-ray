@@ -18,5 +18,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isArrayExpression",
     validateNode, main, breakOnMatch: false
 };

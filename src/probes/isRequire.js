@@ -156,5 +156,6 @@ function parseRequireCallExpression(nodeToWalk) {
 }
 
 module.exports = {
+    name: "isRequire",
     validateNode, main, breakOnMatch: true, breakGroup: "import"
 };

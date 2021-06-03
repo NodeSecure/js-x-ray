@@ -85,7 +85,7 @@ class Analysis {
         }
 
         // Searching for morse string like "--.- --.--."
-        if (secString.Utils.isMorse(str)) {
+        if (secString.Utils.stringCharDiversity(str, ["\n"]) >= 3 && secString.Utils.isMorse(str)) {
             this.counter.morseLiteral++;
         }
     }

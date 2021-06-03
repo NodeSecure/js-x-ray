@@ -19,5 +19,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isAssignmentExpression",
     validateNode, main, breakOnMatch: false
 };

@@ -1,1 +1,33 @@
-_="b = \"JavaScript SourceGCRUSH</ <b></b>\" + b;Q=[];for (1000;qi-1013343992#Q.push(Strg.fromCharCoV(i))L=3].onclick=function(s){P1`(@|^)s*//.*|@+s*5`7775,X=B=s/2,WmD';S=	i;;m=c+m){M=N=e=c=0,Q;!c#q!~y#(c=y!cO){x)0xWo;}else W,t=1;X;t++)X=0;++i<s-t;)!=s.substr(i,t)E~(At)))X=t1t) {	x;(R=O[xE*j-j-(R+1)*	c)(j>M||=M#R>N)#(M=j,N=R,e=xj<1)Vlete O[x]}]=1;Wo;!ePs+c+e}c=s'\"5<s\"'\")?(BD\"',/\"/g):(B=\"'\",/'/g6D_Dsc,'7ZB)';Y  $Dm5with(_$[YE)_=zpop()e(_)';	i;4]=SF to ZiF (Z(i-S)F, Z((i/S*1e4|0)/100)+'%)'};setTimeout(\"1=e(9]`e7(_7)/,'_5L()\")`%..i5b.childKn[G rowP12 colP80></>.lengths.VxOf(.Kplace(for(.nerHTML	encoVURI(.split(\\;~j;]++)A;x  O)if(].uee).zc)#i-o[x);textaKaini=j=val+B+/g,'o={}button>)bKak;#&&5')7@[rn]Ax,j+D='E])F+'BG<br><KrePs=VdeWO=Z'+`/q--i;yQ[iEzjo(,]=";for(Y in $="zyq`ZWVPKGFEDA@75#	")with(_.split($[Y]))_=join(pop());eval(_)
+import _curry2 from "./internal/_curry2.js";
+import _reduce from "./internal/_reduce.js";
+import ap from "./ap.js";
+import curryN from "./curryN.js";
+import map from "./map.js";
+/**
+ * "lifts" a function to be the specified arity, so that it may "map over" that
+ * many lists, Functions or other objects that satisfy the [FantasyLand Apply spec](https://github.com/fantasyland/fantasy-land#apply).
+ *
+ * @func
+ * @memberOf R
+ * @since v0.7.0
+ * @category Function
+ * @sig Number -> (*... -> *) -> ([*]... -> [*])
+ * @param {Function} fn The function to lift into higher context
+ * @return {Function} The lifted function.
+ * @see R.lift, R.ap
+ * @example
+ *
+ *      const madd3 = R.liftN(3, (...args) => R.sum(args));
+ *      madd3([1,2,3], [1,2,3], [1]); //=> [3, 4, 5, 4, 5, 6, 5, 6, 7]
+ */
+
+var liftN =
+/*#__PURE__*/
+_curry2(function liftN(arity, fn) {
+  var lifted = curryN(arity, fn);
+  return curryN(arity, function () {
+    return _reduce(ap, map(lifted, arguments[0]), Array.prototype.slice.call(arguments, 1));
+  });
+});
+
+export default liftN;

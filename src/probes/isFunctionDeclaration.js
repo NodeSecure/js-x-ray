@@ -17,5 +17,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isFunctionDeclaration",
     validateNode, main, breakOnMatch: false
 };

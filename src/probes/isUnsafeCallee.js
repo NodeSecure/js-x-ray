@@ -16,5 +16,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isUnsafeCallee",
     validateNode, main, breakOnMatch: false
 };

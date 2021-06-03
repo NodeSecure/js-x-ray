@@ -20,5 +20,6 @@ function main(node, options) {
 }
 
 module.exports = {
+    name: "isObjectExpression",
     validateNode, main, breakOnMatch: false
 };
