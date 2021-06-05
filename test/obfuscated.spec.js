@@ -25,15 +25,15 @@ test("should detect 'jsfuck' obfuscation", (tape) => {
   tape.end();
 });
 
-test("should detect 'morse' obfuscation", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "morse.js"), "utf-8");
-  const { warnings } = runASTAnalysis(trycatch);
+// test("should detect 'morse' obfuscation", (tape) => {
+//   const trycatch = readFileSync(join(FIXTURE_PATH, "morse.js"), "utf-8");
+//   const { warnings } = runASTAnalysis(trycatch);
 
-  tape.strictEqual(warnings.length, 1);
-  tape.deepEqual(getWarningKind(warnings), [Warnings.obfuscatedCode].sort());
-  tape.strictEqual(warnings[0].value, "morse");
-  tape.end();
-});
+//   tape.strictEqual(warnings.length, 1);
+//   tape.deepEqual(getWarningKind(warnings), [Warnings.obfuscatedCode].sort());
+//   tape.strictEqual(warnings[0].value, "morse");
+//   tape.end();
+// });
 
 test("should detect 'jjencode' obfuscation", (tape) => {
   const trycatch = readFileSync(join(FIXTURE_PATH, "jjencode.js"), "utf-8");

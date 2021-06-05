@@ -5,8 +5,6 @@
 )
 [![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE)
 ![dep](https://img.shields.io/david/NodeSecure/js-x-ray)
-![size](https://img.shields.io/bundlephobia/min/js-x-ray)
-
 
 JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to enable better code evolution and allow better access to developers and researchers.
 
