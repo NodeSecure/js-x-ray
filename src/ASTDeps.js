@@ -1,58 +1,55 @@
-"use strict";
 
-class ASTDeps {
-    #inTry = false;
-    dependencies = Object.create(null);
+export default class ASTDeps {
+  #inTry = false;
+  dependencies = Object.create(null);
 
-    get isInTryStmt() {
-        return this.#inTry;
+  get isInTryStmt() {
+    return this.#inTry;
+  }
+
+  set isInTryStmt(value) {
+    if (typeof value !== "boolean") {
+      throw new TypeError("value must be a boolean!");
     }
 
-    set isInTryStmt(value) {
-        if (typeof value !== "boolean") {
-            throw new TypeError("value must be a boolean!");
-        }
+    this.#inTry = value;
+  }
 
-        this.#inTry = value;
+  removeByName(name) {
+    if (Reflect.has(this.dependencies, name)) {
+      delete this.dependencies[name];
+    }
+  }
+
+  add(depName, location = null, unsafe = false) {
+    if (depName.trim() === "") {
+      return;
     }
 
-    removeByName(name) {
-        if (Reflect.has(this.dependencies, name)) {
-            delete this.dependencies[name];
-        }
+    const cleanDepName = depName.charAt(depName.length - 1) === "/" ? depName.slice(0, -1) : depName;
+    const dep = {
+      unsafe,
+      inTry: this.isInTryStmt
+    };
+    if (location !== null) {
+      dep.location = location;
     }
+    this.dependencies[cleanDepName] = dep;
+  }
 
-    add(depName, location = null, unsafe = false) {
-        if (depName.trim() === "") {
-            return;
-        }
+  get size() {
+    return Object.keys(this.dependencies).length;
+  }
 
-        const cleanDepName = depName.charAt(depName.length - 1) === "/" ? depName.slice(0, -1) : depName;
-        const dep = {
-            unsafe,
-            inTry: this.isInTryStmt
-        };
-        if (location !== null) {
-            dep.location = location;
-        }
-        this.dependencies[cleanDepName] = dep;
+  * getDependenciesInTryStatement() {
+    for (const [depName, props] of Object.entries(this.dependencies)) {
+      if (props.inTry === true && props.unsafe === false) {
+        yield depName;
+      }
     }
+  }
 
-    get size() {
-        return Object.keys(this.dependencies).length;
-    }
-
-    * getDependenciesInTryStatement() {
-        for (const [depName, props] of Object.entries(this.dependencies)) {
-            if (props.inTry === true && props.unsafe === false) {
-                yield depName;
-            }
-        }
-    }
-
-    * [Symbol.iterator]() {
-        yield* Object.keys(this.dependencies);
-    }
+  * [Symbol.iterator]() {
+    yield* Object.keys(this.dependencies);
+  }
 }
-
-module.exports = ASTDeps;

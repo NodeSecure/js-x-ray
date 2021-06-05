@@ -1,150 +1,146 @@
-"use strict";
+// Import Third-party Dependencies
+import { Utils, Literal } from "@nodesecure/sec-literal";
 
-// Require Third-party Dependencies
-const secString = require("sec-literal");
-
-// Require Internal Dependencies
-const helpers = require("./utils");
-const constants = require("./constants");
-const ASTDeps = require("./ASTDeps");
-const obfuscators = require("./obfuscators");
-const { runOnProbes } = require("./probes");
+// Import Internal Dependencies
+import { rootLocation, toArrayLocation, generateWarning } from "./utils.js";
+import { warnings as _warnings, processMainModuleRequire } from "./constants.js";
+import ASTDeps from "./ASTDeps.js";
+import { isObfuscatedCode } from "./obfuscators/index.js";
+import { runOnProbes } from "./probes/index.js";
 
 // CONSTANTS
 const kDictionaryStrParts = [
-    "abcdefghijklmnopqrstuvwxyz",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "0123456789"
+  "abcdefghijklmnopqrstuvwxyz",
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "0123456789"
 ];
 
 const kWarningsNameStr = Object.freeze({
-    [constants.warnings.parsingError]: "parsing-error",
-    [constants.warnings.unsafeImport]: "unsafe-import",
-    [constants.warnings.unsafeRegex]: "unsafe-regex",
-    [constants.warnings.unsafeStmt]: "unsafe-stmt",
-    [constants.warnings.unsafeAssign]: "unsafe-assign",
-    [constants.warnings.encodedLiteral]: "encoded-literal",
-    [constants.warnings.shortIdentifiers]: "short-identifiers",
-    [constants.warnings.suspiciousLiteral]: "suspicious-literal",
-    [constants.warnings.obfuscatedCode]: "obfuscated-code"
+  [_warnings.parsingError]: "parsing-error",
+  [_warnings.unsafeImport]: "unsafe-import",
+  [_warnings.unsafeRegex]: "unsafe-regex",
+  [_warnings.unsafeStmt]: "unsafe-stmt",
+  [_warnings.unsafeAssign]: "unsafe-assign",
+  [_warnings.encodedLiteral]: "encoded-literal",
+  [_warnings.shortIdentifiers]: "short-identifiers",
+  [_warnings.suspiciousLiteral]: "suspicious-literal",
+  [_warnings.obfuscatedCode]: "obfuscated-code"
 });
 
-class Analysis {
-    hasDictionaryString = false;
-    hasPrefixedIdentifiers = false;
-    varkinds = { var: 0, let: 0, const: 0 };
-    idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
-    counter = {
-        identifiers: 0,
-        doubleUnaryArray: 0,
-        computedMemberExpr: 0,
-        memberExpr: 0,
-        deepBinaryExpr: 0,
-        encodedArrayValue: 0,
-        morseLiteral: 0
-    };
-    identifiersName = [];
+export default class Analysis {
+  hasDictionaryString = false;
+  hasPrefixedIdentifiers = false;
+  varkinds = { var: 0, let: 0, const: 0 };
+  idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
+  counter = {
+    identifiers: 0,
+    doubleUnaryArray: 0,
+    computedMemberExpr: 0,
+    memberExpr: 0,
+    deepBinaryExpr: 0,
+    encodedArrayValue: 0,
+    morseLiteral: 0
+  };
+  identifiersName = [];
 
-    constructor() {
-        this.dependencies = new ASTDeps();
+  constructor() {
+    this.dependencies = new ASTDeps();
 
-        this.identifiers = new Map();
-        this.globalParts = new Map();
-        this.handledEncodedLiteralValues = new Map();
+    this.identifiers = new Map();
+    this.globalParts = new Map();
+    this.handledEncodedLiteralValues = new Map();
 
-        this.requireIdentifiers = new Set(["require", constants.processMainModuleRequire]);
-        this.warnings = [];
-        this.literalScores = [];
+    this.requireIdentifiers = new Set(["require", processMainModuleRequire]);
+    this.warnings = [];
+    this.literalScores = [];
+  }
+
+  addWarning(symbol, value, location = rootLocation()) {
+    if (symbol === _warnings.encodedLiteral && this.handledEncodedLiteralValues.has(value)) {
+      const index = this.handledEncodedLiteralValues.get(value);
+      this.warnings[index].location.push(toArrayLocation(location));
+
+      return;
+    }
+    const warningName = kWarningsNameStr[symbol];
+    this.warnings.push(generateWarning(warningName, { value, location }));
+    if (symbol === _warnings.encodedLiteral) {
+      this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
+    }
+  }
+
+  analyzeString(str) {
+    const score = Utils.stringSuspicionScore(str);
+    if (score !== 0) {
+      this.literalScores.push(score);
     }
 
-    addWarning(symbol, value, location = helpers.rootLocation()) {
-        if (symbol === constants.warnings.encodedLiteral && this.handledEncodedLiteralValues.has(value)) {
-            const index = this.handledEncodedLiteralValues.get(value);
-            this.warnings[index].location.push(helpers.toArrayLocation(location));
-
-            return;
-        }
-        const warningName = kWarningsNameStr[symbol];
-        this.warnings.push(helpers.generateWarning(warningName, { value, location }));
-        if (symbol === constants.warnings.encodedLiteral) {
-            this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
-        }
+    if (!this.hasDictionaryString) {
+      const isDictionaryStr = kDictionaryStrParts.every((word) => str.includes(word));
+      if (isDictionaryStr) {
+        this.hasDictionaryString = true;
+      }
     }
 
-    analyzeString(str) {
-        const score = secString.Utils.stringSuspicionScore(str);
-        if (score !== 0) {
-            this.literalScores.push(score);
-        }
+    // Searching for morse string like "--.- --.--."
+    if (Utils.stringCharDiversity(str, ["\n"]) >= 3 && Utils.isMorse(str)) {
+      this.counter.morseLiteral++;
+    }
+  }
 
-        if (!this.hasDictionaryString) {
-            const isDictionaryStr = kDictionaryStrParts.every((word) => str.includes(word));
-            if (isDictionaryStr) {
-                this.hasDictionaryString = true;
-            }
-        }
+  analyzeLiteral(node, inArrayExpr = false) {
+    if (typeof node.value !== "string" || Utils.isSvg(node)) {
+      return;
+    }
+    this.analyzeString(node.value);
 
-        // Searching for morse string like "--.- --.--."
-        if (secString.Utils.stringCharDiversity(str, ["\n"]) >= 3 && secString.Utils.isMorse(str)) {
-            this.counter.morseLiteral++;
-        }
+    const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = Literal.defaultAnalysis(node);
+    if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
+      if (inArrayExpr) {
+        this.counter.encodedArrayValue++;
+      }
+      else {
+        this.addWarning(_warnings.encodedLiteral, node.value, node.loc);
+      }
+    }
+  }
+
+  getResult(isMinified) {
+    this.counter.identifiers = this.identifiersName.length;
+    const [isObfuscated, kind] = isObfuscatedCode(this);
+    if (isObfuscated) {
+      this.addWarning(_warnings.obfuscatedCode, kind || "unknown");
     }
 
-    analyzeLiteral(node, inArrayExpr = false) {
-        if (typeof node.value !== "string" || secString.Utils.isSvg(node)) {
-            return;
-        }
-        this.analyzeString(node.value);
+    const identifiersLengthArr = this.identifiersName
+      .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
 
-        const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = secString.Literal.defaultAnalysis(node);
-        if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
-            if (inArrayExpr) {
-                this.counter.encodedArrayValue++;
-            }
-            else {
-                this.addWarning(constants.warnings.encodedLiteral, node.value, node.loc);
-            }
-        }
+    const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
+    if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
+      this.addWarning(_warnings.shortIdentifiers, idsLengthAvg);
+    }
+    if (stringScore >= 3) {
+      this.addWarning(_warnings.suspiciousLiteral, stringScore);
     }
 
-    getResult(isMinified) {
-        this.counter.identifiers = this.identifiersName.length;
-        const [isObfuscated, kind] = obfuscators.isObfuscatedCode(this);
-        if (isObfuscated) {
-            this.addWarning(constants.warnings.obfuscatedCode, kind || "unknown");
-        }
+    return { idsLengthAvg, stringScore, warnings: this.warnings };
+  }
 
-        const identifiersLengthArr = this.identifiersName
-            .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
-
-        const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
-        if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
-            this.addWarning(constants.warnings.shortIdentifiers, idsLengthAvg);
-        }
-        if (stringScore >= 3) {
-            this.addWarning(constants.warnings.suspiciousLiteral, stringScore);
-        }
-
-        return { idsLengthAvg, stringScore, warnings: this.warnings };
+  walk(node) {
+    // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
+    if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
+      this.dependencies.isInTryStmt = true;
+    }
+    else if (node.type === "CatchClause") {
+      this.dependencies.isInTryStmt = false;
     }
 
-    walk(node) {
-        // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
-        if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
-            this.dependencies.isInTryStmt = true;
-        }
-        else if (node.type === "CatchClause") {
-            this.dependencies.isInTryStmt = false;
-        }
-
-        return runOnProbes(node, this);
-    }
+    return runOnProbes(node, this);
+  }
 }
 
 function sum(arr = []) {
-    return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
+  return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
 }
 
-Analysis.Warnings = constants.warnings;
-
-module.exports = Analysis;
+Analysis.Warnings = _warnings;

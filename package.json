@@ -1,21 +1,21 @@
 {
-  "name": "js-x-ray",
+  "name": "@nodesecure/js-x-ray",
   "version": "3.2.0",
   "description": "JavaScript AST XRay analysis",
-  "main": "index.js",
+  "type": "module",
+  "exports": "./index.js",
   "engines": {
-    "node": ">=12.12.0"
+    "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "scripts": {
     "eslint": "eslint src test",
     "eslint-fix": "npm run eslint -- --fix",
     "prepublishOnly": "pkg-ok",
-    "test": "npm run test-only && npm run eslint",
-    "test-only": "jest --coverage"
+    "test": "cross-env esm-tape-runner 'test/*.spec.js' | tap-monkey"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fraxken/js-x-ray.git"
+    "url": "git+https://github.com/NodeSecure/js-x-ray.git"
   },
   "keywords": [
     "ast",
@@ -32,42 +32,26 @@
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fraxken/js-x-ray/issues"
+    "url": "https://github.com/NodeSecure/js-x-ray/issues"
   },
-  "jest": {
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ],
-    "collectCoverageFrom": [
-      "index.js",
-      "**/src/**/*.js"
-    ],
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/test/**/*.js"
-    ],
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/test/fixtures/",
-      "/test/utils/"
-    ]
-  },
-  "homepage": "https://github.com/fraxken/js-x-ray#readme",
+  "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "estree-walker": "^2.0.2",
+    "@nodesecure/sec-literal": "^1.0.0",
+    "estree-walker": "^3.0.0",
     "meriyah": "^4.1.5",
-    "safe-regex": "^2.1.1",
-    "sec-literal": "^1.2.0"
+    "safe-regex": "^2.1.1"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/preset-env": "^7.14.4",
-    "@slimio/eslint-config": "^4.1.0",
+    "@nodesecure/eslint-config": "^1.0.0",
     "@slimio/is": "^1.5.1",
+    "@small-tech/esm-tape-runner": "^1.0.3",
+    "@small-tech/tap-monkey": "^1.3.0",
     "@types/node": "^15.12.0",
+    "cross-env": "^7.0.3",
     "eslint": "^7.27.0",
     "is-minified-code": "^2.0.0",
     "jest": "^27.0.4",
-    "pkg-ok": "^2.3.1"
+    "pkg-ok": "^2.3.1",
+    "tape": "^5.2.2"
   }
 }

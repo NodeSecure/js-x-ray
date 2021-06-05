@@ -1,20 +1,18 @@
-"use strict";
-
 function validateNode(node) {
-    return [
-        node.type === "UnaryExpression"
-    ];
+  return [
+    node.type === "UnaryExpression"
+  ];
 }
 
 function main(node, options) {
-    const { analysis } = options;
+  const { analysis } = options;
 
-    if (node.argument.type === "UnaryExpression" && node.argument.argument.type === "ArrayExpression") {
-        analysis.counter.doubleUnaryArray++;
-    }
+  if (node.argument.type === "UnaryExpression" && node.argument.argument.type === "ArrayExpression") {
+    analysis.counter.doubleUnaryArray++;
+  }
 }
 
-module.exports = {
-    name: "isUnaryExpression",
-    validateNode, main, breakOnMatch: false
+export default {
+  name: "isUnaryExpression",
+  validateNode, main, breakOnMatch: false
 };

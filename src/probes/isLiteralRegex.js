@@ -1,29 +1,27 @@
-"use strict";
-
 // Require Internal Dependencies
-const helpers = require("../utils");
-const { warnings } = require("../constants");
+import { isLiteralRegex } from "../utils.js";
+import { warnings } from "../constants.js";
 
 // Require Third-party Dependencies
-const safeRegex = require("safe-regex");
+import safeRegex from "safe-regex";
 
 // Search for Literal Regex.
 // then we use the safe-regex package to detect whether or not regex is safe!
 function validateNode(node) {
-    return [
-        helpers.isLiteralRegex(node)
-    ];
+  return [
+    isLiteralRegex(node)
+  ];
 }
 
 function main(node, options) {
-    const { analysis } = options;
+  const { analysis } = options;
 
-    if (!safeRegex(node.regex.pattern)) {
-        analysis.addWarning(warnings.unsafeRegex, node.regex.pattern, node.loc);
-    }
+  if (!safeRegex(node.regex.pattern)) {
+    analysis.addWarning(warnings.unsafeRegex, node.regex.pattern, node.loc);
+  }
 }
 
-module.exports = {
-    name: "isLiteralRegex",
-    validateNode, main, breakOnMatch: false
+export default {
+  name: "isLiteralRegex",
+  validateNode, main, breakOnMatch: false
 };
