@@ -38,7 +38,7 @@
   "dependencies": {
     "@nodesecure/sec-literal": "^1.0.0",
     "estree-walker": "^3.0.0",
-    "meriyah": "^4.1.5",
+    "meriyah": "^4.2.0",
     "safe-regex": "^2.1.1"
   },
   "devDependencies": {
