@@ -27,6 +27,7 @@
   ],
   "files": [
     "src",
+    "index.js",
     "index.d.ts"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
