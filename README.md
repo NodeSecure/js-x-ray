@@ -4,7 +4,7 @@
 [![Security Responsible Disclosure](https://img.shields.io/badge/Security-Responsible%20Disclosure-yellow.svg)](https://github.com/nodejs/security-wg/blob/master/processes/responsible_disclosure_template.md
 )
 [![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE)
-![dep](https://img.shields.io/david/NodeSecure/js-x-ray)
+![build](https://img.shields.io/github/workflow/status/NodeSecure/js-x-ray/Node.js%20CI)
 
 JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to enable better code evolution and allow better access to developers and researchers.
 
