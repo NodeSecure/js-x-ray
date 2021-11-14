@@ -1,6 +1,10 @@
+// Import Node.js Dependencies
+import fs from "fs/promises";
+
 // Import Third-party Dependencies
 import { walk } from "estree-walker";
 import * as meriyah from "meriyah";
+import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
 import Analysis from "./src/Analysis.js";
@@ -39,6 +43,34 @@ export function runASTAnalysis(str, options = Object.create(null)) {
   return {
     dependencies, warnings, idsLengthAvg, stringScore, isOneLineRequire
   };
+}
+
+export async function runASTAnalysisOnFile(pathToFile, options = {}) {
+  try {
+    const { packageName = null } = options;
+    const str = await fs.readFile(pathToFile, "utf-8");
+
+    const isMinified = pathToFile.includes(".min") || isMinified(str);
+    const data = runASTAnalysis(str, { isMinified });
+    if (packageName !== null) {
+      data.dependencies.removeByName(packageName);
+    }
+
+    return {
+      ok: true,
+      dependencies: data.dependencies,
+      warnings: data.warnings,
+      isMinified: !data.isOneLineRequire && isMinified
+    };
+  }
+  catch (error) {
+    return {
+      ok: false,
+      warnings: [
+        { kind: "parsing-error", value: error.message, location: [[0, 0], [0, 0]] }
+      ]
+    };
+  }
 }
 
 export const CONSTANTS = {
