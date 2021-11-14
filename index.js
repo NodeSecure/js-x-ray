@@ -1,5 +1,6 @@
 // Import Node.js Dependencies
 import fs from "fs/promises";
+import path from "path";
 
 // Import Third-party Dependencies
 import { walk } from "estree-walker";
@@ -47,11 +48,14 @@ export function runASTAnalysis(str, options = Object.create(null)) {
 
 export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   try {
-    const { packageName = null } = options;
+    const { packageName = null, module = true } = options;
     const str = await fs.readFile(pathToFile, "utf-8");
 
-    const isMinified = pathToFile.includes(".min") || isMinified(str);
-    const data = runASTAnalysis(str, { isMinified });
+    const isMin = pathToFile.includes(".min") || isMinified(str);
+    const data = runASTAnalysis(str, {
+      isMinified: isMin,
+      module: path.extname(file) === ".mjs" ? true : module
+    });
     if (packageName !== null) {
       data.dependencies.removeByName(packageName);
     }
@@ -60,7 +64,7 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
       ok: true,
       dependencies: data.dependencies,
       warnings: data.warnings,
-      isMinified: !data.isOneLineRequire && isMinified
+      isMinified: !data.isOneLineRequire && isMin
     };
   }
   catch (error) {
