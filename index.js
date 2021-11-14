@@ -54,7 +54,7 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
     const isMin = pathToFile.includes(".min") || isMinified(str);
     const data = runASTAnalysis(str, {
       isMinified: isMin,
-      module: path.extname(file) === ".mjs" ? true : module
+      module: path.extname(pathToFile) === ".mjs" ? true : module
     });
     if (packageName !== null) {
       data.dependencies.removeByName(packageName);
