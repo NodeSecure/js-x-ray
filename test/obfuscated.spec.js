@@ -7,7 +7,7 @@ import { join, dirname } from "path";
 import test from "tape";
 
 // Import Internal Dependencies
-import { runASTAnalysis, CONSTANTS } from "../index.js";
+import { runASTAnalysis, CONSTANTS, runASTAnalysisOnFile } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
@@ -66,5 +66,34 @@ test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", (
     Warnings.obfuscatedCode
   ].sort());
   tape.strictEqual(warnings[0].value, "obfuscator.io");
+  tape.end();
+});
+
+test("should not detect 'trojan-source' when providing safe control character", (tape) => {
+  const { warnings } = runASTAnalysis(`
+    const simpleStringWithControlCharacters = "Its only a \u0008backspace";
+  `);
+
+  tape.deepEqual([...warnings], []);
+  tape.end();
+});
+
+test("should detect 'trojan-source' when there is one unsafe unicode control char", (tape) => {
+  const { warnings } = runASTAnalysis(`
+    const role = "ROLE_ADMIN⁦" // Dangerous control char;
+  `);
+
+  tape.strictEqual(warnings.length, 1);
+  tape.deepEqual(getWarningKind(warnings), [Warnings.obfuscatedCode]);
+  tape.deepEqual(warnings[0].value, "trojan-source");
+  tape.end();
+});
+
+test("should detect 'trojan-source' when there is atleast one unsafe unicode control char", async(tape) => {
+  const { warnings } = await runASTAnalysisOnFile(join(FIXTURE_PATH, "unsafe-unicode-chars.js"));
+
+  tape.strictEqual(warnings.length, 1);
+  tape.deepEqual(getWarningKind(warnings), [Warnings.obfuscatedCode]);
+  tape.deepEqual(warnings[0].value, "trojan-source");
   tape.end();
 });

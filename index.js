@@ -21,6 +21,7 @@ export function runASTAnalysis(str, options = Object.create(null)) {
   });
 
   const sastAnalysis = new Analysis();
+  sastAnalysis.analyzeSourceString(str);
 
   // we walk each AST Nodes, this is a purely synchronous I/O
   walk(body, {

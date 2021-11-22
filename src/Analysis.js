@@ -5,7 +5,7 @@ import { Utils, Literal } from "@nodesecure/sec-literal";
 import { rootLocation, toArrayLocation, generateWarning } from "./utils.js";
 import { warnings as _warnings, processMainModuleRequire } from "./constants.js";
 import ASTDeps from "./ASTDeps.js";
-import { isObfuscatedCode } from "./obfuscators/index.js";
+import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { runOnProbes } from "./probes/index.js";
 
 // CONSTANTS
@@ -66,6 +66,12 @@ export default class Analysis {
     this.warnings.push(generateWarning(warningName, { value, location }));
     if (symbol === _warnings.encodedLiteral) {
       this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
+    }
+  }
+
+  analyzeSourceString(sourceString) {
+    if (hasTrojanSource(sourceString)) {
+      this.addWarning(_warnings.obfuscatedCode, "trojan-source");
     }
   }
 
