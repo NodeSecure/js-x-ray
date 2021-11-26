@@ -6,6 +6,7 @@ import * as jjencode from "./jjencode.js";
 import * as jsfuck from "./jsfuck.js";
 import * as freejsobfuscator from "./freejsobfuscator.js";
 import * as obfuscatorio from "./obfuscator-io.js";
+import * as trojan from "./trojan-source.js";
 
 // CONSTANTS
 const kMinimumIdsCount = 5;
@@ -51,6 +52,10 @@ export function isObfuscatedCode(analysis) {
   }
 
   return [encoderName !== null, encoderName];
+}
+
+export function hasTrojanSource(sourceString) {
+  return trojan.verify(sourceString);
 }
 
 function calcAvgPrefixedIdentifiers(analysis, prefix) {
