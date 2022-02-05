@@ -1,7 +1,3 @@
-/// <reference types="meriyah"/>
-
-import { SourceLocation } from "meriyah/dist/estree";
-
 declare class ASTDeps {
   constructor();
   removeByName(name: string): void;
@@ -41,11 +37,22 @@ declare namespace JSXRay {
     isOneLineRequire: boolean;
   }
 
+  interface SourceLocation {
+    start: {
+      line: number;
+      column: number;
+    };
+    end: {
+      line: number;
+      column: number;
+    }
+  }
+
   interface Dependency {
     unsafe: boolean;
     inTry: boolean;
     location?: SourceLocation;
-  };
+  }
 
   interface WarningsNames {
     parsingError: "parsing-error",
