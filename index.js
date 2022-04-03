@@ -16,8 +16,13 @@ export function runASTAnalysis(str, options = Object.create(null)) {
   // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
   // Example: #!/usr/bin/env node
   const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
+  const isEcmaScriptModule = Boolean(module);
   const { body } = meriyah.parseScript(strToAnalyze, {
-    next: true, loc: true, raw: true, module: Boolean(module)
+    next: true,
+    loc: true,
+    raw: true,
+    module: isEcmaScriptModule,
+    globalReturn: !isEcmaScriptModule
   });
 
   const sastAnalysis = new Analysis();
