@@ -37,7 +37,7 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "@nodesecure/sec-literal": "^1.0.1",
+    "@nodesecure/sec-literal": "^1.1.0",
     "estree-walker": "^3.0.1",
     "is-minified-code": "^2.0.0",
     "meriyah": "^4.2.0",
