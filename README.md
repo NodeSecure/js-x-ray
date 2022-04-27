@@ -73,6 +73,41 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > ⚠️ There is also a lot of suspicious code example in the root cases directory. Feel free to try the tool on these files.
 
+## Warnings CONSTANTS
+
+This section describes how use warnings CONSTANTS.
+
+The structure of the Constants is as follows:
+```
+/**
+ * @property {object}  CONSTANTS                         - The default values for Constants.
+ * @property {object}  CONSTANTS.Warnings                - The default Warnings object.
+ * @property {string}  CONSTANTS.Warnings[name]          - The default warning name (parsingError, unsafeImport etc...).
+ * @property {string}  CONSTANTS.Warnings[name].i18n     - i18n token.
+ * @property {string}  CONSTANTS.Warnings[name].code     - Used to perform unit tests.
+ */
+ 
+export const CONSTANTS = {
+  Warnings: Object.freeze({
+    parsingError: {
+      i18n: "sast_warnings.ast_error"
+      code: "ast-error",
+    },
+    ...otherWarnings
+  })
+};
+```
+
+We make a call to `i18n` through the package `NodeSecure/i18n` to get the translation.
+
+```
+import * as jsxray from "@nodesecure/js-x-ray";
+import * as i18n from "@nodesecure/i18n";
+
+console.log(i18n.getToken(jsxray.CONSTANTS.Warnings.parsingError.i18n));
+
+```
+
 ## Warnings Legends (v2.0+)
 
 > Node-secure versions equal or lower than 0.7.0 are no longer compatible with the warnings table below.
