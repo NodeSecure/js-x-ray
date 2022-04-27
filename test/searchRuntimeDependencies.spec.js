@@ -11,7 +11,15 @@ import { runASTAnalysis, CONSTANTS } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const { Warnings } = CONSTANTS;
+const { Warnings: {
+  unsafeRegex,
+  unsafeStmt,
+  unsafeAssign,
+  unsafeImport,
+  shortIdentifiers,
+  encodedLiteral,
+  suspiciousLiteral }
+} = CONSTANTS;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
 
@@ -55,7 +63,7 @@ test("should return unsafe-import when a CallExpression is used in a require sta
         require(evil() + "s");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport, Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code, unsafeImport.code].sort());
   tape.strictEqual(isOneLineRequire, false);
   tape.deepEqual([...dependencies], []);
   tape.end();
@@ -67,7 +75,7 @@ test("should return the string value of the encoded hexadecimal literal", (tape)
         const foo = "68747470";
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport, Warnings.encodedLiteral].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code, encodedLiteral.code].sort());
   tape.deepEqual([...dependencies], ["http"]);
   tape.end();
 });
@@ -77,7 +85,7 @@ test("should detect an unsafe import because of the usage of data:text/javascrip
         import 'data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==';
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code].sort());
   tape.deepEqual([...dependencies], ["data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg=="]);
   tape.end();
 });
@@ -89,7 +97,7 @@ test("should be capable to reverse the CallExpression Buffer.from call with an A
         );
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code].sort());
   tape.deepEqual([...dependencies], ["dl-tar"]);
   tape.end();
 });
@@ -102,7 +110,7 @@ test("should reverse the encoded hexadecimal value even if we can't follow unhex
         const px = require.resolve(unhex("646c2d746172"));
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code].sort());
   tape.deepEqual([...dependencies], ["dl-tar"]);
   tape.end();
 });
@@ -114,7 +122,7 @@ test("should be capable to reverse the CallExpression Buffer.from with an hexade
         );
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code].sort());
   tape.deepEqual([...dependencies], ["dl-tar"]);
   tape.end();
 });
@@ -125,7 +133,7 @@ test("should return an unsafe-assign warning when a protected global is assigned
         r("http");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeAssign].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeAssign.code].sort());
   tape.deepEqual([...dependencies], ["http"]);
   tape.end();
 });
@@ -137,7 +145,7 @@ test("should succesfully follow the require stmt when assigned multiple times an
         b("http");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeAssign, Warnings.unsafeAssign].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeAssign.code, unsafeAssign.code].sort());
   tape.deepEqual([...dependencies], ["http"]);
   tape.end();
 });
@@ -147,7 +155,7 @@ test("should return unsafe-import when trying to require an empty ArrayExpressio
         require(["", ""]);
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeImport].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeImport.code].sort());
   tape.deepEqual([...dependencies], []);
   tape.end();
 });
@@ -158,7 +166,7 @@ test("should detect unsafe eval statments", (tape) => {
         const g = eval("this");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeStmt, Warnings.unsafeStmt].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeStmt.code, unsafeStmt.code].sort());
   tape.end();
 });
 
@@ -168,7 +176,7 @@ test("should detect unsafe Function statments", (tape) => {
         const g = Function("return this")();
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeStmt, Warnings.unsafeStmt].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeStmt.code, unsafeStmt.code].sort());
   tape.end();
 });
 
@@ -177,7 +185,7 @@ test("should detect unsafe-assign of eval", (tape) => {
         const e = eval;
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeAssign].sort());
+  tape.deepEqual(getWarningKind(warnings), [unsafeAssign.code].sort());
   tape.end();
 });
 
@@ -191,7 +199,7 @@ test("should be capable of following global parts", (tape) => {
     `);
 
   tape.deepEqual(getWarningKind(warnings), [
-    Warnings.unsafeAssign, Warnings.unsafeAssign, Warnings.unsafeAssign
+    unsafeAssign.code, unsafeAssign.code, unsafeAssign.code
   ].sort());
   tape.deepEqual([...dependencies], ["http", "fs"]);
   tape.end();
@@ -218,7 +226,7 @@ test("should detect the suspicious string", (tape) => {
   const suspectString = readFileSync(join(FIXTURE_PATH, "suspect-string.js"), "utf-8");
   const { warnings, stringScore } = runASTAnalysis(suspectString);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.suspiciousLiteral].sort());
+  tape.deepEqual(getWarningKind(warnings), [suspiciousLiteral.code].sort());
   tape.strictEqual(stringScore, 8);
   tape.end();
 });
@@ -228,11 +236,11 @@ test("should be capable to follow hexa computation members expr", (tape) => {
   const { warnings, dependencies } = runASTAnalysis(advancedComputation);
 
   tape.deepEqual(getWarningKind(warnings), [
-    Warnings.encodedLiteral,
-    Warnings.unsafeAssign,
-    Warnings.unsafeAssign,
-    Warnings.unsafeImport,
-    Warnings.unsafeStmt
+    encodedLiteral.code,
+    unsafeAssign.code,
+    unsafeAssign.code,
+    unsafeImport.code,
+    unsafeStmt.code
   ].sort());
   tape.deepEqual([...dependencies], ["./test/data"]);
   tape.end();
@@ -248,10 +256,9 @@ test("should support runtime analysis of ESM and return http", (tape) => {
 });
 
 test("should detect two unsafe regex", (tape) => {
-  const unsafeRegex = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
-  const { warnings } = runASTAnalysis(unsafeRegex, { module: false });
-
-  tape.deepEqual(getWarningKind(warnings), [Warnings.unsafeRegex, Warnings.unsafeRegex].sort());
+  const regexUnsafe = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
+  const { warnings } = runASTAnalysis(regexUnsafe, { module: false });
+  tape.deepEqual(getWarningKind(warnings), [unsafeRegex.code, unsafeRegex.code].sort());
   tape.end();
 });
 
@@ -259,7 +266,7 @@ test("should detect short identifiers!", (tape) => {
   const shortIds = readFileSync(join(FIXTURE_PATH, "short-ids.js"), "utf-8");
   const { warnings } = runASTAnalysis(shortIds);
 
-  tape.deepEqual(getWarningKind(warnings), [Warnings.shortIdentifiers].sort());
+  tape.deepEqual(getWarningKind(warnings), [shortIdentifiers.code].sort());
   tape.end();
 });
 
