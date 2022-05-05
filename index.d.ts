@@ -117,9 +117,7 @@ declare namespace JSXRay {
 
   export function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
 
-  export namespace CONSTANTS {
-    export const Warnings: WarningsNames;
-  }
+  export const warnings: WarningsNames;
 }
 
 export = JSXRay;

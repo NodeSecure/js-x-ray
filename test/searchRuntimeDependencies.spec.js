@@ -7,19 +7,19 @@ import { join, dirname } from "path";
 import test from "tape";
 
 // Import Internal Dependencies
-import { runASTAnalysis, CONSTANTS } from "../index.js";
+import { runASTAnalysis, warnings } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const { Warnings: {
+const {
   unsafeRegex,
   unsafeStmt,
   unsafeAssign,
   unsafeImport,
   shortIdentifiers,
   encodedLiteral,
-  suspiciousLiteral }
-} = CONSTANTS;
+  suspiciousLiteral
+} = warnings;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
 

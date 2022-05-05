@@ -7,11 +7,11 @@ import { join, dirname } from "path";
 import test from "tape";
 
 // Import Internal Dependencies
-import { runASTAnalysis, CONSTANTS, runASTAnalysisOnFile } from "../index.js";
+import { runASTAnalysis, warnings, runASTAnalysisOnFile } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const { Warnings: { obfuscatedCode, encodedLiteral } } = CONSTANTS;
+const { obfuscatedCode, encodedLiteral } = warnings;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures/obfuscated");
 

@@ -83,43 +83,43 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   }
 }
 
-export const CONSTANTS = {
-  Warnings: Object.freeze({
-    parsingError: {
-      code: "ast-error",
-      i18n: "sast_warnings.ast_error"
-    },
-    unsafeImport: {
-      code: "unsafe-import",
-      i18n: "sast_warnings.unsafe_import"
-    },
-    unsafeRegex: {
-      code: "unsafe-regex",
-      i18n: "sast_warnings.unsafe_regex"
-    },
-    unsafeStmt: {
-      code: "unsafe-stmt",
-      i18n: "sast_warnings.unsafe_stmt"
-    },
-    unsafeAssign: {
-      code: "unsafe-assign",
-      i18n: "sast_warnings.unsafe_assign"
-    },
-    encodedLiteral: {
-      code: "encoded-literal",
-      i18n: "sast_warnings.encoded_literal"
-    },
-    shortIdentifiers: {
-      code: "short-identifiers",
-      i18n: "sast_warnings.short_identifiers"
-    },
-    suspiciousLiteral: {
-      code: "suspicious-literal",
-      i18n: "sast_warnings.suspicious_literal"
-    },
-    obfuscatedCode: {
-      code: "obfuscated-code",
-      i18n: "sast_warnings.obfuscated_code"
-    }
-  })
-};
+export const warnings = Object.freeze({
+  parsingError: {
+    code: "ast-error",
+    i18n: "sast_warnings.ast_error"
+  },
+  unsafeImport: {
+    code: "unsafe-import",
+    i18n: "sast_warnings.unsafe_import"
+  },
+  unsafeRegex: {
+    code: "unsafe-regex",
+    i18n: "sast_warnings.unsafe_regex"
+  },
+  unsafeStmt: {
+    code: "unsafe-stmt",
+    i18n: "sast_warnings.unsafe_stmt"
+  },
+  unsafeAssign: {
+    code: "unsafe-assign",
+    i18n: "sast_warnings.unsafe_assign"
+  },
+  encodedLiteral: {
+    code: "encoded-literal",
+    i18n: "sast_warnings.encoded_literal"
+  },
+  shortIdentifiers: {
+    code: "short-identifiers",
+    i18n: "sast_warnings.short_identifiers"
+  },
+  suspiciousLiteral: {
+    code: "suspicious-literal",
+    i18n: "sast_warnings.suspicious_literal"
+  },
+  obfuscatedCode: {
+    code: "obfuscated-code",
+    i18n: "sast_warnings.obfuscated_code"
+  }
+});
+
+
