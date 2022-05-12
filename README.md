@@ -78,13 +78,13 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 This section describes how use `warnings` export.
 
 The structure of the `warnings` is as follows:
-```
+```js
 /**
- * @property {object}  warnings                         - The default values for Constants.
- * @property {string}  warnings[name]                   - The default warning name (parsingError, unsafeImport etc...).
- * @property {string}  warnings[name].i18n              - i18n token.
- * @property {string}  warnings[name].code              - Used to perform unit tests.
- * @property {string}  warnings[name].severity          - Warning severity.
+ * @property {object}  warnings                - The default values for Constants.
+ * @property {string}  warnings[name]          - The default warning name (parsingError, unsafeImport etc...).
+ * @property {string}  warnings[name].i18n     - i18n token.
+ * @property {string}  warnings[name].code     - Used to perform unit tests.
+ * @property {string}  warnings[name].severity - Warning severity.
  */
  
 export const warnings = Object.freeze({
@@ -99,12 +99,11 @@ export const warnings = Object.freeze({
 
 We make a call to `i18n` through the package `NodeSecure/i18n` to get the translation.
 
-```
+```js
 import * as jsxray from "@nodesecure/js-x-ray";
 import * as i18n from "@nodesecure/i18n";
 
 console.log(i18n.getToken(jsxray.warnings.parsingError.i18n));
-
 ```
 
 ## Warnings Legends (v2.0+)
