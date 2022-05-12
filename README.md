@@ -84,12 +84,14 @@ The structure of the `warnings` is as follows:
  * @property {string}  warnings[name]                   - The default warning name (parsingError, unsafeImport etc...).
  * @property {string}  warnings[name].i18n              - i18n token.
  * @property {string}  warnings[name].code              - Used to perform unit tests.
+ * @property {string}  warnings[name].severity          - Warning severity.
  */
  
 export const warnings = Object.freeze({
     parsingError: {
       i18n: "sast_warnings.ast_error"
       code: "ast-error",
+      severity: "Information"
     },
     ...otherWarnings
   });
