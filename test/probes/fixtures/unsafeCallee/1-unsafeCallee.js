@@ -1,1 +1,2 @@
-require(Buffer.from("6673", "hex").toString());
+// eslint-disable-next-line no-eval
+eval("this");
