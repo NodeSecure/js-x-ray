@@ -73,6 +73,39 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > ⚠️ There is also a lot of suspicious code example in the root cases directory. Feel free to try the tool on these files.
 
+## Warnings
+
+This section describes how use `warnings` export.
+
+The structure of the `warnings` is as follows:
+```js
+/**
+ * @property {object}  warnings                - The default values for Constants.
+ * @property {string}  warnings[name]          - The default warning name (parsingError, unsafeImport etc...).
+ * @property {string}  warnings[name].i18n     - i18n token.
+ * @property {string}  warnings[name].code     - Used to perform unit tests.
+ * @property {string}  warnings[name].severity - Warning severity.
+ */
+ 
+export const warnings = Object.freeze({
+    parsingError: {
+      i18n: "sast_warnings.ast_error"
+      code: "ast-error",
+      severity: "Information"
+    },
+    ...otherWarnings
+  });
+```
+
+We make a call to `i18n` through the package `NodeSecure/i18n` to get the translation.
+
+```js
+import * as jsxray from "@nodesecure/js-x-ray";
+import * as i18n from "@nodesecure/i18n";
+
+console.log(i18n.getToken(jsxray.warnings.parsingError.i18n));
+```
+
 ## Warnings Legends (v2.0+)
 
 > Node-secure versions equal or lower than 0.7.0 are no longer compatible with the warnings table below.
@@ -123,7 +156,7 @@ interface Report {
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -136,6 +169,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.linkedin.com/in/thomas-gentilhomme/"><img src="https://avatars.githubusercontent.com/u/4438263?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Gentilhomme</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=fraxken" title="Code">💻</a> <a href="https://github.com/NodeSecure/js-x-ray/commits?author=fraxken" title="Documentation">📖</a> <a href="https://github.com/NodeSecure/js-x-ray/pulls?q=is%3Apr+reviewed-by%3Afraxken" title="Reviewed Pull Requests">👀</a> <a href="#security-fraxken" title="Security">🛡️</a> <a href="https://github.com/NodeSecure/js-x-ray/issues?q=author%3Afraxken" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/Rossb0b"><img src="https://avatars.githubusercontent.com/u/39910164?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Nicolas Hallaert</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=Rossb0b" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/antoine-coulon"><img src="https://avatars.githubusercontent.com/u/43391199?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Antoine</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=antoine-coulon" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Mathieuka"><img src="https://avatars.githubusercontent.com/u/34446722?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mathieu</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=Mathieuka" title="Code">💻</a></td>
   </tr>
 </table>
 

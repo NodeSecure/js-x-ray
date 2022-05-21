@@ -83,16 +83,52 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   }
 }
 
-export const CONSTANTS = {
-  Warnings: Object.freeze({
-    parsingError: "ast-error",
-    unsafeImport: "unsafe-import",
-    unsafeRegex: "unsafe-regex",
-    unsafeStmt: "unsafe-stmt",
-    unsafeAssign: "unsafe-assign",
-    encodedLiteral: "encoded-literal",
-    shortIdentifiers: "short-identifiers",
-    suspiciousLiteral: "suspicious-literal",
-    obfuscatedCode: "obfuscated-code"
-  })
-};
+export const warnings = Object.freeze({
+  parsingError: {
+    code: "ast-error",
+    i18n: "sast_warnings.ast_error",
+    severity: "Information"
+  },
+  unsafeImport: {
+    code: "unsafe-import",
+    i18n: "sast_warnings.unsafe_import",
+    severity: "Warning"
+  },
+  unsafeRegex: {
+    code: "unsafe-regex",
+    i18n: "sast_warnings.unsafe_regex",
+    severity: "Warning"
+  },
+  unsafeStmt: {
+    code: "unsafe-stmt",
+    i18n: "sast_warnings.unsafe_stmt",
+    severity: "Warning"
+  },
+  unsafeAssign: {
+    code: "unsafe-assign",
+    i18n: "sast_warnings.unsafe_assign",
+    severity: "Warning"
+  },
+  encodedLiteral: {
+    code: "encoded-literal",
+    i18n: "sast_warnings.encoded_literal",
+    severity: "Information"
+  },
+  shortIdentifiers: {
+    code: "short-identifiers",
+    i18n: "sast_warnings.short_identifiers",
+    severity: "Warning"
+  },
+  suspiciousLiteral: {
+    code: "suspicious-literal",
+    i18n: "sast_warnings.suspicious_literal",
+    severity: "Warning"
+  },
+  obfuscatedCode: {
+    code: "obfuscated-code",
+    i18n: "sast_warnings.obfuscated_code",
+    severity: "Critical"
+  }
+});
+
+
