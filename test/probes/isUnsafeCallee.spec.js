@@ -1,6 +1,6 @@
 // Require Internal Dependencies
 import { parseScript, getSastAnalysis } from "../utils/index.js";
-import { CONSTANTS } from "../../index.js";
+import { warnings } from "../../index.js";
 
 // Require Third-party dependencies
 import test from "tape";
@@ -19,7 +19,7 @@ test("should detect eval", (tape) => {
   const ast = parseScript(str);
   const analysis = getSastAnalysis(str, ast.body);
 
-  tape.equal(analysis.warnings[0].kind, CONSTANTS.Warnings.unsafeStmt);
+  tape.equal(analysis.warnings[0].kind, warnings.unsafeStmt.code);
   tape.equal(analysis.warnings[0].value, "eval");
   tape.end();
 });
