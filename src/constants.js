@@ -43,5 +43,6 @@ export const warnings = Object.freeze({
   encodedLiteral: Symbol("EncodedLiteral"),
   shortIdentifiers: Symbol("ShortIdentifiers"),
   suspiciousLiteral: Symbol("SuspiciousLiteral"),
-  obfuscatedCode: Symbol("ObfuscatedCode")
+  obfuscatedCode: Symbol("ObfuscatedCode"),
+  weakCrypto: Symbol("WeakCrypto")
 });

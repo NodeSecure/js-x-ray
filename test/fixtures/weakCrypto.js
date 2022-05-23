@@ -1,0 +1,1 @@
+createHash("md5");
