@@ -50,3 +50,13 @@ test("isIntryStmt must be a boolean!", (tape) => {
 
   tape.end();
 });
+
+test("check presence of a dependency", (tape) => {
+  const deps = new ASTDeps();
+
+  deps.add("foo");
+
+  tape.strictEqual(deps.has("foo"), true);
+  tape.strictEqual(deps.has("bar"), false);
+  tape.end();
+});

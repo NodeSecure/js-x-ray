@@ -37,6 +37,14 @@ export default class ASTDeps {
     this.dependencies[cleanDepName] = dep;
   }
 
+  has(depName) {
+    if (depName.trim() === "") {
+      return false;
+    }
+
+    return Reflect.has(this.dependencies, depName);
+  }
+
   get size() {
     return Object.keys(this.dependencies).length;
   }
