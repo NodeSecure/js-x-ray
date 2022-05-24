@@ -1,1 +1,0 @@
-createHash("md5");

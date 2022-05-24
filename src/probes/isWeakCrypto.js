@@ -11,7 +11,7 @@ function validateNode(node) {
 
 function main(node, { analysis }) {
   const arg = node.arguments.at(0);
-  if (arg.value === "md5") {
+  if (arg.value === "md5" && analysis.dependencies.has("crypto")) {
     analysis.addWarning(warnings.weakCrypto, "md5", node.loc);
   }
 }
