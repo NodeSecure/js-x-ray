@@ -1,7 +1,6 @@
 import * as meriyah from "meriyah";
 import Analysis from "../../src/Analysis.js";
 import { walk } from "estree-walker";
-import { kSymSkip } from "../../src/probes/index.js";
 
 export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
@@ -23,7 +22,7 @@ function runOnProbes(node, analysis, probe) {
   if (isMatching) {
     const result = probe.main(node, { analysis, data });
 
-    if (result === kSymSkip) {
+    if (result === Symbol.for("skipWalk")) {
       return "skip";
     }
   }
