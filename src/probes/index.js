@@ -33,7 +33,7 @@ const kListOfProbes = [
 ];
 
 const kSymBreak = Symbol.for("breakWalk");
-const kSymSkip = Symbol.for("skipWalk");
+export const kSymSkip = Symbol.for("skipWalk");
 
 export function runOnProbes(node, analysis) {
   const breakedGroups = new Set();

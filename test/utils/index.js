@@ -1,6 +1,7 @@
 import * as meriyah from "meriyah";
 import Analysis from "../../src/Analysis.js";
 import { walk } from "estree-walker";
+import { kSymSkip } from "../../src/probes/index.js";
 
 export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
@@ -18,7 +19,21 @@ export function parseScript(str) {
   });
 }
 
-export function getSastAnalysis(strSource, body) {
+function runOnProbes(node, analysis, probe) {
+  const [isMatching, data = null] = probe.validateNode(node, analysis);
+
+  if (isMatching) {
+    const result = probe.main(node, { analysis, data });
+
+    if (result === kSymSkip) {
+      return "skip";
+    }
+  }
+
+  return null;
+}
+
+export function getSastAnalysis(strSource, body, probe) {
   const sastAnalysis = new Analysis();
   sastAnalysis.analyzeSourceString(strSource);
 
@@ -29,7 +44,9 @@ export function getSastAnalysis(strSource, body) {
         return;
       }
 
-      const action = sastAnalysis.walk(node);
+
+      const action = runOnProbes(node, sastAnalysis, probe);
+
       if (action === "skip") {
         this.skip();
       }
@@ -37,4 +54,8 @@ export function getSastAnalysis(strSource, body) {
   });
 
   return sastAnalysis;
+}
+
+export function getWarningOnAnalysisResult(analysis, warning) {
+  return analysis.warnings.find((item) => item.kind === warning);
 }

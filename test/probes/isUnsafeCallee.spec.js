@@ -1,6 +1,7 @@
 // Require Internal Dependencies
-import { parseScript, getSastAnalysis } from "../utils/index.js";
+import { parseScript, getSastAnalysis, getWarningOnAnalysisResult } from "../utils/index.js";
 import { warnings } from "../../index.js";
+import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
 
 // Require Third-party dependencies
 import test from "tape";
@@ -13,13 +14,16 @@ import { readFileSync } from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures/unsafeCallee");
 
+const warningUnsafeStmt = warnings.unsafeStmt.code;
+
 test("should detect eval", (tape) => {
   const str = readFileSync(join(FIXTURE_PATH, "1-unsafeCallee.js"), "utf-8");
 
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body);
+  const analysis = getSastAnalysis(str, ast.body, isUnsafeCallee);
 
-  tape.equal(analysis.warnings[0].kind, warnings.unsafeStmt.code);
-  tape.equal(analysis.warnings[0].value, "eval");
+  const result = getWarningOnAnalysisResult(analysis, warningUnsafeStmt);
+  tape.equal(result.kind, warningUnsafeStmt);
+  tape.equal(result.value, "eval");
   tape.end();
 });
