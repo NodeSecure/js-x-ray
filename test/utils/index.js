@@ -8,9 +8,7 @@ export function getWarningKind(warnings) {
 }
 
 export function parseScript(str) {
-  const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
-
-  return meriyah.parseScript(strToAnalyze, {
+  return meriyah.parseScript(str, {
     next: true,
     loc: true,
     raw: true,
