@@ -123,6 +123,7 @@ This section describe all the possible warnings returned by JSXRay.
 | short-identifiers | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
 | suspicious-literal | This mean that the sum of suspicious score of all Literals is bigger than 3. |
 | obfuscated-code (**experimental**) | There's a very high probability that the code is obfuscated... |
+| weak-crypto (**experimental**) | The code probably contains a weak crypto algorithm ("md5...) |
 
 > 👀 More details on warnings and their implementations [here](./WARNINGS.md)
 
