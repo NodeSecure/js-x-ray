@@ -23,3 +23,13 @@ test("it should report a warning in case of `createHash('md5')` usage", (tape) =
   tape.strictEqual(outputWarnings[0].value, "md5");
   tape.end();
 });
+
+test("it should report a warning in case of `[expression]createHash('md5')` usage", (tape) => {
+  const md5Usage = readFileSync(join(FIXTURE_PATH, "memberExpression.js"), "utf-8");
+  const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
+
+  tape.strictEqual(outputWarnings.length, 1);
+  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto].sort());
+  tape.strictEqual(outputWarnings[0].value, "md5");
+  tape.end();
+});

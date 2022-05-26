@@ -2,10 +2,14 @@
 import { warnings } from "../constants.js";
 
 function validateNode(node) {
+  const isCallExpression = node.type === "CallExpression";
   return [
-    node.type === "CallExpression" &&
-    node.callee.type === "Identifier" &&
-    node.callee.name === "createHash"
+    isCallExpression &&
+        ((node.callee.type === "Identifier" &&
+        node.callee.name === "createHash")
+        ||
+        (node.callee.type === "MemberExpression" &&
+        node.callee.property.name === "createHash"))
   ];
 }
 
