@@ -19,7 +19,7 @@ test("it should report a warning in case of `createHash('md5')` usage", (tape) =
   const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
 
   tape.strictEqual(outputWarnings.length, 1);
-  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto].sort());
+  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
   tape.strictEqual(outputWarnings[0].value, "md5");
   tape.end();
 });
@@ -29,7 +29,7 @@ test("it should report a warning in case of `[expression]createHash('md5')` usag
   const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
 
   tape.strictEqual(outputWarnings.length, 1);
-  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto].sort());
+  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
   tape.strictEqual(outputWarnings[0].value, "md5");
   tape.end();
 });
