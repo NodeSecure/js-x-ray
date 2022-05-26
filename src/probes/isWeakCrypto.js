@@ -3,14 +3,14 @@ import { warnings } from "../constants.js";
 
 function validateNode(node) {
   const isCallExpression = node.type === "CallExpression";
-  return [
-    isCallExpression &&
-        ((node.callee.type === "Identifier" &&
-        node.callee.name === "createHash")
-        ||
-        (node.callee.type === "MemberExpression" &&
-        node.callee.property.name === "createHash"))
-  ];
+  const isSimpleIdentifier = isCallExpression &&
+    node.callee.type === "Identifier" &&
+    node.callee.name === "createHash";
+  const isMemberExpression = isCallExpression &&
+    node.callee.type === "MemberExpression" &&
+    node.callee.property.name === "createHash";
+
+  return [isSimpleIdentifier || isMemberExpression];
 }
 
 function main(node, { analysis }) {
