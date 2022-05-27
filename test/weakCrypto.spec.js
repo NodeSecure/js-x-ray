@@ -33,3 +33,11 @@ test("it should report a warning in case of `[expression]createHash('md5')` usag
   tape.strictEqual(outputWarnings[0].value, "md5");
   tape.end();
 });
+
+test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", (tape) => {
+  const md5Usage = readFileSync(join(FIXTURE_PATH, "sha256.js"), "utf-8");
+  const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
+
+  tape.strictEqual(outputWarnings.length, 0);
+  tape.end();
+});
