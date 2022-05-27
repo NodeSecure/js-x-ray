@@ -27,3 +27,26 @@ test("should detect eval", (tape) => {
   tape.equal(result.value, "eval");
   tape.end();
 });
+
+test("should detect Function", (tape) => {
+  const str = readFileSync(join(FIXTURE_PATH, "2-unsafeCallee.js"), "utf-8");
+
+  const ast = parseScript(str);
+  const analysis = getSastAnalysis(str, ast.body, isUnsafeCallee);
+
+  const result = getWarningOnAnalysisResult(analysis, warningUnsafeStmt);
+  tape.equal(result.kind, warningUnsafeStmt);
+  tape.equal(result.value, "Function");
+  tape.end();
+});
+
+test("should not detect Function", (tape) => {
+  const str = readFileSync(join(FIXTURE_PATH, "3-unsafeCallee.js"), "utf-8");
+
+  const ast = parseScript(str);
+  const analysis = getSastAnalysis(str, ast.body, isUnsafeCallee);
+
+  const result = getWarningOnAnalysisResult(analysis, warningUnsafeStmt);
+  tape.equal(result, undefined);
+  tape.end();
+});
