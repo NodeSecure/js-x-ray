@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint src test",
     "prepublishOnly": "pkg-ok",
-    "test": "cross-env esm-tape-runner 'test/*.spec.js' | tap-monkey",
+    "test": "cross-env esm-tape-runner 'test/**/*.spec.js' | tap-monkey",
     "check": "cross-env npm run lint && npm run test"
   },
   "repository": {
