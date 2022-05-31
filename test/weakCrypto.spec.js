@@ -1,5 +1,6 @@
 // Node.Js Dependencies
 import { readFileSync } from "fs";
+import { readdir } from 'fs/promises';
 import { fileURLToPath } from "url";
 import { join, dirname } from "path";
 
@@ -14,28 +15,38 @@ import { getWarningKind } from "./utils/index.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures", "weakCrypto");
 
-test("it should report a warning in case of `createHash('md5')` usage", (tape) => {
-  const md5Usage = readFileSync(join(FIXTURE_PATH, "directCallExpression.js"), "utf-8");
-  const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
+test("it should report a warning in case of `createHash(<weak-algo>)` usage", async (tape) => {
+  const fixturesDir = join(FIXTURE_PATH, "directCallExpression");
+  const fixtureFiles = await readdir(fixturesDir);
 
-  tape.strictEqual(outputWarnings.length, 1);
-  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
-  tape.strictEqual(outputWarnings[0].value, "md5");
+  for (const fixtureFile of fixtureFiles) {
+    const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
+    const { warnings: outputWarnings } = runASTAnalysis(fixture);
+
+    tape.strictEqual(outputWarnings.length, 1);
+    tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
+    tape.strictEqual(outputWarnings[0].value, fixtureFile.split(".")[0]);
+  }
   tape.end();
 });
 
-test("it should report a warning in case of `[expression]createHash('md5')` usage", (tape) => {
-  const md5Usage = readFileSync(join(FIXTURE_PATH, "memberExpression.js"), "utf-8");
-  const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
+test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async (tape) => {
+  const fixturesDir = join(FIXTURE_PATH, "memberExpression");
+  const fixtureFiles = await readdir(fixturesDir);
 
-  tape.strictEqual(outputWarnings.length, 1);
-  tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
-  tape.strictEqual(outputWarnings[0].value, "md5");
+  for (const fixtureFile of fixtureFiles) {
+    const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
+    const { warnings: outputWarnings } = runASTAnalysis(fixture);
+
+    tape.strictEqual(outputWarnings.length, 1);
+    tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
+    tape.strictEqual(outputWarnings[0].value, fixtureFile.split(".")[0]);
+  }
   tape.end();
 });
 
 test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", (tape) => {
-  const md5Usage = readFileSync(join(FIXTURE_PATH, "sha256.js"), "utf-8");
+  const md5Usage = readFileSync(join(FIXTURE_PATH, "strongAlgorithms", "sha256.js"), "utf-8");
   const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
 
   tape.strictEqual(outputWarnings.length, 0);

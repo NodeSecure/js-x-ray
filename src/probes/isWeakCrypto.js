@@ -1,6 +1,9 @@
 // Internal Dependencies
 import { warnings } from "../constants.js";
 
+// Constants
+const weakAlgorithms = ["md5", "sha1", "ripemd160", "md4", "md2"];
+
 function validateNode(node) {
   const isCallExpression = node.type === "CallExpression";
   const isSimpleIdentifier = isCallExpression &&
@@ -15,8 +18,13 @@ function validateNode(node) {
 
 function main(node, { analysis }) {
   const arg = node.arguments.at(0);
-  if (arg.value === "md5" && analysis.dependencies.has("crypto")) {
-    analysis.addWarning(warnings.weakCrypto, "md5", node.loc);
+  const isCryptoImported = analysis.dependencies.has("crypto");
+
+  if (
+    weakAlgorithms.includes(arg.value) &&
+    isCryptoImported
+  ) {
+    analysis.addWarning(warnings.weakCrypto, arg.value, node.loc);
   }
 }
 
