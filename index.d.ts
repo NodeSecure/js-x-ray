@@ -17,7 +17,8 @@ declare namespace JSXRay {
     | "unsafe-assign"
     | "short-identifiers"
     | "suspicious-literal"
-    | "obfuscated-code";
+    | "obfuscated-code"
+    | "weak-crypto";
 
   type WarningLocation = [[number, number], [number, number]];
   interface BaseWarning {
@@ -103,7 +104,8 @@ declare namespace JSXRay {
     weakCrypto: {
       code: "weak-crypto",
       i18n: "sast_warnings.weak_crypto",
-      severity: "Information"
+      severity: "Information",
+      experimental: true
    }
   }
 

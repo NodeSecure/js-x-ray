@@ -9,7 +9,6 @@ import test from "tape";
 
 // Internal Dependencies
 import { runASTAnalysis, warnings } from "../index.js";
-import { getWarningKind } from "./utils/index.js";
 
 // Constants
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -23,9 +22,11 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
     const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
+    const [firstWarning] = outputWarnings;
     tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
-    tape.strictEqual(outputWarnings[0].value, fixtureFile.split(".")[0]);
+    tape.deepEqual(firstWarning.kind, warnings.weakCrypto.code);
+    tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
+    tape.strictEqual(firstWarning.experimental, true);
   }
   tape.end();
 });
@@ -38,9 +39,11 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
     const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
+    const [firstWarning] = outputWarnings;
     tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(getWarningKind(outputWarnings), [warnings.weakCrypto.code].sort());
-    tape.strictEqual(outputWarnings[0].value, fixtureFile.split(".")[0]);
+    tape.deepEqual(firstWarning.kind, warnings.weakCrypto.code);
+    tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
+    tape.strictEqual(firstWarning.experimental, true);
   }
   tape.end();
 });

@@ -132,7 +132,8 @@ export const warnings = Object.freeze({
   weakCrypto: {
     code: "weak-crypto",
     i18n: "sast_warnings.weak_crypto",
-    severity: "Information"
+    severity: "Information",
+    experimental: true
   }
 });
 
