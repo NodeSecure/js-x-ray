@@ -24,7 +24,8 @@ const kWarningsNameStr = Object.freeze({
   [_warnings.encodedLiteral]: "encoded-literal",
   [_warnings.shortIdentifiers]: "short-identifiers",
   [_warnings.suspiciousLiteral]: "suspicious-literal",
-  [_warnings.obfuscatedCode]: "obfuscated-code"
+  [_warnings.obfuscatedCode]: "obfuscated-code",
+  [_warnings.weakCrypto]: "weak-crypto"
 });
 
 export default class Analysis {

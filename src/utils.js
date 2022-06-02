@@ -6,6 +6,7 @@ import { globalIdentifiers, processMainModuleRequire } from "./constants.js";
 
 // CONSTANTS
 const kBinaryExprTypes = new Set(["Literal", "BinaryExpression", "Identifier"]);
+const kExperimentalWarnings = new Set(["weak-crypto"]);
 
 export function notNullOrUndefined(value) {
   return value !== null && value !== void 0;
@@ -170,12 +171,17 @@ export function generateWarning(kind, options) {
   if (kind === "encoded-literal") {
     return { kind, value, location: [toArrayLocation(location)] };
   }
+
   const result = { kind, location: toArrayLocation(location) };
   if (notNullOrUndefined(file)) {
     result.file = file;
   }
   if (notNullOrUndefined(value)) {
     result.value = value;
+  }
+
+  if (kExperimentalWarnings.has(kind)) {
+    result.experimental = true;
   }
 
   return result;
