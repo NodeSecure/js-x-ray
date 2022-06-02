@@ -2,7 +2,7 @@
 import { warnings } from "../constants.js";
 
 // Constants
-const weakAlgorithms = ["md5", "sha1", "ripemd160", "md4", "md2"];
+const weakAlgorithms = new Set(["md5", "sha1", "ripemd160", "md4", "md2"]);
 
 function validateNode(node) {
   const isCallExpression = node.type === "CallExpression";
@@ -21,7 +21,7 @@ function main(node, { analysis }) {
   const isCryptoImported = analysis.dependencies.has("crypto");
 
   if (
-    weakAlgorithms.includes(arg.value) &&
+    weakAlgorithms.has(arg.value) &&
     isCryptoImported
   ) {
     analysis.addWarning(warnings.weakCrypto, arg.value, node.loc);
