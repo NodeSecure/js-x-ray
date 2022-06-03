@@ -10,7 +10,12 @@ import { globalParts, warnings } from "../constants.js";
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
 
-// Check all 'string' Literal values
+/**
+ * @description Search for Literal AST Node
+ * @see https://github.com/estree/estree/blob/master/es5.md#literal
+ * @example
+ * "foobar"
+ */
 function validateNode(node) {
   return [
     node.type === "Literal" && typeof node.value === "string"

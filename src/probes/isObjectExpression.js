@@ -1,3 +1,9 @@
+/**
+ * @description Search for ObjectExpression AST Node (commonly known as Object).
+ * @see https://github.com/estree/estree/blob/master/es5.md#objectexpression
+ * @example
+ * { foo: "bar" }
+ */
 function validateNode(node) {
   return [
     node.type === "ObjectExpression"
