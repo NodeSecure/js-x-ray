@@ -54,6 +54,17 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "tony-go",
+      "name": "Tony Gorez",
+      "avatar_url": "https://avatars.githubusercontent.com/u/22824417?v=4",
+      "profile": "http://tonygo.dev",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
