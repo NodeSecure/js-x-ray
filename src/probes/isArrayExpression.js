@@ -1,4 +1,10 @@
-// Search for Array
+/**
+ * @description Search for ArrayExpression AST Node (Commonly known as JS Arrays)
+ *
+ * @see https://github.com/estree/estree/blob/master/es5.md#arrayexpression
+ * @example
+ * ["foo", "bar", 1]
+ */
 function validateNode(node) {
   return [
     node.type === "ArrayExpression"

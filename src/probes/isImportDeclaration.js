@@ -1,10 +1,17 @@
 // Require Internal Dependencies
 import { warnings } from "../constants.js";
 
-// Looking for ESM ImportDeclaration
-// see: https://github.com/estree/estree/blob/master/es2015.md#importdeclaration
+/**
+ * @description Search for ESM ImportDeclaration
+ * @see https://github.com/estree/estree/blob/master/es2015.md#importdeclaration
+ * @example
+ * import * as foo from "bar";
+ * import fs from "fs";
+ * import "make-promises-safe";
+ */
 function validateNode(node) {
   return [
+    // Note: the source property is the right-side Literal part of the Import
     node.type === "ImportDeclaration" && node.source.type === "Literal"
   ];
 }

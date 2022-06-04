@@ -1,6 +1,13 @@
 // Import Internal Dependencies
 import { getIdName } from "../utils.js";
 
+/**
+ * @description Search for AssignmentExpression (Not to be confused with AssignmentPattern).
+ *
+ * @see https://github.com/estree/estree/blob/master/es5.md#assignmentexpression
+ * @example
+ * (foo = 5)
+ */
 function validateNode(node) {
   return [
     node.type === "AssignmentExpression"

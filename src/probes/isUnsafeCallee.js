@@ -2,7 +2,12 @@
 import { isUnsafeCallee } from "../utils.js";
 import { warnings } from "../constants.js";
 
-// Detect unsafe statement like eval("this") or Function("return this")();
+/**
+ * @description Detect unsafe statement
+ * @example
+ * eval("this");
+ * Function("return this")();
+ */
 function validateNode(node) {
   return isUnsafeCallee(node);
 }
