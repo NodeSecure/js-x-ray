@@ -10,7 +10,7 @@ JavaScript AST analysis. This package has been created to export the [Node-Secur
 
 The goal is to quickly identify dangerous code and patterns for developers and Security researchers. Interpreting the results of this tool will still require you to have a set of security notions.
 
-> 💖 I have no particular background in security. I'm simply becoming more and more interested and passionate about static code analysis. But I would be more than happy to learn that my work can help prevent potential future attacks (or leaks).
+> **Note** I have no particular background in security. I'm simply becoming more and more interested and passionate about static code analysis. But I would be more than happy to learn that my work can help prevent potential future attacks (or leaks).
 
 ## Goals
 The objective of the project is to successfully detect all potentially suspicious JavaScript codes.. The target is obviously codes that are added or injected for malicious purposes..
@@ -71,7 +71,7 @@ console.log(warnings);
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
-> ⚠️ There is also a lot of suspicious code example in the root cases directory. Feel free to try the tool on these files.
+> **Warning** There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
 
 ## Warnings
 
@@ -106,26 +106,24 @@ import * as i18n from "@nodesecure/i18n";
 console.log(i18n.getToken(jsxray.warnings.parsingError.i18n));
 ```
 
-## Warnings Legends (v2.0+)
+## Warnings Legends
 
-> Node-secure versions equal or lower than 0.7.0 are no longer compatible with the warnings table below.
+> **Warning** versions of NodeSecure greather than v0.7.0 are no longer compatible with the warnings table below.
 
-This section describe all the possible warnings returned by JSXRay.
+This section describe all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
 
-| name | description |
-| --- | --- |
-| parsing-error | An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST as failed. If you encounter such an error, **please open an issue here**. |
-| unsafe-import | Unable to follow an import (require, require.resolve) statement/expr. |
-| unsafe-regex | A RegEx as been detected as unsafe and may be used for a ReDoS Attack. |
-| unsafe-stmt | Usage of dangerous statement like `eval()` or `Function("")`. |
-| unsafe-assign | Assignment of a protected global like `process` or `require`. |
-| encoded-literal | An encoded literal has been detected (it can be an hexa value, unicode sequence, base64 string etc) |
-| short-identifiers | This mean that all identifiers has an average length below 1.5. Only possible if the file contains more than 5 identifiers. |
-| suspicious-literal | This mean that the sum of suspicious score of all Literals is bigger than 3. |
-| obfuscated-code (**experimental**) | There's a very high probability that the code is obfuscated... |
-| weak-crypto (**experimental**) | The code probably contains a weak crypto algorithm ("md5...) |
-
-> 👀 More details on warnings and their implementations [here](./WARNINGS.md)
+| name | experimental | description |
+| --- | :-: | --- |
+| [parsing-error](./docs/parsing-error.md) | ❌ | The AST parser throw an error |
+| [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (require, require.resolve) statement/expr. |
+| [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A RegEx as been detected as unsafe and may be used for a ReDoS Attack. |
+| [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statement like `eval()` or `Function("")`. |
+| [unsafe-assign](./docs/unsafe-assign.md) | ❌ | Assignment of a protected global like `process` or `require`. |
+| [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexa value, unicode sequence or a base64 string) |
+| [short-identifiers](./docs/short-identifiers.md) | ❌ | This mean that all identifiers has an average length below 1.5. |
+| [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code. |
+| [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
+| [weak-crypto](./docs/weak-crypto.md) | ✔️ | The code probably contains a weak crypto algorithm (md5, sha1...) |
 
 ## API
 
@@ -148,6 +146,32 @@ interface Report {
     idsLengthAvg: number;
     stringScore: number;
     isOneLineRequire: boolean;
+}
+```
+
+</details>
+
+<details>
+<summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise< ReportOnFile ></summary>
+
+```ts
+interface RuntimeOptions {
+    module?: boolean;
+    isMinified?: boolean;
+}
+```
+
+Run the SAST scanner on a given JavaScript file.
+
+```ts
+export type ReportOnFile = {
+  ok: true,
+  warnings: Warning<BaseWarning>[];
+  dependencies: ASTDeps;
+  isMinified: boolean;
+} | {
+  ok: false,
+  warnings: Warning<BaseWarning>[];
 }
 ```
 

@@ -127,7 +127,8 @@ export const warnings = Object.freeze({
   obfuscatedCode: {
     code: "obfuscated-code",
     i18n: "sast_warnings.obfuscated_code",
-    severity: "Critical"
+    severity: "Critical",
+    experimental: true
   },
   weakCrypto: {
     code: "weak-crypto",
