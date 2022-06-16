@@ -164,25 +164,3 @@ export function toArrayLocation(location = rootLocation()) {
 
   return [[start.line || 0, start.column || 0], [end.line || 0, end.column || 0]];
 }
-
-export function generateWarning(kind, options) {
-  const { location, file = null, value = null } = options;
-
-  if (kind === "encoded-literal") {
-    return { kind, value, location: [toArrayLocation(location)] };
-  }
-
-  const result = { kind, location: toArrayLocation(location) };
-  if (notNullOrUndefined(file)) {
-    result.file = file;
-  }
-  if (notNullOrUndefined(value)) {
-    result.value = value;
-  }
-
-  if (kExperimentalWarnings.has(kind)) {
-    result.experimental = true;
-  }
-
-  return result;
-}

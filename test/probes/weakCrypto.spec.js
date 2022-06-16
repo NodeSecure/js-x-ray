@@ -1,6 +1,6 @@
 // Node.Js Dependencies
 import { readFileSync } from "fs";
-import { readdir } from 'fs/promises';
+import { readdir } from "fs/promises";
 import { fileURLToPath } from "url";
 import { join, dirname } from "path";
 
@@ -8,13 +8,13 @@ import { join, dirname } from "path";
 import test from "tape";
 
 // Internal Dependencies
-import { runASTAnalysis, warnings } from "../index.js";
+import { runASTAnalysis } from "../../index.js";
 
 // Constants
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures", "weakCrypto");
 
-test("it should report a warning in case of `createHash(<weak-algo>)` usage", async (tape) => {
+test("it should report a warning in case of `createHash(<weak-algo>)` usage", async(tape) => {
   const fixturesDir = join(FIXTURE_PATH, "directCallExpression");
   const fixtureFiles = await readdir(fixturesDir);
 
@@ -24,14 +24,14 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
 
     const [firstWarning] = outputWarnings;
     tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(firstWarning.kind, warnings.weakCrypto.code);
+    tape.deepEqual(firstWarning.kind, "weak-crypto");
     tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
     tape.strictEqual(firstWarning.experimental, true);
   }
   tape.end();
 });
 
-test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async (tape) => {
+test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async(tape) => {
   const fixturesDir = join(FIXTURE_PATH, "memberExpression");
   const fixtureFiles = await readdir(fixturesDir);
 
@@ -41,7 +41,7 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
 
     const [firstWarning] = outputWarnings;
     tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(firstWarning.kind, warnings.weakCrypto.code);
+    tape.deepEqual(firstWarning.kind, "weak-crypto");
     tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
     tape.strictEqual(firstWarning.experimental, true);
   }

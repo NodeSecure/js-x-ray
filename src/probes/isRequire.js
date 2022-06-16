@@ -2,7 +2,6 @@
 
 // Import Internal Dependencies
 import { isRequireGlobalMemberExpr, getMemberExprName, arrExprToString, concatBinaryExpr } from "../utils.js";
-import { warnings } from "../constants.js";
 
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
@@ -52,7 +51,7 @@ function main(node, options) {
         analysis.dependencies.add(analysis.identifiers.get(arg.name), node.loc);
       }
       else {
-        analysis.addWarning(warnings.unsafeImport, null, node.loc);
+        analysis.addWarning("unsafe-import", null, node.loc);
       }
       break;
 
@@ -65,7 +64,7 @@ function main(node, options) {
     case "ArrayExpression": {
       const value = arrExprToString(arg.elements, analysis.identifiers).trim();
       if (value === "") {
-        analysis.addWarning(warnings.unsafeImport, null, node.loc);
+        analysis.addWarning("unsafe-import", null, node.loc);
       }
       else {
         analysis.dependencies.add(value, node.loc);
@@ -81,7 +80,7 @@ function main(node, options) {
 
       const value = concatBinaryExpr(arg, analysis.identifiers);
       if (value === null) {
-        analysis.addWarning(warnings.unsafeImport, null, node.loc);
+        analysis.addWarning("unsafe-import", null, node.loc);
       }
       else {
         analysis.dependencies.add(value, node.loc);
@@ -94,14 +93,14 @@ function main(node, options) {
       const { dependencies } = parseRequireCallExpression(arg);
       dependencies.forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
 
-      analysis.addWarning(warnings.unsafeImport, null, node.loc);
+      analysis.addWarning("unsafe-import", null, node.loc);
 
       // We skip walking the tree to avoid anymore warnings...
       return Symbol.for("skipWalk");
     }
 
     default:
-      analysis.addWarning(warnings.unsafeImport, null, node.loc);
+      analysis.addWarning("unsafe-import", null, node.loc);
   }
 }
 

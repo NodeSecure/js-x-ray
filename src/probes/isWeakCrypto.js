@@ -1,8 +1,5 @@
-// Internal Dependencies
-import { warnings } from "../constants.js";
-
-// Constants
-const weakAlgorithms = new Set(["md5", "sha1", "ripemd160", "md4", "md2"]);
+// CONSTANTS
+const kWeakAlgorithms = new Set(["md5", "sha1", "ripemd160", "md4", "md2"]);
 
 function validateNode(node) {
   const isCallExpression = node.type === "CallExpression";
@@ -21,10 +18,10 @@ function main(node, { analysis }) {
   const isCryptoImported = analysis.dependencies.has("crypto");
 
   if (
-    weakAlgorithms.has(arg.value) &&
+    kWeakAlgorithms.has(arg.value) &&
     isCryptoImported
   ) {
-    analysis.addWarning(warnings.weakCrypto, arg.value, node.loc);
+    analysis.addWarning("weak-crypto", arg.value, node.loc);
   }
 }
 

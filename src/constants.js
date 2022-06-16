@@ -33,16 +33,3 @@ export const unsafeUnicodeControlCharacters = [
   "\u200F",
   "\u061C"
 ];
-
-export const warnings = Object.freeze({
-  parsingError: Symbol("ParsingError"),
-  unsafeImport: Symbol("UnsafeImport"),
-  unsafeRegex: Symbol("UnsafeRegex"),
-  unsafeStmt: Symbol("UnsafeStmt"),
-  unsafeAssign: Symbol("UnsafeAssign"),
-  encodedLiteral: Symbol("EncodedLiteral"),
-  shortIdentifiers: Symbol("ShortIdentifiers"),
-  suspiciousLiteral: Symbol("SuspiciousLiteral"),
-  obfuscatedCode: Symbol("ObfuscatedCode"),
-  weakCrypto: Symbol("WeakCrypto")
-});
