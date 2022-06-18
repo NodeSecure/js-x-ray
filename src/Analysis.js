@@ -2,8 +2,9 @@
 import { Utils, Literal } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
-import { rootLocation, toArrayLocation, generateWarning } from "./utils.js";
-import { warnings as _warnings, processMainModuleRequire } from "./constants.js";
+import { rootLocation, toArrayLocation } from "./utils.js";
+import { generateWarning } from "./warnings.js";
+import { processMainModuleRequire } from "./constants.js";
 import ASTDeps from "./ASTDeps.js";
 import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { runOnProbes } from "./probes/index.js";
@@ -14,19 +15,6 @@ const kDictionaryStrParts = [
   "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   "0123456789"
 ];
-
-const kWarningsNameStr = Object.freeze({
-  [_warnings.parsingError]: "parsing-error",
-  [_warnings.unsafeImport]: "unsafe-import",
-  [_warnings.unsafeRegex]: "unsafe-regex",
-  [_warnings.unsafeStmt]: "unsafe-stmt",
-  [_warnings.unsafeAssign]: "unsafe-assign",
-  [_warnings.encodedLiteral]: "encoded-literal",
-  [_warnings.shortIdentifiers]: "short-identifiers",
-  [_warnings.suspiciousLiteral]: "suspicious-literal",
-  [_warnings.obfuscatedCode]: "obfuscated-code",
-  [_warnings.weakCrypto]: "weak-crypto"
-});
 
 export default class Analysis {
   hasDictionaryString = false;
@@ -56,23 +44,24 @@ export default class Analysis {
     this.literalScores = [];
   }
 
-  addWarning(symbol, value, location = rootLocation()) {
-    if (symbol === _warnings.encodedLiteral && this.handledEncodedLiteralValues.has(value)) {
+  addWarning(name, value, location = rootLocation()) {
+    const isEncodedLiteral = name === "encoded-literal";
+    if (isEncodedLiteral && this.handledEncodedLiteralValues.has(value)) {
       const index = this.handledEncodedLiteralValues.get(value);
       this.warnings[index].location.push(toArrayLocation(location));
 
       return;
     }
-    const warningName = kWarningsNameStr[symbol];
-    this.warnings.push(generateWarning(warningName, { value, location }));
-    if (symbol === _warnings.encodedLiteral) {
+
+    this.warnings.push(generateWarning(name, { value, location }));
+    if (isEncodedLiteral) {
       this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
     }
   }
 
   analyzeSourceString(sourceString) {
     if (hasTrojanSource(sourceString)) {
-      this.addWarning(_warnings.obfuscatedCode, "trojan-source");
+      this.addWarning("obfuscated-code", "trojan-source");
     }
   }
 
@@ -107,7 +96,7 @@ export default class Analysis {
         this.counter.encodedArrayValue++;
       }
       else {
-        this.addWarning(_warnings.encodedLiteral, node.value, node.loc);
+        this.addWarning("encoded-literal", node.value, node.loc);
       }
     }
   }
@@ -116,7 +105,7 @@ export default class Analysis {
     this.counter.identifiers = this.identifiersName.length;
     const [isObfuscated, kind] = isObfuscatedCode(this);
     if (isObfuscated) {
-      this.addWarning(_warnings.obfuscatedCode, kind || "unknown");
+      this.addWarning("obfuscated-code", kind || "unknown");
     }
 
     const identifiersLengthArr = this.identifiersName
@@ -124,10 +113,10 @@ export default class Analysis {
 
     const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
     if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
-      this.addWarning(_warnings.shortIdentifiers, idsLengthAvg);
+      this.addWarning("short-identifiers", idsLengthAvg);
     }
     if (stringScore >= 3) {
-      this.addWarning(_warnings.suspiciousLiteral, stringScore);
+      this.addWarning("suspicious-literal", stringScore);
     }
 
     return { idsLengthAvg, stringScore, warnings: this.warnings };
@@ -149,5 +138,3 @@ export default class Analysis {
 function sum(arr = []) {
   return arr.length === 0 ? 0 : (arr.reduce((prev, curr) => prev + curr, 0) / arr.length);
 }
-
-Analysis.Warnings = _warnings;

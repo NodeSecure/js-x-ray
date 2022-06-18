@@ -1,6 +1,5 @@
 // Import Internal Dependencies
 import { isLiteralRegex } from "../utils.js";
-import { warnings } from "../constants.js";
 
 // Import Third-party Dependencies
 import safeRegex from "safe-regex";
@@ -25,7 +24,7 @@ function main(node, options) {
 
   // We use the safe-regex package to detect whether or not regex is safe!
   if (!safeRegex(pattern)) {
-    analysis.addWarning(warnings.unsafeRegex, pattern, node.loc);
+    analysis.addWarning("unsafe-regex", pattern, node.loc);
   }
 }
 

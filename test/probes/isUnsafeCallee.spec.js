@@ -1,6 +1,5 @@
 // Require Internal Dependencies
 import { parseScript, getSastAnalysis, getWarningOnAnalysisResult } from "../utils/index.js";
-import { warnings } from "../../index.js";
 import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
 
 // Require Third-party dependencies
@@ -14,7 +13,7 @@ import { readFileSync } from "fs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURE_PATH = join(__dirname, "fixtures/unsafeCallee");
 
-const warningUnsafeStmt = warnings.unsafeStmt.code;
+const warningUnsafeStmt = "unsafe-stmt";
 
 test("should detect eval", (tape) => {
   const str = readFileSync(join(FIXTURE_PATH, "1-unsafeCallee.js"), "utf-8");

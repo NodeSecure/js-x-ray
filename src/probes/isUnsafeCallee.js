@@ -1,6 +1,5 @@
 // Require Internal Dependencies
 import { isUnsafeCallee } from "../utils.js";
-import { warnings } from "../constants.js";
 
 /**
  * @description Detect unsafe statement
@@ -15,7 +14,7 @@ function validateNode(node) {
 function main(node, options) {
   const { analysis, data: calleeName } = options;
 
-  analysis.addWarning(warnings.unsafeStmt, calleeName, node.loc);
+  analysis.addWarning("unsafe-stmt", calleeName, node.loc);
 }
 
 export default {

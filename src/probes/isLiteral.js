@@ -5,7 +5,7 @@ import { builtinModules } from "repl";
 import { Hex } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
-import { globalParts, warnings } from "../constants.js";
+import { globalParts } from "../constants.js";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
@@ -34,10 +34,10 @@ function main(node, options) {
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
     if (kNodeDeps.has(value)) {
       analysis.dependencies.add(value, node.loc);
-      analysis.addWarning(warnings.unsafeImport, null, node.loc);
+      analysis.addWarning("unsafe-import", null, node.loc);
     }
     else if (globalParts.has(value) || !Hex.isSafe(node.value)) {
-      analysis.addWarning(warnings.encodedLiteral, node.value, node.loc);
+      analysis.addWarning("encoded-literal", node.value, node.loc);
     }
   }
   // Else we are checking all other string with our suspect method

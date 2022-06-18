@@ -1,6 +1,6 @@
 // Require Internal Dependencies
 import { getIdName, getMemberExprName, isUnsafeCallee, isRequireGlobalMemberExpr } from "../utils.js";
-import { warnings, globalParts, processMainModuleRequire } from "../constants.js";
+import { globalParts, processMainModuleRequire } from "../constants.js";
 
 // CONSTANTS
 const kUnsafeCallee = new Set(["eval", "Function"]);
@@ -36,11 +36,11 @@ function main(mainNode, options) {
     // const r = require
     else if (node.init.type === "Identifier") {
       if (kUnsafeCallee.has(node.init.name)) {
-        analysis.addWarning(warnings.unsafeAssign, node.init.name, node.loc);
+        analysis.addWarning("unsafe-assign", node.init.name, node.loc);
       }
       else if (analysis.requireIdentifiers.has(node.init.name)) {
         analysis.requireIdentifiers.add(node.id.name);
-        analysis.addWarning(warnings.unsafeAssign, node.init.name, node.loc);
+        analysis.addWarning("unsafe-assign", node.init.name, node.loc);
       }
       else if (globalParts.has(node.init.name)) {
         analysis.globalParts.set(node.id.name, node.init.name);
@@ -56,14 +56,14 @@ function main(mainNode, options) {
 
       if (analysis.globalParts.has(members[0]) || members.every((part) => globalParts.has(part))) {
         analysis.globalParts.set(node.id.name, members.slice(1).join("."));
-        analysis.addWarning(warnings.unsafeAssign, value, node.loc);
+        analysis.addWarning("unsafe-assign", value, node.loc);
       }
       getRequirablePatterns(analysis.globalParts)
         .forEach((name) => analysis.requireIdentifiers.add(name));
 
       if (isRequireStatement(value)) {
         analysis.requireIdentifiers.add(node.id.name);
-        analysis.addWarning(warnings.unsafeAssign, value, node.loc);
+        analysis.addWarning("unsafe-assign", value, node.loc);
       }
     }
     else if (isUnsafeCallee(node.init)[0]) {

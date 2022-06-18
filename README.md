@@ -77,24 +77,23 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 This section describes how use `warnings` export.
 
-The structure of the `warnings` is as follows:
-```js
-/**
- * @property {object}  warnings                - The default values for Constants.
- * @property {string}  warnings[name]          - The default warning name (parsingError, unsafeImport etc...).
- * @property {string}  warnings[name].i18n     - i18n token.
- * @property {string}  warnings[name].code     - Used to perform unit tests.
- * @property {string}  warnings[name].severity - Warning severity.
- */
- 
-export const warnings = Object.freeze({
-    parsingError: {
-      i18n: "sast_warnings.ast_error"
-      code: "ast-error",
-      severity: "Information"
-    },
-    ...otherWarnings
-  });
+```ts
+type WarningName = "parsing-error"
+| "encoded-literal"
+| "unsafe-regex"
+| "unsafe-stmt"
+| "unsafe-assign"
+| "short-identifiers"
+| "suspicious-literal"
+| "obfuscated-code"
+| "weak-crypto"
+| "unsafe-import";
+
+declare const warnings: Record<WarningName, {
+  i18n: string;
+  severity: "Information" | "Warning" | "Critical";
+  experimental?: boolean;
+}>;
 ```
 
 We make a call to `i18n` through the package `NodeSecure/i18n` to get the translation.
@@ -103,7 +102,7 @@ We make a call to `i18n` through the package `NodeSecure/i18n` to get the transl
 import * as jsxray from "@nodesecure/js-x-ray";
 import * as i18n from "@nodesecure/i18n";
 
-console.log(i18n.getToken(jsxray.warnings.parsingError.i18n));
+console.log(i18n.getToken(jsxray.warnings["parsing-error"].i18n));
 ```
 
 ## Warnings Legends
@@ -142,7 +141,7 @@ The method take a first argument which is the code you want to analyse. It will 
 ```ts
 interface Report {
     dependencies: ASTDeps;
-    warnings: Warning<BaseWarning>[];
+    warnings: Warning[];
     idsLengthAvg: number;
     stringScore: number;
     isOneLineRequire: boolean;
@@ -166,12 +165,12 @@ Run the SAST scanner on a given JavaScript file.
 ```ts
 export type ReportOnFile = {
   ok: true,
-  warnings: Warning<BaseWarning>[];
+  warnings: Warning[];
   dependencies: ASTDeps;
   isMinified: boolean;
 } | {
   ok: false,
-  warnings: Warning<BaseWarning>[];
+  warnings: Warning[];
 }
 ```
 
