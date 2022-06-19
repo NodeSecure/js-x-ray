@@ -27,6 +27,7 @@
   ],
   "files": [
     "src",
+    "types",
     "index.js",
     "index.d.ts"
   ],
