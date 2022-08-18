@@ -1,6 +1,7 @@
 export {
   ASTDeps,
-  SourceLocation
+  SourceLocation,
+  Dependency
 }
 
 interface SourceLocation {
@@ -14,6 +15,12 @@ interface SourceLocation {
   }
 }
 
+interface Dependency {
+  unsafe: boolean;
+  inTry: boolean;
+  location?: SourceLocation;
+}
+
 declare class ASTDeps {
   constructor();
   removeByName(name: string): void;
@@ -21,10 +28,6 @@ declare class ASTDeps {
   getDependenciesInTryStatement(): IterableIterator<string>;
 
   public isInTryStmt: boolean;
-  public dependencies: Record<string, {
-    unsafe: boolean;
-    inTry: boolean;
-    location?: SourceLocation;
-  }>;
+  public dependencies: Record<string, Dependency>;
   public readonly size: number;
 }
