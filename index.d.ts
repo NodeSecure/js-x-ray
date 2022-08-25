@@ -13,7 +13,7 @@ import {
   WarningName,
   WarningNameWithValue
 } from "./types/warnings";
-import { ASTDeps } from "./types/astdeps";
+import { ASTDeps, Dependency } from "./types/astdeps";
 
 declare const warnings: Record<WarningName, Pick<WarningDefault, "experimental" | "i18n" | "severity">>;
 
@@ -26,6 +26,7 @@ export {
   RuntimeFileOptions,
   RuntimeOptions,
   ASTDeps,
+  Dependency,
   Warning,
   WarningDefault,
   WarningLocation,
