@@ -74,6 +74,15 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "Aekk0",
+      "name": "Franck Hallaert",
+      "avatar_url": "https://avatars.githubusercontent.com/u/110826655?v=4",
+      "profile": "https://www.linkedin.com/in/franck-hallaert/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
