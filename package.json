@@ -45,14 +45,14 @@
     "safe-regex": "^2.1.1"
   },
   "devDependencies": {
-    "@nodesecure/eslint-config": "^1.4.1",
+    "@nodesecure/eslint-config": "^1.5.0",
     "@slimio/is": "^1.5.1",
     "@small-tech/esm-tape-runner": "^2.0.0",
     "@small-tech/tap-monkey": "^1.4.0",
-    "@types/node": "^17.0.42",
+    "@types/node": "^18.7.13",
     "cross-env": "^7.0.3",
-    "eslint": "^8.17.0",
+    "eslint": "^8.23.0",
     "pkg-ok": "^3.0.0",
-    "tape": "^5.5.3"
+    "tape": "^5.6.0"
   }
 }
