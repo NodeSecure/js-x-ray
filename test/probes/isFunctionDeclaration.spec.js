@@ -6,9 +6,7 @@ import isFunctionDeclaration from "../../src/probes/isFunctionDeclaration.js";
 import test from "tape";
 
 test("should detect 1 function declaration", (tape) => {
-  const str = `
-  function foo() {}
-  `;
+  const str = "function foo() {}";
   const ast = parseScript(str);
   const analysis = getSastAnalysis(str, ast.body, isFunctionDeclaration);
 
@@ -18,9 +16,7 @@ test("should detect 1 function declaration", (tape) => {
 });
 
 test("should detect 0 function declaration", (tape) => {
-  const str = `
-  foo()
-  `;
+  const str = "foo()";
   const ast = parseScript(str);
   const analysis = getSastAnalysis(str, ast.body, isFunctionDeclaration);
 
