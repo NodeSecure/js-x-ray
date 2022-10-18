@@ -20,6 +20,13 @@ function main(node, options) {
   const { analysis } = options;
 
   const arg = node.arguments[0];
+  /**
+   * Note: RegExp Object can contain a RegExpLiteral
+   * @see https://github.com/estree/estree/blob/master/es5.md#regexpliteral
+   *
+   * @example
+   * new RegExp(/^foo/)
+   */
   const pattern = isLiteralRegex(arg) ? arg.regex.pattern : arg.value;
 
   // We use the safe-regex package to detect whether or not regex is safe!
