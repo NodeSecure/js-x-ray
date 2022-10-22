@@ -35,10 +35,11 @@ test("should return all the required runtime dependencies", (tape) => {
 });
 
 test("should return the dependencies even when they are concatened by a BinaryExpression", (tape) => {
-  const { dependencies, warnings } = runASTAnalysis(`const myVar = "ht";
-        require(myVar + "tp");
-        require("eve" + "nt" + "s");
-    `);
+  const { dependencies, warnings } = runASTAnalysis(`
+    const myVar = "ht";
+    require(myVar + "tp");
+    require("eve" + "nt" + "s");
+  `);
 
   tape.strictEqual(warnings.length, 0);
   tape.deepEqual([...dependencies], ["http", "events"]);
@@ -47,12 +48,12 @@ test("should return the dependencies even when they are concatened by a BinaryEx
 
 test("should return unsafe-import when a CallExpression is used in a require statment", (tape) => {
   const { dependencies, warnings, isOneLineRequire } = runASTAnalysis(`
-        function evil() {
-            return "http";
-        }
-        require(evil());
-        require(evil() + "s");
-    `);
+    function evil() {
+        return "http";
+    }
+    require(evil());
+    require(evil() + "s");
+  `);
 
   tape.deepEqual(getWarningKind(warnings), ["unsafe-import", "unsafe-import"].sort());
   tape.strictEqual(isOneLineRequire, false);
@@ -163,9 +164,9 @@ test("should detect unsafe eval statments", (tape) => {
 
 test("should detect unsafe Function statments", (tape) => {
   const { warnings } = runASTAnalysis(`
-        Function("return this")();
-        const g = Function("return this")();
-    `);
+    Function("return this")();
+    const g = Function("return this")();
+  `);
 
   tape.deepEqual(getWarningKind(warnings), ["unsafe-stmt", "unsafe-stmt"].sort());
   tape.end();

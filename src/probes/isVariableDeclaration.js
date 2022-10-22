@@ -1,5 +1,11 @@
+// Import Third-party Dependencies
+import {
+  getVariableDeclarationIdentifiers,
+  getMemberExpressionIdentifier
+} from "@nodesecure/estree-ast-utils";
+
 // Require Internal Dependencies
-import { getIdName, getMemberExprName, isUnsafeCallee, isRequireGlobalMemberExpr } from "../utils.js";
+import { isUnsafeCallee, isRequireGlobalMemberExpr } from "../utils.js";
 import { globalParts, processMainModuleRequire } from "../constants.js";
 
 // CONSTANTS
@@ -15,12 +21,13 @@ function validateNode(node) {
 
 function main(mainNode, options) {
   const { analysis } = options;
+  const { tracer } = analysis;
 
   analysis.varkinds[mainNode.kind]++;
 
   for (const node of mainNode.declarations) {
     analysis.idtypes.variableDeclarator++;
-    for (const name of getIdName(node.id)) {
+    for (const { name } of getVariableDeclarationIdentifiers(node.id)) {
       analysis.identifiersName.push({ name, type: "variableDeclarator" });
     }
 
@@ -28,13 +35,9 @@ function main(mainNode, options) {
       continue;
     }
 
-    if (node.init.type === "Literal") {
-      analysis.identifiers.set(node.id.name, String(node.init.value));
-    }
-
     // Searching for someone who assign require to a variable, ex:
     // const r = require
-    else if (node.init.type === "Identifier") {
+    if (node.init.type === "Identifier") {
       if (kUnsafeCallee.has(node.init.name)) {
         analysis.addWarning("unsafe-assign", node.init.name, node.loc);
       }
@@ -51,8 +54,8 @@ function main(mainNode, options) {
 
     // Same as before but for pattern like process.mainModule and require.resolve
     else if (node.init.type === "MemberExpression") {
-      const value = getMemberExprName(node.init);
-      const members = value.split(".");
+      const members = [...getMemberExpressionIdentifier(node.init, { tracer })];
+      const value = members.join("");
 
       if (analysis.globalParts.has(members[0]) || members.every((part) => globalParts.has(part))) {
         analysis.globalParts.set(node.id.name, members.slice(1).join("."));

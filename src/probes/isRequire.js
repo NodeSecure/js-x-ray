@@ -1,11 +1,16 @@
 /* eslint-disable consistent-return */
 
 // Import Internal Dependencies
-import { isRequireGlobalMemberExpr, getMemberExprName, arrExprToString, concatBinaryExpr } from "../utils.js";
+import { isRequireGlobalMemberExpr } from "../utils.js";
 
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
 import { walk } from "estree-walker";
+import {
+  concatBinaryExpression,
+  arrayExpressionToString,
+  getMemberExpressionIdentifier
+} from "@nodesecure/estree-ast-utils";
 
 function validateNode(node, analysis) {
   return [
@@ -28,27 +33,35 @@ function isRequireMemberExpr(node) {
     return false;
   }
 
-  return isRequireGlobalMemberExpr(getMemberExprName(node.callee));
+  return isRequireGlobalMemberExpr(
+    [...getMemberExpressionIdentifier(node.callee)].join(".")
+  );
 }
 
 function isRequireIdentifiers(node, analysis) {
   if (node.type !== "CallExpression") {
     return false;
   }
-  const fullName = node.callee.type === "MemberExpression" ? getMemberExprName(node.callee) : node.callee.name;
+  const fullName = node.callee.type === "MemberExpression" ?
+    [...getMemberExpressionIdentifier(node.callee)].join(".") :
+    node.callee.name;
 
   return analysis.requireIdentifiers.has(fullName);
 }
 
 function main(node, options) {
   const { analysis } = options;
+  const { tracer } = analysis;
 
   const arg = node.arguments[0];
   switch (arg.type) {
     // const foo = "http"; require(foo);
     case "Identifier":
-      if (analysis.identifiers.has(arg.name)) {
-        analysis.dependencies.add(analysis.identifiers.get(arg.name), node.loc);
+      if (analysis.tracer.literalIdentifiers.has(arg.name)) {
+        analysis.dependencies.add(
+          analysis.tracer.literalIdentifiers.get(arg.name),
+          node.loc
+        );
       }
       else {
         analysis.addWarning("unsafe-import", null, node.loc);
@@ -60,9 +73,12 @@ function main(node, options) {
       analysis.dependencies.add(arg.value, node.loc);
       break;
 
-    // require(["ht" + "tp"])
+    // require(["ht", "tp"])
     case "ArrayExpression": {
-      const value = arrExprToString(arg.elements, analysis.identifiers).trim();
+      const value = [...arrayExpressionToString(arg, { tracer })]
+        .join("")
+        .trim();
+
       if (value === "") {
         analysis.addWarning("unsafe-import", null, node.loc);
       }
@@ -78,12 +94,15 @@ function main(node, options) {
         break;
       }
 
-      const value = concatBinaryExpr(arg, analysis.identifiers);
-      if (value === null) {
-        analysis.addWarning("unsafe-import", null, node.loc);
+      try {
+        const iter = concatBinaryExpression(arg, {
+          tracer, stopOnUnsupportedNode: true
+        });
+
+        analysis.dependencies.add([...iter].join(""), node.loc);
       }
-      else {
-        analysis.dependencies.add(value, node.loc);
+      catch {
+        analysis.addWarning("unsafe-import", null, node.loc);
       }
       break;
     }
@@ -119,14 +138,17 @@ function parseRequireCallExpression(nodeToWalk) {
         return this.skip();
       }
 
-      const fullName = node.callee.type === "MemberExpression" ? getMemberExprName(node.callee) : node.callee.name;
+      const fullName = node.callee.type === "MemberExpression" ?
+        [...getMemberExpressionIdentifier(node.callee)].join(".") :
+        node.callee.name;
+
       switch (fullName) {
         case "Buffer.from": {
           const [element, convert] = node.arguments;
 
           if (element.type === "ArrayExpression") {
-            const depName = arrExprToString(element);
-            if (depName.trim() !== "") {
+            const depName = [...arrayExpressionToString(element)].join("").trim();
+            if (depName !== "") {
               dependencies.add(depName);
             }
           }
