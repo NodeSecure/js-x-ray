@@ -1,5 +1,6 @@
 // Import Third-party Dependencies
 import { Utils, Literal } from "@nodesecure/sec-literal";
+import { VariableTracer } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
 import { rootLocation, toArrayLocation } from "./utils.js";
@@ -33,9 +34,11 @@ export default class Analysis {
   identifiersName = [];
 
   constructor() {
+    this.tracer = new VariableTracer()
+      .enableDefaultTracing()
+      .trace("crypto.createHash", { followConsecutiveAssignment: true });
     this.dependencies = new ASTDeps();
 
-    this.identifiers = new Map();
     this.globalParts = new Map();
     this.handledEncodedLiteralValues = new Map();
 
@@ -123,6 +126,8 @@ export default class Analysis {
   }
 
   walk(node) {
+    this.tracer.walk(node);
+
     // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
     if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
       this.dependencies.isInTryStmt = true;

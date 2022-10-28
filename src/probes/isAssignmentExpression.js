@@ -1,5 +1,5 @@
-// Import Internal Dependencies
-import { getIdName } from "../utils.js";
+// Import Third-party Dependencies
+import { getVariableDeclarationIdentifiers } from "@nodesecure/estree-ast-utils";
 
 /**
  * @description Search for AssignmentExpression (Not to be confused with AssignmentPattern).
@@ -18,7 +18,7 @@ function main(node, options) {
   const { analysis } = options;
 
   analysis.idtypes.assignExpr++;
-  for (const name of getIdName(node.left)) {
+  for (const { name } of getVariableDeclarationIdentifiers(node.left)) {
     analysis.identifiersName.push({ name, type: "assignExpr" });
   }
 }
