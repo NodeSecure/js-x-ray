@@ -4,9 +4,6 @@ import { builtinModules } from "repl";
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
 
-// Import Internal Dependencies
-import { globalParts } from "../constants.js";
-
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
 
@@ -36,7 +33,7 @@ function main(node, options) {
       analysis.dependencies.add(value, node.loc);
       analysis.addWarning("unsafe-import", null, node.loc);
     }
-    else if (globalParts.has(value) || !Hex.isSafe(node.value)) {
+    else if (value === "require" || !Hex.isSafe(node.value)) {
       analysis.addWarning("encoded-literal", node.value, node.loc);
     }
   }

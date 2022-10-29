@@ -5,7 +5,6 @@ import { VariableTracer } from "@nodesecure/estree-ast-utils";
 // Import Internal Dependencies
 import { rootLocation, toArrayLocation } from "./utils.js";
 import { generateWarning } from "./warnings.js";
-import { processMainModuleRequire } from "./constants.js";
 import ASTDeps from "./ASTDeps.js";
 import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { runOnProbes } from "./probes/index.js";
@@ -37,12 +36,9 @@ export default class Analysis {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
       .trace("crypto.createHash", { followConsecutiveAssignment: true });
+
     this.dependencies = new ASTDeps();
-
-    this.globalParts = new Map();
     this.handledEncodedLiteralValues = new Map();
-
-    this.requireIdentifiers = new Set(["require", processMainModuleRequire]);
     this.warnings = [];
     this.literalScores = [];
   }

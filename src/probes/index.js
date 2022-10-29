@@ -4,7 +4,6 @@ import isLiteral from "./isLiteral.js";
 import isLiteralRegex from "./isLiteralRegex.js";
 import isRegexObject from "./isRegexObject.js";
 import isVariableDeclaration from "./isVariableDeclaration.js";
-import isAssignmentExprOrMemberExpr from "./isAssignmentExprOrMemberExpr.js";
 import isRequire from "./isRequire.js";
 import isImportDeclaration from "./isImportDeclaration.js";
 import isMemberExpression from "./isMemberExpression.js";
@@ -22,7 +21,6 @@ const kListOfProbes = [
   isLiteralRegex,
   isRegexObject,
   isVariableDeclaration,
-  isAssignmentExprOrMemberExpr,
   isRequire,
   isImportDeclaration,
   isMemberExpression,

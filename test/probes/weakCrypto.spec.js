@@ -46,8 +46,11 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
 });
 
 test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", (tape) => {
-  const md5Usage = readFileSync(new URL("strongAlgorithms/sha256.js", FIXTURE_URL), "utf-8");
-  const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
+  const code = `
+    import crypto from 'crypto';
+    crypto.createHash('sha256');
+  `;
+  const { warnings: outputWarnings } = runASTAnalysis(code);
 
   tape.strictEqual(outputWarnings.length, 0);
   tape.end();

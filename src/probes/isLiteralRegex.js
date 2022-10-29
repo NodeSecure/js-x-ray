@@ -1,7 +1,5 @@
-// Require Internal Dependencies
-import { isLiteralRegex } from "../utils.js";
-
 // Require Third-party Dependencies
+import { isLiteralRegex } from "@nodesecure/estree-ast-utils";
 import safeRegex from "safe-regex";
 
 /**

@@ -1,26 +1,30 @@
+// Import Third-party Dependencies
+import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
+
 // CONSTANTS
-const kWeakAlgorithms = new Set(["md5", "sha1", "ripemd160", "md4", "md2"]);
+const kWeakAlgorithms = new Set([
+  "md5",
+  "sha1",
+  "ripemd160",
+  "md4",
+  "md2"
+]);
 
-function validateNode(node) {
-  const isCallExpression = node.type === "CallExpression";
-  const isSimpleIdentifier = isCallExpression &&
-    node.callee.type === "Identifier" &&
-    node.callee.name === "createHash";
-  const isMemberExpression = isCallExpression &&
-    node.callee.type === "MemberExpression" &&
-    node.callee.property.name === "createHash";
+function validateNode(node, { tracer }) {
+  const id = getCallExpressionIdentifier(node);
+  if (id === null) {
+    return [false];
+  }
 
-  return [isSimpleIdentifier || isMemberExpression];
+  const data = tracer.getDataFromIdentifier(id);
+
+  return [data !== null && data.identifierOrMemberExpr === "crypto.createHash"];
 }
 
 function main(node, { analysis }) {
   const arg = node.arguments.at(0);
-  const isCryptoImported = analysis.dependencies.has("crypto");
 
-  if (
-    kWeakAlgorithms.has(arg.value) &&
-    isCryptoImported
-  ) {
+  if (kWeakAlgorithms.has(arg.value)) {
     analysis.addWarning("weak-crypto", arg.value, node.loc);
   }
 }
