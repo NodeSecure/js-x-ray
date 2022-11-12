@@ -1,8 +1,6 @@
 // Node.Js Dependencies
 import { readFileSync } from "fs";
 import { readdir } from "fs/promises";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
 
 // Third-party Dependencies
 import test from "tape";
@@ -11,15 +9,14 @@ import test from "tape";
 import { runASTAnalysis } from "../../index.js";
 
 // Constants
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_PATH = join(__dirname, "fixtures", "weakCrypto");
+const FIXTURE_URL = new URL("fixtures/weakCrypto/", import.meta.url);
 
 test("it should report a warning in case of `createHash(<weak-algo>)` usage", async(tape) => {
-  const fixturesDir = join(FIXTURE_PATH, "directCallExpression");
+  const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
   const fixtureFiles = await readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {
-    const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
+    const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
     const [firstWarning] = outputWarnings;
@@ -32,11 +29,11 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
 });
 
 test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async(tape) => {
-  const fixturesDir = join(FIXTURE_PATH, "memberExpression");
+  const fixturesDir = new URL("memberExpression/", FIXTURE_URL);
   const fixtureFiles = await readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {
-    const fixture = readFileSync(join(fixturesDir, fixtureFile), "utf-8");
+    const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
     const [firstWarning] = outputWarnings;
@@ -49,7 +46,7 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
 });
 
 test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", (tape) => {
-  const md5Usage = readFileSync(join(FIXTURE_PATH, "strongAlgorithms", "sha256.js"), "utf-8");
+  const md5Usage = readFileSync(new URL("strongAlgorithms/sha256.js", FIXTURE_URL), "utf-8");
   const { warnings: outputWarnings } = runASTAnalysis(md5Usage);
 
   tape.strictEqual(outputWarnings.length, 0);

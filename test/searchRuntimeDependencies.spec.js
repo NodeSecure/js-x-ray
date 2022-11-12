@@ -1,7 +1,5 @@
 // Import Node.js Dependencies
 import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { join, dirname } from "path";
 
 // Import Third-party Dependencies
 import test from "tape";
@@ -11,8 +9,7 @@ import { runASTAnalysis } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_PATH = join(__dirname, "fixtures/searchRuntimeDependencies");
+const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
 
 test("should return all the required runtime dependencies", (tape) => {
   const { dependencies, warnings } = runASTAnalysis(`
@@ -215,7 +212,7 @@ test("should return runtime dependencies concatened when done in a ArrayExpressi
 });
 
 test("should detect the suspicious string", (tape) => {
-  const suspectString = readFileSync(join(FIXTURE_PATH, "suspect-string.js"), "utf-8");
+  const suspectString = readFileSync(new URL("suspect-string.js", FIXTURE_URL), "utf-8");
   const { warnings, stringScore } = runASTAnalysis(suspectString);
 
   tape.deepEqual(getWarningKind(warnings), ["suspicious-literal"].sort());
@@ -224,7 +221,7 @@ test("should detect the suspicious string", (tape) => {
 });
 
 test("should be capable to follow hexa computation members expr", (tape) => {
-  const advancedComputation = readFileSync(join(FIXTURE_PATH, "advanced-computation.js"), "utf-8");
+  const advancedComputation = readFileSync(new URL("advanced-computation.js", FIXTURE_URL), "utf-8");
   const { warnings, dependencies } = runASTAnalysis(advancedComputation);
 
   tape.deepEqual(getWarningKind(warnings), [
@@ -239,7 +236,7 @@ test("should be capable to follow hexa computation members expr", (tape) => {
 });
 
 test("should support runtime analysis of ESM and return http", (tape) => {
-  const esm = readFileSync(join(FIXTURE_PATH, "esm.js"), "utf-8");
+  const esm = readFileSync(new URL("esm.js", FIXTURE_URL), "utf-8");
   const { dependencies, warnings } = runASTAnalysis(esm, { module: true });
 
   tape.strictEqual(warnings.length, 0);
@@ -248,14 +245,14 @@ test("should support runtime analysis of ESM and return http", (tape) => {
 });
 
 test("should detect two unsafe regex", (tape) => {
-  const regexUnsafe = readFileSync(join(FIXTURE_PATH, "unsafe-regex.js"), "utf-8");
+  const regexUnsafe = readFileSync(new URL("unsafe-regex.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(regexUnsafe, { module: false });
   tape.deepEqual(getWarningKind(warnings), ["unsafe-regex", "unsafe-regex"].sort());
   tape.end();
 });
 
 test("should detect short identifiers!", (tape) => {
-  const shortIds = readFileSync(join(FIXTURE_PATH, "short-ids.js"), "utf-8");
+  const shortIds = readFileSync(new URL("short-ids.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(shortIds);
 
   tape.deepEqual(getWarningKind(warnings), ["short-identifiers"].sort());
@@ -263,7 +260,7 @@ test("should detect short identifiers!", (tape) => {
 });
 
 test("should detect that http is under a TryStatement", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "try-catch.js"), "utf-8");
+  const trycatch = readFileSync(new URL("try-catch.js", FIXTURE_URL), "utf-8");
   const { dependencies: deps } = runASTAnalysis(trycatch);
 
   tape.strictEqual(Reflect.has(deps.dependencies, "http"), true);
