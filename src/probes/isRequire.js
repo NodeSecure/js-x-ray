@@ -28,7 +28,11 @@ function main(node, options) {
   const { analysis } = options;
   const { tracer } = analysis;
 
+  if (node.arguments.length === 0) {
+    return;
+  }
   const arg = node.arguments.at(0);
+
   switch (arg.type) {
     // const foo = "http"; require(foo);
     case "Identifier":
