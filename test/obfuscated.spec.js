@@ -1,7 +1,6 @@
 // Import Node.js Dependencies
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
-import { join, dirname } from "path";
 
 // Import Third-party Dependencies
 import test from "tape";
@@ -11,11 +10,10 @@ import { runASTAnalysis, runASTAnalysisOnFile } from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const FIXTURE_PATH = join(__dirname, "fixtures/obfuscated");
+const FIXTURE_URL = new URL("fixtures/obfuscated/", import.meta.url);
 
 test("should detect 'jsfuck' obfuscation", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "jsfuck.js"), "utf-8");
+  const trycatch = readFileSync(new URL("jsfuck.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(trycatch);
 
   tape.strictEqual(warnings.length, 1);
@@ -25,7 +23,7 @@ test("should detect 'jsfuck' obfuscation", (tape) => {
 });
 
 // test("should detect 'morse' obfuscation", (tape) => {
-//   const trycatch = readFileSync(join(FIXTURE_PATH, "morse.js"), "utf-8");
+//   const trycatch = readFileSync(new URL("morse.js", FIXTURE_URL), "utf-8");
 //   const { warnings } = runASTAnalysis(trycatch);
 
 //   tape.strictEqual(warnings.length, 1);
@@ -35,7 +33,7 @@ test("should detect 'jsfuck' obfuscation", (tape) => {
 // });
 
 test("should detect 'jjencode' obfuscation", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "jjencode.js"), "utf-8");
+  const trycatch = readFileSync(new URL("jjencode.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(trycatch);
 
   tape.strictEqual(warnings.length, 1);
@@ -45,7 +43,7 @@ test("should detect 'jjencode' obfuscation", (tape) => {
 });
 
 test("should detect 'freejsobfuscator' obfuscation", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "freejsobfuscator.js"), "utf-8");
+  const trycatch = readFileSync(new URL("freejsobfuscator.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(trycatch);
 
   tape.strictEqual(warnings.length, 3);
@@ -57,7 +55,7 @@ test("should detect 'freejsobfuscator' obfuscation", (tape) => {
 });
 
 test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", (tape) => {
-  const trycatch = readFileSync(join(FIXTURE_PATH, "obfuscatorio-hexa.js"), "utf-8");
+  const trycatch = readFileSync(new URL("obfuscatorio-hexa.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(trycatch);
 
   tape.strictEqual(warnings.length, 1);
@@ -89,7 +87,7 @@ test("should detect 'trojan-source' when there is one unsafe unicode control cha
 });
 
 test("should detect 'trojan-source' when there is atleast one unsafe unicode control char", async(tape) => {
-  const { warnings } = await runASTAnalysisOnFile(join(FIXTURE_PATH, "unsafe-unicode-chars.js"));
+  const { warnings } = await runASTAnalysisOnFile(fileURLToPath(new URL("unsafe-unicode-chars.js", FIXTURE_URL)));
 
   tape.strictEqual(warnings.length, 1);
   tape.deepEqual(getWarningKind(warnings), ["obfuscated-code"]);
