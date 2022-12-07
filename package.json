@@ -42,7 +42,7 @@
     "@nodesecure/sec-literal": "^1.1.0",
     "estree-walker": "^3.0.1",
     "is-minified-code": "^2.0.0",
-    "meriyah": "^4.3.2",
+    "meriyah": "^4.3.3",
     "safe-regex": "^2.1.1"
   },
   "devDependencies": {
