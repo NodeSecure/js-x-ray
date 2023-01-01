@@ -1,59 +1,34 @@
 /* eslint-disable consistent-return */
 
-// Import Internal Dependencies
-import { isRequireGlobalMemberExpr } from "../utils.js";
-
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
 import { walk } from "estree-walker";
 import {
   concatBinaryExpression,
   arrayExpressionToString,
-  getMemberExpressionIdentifier
+  getMemberExpressionIdentifier,
+  getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 
-function validateNode(node, analysis) {
+function validateNode(node, { tracer }) {
+  const id = getCallExpressionIdentifier(node);
+  if (id === null) {
+    return [false];
+  }
+
+  const data = tracer.getDataFromIdentifier(id);
+
   return [
-    isRequireIdentifiers(node, analysis) ||
-    isRequireResolve(node) ||
-    isRequireMemberExpr(node)
+    data !== null && data.name === "require",
+    data?.identifierOrMemberExpr ?? void 0
   ];
-}
-
-function isRequireResolve(node) {
-  if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
-    return false;
-  }
-
-  return node.callee.object.name === "require" && node.callee.property.name === "resolve";
-}
-
-function isRequireMemberExpr(node) {
-  if (node.type !== "CallExpression" || node.callee.type !== "MemberExpression") {
-    return false;
-  }
-
-  return isRequireGlobalMemberExpr(
-    [...getMemberExpressionIdentifier(node.callee)].join(".")
-  );
-}
-
-function isRequireIdentifiers(node, analysis) {
-  if (node.type !== "CallExpression") {
-    return false;
-  }
-  const fullName = node.callee.type === "MemberExpression" ?
-    [...getMemberExpressionIdentifier(node.callee)].join(".") :
-    node.callee.name;
-
-  return analysis.requireIdentifiers.has(fullName);
 }
 
 function main(node, options) {
   const { analysis } = options;
   const { tracer } = analysis;
 
-  const arg = node.arguments[0];
+  const arg = node.arguments.at(0);
   switch (arg.type) {
     // const foo = "http"; require(foo);
     case "Identifier":

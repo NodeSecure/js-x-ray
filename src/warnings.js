@@ -19,10 +19,6 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.unsafe_stmt",
     severity: "Warning"
   },
-  "unsafe-assign": {
-    i18n: "sast_warnings.unsafe_assign",
-    severity: "Warning"
-  },
   "encoded-literal": {
     i18n: "sast_warnings.encoded_literal",
     severity: "Information"

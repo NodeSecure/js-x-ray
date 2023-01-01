@@ -122,7 +122,7 @@ test("should return an unsafe-assign warning when a protected global is assigned
         r("http");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), ["unsafe-assign"].sort());
+  tape.deepEqual(getWarningKind(warnings), []);
   tape.deepEqual([...dependencies], ["http"]);
   tape.end();
 });
@@ -134,7 +134,7 @@ test("should succesfully follow the require stmt when assigned multiple times an
         b("http");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), ["unsafe-assign", "unsafe-assign"].sort());
+  tape.deepEqual(getWarningKind(warnings), []);
   tape.deepEqual([...dependencies], ["http"]);
   tape.end();
 });
@@ -169,27 +169,16 @@ test("should detect unsafe Function statments", (tape) => {
   tape.end();
 });
 
-test("should detect unsafe-assign of eval", (tape) => {
-  const { warnings } = runASTAnalysis(`
-        const e = eval;
-    `);
-
-  tape.deepEqual(getWarningKind(warnings), ["unsafe-assign"].sort());
-  tape.end();
-});
-
 test("should be capable of following global parts", (tape) => {
   const { warnings, dependencies } = runASTAnalysis(`
-        const g = global.process;
-        const r = g.mainModule;
-        const c = r.require;
-        c("http");
-        r.require("fs");
+      const g = global.process;
+      const r = g.mainModule;
+      const c = r.require;
+      c("http");
+      r.require("fs");
     `);
 
-  tape.deepEqual(getWarningKind(warnings), [
-    "unsafe-assign", "unsafe-assign", "unsafe-assign"
-  ].sort());
+  tape.deepEqual(getWarningKind(warnings), []);
   tape.deepEqual([...dependencies], ["http", "fs"]);
   tape.end();
 });
@@ -226,8 +215,6 @@ test("should be capable to follow hexa computation members expr", (tape) => {
 
   tape.deepEqual(getWarningKind(warnings), [
     "encoded-literal",
-    "unsafe-assign",
-    "unsafe-assign",
     "unsafe-import",
     "unsafe-stmt"
   ].sort());
