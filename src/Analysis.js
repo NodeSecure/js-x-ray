@@ -110,7 +110,8 @@ export default class Analysis {
     }
 
     const identifiersLengthArr = this.identifiersName
-      .filter((value) => value.type !== "property" && typeof value.name === "string").map((value) => value.name.length);
+      .filter((value) => value.type !== "property" && typeof value.name === "string")
+      .map((value) => value.name.length);
 
     const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
     if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
