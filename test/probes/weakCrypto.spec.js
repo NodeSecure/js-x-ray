@@ -55,3 +55,16 @@ test("it should NOT report a warning in case of `[expression]createHash('sha256'
   tape.strictEqual(outputWarnings.length, 0);
   tape.end();
 });
+
+test("it should NOT report a warning if crypto.createHash is not imported", (tape) => {
+  const code = `
+    const crypto = {
+      createHash() {}
+    }
+    crypto.createHash('md5');
+  `;
+  const { warnings: outputWarnings } = runASTAnalysis(code);
+
+  tape.strictEqual(outputWarnings.length, 0);
+  tape.end();
+});

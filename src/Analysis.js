@@ -35,7 +35,9 @@ export default class Analysis {
   constructor() {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
-      .trace("crypto.createHash", { followConsecutiveAssignment: true });
+      .trace("crypto.createHash", {
+        followConsecutiveAssignment: true, moduleName: "crypto"
+      });
 
     this.dependencies = new ASTDeps();
     this.handledEncodedLiteralValues = new Map();

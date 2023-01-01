@@ -12,7 +12,7 @@ const kWeakAlgorithms = new Set([
 
 function validateNode(node, { tracer }) {
   const id = getCallExpressionIdentifier(node);
-  if (id === null) {
+  if (id === null || !tracer.importedModules.has("crypto")) {
     return [false];
   }
 
