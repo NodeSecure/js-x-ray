@@ -22,7 +22,7 @@ export default class ASTDeps {
   }
 
   add(depName, location = null, unsafe = false) {
-    if (depName.trim() === "") {
+    if (typeof depName !== "string" || depName.trim() === "") {
       return;
     }
 
