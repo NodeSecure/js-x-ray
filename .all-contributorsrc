@@ -92,6 +92,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "targos",
+      "name": "Michaël Zasso",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2352663?v=4",
+      "profile": "https://github.com/targos",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
