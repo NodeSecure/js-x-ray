@@ -11,6 +11,13 @@ import isMinified from "is-minified-code";
 import Analysis from "./src/Analysis.js";
 import { warnings } from "./src/warnings.js";
 
+// CONSTANTS
+const kMeriyahDefaultOptions = {
+  next: true,
+  loc: true,
+  raw: true
+};
+
 export function runASTAnalysis(str, options = Object.create(null)) {
   const { module = true, isMinified = false } = options;
 
@@ -18,13 +25,7 @@ export function runASTAnalysis(str, options = Object.create(null)) {
   // Example: #!/usr/bin/env node
   const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
   const isEcmaScriptModule = Boolean(module);
-  const { body } = meriyah.parseScript(strToAnalyze, {
-    next: true,
-    loc: true,
-    raw: true,
-    module: isEcmaScriptModule,
-    globalReturn: !isEcmaScriptModule
-  });
+  const body = parseScriptExtended(strToAnalyze, isEcmaScriptModule);
 
   const sastAnalysis = new Analysis();
   sastAnalysis.analyzeSourceString(str);
@@ -81,6 +82,29 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
         { kind: "parsing-error", value: error.message, location: [[0, 0], [0, 0]] }
       ]
     };
+  }
+}
+
+function parseScriptExtended(strToAnalyze, isEcmaScriptModule) {
+  try {
+    const { body } = meriyah.parseScript(strToAnalyze, {
+      ...kMeriyahDefaultOptions,
+      module: isEcmaScriptModule,
+      globalReturn: !isEcmaScriptModule
+    });
+
+    return body;
+  }
+  catch (error) {
+    if (error.name === "SyntaxError" && error.description.includes("The import keyword")) {
+      const { body } = meriyah.parseScript(strToAnalyze, {
+        ...kMeriyahDefaultOptions, module: true
+      });
+
+      return body;
+    }
+
+    throw error;
   }
 }
 
