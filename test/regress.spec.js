@@ -6,7 +6,6 @@ import test from "tape";
 
 // Import Internal Dependencies
 import { runASTAnalysis } from "../index.js";
-import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
 const FIXTURE_URL = new URL("fixtures/regress/", import.meta.url);
