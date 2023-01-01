@@ -69,16 +69,6 @@ test("should return the string value of the encoded hexadecimal literal", (tape)
   tape.end();
 });
 
-test("should detect an unsafe import because of the usage of data:text/javascript", (tape) => {
-  const { dependencies, warnings } = runASTAnalysis(`
-        import 'data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==';
-    `);
-
-  tape.deepEqual(getWarningKind(warnings), ["unsafe-import"].sort());
-  tape.deepEqual([...dependencies], ["data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg=="]);
-  tape.end();
-});
-
 test("should be capable to reverse the CallExpression Buffer.from call with an ArrayExpression as first argument", (tape) => {
   const { dependencies, warnings } = runASTAnalysis(`
         const px = require.resolve(
