@@ -13,6 +13,8 @@ import isAssignmentExpression from "./isAssignmentExpression.js";
 import isObjectExpression from "./isObjectExpression.js";
 import isUnaryExpression from "./isUnaryExpression.js";
 import isWeakCrypto from "./isWeakCrypto.js";
+import isClassDeclaration from "./isClassDeclaration.js";
+import isMethodDefinition from "./isMethodDefinition.js";
 
 // CONSTANTS
 const kListOfProbes = [
@@ -29,7 +31,9 @@ const kListOfProbes = [
   isArrayExpression,
   isFunctionDeclaration,
   isUnaryExpression,
-  isWeakCrypto
+  isWeakCrypto,
+  isClassDeclaration,
+  isMethodDefinition
 ];
 
 const kSymBreak = Symbol.for("breakWalk");
