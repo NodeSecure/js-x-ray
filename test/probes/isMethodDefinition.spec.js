@@ -1,9 +1,9 @@
-// Require Internal Dependencies
+// Import Third-party dependencies
+import test from "tape";
+
+// Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isMethodDefinition from "../../src/probes/isMethodDefinition.js";
-
-// Require Third-party dependencies
-import test from "tape";
 
 test("should detect two identifiers (constructor and one method definition)", (tape) => {
   const str = `class File {
@@ -11,7 +11,8 @@ test("should detect two identifiers (constructor and one method definition)", (t
     foo() {}
   }`;
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMethodDefinition);
+  const { analysis } = getSastAnalysis(str, isMethodDefinition)
+    .execute(ast.body);
 
   tape.deepEqual(analysis.identifiersName, [
     { name: "constructor", type: "method" },
@@ -27,7 +28,8 @@ test("should detect two identifiers (getter and setter)", (tape) => {
     set bar(value) {}
   }`;
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMethodDefinition);
+  const { analysis } = getSastAnalysis(str, isMethodDefinition)
+    .execute(ast.body);
 
   tape.deepEqual(analysis.identifiersName, [
     { name: "foo", type: "method" },

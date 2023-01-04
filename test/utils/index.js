@@ -6,6 +6,23 @@ export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
 }
 
+export function mockedFunction() {
+  return {
+    called: 0,
+    args: [],
+    haveBeenCalledTimes(count = 0) {
+      return this.called === count;
+    },
+    haveBeenCalledWith(value) {
+      return this.args.includes(value);
+    },
+    callback(...args) {
+      this.args.push(...args);
+      this.called++;
+    }
+  };
+}
+
 export function parseScript(str) {
   return meriyah.parseScript(str, {
     next: true,
@@ -30,29 +47,40 @@ function runOnProbes(node, analysis, probe) {
   return null;
 }
 
-export function getSastAnalysis(strSource, body, probe) {
-  const sastAnalysis = new Analysis();
-  sastAnalysis.analyzeSourceString(strSource);
+export function getSastAnalysis(strSource, probe) {
+  return {
+    analysis: new Analysis(),
+    getWarning(warning) {
+      return this.analysis.warnings.find(
+        (item) => item.kind === warning
+      );
+    },
+    warnings() {
+      return this.analysis.warnings;
+    },
+    dependencies() {
+      return this.analysis.dependencies.dependencies;
+    },
+    execute(body) {
+      const self = this;
+      this.analysis.analyzeSourceString(strSource);
 
-  walk(body, {
-    enter(node) {
-      // Skip the root of the AST.
-      if (Array.isArray(node)) {
-        return;
-      }
+      walk(body, {
+        enter(node) {
+          // Skip the root of the AST.
+          if (Array.isArray(node)) {
+            return;
+          }
 
+          const action = runOnProbes(node, self.analysis, probe);
 
-      const action = runOnProbes(node, sastAnalysis, probe);
+          if (action === "skip") {
+            this.skip();
+          }
+        }
+      });
 
-      if (action === "skip") {
-        this.skip();
-      }
+      return this;
     }
-  });
-
-  return sastAnalysis;
-}
-
-export function getWarningOnAnalysisResult(analysis, warning) {
-  return analysis.warnings.find((item) => item.kind === warning);
+  };
 }

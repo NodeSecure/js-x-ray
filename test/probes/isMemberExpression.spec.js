@@ -1,14 +1,15 @@
-// Require Internal Dependencies
+// Import Third-party dependencies
+import test from "tape";
+
+// Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isMemberExpression from "../../src/probes/isMemberExpression.js";
-
-// Require Third-party dependencies
-import test from "tape";
 
 test("should detect 1 member expression", (tape) => {
   const str = "process.mainModule";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMemberExpression);
+  const { analysis } = getSastAnalysis(str, isMemberExpression)
+    .execute(ast.body);
 
   tape.equal(analysis.counter.memberExpr, 1);
 
@@ -18,7 +19,8 @@ test("should detect 1 member expression", (tape) => {
 test("should detect 2 members expressions", (tape) => {
   const str = "process.mainModule.foo";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMemberExpression);
+  const { analysis } = getSastAnalysis(str, isMemberExpression)
+    .execute(ast.body);
 
   tape.equal(analysis.counter.memberExpr, 2);
 
@@ -28,7 +30,8 @@ test("should detect 2 members expressions", (tape) => {
 test("should detect 1 member expression and 2 nodes", (tape) => {
   const str = "process.mainModule['foo']['bar']";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMemberExpression);
+  const { analysis } = getSastAnalysis(str, isMemberExpression)
+    .execute(ast.body);
 
   tape.equal(analysis.counter.memberExpr, 1);
   tape.equal(analysis.counter.computedMemberExpr, 2);
@@ -39,7 +42,8 @@ test("should detect 1 member expression and 2 nodes", (tape) => {
 test("should detect 0 member expression", (tape) => {
   const str = "process";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isMemberExpression);
+  const { analysis } = getSastAnalysis(str, isMemberExpression)
+    .execute(ast.body);
 
   tape.equal(analysis.counter.memberExpr, 0);
 

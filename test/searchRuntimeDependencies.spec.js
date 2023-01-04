@@ -1,5 +1,5 @@
 // Import Node.js Dependencies
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
 // Import Third-party Dependencies
 import test from "tape";
