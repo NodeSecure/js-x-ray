@@ -22,6 +22,8 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm run test
+      - name: Send coverage report to Codecov
+        uses: codecov/codecov-action@v1
   nsci:
     runs-on: ubuntu-latest
     strategy:
@@ -31,5 +33,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: NodeSecure/ci-action@v1
-        with: 
+        with:
           warnings: warning
