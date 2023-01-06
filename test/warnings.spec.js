@@ -1,7 +1,7 @@
 // Import Third-party Dependencies
 import test from "tape";
 
-// Require Internal Dependencies
+// Import Internal Dependencies
 import { rootLocation } from "../src/utils.js";
 import { generateWarning } from "../src/warnings.js";
 

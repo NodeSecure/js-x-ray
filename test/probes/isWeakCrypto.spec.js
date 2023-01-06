@@ -1,11 +1,10 @@
-// Node.Js Dependencies
-import { readFileSync } from "fs";
-import { readdir } from "fs/promises";
+// Import Node.js Dependencies
+import { readFileSync, promises as fs } from "node:fs";
 
-// Third-party Dependencies
+// Import Third-party Dependencies
 import test from "tape";
 
-// Internal Dependencies
+// Import Internal Dependencies
 import { runASTAnalysis } from "../../index.js";
 
 // Constants
@@ -13,7 +12,7 @@ const FIXTURE_URL = new URL("fixtures/weakCrypto/", import.meta.url);
 
 test("it should report a warning in case of `createHash(<weak-algo>)` usage", async(tape) => {
   const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
-  const fixtureFiles = await readdir(fixturesDir);
+  const fixtureFiles = await fs.readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {
     const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
@@ -30,7 +29,7 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
 
 test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async(tape) => {
   const fixturesDir = new URL("memberExpression/", FIXTURE_URL);
-  const fixtureFiles = await readdir(fixturesDir);
+  const fixtureFiles = await fs.readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {
     const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");

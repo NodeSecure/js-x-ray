@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 // Import Third-party Dependencies
 import test from "tape";

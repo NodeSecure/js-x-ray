@@ -1,14 +1,15 @@
-// Require Internal Dependencies
+// Import Third-party dependencies
+import test from "tape";
+
+// Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isImportDeclaration from "../../src/probes/isImportDeclaration.js";
-
-// Require Third-party dependencies
-import test from "tape";
 
 test("should detect 1 dependency for an ImportNamespaceSpecifier", (tape) => {
   const str = "import * as foo from \"bar\"";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isImportDeclaration);
+  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+    .execute(ast.body);
 
   const { dependencies } = analysis.dependencies;
   tape.strictEqual("bar" in dependencies, true);
@@ -19,7 +20,8 @@ test("should detect 1 dependency for an ImportNamespaceSpecifier", (tape) => {
 test("should detect 1 dependency for an ImportDefaultSpecifier", (tape) => {
   const str = "import foo from \"bar\"";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isImportDeclaration);
+  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+    .execute(ast.body);
 
   const { dependencies } = analysis.dependencies;
   tape.strictEqual("bar" in dependencies, true);
@@ -30,7 +32,8 @@ test("should detect 1 dependency for an ImportDefaultSpecifier", (tape) => {
 test("should detect 1 dependency for an ImportSpecifier", (tape) => {
   const str = "import { xd } from \"bar\"";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isImportDeclaration);
+  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+    .execute(ast.body);
 
   const { dependencies } = analysis.dependencies;
   tape.strictEqual("bar" in dependencies, true);
@@ -41,7 +44,8 @@ test("should detect 1 dependency for an ImportSpecifier", (tape) => {
 test("should detect 1 dependency with no specificiers", (tape) => {
   const str = "import \"bar\"";
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isImportDeclaration);
+  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+    .execute(ast.body);
 
   const { dependencies } = analysis.dependencies;
   tape.strictEqual("bar" in dependencies, true);
@@ -54,13 +58,12 @@ test("should detect an unsafe import using data:text/javascript and throw a unsa
   const str = `import '${expectedValue}';`;
 
   const ast = parseScript(str);
-  const analysis = getSastAnalysis(str, ast.body, isImportDeclaration);
+  const sastAnalysis = getSastAnalysis(str, isImportDeclaration)
+    .execute(ast.body);
 
-  const { warnings } = analysis;
-  tape.strictEqual(warnings.length, 1);
+  tape.strictEqual(sastAnalysis.warnings().length, 1);
 
-  const [unsafeImport] = warnings;
-  tape.strictEqual(unsafeImport.kind, "unsafe-import");
+  const unsafeImport = sastAnalysis.getWarning("unsafe-import");
   tape.strictEqual(unsafeImport.value, expectedValue);
 
   tape.end();
