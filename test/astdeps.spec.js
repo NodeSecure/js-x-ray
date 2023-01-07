@@ -58,3 +58,21 @@ test("check presence of a dependency", (tape) => {
   tape.strictEqual(deps.has("bar"), false);
   tape.end();
 });
+
+test("it should not add dependency if not a string primitive", (tape) => {
+  const deps = new ASTDeps();
+
+  deps.add(5);
+  tape.strictEqual(deps.size, 0);
+
+  tape.end();
+});
+
+test("it should not add dependency if provided with empty string", (tape) => {
+  const deps = new ASTDeps();
+
+  deps.add("");
+  tape.strictEqual(deps.size, 0);
+
+  tape.end();
+});

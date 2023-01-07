@@ -72,8 +72,9 @@ export function getSastAnalysis(strSource, probe) {
             return;
           }
 
-          const action = runOnProbes(node, self.analysis, probe);
+          self.analysis.tracer.walk(node);
 
+          const action = runOnProbes(node, self.analysis, probe);
           if (action === "skip") {
             this.skip();
           }

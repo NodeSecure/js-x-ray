@@ -70,6 +70,7 @@ function main(node, options) {
     // require("ht" + "tp");
     case "BinaryExpression": {
       if (arg.operator !== "+") {
+        analysis.addWarning("unsafe-import", null, node.loc);
         break;
       }
 
@@ -88,8 +89,8 @@ function main(node, options) {
 
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
-      const { dependencies } = parseRequireCallExpression(arg);
-      dependencies.forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
+      walkRequireCallExpression(arg)
+        .forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
 
       analysis.addWarning("unsafe-import", null, node.loc);
 
@@ -102,7 +103,7 @@ function main(node, options) {
   }
 }
 
-function parseRequireCallExpression(nodeToWalk) {
+function walkRequireCallExpression(nodeToWalk) {
   const dependencies = new Set();
 
   walk(nodeToWalk, {
@@ -111,8 +112,9 @@ function parseRequireCallExpression(nodeToWalk) {
         return;
       }
 
-      if (node.arguments[0].type === "Literal" && Hex.isHex(node.arguments[0].value)) {
-        dependencies.add(Buffer.from(node.arguments[0].value, "hex").toString());
+      const rootArgument = node.arguments.at(0);
+      if (rootArgument.type === "Literal" && Hex.isHex(rootArgument.value)) {
+        dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
 
         return this.skip();
       }
@@ -127,9 +129,7 @@ function parseRequireCallExpression(nodeToWalk) {
 
           if (element.type === "ArrayExpression") {
             const depName = [...arrayExpressionToString(element)].join("").trim();
-            if (depName !== "") {
-              dependencies.add(depName);
-            }
+            dependencies.add(depName);
           }
           else if (element.type === "Literal" && convert.type === "Literal" && convert.value === "hex") {
             const value = Buffer.from(element.value, "hex").toString();
@@ -138,10 +138,8 @@ function parseRequireCallExpression(nodeToWalk) {
           break;
         }
         case "require.resolve": {
-          const [element] = node.arguments;
-
-          if (element.type === "Literal") {
-            dependencies.add(element.value);
+          if (rootArgument.type === "Literal") {
+            dependencies.add(rootArgument.value);
           }
           break;
         }
@@ -149,9 +147,7 @@ function parseRequireCallExpression(nodeToWalk) {
     }
   });
 
-  return {
-    dependencies: [...dependencies]
-  };
+  return [...dependencies];
 }
 
 export default {
