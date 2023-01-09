@@ -10,8 +10,9 @@
   "scripts": {
     "lint": "eslint src test",
     "prepublishOnly": "pkg-ok",
-    "test": "cross-env esm-tape-runner 'test/**/*.spec.js' | tap-monkey",
-    "check": "cross-env npm run lint && npm run test"
+    "test-only": "cross-env esm-tape-runner 'test/**/*.spec.js' | tap-monkey",
+    "test": "c8 --all --src ./src -r html npm run test-only",
+    "check": "cross-env npm run lint && npm run test-only"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,7 @@
     "@small-tech/esm-tape-runner": "^2.0.0",
     "@small-tech/tap-monkey": "^1.4.0",
     "@types/node": "^18.11.18",
+    "c8": "^7.12.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "pkg-ok": "^3.0.0",
