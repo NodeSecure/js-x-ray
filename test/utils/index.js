@@ -10,6 +10,9 @@ export function mockedFunction() {
   return {
     called: 0,
     args: [],
+    at(position) {
+      return this.args[position];
+    },
     haveBeenCalledTimes(count = 0) {
       return this.called === count;
     },

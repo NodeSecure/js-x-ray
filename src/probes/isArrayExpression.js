@@ -1,3 +1,9 @@
+// Import Internal Dependencies
+import { extractNode } from "../utils.js";
+
+// CONSTANTS
+const kLiteralExtractor = extractNode("Literal");
+
 /**
  * @description Search for ArrayExpression AST Node (Commonly known as JS Arrays)
  *
@@ -11,14 +17,11 @@ function validateNode(node) {
   ];
 }
 
-function main(node, options) {
-  const { analysis } = options;
-
-  for (const elem of node.elements) {
-    if (elem !== null && elem.type === "Literal") {
-      analysis.analyzeLiteral(elem, true);
-    }
-  }
+function main(node, { analysis }) {
+  kLiteralExtractor(
+    (literalNode) => analysis.analyzeLiteral(literalNode, true),
+    node.elements
+  );
 }
 
 export default {
