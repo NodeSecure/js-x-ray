@@ -1,11 +1,13 @@
-# js-x-ray
-![version](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/master/package.json&query=$.version&label=Version)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/NodeSecure/js-x-ray/commit-activity)
+<p align="center">
+  <h1 align="center">JS-X-RAY</h1>
+</p>
+
+![version](https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/master/package.json&query=$.version&label=Version)
+[![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE)
 [![OpenSSF
-Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
-[![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE)
-![coverage](https://img.shields.io/codecov/c/github/NodeSecure/js-x-ray)
-![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/node.js.yml)
+Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
+![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/node.js.yml?style=for-the-badge)
+![coverage](https://img.shields.io/codecov/c/github/NodeSecure/js-x-ray?style=for-the-badge)
 
 JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to enable better code evolution and allow better access to developers and researchers.
 
