@@ -106,7 +106,7 @@ export default class Analysis {
     this.counter.identifiers = this.identifiersName.length;
     const [isObfuscated, kind] = isObfuscatedCode(this);
     if (isObfuscated) {
-      this.addWarning("obfuscated-code", kind || "unknown");
+      this.addWarning("obfuscated-code", kind);
     }
 
     const identifiersLengthArr = this.identifiersName

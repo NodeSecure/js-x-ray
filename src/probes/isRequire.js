@@ -125,15 +125,11 @@ function walkRequireCallExpression(nodeToWalk) {
 
       switch (fullName) {
         case "Buffer.from": {
-          const [element, convert] = node.arguments;
+          const [element] = node.arguments;
 
           if (element.type === "ArrayExpression") {
             const depName = [...arrayExpressionToString(element)].join("").trim();
             dependencies.add(depName);
-          }
-          else if (element.type === "Literal" && convert.type === "Literal" && convert.value === "hex") {
-            const value = Buffer.from(element.value, "hex").toString();
-            dependencies.add(value);
           }
           break;
         }

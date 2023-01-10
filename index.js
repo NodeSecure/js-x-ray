@@ -58,11 +58,12 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   try {
     const { packageName = null, module = true } = options;
     const str = await fs.readFile(pathToFile, "utf-8");
+    const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
 
-    const isMin = pathToFile.includes(".min") || isMinified(str);
+    const isMin = filePathString.includes(".min") || isMinified(str);
     const data = runASTAnalysis(str, {
       isMinified: isMin,
-      module: path.extname(pathToFile) === ".mjs" ? true : module
+      module: path.extname(filePathString) === ".mjs" ? true : module
     });
     if (packageName !== null) {
       data.dependencies.removeByName(packageName);
