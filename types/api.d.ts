@@ -1,5 +1,5 @@
-import { ASTDeps } from "./astdeps";
-import { Warning } from "./warnings";
+import { ASTDeps } from "./astdeps.js";
+import { Warning } from "./warnings.js";
 
 export {
   runASTAnalysis,

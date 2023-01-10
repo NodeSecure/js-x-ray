@@ -5,15 +5,15 @@ import {
   ReportOnFile,
   RuntimeFileOptions,
   RuntimeOptions
-} from "./types/api";
+} from "./types/api.js";
 import {
   Warning,
   WarningDefault,
   WarningLocation,
   WarningName,
   WarningNameWithValue
-} from "./types/warnings";
-import { ASTDeps, Dependency } from "./types/astdeps";
+} from "./types/warnings.js";
+import { ASTDeps, Dependency } from "./types/astdeps.js";
 
 declare const warnings: Record<WarningName, Pick<WarningDefault, "experimental" | "i18n" | "severity">>;
 
