@@ -29,6 +29,16 @@ test("add values to ASTDeps instance", (tape) => {
   tape.end();
 });
 
+test("add method should cleanup ending slash", (tape) => {
+  const deps = new ASTDeps();
+  deps.add("foo/");
+
+  tape.strictEqual(deps.size, 1);
+  tape.ok(deps.has("foo"));
+
+  tape.end();
+});
+
 test("delete values from ASTDeps instance", (tape) => {
   const deps = new ASTDeps();
   deps.add("foo");
@@ -56,6 +66,7 @@ test("check presence of a dependency", (tape) => {
 
   tape.strictEqual(deps.has("foo"), true);
   tape.strictEqual(deps.has("bar"), false);
+  tape.strictEqual(deps.has(""), false);
   tape.end();
 });
 
