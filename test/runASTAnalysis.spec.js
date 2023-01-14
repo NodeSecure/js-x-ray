@@ -41,6 +41,30 @@ test("it should throw a 'suspicious-literal' warning when given a code with a su
   tape.end();
 });
 
+test("it should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", (tape) => {
+  const suspectString = readFileSync(new URL("suspiciousFile.js", FIXTURE_URL), "utf-8");
+  const { warnings } = runASTAnalysis(suspectString);
+
+  tape.deepEqual(getWarningKind(warnings), ["suspicious-file"].sort());
+  tape.end();
+});
+
+test("it should combine same encoded-literal as one warning with multiple locations", (tape) => {
+  const { warnings } = runASTAnalysis(`
+    const foo = "18c15e5c5c9dac4d16f9311a92bb8331";
+    const bar = "18c15e5c5c9dac4d16f9311a92bb8331";
+    const xd = "18c15e5c5c9dac4d16f9311a92bb8331";
+  `);
+
+  tape.strictEqual(warnings.length, 1);
+  tape.deepEqual(getWarningKind(warnings), ["encoded-literal"].sort());
+
+  const [encodedLiteral] = warnings;
+  tape.strictEqual(encodedLiteral.location.length, 3);
+
+  tape.end();
+});
+
 test("it should be capable to follow a malicious code with hexa computation and reassignments", (tape) => {
   const { warnings, dependencies } = runASTAnalysis(`
     function unhex(r) {

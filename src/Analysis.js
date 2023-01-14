@@ -16,6 +16,8 @@ const kDictionaryStrParts = [
   "0123456789"
 ];
 
+const kMaximumEncodedLiterals = 10;
+
 export default class Analysis {
   hasDictionaryString = false;
   hasPrefixedIdentifiers = false;
@@ -40,23 +42,29 @@ export default class Analysis {
       });
 
     this.dependencies = new ASTDeps();
-    this.handledEncodedLiteralValues = new Map();
+    this.encodedLiterals = new Map();
     this.warnings = [];
     this.literalScores = [];
   }
 
   addWarning(name, value, location = rootLocation()) {
     const isEncodedLiteral = name === "encoded-literal";
-    if (isEncodedLiteral && this.handledEncodedLiteralValues.has(value)) {
-      const index = this.handledEncodedLiteralValues.get(value);
-      this.warnings[index].location.push(toArrayLocation(location));
+    if (isEncodedLiteral) {
+      if (this.encodedLiterals.size > kMaximumEncodedLiterals) {
+        return;
+      }
 
-      return;
+      if (this.encodedLiterals.has(value)) {
+        const index = this.encodedLiterals.get(value);
+        this.warnings[index].location.push(toArrayLocation(location));
+
+        return;
+      }
     }
 
     this.warnings.push(generateWarning(name, { value, location }));
     if (isEncodedLiteral) {
-      this.handledEncodedLiteralValues.set(value, this.warnings.length - 1);
+      this.encodedLiterals.set(value, this.warnings.length - 1);
     }
   }
 
@@ -119,6 +127,12 @@ export default class Analysis {
     }
     if (stringScore >= 3) {
       this.addWarning("suspicious-literal", stringScore);
+    }
+
+    if (this.encodedLiterals.size > kMaximumEncodedLiterals) {
+      this.addWarning("suspicious-file", null);
+      this.warnings = this.warnings
+        .filter((warning) => warning.kind !== "encoded-literal");
     }
 
     return { idsLengthAvg, stringScore, warnings: this.warnings };

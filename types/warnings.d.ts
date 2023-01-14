@@ -13,6 +13,7 @@ type WarningNameWithValue = "parsing-error"
 | "unsafe-stmt"
 | "short-identifiers"
 | "suspicious-literal"
+| "suspicious-file"
 | "obfuscated-code"
 | "weak-crypto";
 type WarningName = WarningNameWithValue | "unsafe-import";
