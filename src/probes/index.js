@@ -8,7 +8,7 @@ import isRequire from "./isRequire.js";
 import isImportDeclaration from "./isImportDeclaration.js";
 import isMemberExpression from "./isMemberExpression.js";
 import isArrayExpression from "./isArrayExpression.js";
-import isFunctionDeclaration from "./isFunctionDeclaration.js";
+import isFunction from "./isFunction.js";
 import isAssignmentExpression from "./isAssignmentExpression.js";
 import isObjectExpression from "./isObjectExpression.js";
 import isUnaryExpression from "./isUnaryExpression.js";
@@ -29,7 +29,7 @@ const kListOfProbes = [
   isAssignmentExpression,
   isObjectExpression,
   isArrayExpression,
-  isFunctionDeclaration,
+  isFunction,
   isUnaryExpression,
   isWeakCrypto,
   isClassDeclaration,
