@@ -109,6 +109,7 @@ export default class Analysis {
       this.addWarning("obfuscated-code", kind);
     }
 
+    console.log(this.identifiersName);
     const identifiersLengthArr = this.identifiersName
       .filter((value) => value.type !== "property" && typeof value.name === "string")
       .map((value) => value.name.length);

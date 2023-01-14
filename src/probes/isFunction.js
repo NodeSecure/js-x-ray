@@ -1,3 +1,9 @@
+// Import Internal Dependencies
+import { extractNode } from "../utils.js";
+
+// CONSTANTS
+const kIdExtractor = extractNode("Identifier");
+
 /**
  * @description Search for FunctionDeclaration AST Node.
  *
@@ -7,12 +13,17 @@
  */
 function validateNode(node) {
   return [
-    node.type === "FunctionDeclaration"
+    node.type === "FunctionDeclaration" || node.type === "FunctionExpression"
   ];
 }
 
 function main(node, options) {
   const { analysis } = options;
+
+  kIdExtractor(
+    ({ name }) => analysis.identifiersName.push({ name, type: "params" }),
+    node.params
+  );
 
   if (node.id === null || node.id.type !== "Identifier") {
     return;
