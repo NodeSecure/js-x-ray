@@ -26,8 +26,8 @@ export function isObfuscatedCode(analysis) {
   else {
     // TODO: also implement Dictionnary checkup
     const identifiers = analysis.identifiersName
-      .map((value) => value)
-      .filter((value) => typeof value === "string");
+      .map((value) => value?.name ?? null)
+      .filter((name) => typeof name === "string");
 
     const { prefix, oneTimeOccurence } = Patterns.commonHexadecimalPrefix(
       identifiers
