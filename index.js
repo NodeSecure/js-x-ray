@@ -15,7 +15,8 @@ import { warnings } from "./src/warnings.js";
 const kMeriyahDefaultOptions = {
   next: true,
   loc: true,
-  raw: true
+  raw: true,
+  jsx: true
 };
 
 export function runASTAnalysis(str, options = Object.create(null)) {
@@ -97,7 +98,10 @@ function parseScriptExtended(strToAnalyze, isEcmaScriptModule) {
     return body;
   }
   catch (error) {
-    if (error.name === "SyntaxError" && error.description.includes("The import keyword")) {
+    if (error.name === "SyntaxError" && (
+      error.description.includes("The import keyword") ||
+      error.description.includes("The export keyword")
+    )) {
       const { body } = meriyah.parseScript(strToAnalyze, {
         ...kMeriyahDefaultOptions, module: true
       });

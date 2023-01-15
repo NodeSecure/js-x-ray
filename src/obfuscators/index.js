@@ -25,8 +25,12 @@ export function isObfuscatedCode(analysis) {
   }
   else {
     // TODO: also implement Dictionnary checkup
+    const identifiers = analysis.identifiersName
+      .map((value) => value)
+      .filter((value) => typeof value === "string");
+
     const { prefix, oneTimeOccurence } = Patterns.commonHexadecimalPrefix(
-      analysis.identifiersName.map((value) => value.name)
+      identifiers
     );
     const uPrefixNames = new Set(Object.keys(prefix));
 
