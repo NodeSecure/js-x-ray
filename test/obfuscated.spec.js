@@ -46,7 +46,6 @@ test("should detect 'freejsobfuscator' obfuscation", (tape) => {
   const trycatch = readFileSync(new URL("freejsobfuscator.js", FIXTURE_URL), "utf-8");
   const { warnings } = runASTAnalysis(trycatch);
 
-  tape.strictEqual(warnings.length, 3);
   tape.deepEqual(getWarningKind(warnings), [
     "encoded-literal", "encoded-literal", "obfuscated-code"
   ].sort());

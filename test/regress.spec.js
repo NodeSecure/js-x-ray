@@ -14,5 +14,13 @@ const FIXTURE_URL = new URL("fixtures/regress/", import.meta.url);
 test("it should not crash for prop-types", (tape) => {
   const propTypes = readFileSync(new URL("prop-types.min.js", FIXTURE_URL), "utf-8");
   runASTAnalysis(propTypes);
+
+  tape.end();
+});
+
+test("it should not crash for JSX", (tape) => {
+  const propTypes = readFileSync(new URL("jsx.js", FIXTURE_URL), "utf-8");
+  runASTAnalysis(propTypes);
+
   tape.end();
 });
