@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@nodesecure/eslint-config": "^1.6.0",
-    "@slimio/is": "^1.5.1",
+    "@slimio/is": "^2.0.0",
     "@small-tech/esm-tape-runner": "^2.0.0",
     "@small-tech/tap-monkey": "^1.4.0",
     "@types/node": "^18.11.18",
