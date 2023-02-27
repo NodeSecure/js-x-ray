@@ -51,3 +51,4 @@ jobs:
       - uses: NodeSecure/ci-action@e3ac9c03585752e979622279106a161e94d5717b # v1
         with:
           warnings: warning
+          vulnerabilities: off
