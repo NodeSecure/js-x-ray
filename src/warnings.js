@@ -45,6 +45,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.weak_crypto",
     severity: "Information",
     experimental: true
+  },
+  "shady-link": {
+    i18n: "sast_warnings.shady_link",
+    severity: "Warning",
+    experimental: true
   }
 });
 

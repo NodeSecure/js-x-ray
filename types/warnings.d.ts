@@ -15,7 +15,8 @@ type WarningNameWithValue = "parsing-error"
 | "suspicious-literal"
 | "suspicious-file"
 | "obfuscated-code"
-| "weak-crypto";
+| "weak-crypto"
+| "shady-link";
 type WarningName = WarningNameWithValue | "unsafe-import";
 
 type WarningLocation = [[number, number], [number, number]];
