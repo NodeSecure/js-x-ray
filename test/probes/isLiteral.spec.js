@@ -87,7 +87,7 @@ test("should not throw any warnings without hexadecimal value (and should call a
   tape.end();
 });
 
-test("should detect shady link", (tape) => {
+test("should detect shady link when an URL is bit.ly", (tape) => {
   const str = "const foo = 'http://foobar.link'";
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
@@ -95,6 +95,19 @@ test("should detect shady link", (tape) => {
   tape.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
   tape.strictEqual(warning.value, "http://foobar.link");
+
+  tape.end();
+});
+
+
+test("should detect shady link when an URL has a suspicious domain", (tape) => {
+  const str = "const foo = 'http://bit.ly/foo'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+
+  tape.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  tape.strictEqual(warning.value, "http://bit.ly/foo");
 
   tape.end();
 });

@@ -6,6 +6,10 @@ import { Hex } from "@nodesecure/sec-literal";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
+const kShadyLinkRegExps = [
+  /(http[s]?:\/\/bit\.ly.*)$/,
+  /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
+];
 
 /**
  * @description Search for Literal AST Node
@@ -37,11 +41,16 @@ function main(node, options) {
       analysis.addWarning("encoded-literal", node.value, node.loc);
     }
   }
-  else if (/(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/.test(node.value)) {
-    analysis.addWarning("shady-link", node.value, node.loc);
-  }
   // Else we are checking all other string with our suspect method
   else {
+    for (const regex of kShadyLinkRegExps) {
+      if (regex.test(node.value)) {
+        analysis.addWarning("shady-link", node.value, node.loc);
+
+        return;
+      }
+    }
+
     analysis.analyzeLiteral(node);
   }
 }
