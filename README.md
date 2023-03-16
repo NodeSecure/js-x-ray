@@ -101,7 +101,8 @@ type WarningName = "parsing-error"
 | "suspicious-file"
 | "obfuscated-code"
 | "weak-crypto"
-| "unsafe-import";
+| "unsafe-import"
+| "shady-link";
 
 declare const warnings: Record<WarningName, {
   i18n: string;
@@ -137,6 +138,7 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [suspicious-file](./docs/suspicious-file.md) | ✔️ | A suspicious file with more than ten encoded-literal in it |
 | [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
 | [weak-crypto](./docs/weak-crypto.md) | ✔️ | The code probably contains a weak crypto algorithm (md5, sha1...) |
+| [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
 
 ## API
 
