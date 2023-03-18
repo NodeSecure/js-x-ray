@@ -1,11 +1,12 @@
-// Import Third-party dependencies
-import test from "tape";
+// Import Node.js dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isMethodDefinition from "../../src/probes/isMethodDefinition.js";
 
-test("should detect two identifiers (constructor and one method definition)", (tape) => {
+test("should detect two identifiers (constructor and one method definition)", () => {
   const str = `class File {
     constructor() {}
     foo() {}
@@ -14,15 +15,13 @@ test("should detect two identifiers (constructor and one method definition)", (t
   const { analysis } = getSastAnalysis(str, isMethodDefinition)
     .execute(ast.body);
 
-  tape.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(analysis.identifiersName, [
     { name: "constructor", type: "method" },
     { name: "foo", type: "method" }
   ]);
-
-  tape.end();
 });
 
-test("should detect two identifiers (getter and setter)", (tape) => {
+test("should detect two identifiers (getter and setter)", () => {
   const str = `class File {
     get foo() {}
     set bar(value) {}
@@ -31,10 +30,8 @@ test("should detect two identifiers (getter and setter)", (tape) => {
   const { analysis } = getSastAnalysis(str, isMethodDefinition)
     .execute(ast.body);
 
-  tape.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(analysis.identifiersName, [
     { name: "foo", type: "method" },
     { name: "bar", type: "method" }
   ]);
-
-  tape.end();
 });

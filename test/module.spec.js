@@ -1,34 +1,32 @@
-// Import Third-party Dependencies
-import test from "tape";
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { runASTAnalysis } from "../index.js";
 
-test("it should not crash even if module 'false' is provided (import keyword)", (tape) => {
+test("it should not crash even if module 'false' is provided (import keyword)", () => {
   runASTAnalysis("import * as foo from \"foo\";", {
     module: false
   });
-
-  tape.end();
 });
 
-test("it should not crash even if module 'false' is provided (export keyword)", (tape) => {
+test("it should not crash even if module 'false' is provided (export keyword)", () => {
   runASTAnalysis("export const foo = 5;", {
     module: false
   });
-
-  tape.end();
 });
 
-test("it should be capable to extract dependencies name for ECMAScript Modules (ESM)", (tape) => {
+test("it should be capable to extract dependencies name for ECMAScript Modules (ESM)", () => {
   const { dependencies, warnings } = runASTAnalysis(`
     import * as http from "http";
     import fs from "fs";
     import { foo } from "xd";
   `, { module: true });
 
-  tape.strictEqual(warnings.length, 0);
-  tape.deepEqual([...dependencies].sort(), ["http", "fs", "xd"].sort());
-
-  tape.end();
+  assert.strictEqual(warnings.length, 0);
+  assert.deepEqual(
+    [...dependencies].sort(),
+    ["http", "fs", "xd"].sort()
+  );
 });

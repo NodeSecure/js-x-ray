@@ -1,5 +1,6 @@
-// Import Third-party dependencies
-import test from "tape";
+// Import Node.js dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { parseScript, getSastAnalysis } from "../utils/index.js";
@@ -8,7 +9,7 @@ import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
 // CONSTANTS
 const kWarningUnsafeStmt = "unsafe-stmt";
 
-test("should detect eval", (tape) => {
+test("should detect eval", () => {
   const str = "eval(\"this\");";
 
   const ast = parseScript(str);
@@ -16,13 +17,11 @@ test("should detect eval", (tape) => {
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
-  tape.equal(result.kind, kWarningUnsafeStmt);
-  tape.equal(result.value, "eval");
-
-  tape.end();
+  assert.equal(result.kind, kWarningUnsafeStmt);
+  assert.equal(result.value, "eval");
 });
 
-test("should detect Function", (tape) => {
+test("should detect Function", () => {
   const str = "Function(\"return this\")()";
 
   const ast = parseScript(str);
@@ -30,13 +29,11 @@ test("should detect Function", (tape) => {
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
-  tape.equal(result.kind, kWarningUnsafeStmt);
-  tape.equal(result.value, "Function");
-
-  tape.end();
+  assert.equal(result.kind, kWarningUnsafeStmt);
+  assert.equal(result.value, "Function");
 });
 
-test("should not detect Function", (tape) => {
+test("should not detect Function", () => {
   const str = "Function('foo');";
 
   const ast = parseScript(str);
@@ -44,7 +41,5 @@ test("should not detect Function", (tape) => {
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
-  tape.equal(result, undefined);
-
-  tape.end();
+  assert.equal(result, undefined);
 });

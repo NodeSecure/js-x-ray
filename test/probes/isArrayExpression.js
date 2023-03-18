@@ -1,11 +1,12 @@
-// Import Third-party dependencies
-import test from "tape";
+// Import Node.js dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { getSastAnalysis, parseScript, mockedFunction } from "../utils/index.js";
 import isArrayExpression from "../../src/probes/isArrayExpression.js";
 
-test("it should trigger analyzeLiteral method one time", (tape) => {
+test("it should trigger analyzeLiteral method one time", () => {
   const str = "['foo']";
 
   const ast = parseScript(str);
@@ -15,16 +16,14 @@ test("it should trigger analyzeLiteral method one time", (tape) => {
   sastAnalysis.analysis.analyzeLiteral = analyzeLiteralMock.callback.bind(analyzeLiteralMock);
   sastAnalysis.execute(ast.body);
 
-  tape.strictEqual(sastAnalysis.warnings().length, 0);
+  assert.strictEqual(sastAnalysis.warnings().length, 0);
 
-  tape.true(analyzeLiteralMock.haveBeenCalledTimes(1));
+  assert.ok(analyzeLiteralMock.haveBeenCalledTimes(1));
   const literalNode = analyzeLiteralMock.at(0);
-  tape.strictEqual(literalNode.value, "foo");
-
-  tape.end();
+  assert.strictEqual(literalNode.value, "foo");
 });
 
-test("it should trigger analyzeLiteral method two times (ignoring the holey between)", (tape) => {
+test("it should trigger analyzeLiteral method two times (ignoring the holey between)", () => {
   const str = "[5, ,10]";
 
   const ast = parseScript(str);
@@ -34,14 +33,12 @@ test("it should trigger analyzeLiteral method two times (ignoring the holey betw
   sastAnalysis.analysis.analyzeLiteral = analyzeLiteralMock.callback.bind(analyzeLiteralMock);
   sastAnalysis.execute(ast.body);
 
-  tape.true(analyzeLiteralMock.haveBeenCalledTimes(2));
-  tape.strictEqual(analyzeLiteralMock.at(0).value, 5);
-  tape.strictEqual(analyzeLiteralMock.at(2).value, 10);
-
-  tape.end();
+  assert.ok(analyzeLiteralMock.haveBeenCalledTimes(2));
+  assert.strictEqual(analyzeLiteralMock.at(0).value, 5);
+  assert.strictEqual(analyzeLiteralMock.at(2).value, 10);
 });
 
-test("it should trigger analyzeLiteral one time (ignoring non-literal Node)", (tape) => {
+test("it should trigger analyzeLiteral one time (ignoring non-literal Node)", () => {
   const str = "[5, () => void 0]";
 
   const ast = parseScript(str);
@@ -51,8 +48,6 @@ test("it should trigger analyzeLiteral one time (ignoring non-literal Node)", (t
   sastAnalysis.analysis.analyzeLiteral = analyzeLiteralMock.callback.bind(analyzeLiteralMock);
   sastAnalysis.execute(ast.body);
 
-  tape.true(analyzeLiteralMock.haveBeenCalledTimes(1));
-  tape.strictEqual(analyzeLiteralMock.at(0).value, 5);
-
-  tape.end();
+  assert.ok(analyzeLiteralMock.haveBeenCalledTimes(1));
+  assert.strictEqual(analyzeLiteralMock.at(0).value, 5);
 });
