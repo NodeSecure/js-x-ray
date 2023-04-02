@@ -13,8 +13,18 @@ export {
 }
 
 interface RuntimeOptions {
+  /**
+   * @default true
+   */
   module?: boolean;
+  /**
+   * @default false
+   */
   isMinified?: boolean;
+  /**
+   * @default false
+   */
+  removeHTMLComments?: boolean;
 }
 
 interface Report {
@@ -27,7 +37,14 @@ interface Report {
 
 interface RuntimeFileOptions {
   packageName?: string;
+  /**
+   * @default true
+   */
   module?: boolean;
+  /**
+   * @default false
+   */
+  removeHTMLComments?: boolean;
 }
 
 type ReportOnFile = {
