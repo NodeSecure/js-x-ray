@@ -42,3 +42,7 @@ export function extractNode(expectedType) {
     }
   };
 }
+
+export function removeHTMLComment(str) {
+  return str.replace(/<!--[\s\S]*?(?:-->)/g, "");
+}

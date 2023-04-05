@@ -10,6 +10,7 @@ import isMinified from "is-minified-code";
 // Import Internal Dependencies
 import Analysis from "./src/Analysis.js";
 import { warnings } from "./src/warnings.js";
+import * as utils from "./src/utils.js";
 
 // CONSTANTS
 const kMeriyahDefaultOptions = {
@@ -20,13 +21,19 @@ const kMeriyahDefaultOptions = {
 };
 
 export function runASTAnalysis(str, options = Object.create(null)) {
-  const { module = true, isMinified = false } = options;
+  const {
+    module = true,
+    isMinified = false,
+    removeHTMLComments = false
+  } = options;
 
   // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
   // Example: #!/usr/bin/env node
   const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
-  const isEcmaScriptModule = Boolean(module);
-  const body = parseScriptExtended(strToAnalyze, isEcmaScriptModule);
+  const body = parseScriptExtended(strToAnalyze, {
+    isEcmaScriptModule: Boolean(module),
+    removeHTMLComments
+  });
 
   const sastAnalysis = new Analysis();
   sastAnalysis.analyzeSourceString(str);
@@ -57,14 +64,20 @@ export function runASTAnalysis(str, options = Object.create(null)) {
 
 export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   try {
-    const { packageName = null, module = true } = options;
+    const {
+      packageName = null,
+      module = true,
+      removeHTMLComments = false
+    } = options;
+
     const str = await fs.readFile(pathToFile, "utf-8");
     const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
 
     const isMin = filePathString.includes(".min") || isMinified(str);
     const data = runASTAnalysis(str, {
       isMinified: isMin,
-      module: path.extname(filePathString) === ".mjs" ? true : module
+      module: path.extname(filePathString) === ".mjs" ? true : module,
+      removeHTMLComments
     });
     if (packageName !== null) {
       data.dependencies.removeByName(packageName);
@@ -87,13 +100,24 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
   }
 }
 
-function parseScriptExtended(strToAnalyze, isEcmaScriptModule) {
+function parseScriptExtended(strToAnalyze, options = {}) {
+  const { isEcmaScriptModule, removeHTMLComments } = options;
+
+  /**
+   * @see https://github.com/NodeSecure/js-x-ray/issues/109
+   */
+  const cleanedStrToAnalyze = removeHTMLComments ?
+    utils.removeHTMLComment(strToAnalyze) : strToAnalyze;
+
   try {
-    const { body } = meriyah.parseScript(strToAnalyze, {
-      ...kMeriyahDefaultOptions,
-      module: isEcmaScriptModule,
-      globalReturn: !isEcmaScriptModule
-    });
+    const { body } = meriyah.parseScript(
+      cleanedStrToAnalyze,
+      {
+        ...kMeriyahDefaultOptions,
+        module: isEcmaScriptModule,
+        globalReturn: !isEcmaScriptModule
+      }
+    );
 
     return body;
   }
@@ -102,9 +126,13 @@ function parseScriptExtended(strToAnalyze, isEcmaScriptModule) {
       error.description.includes("The import keyword") ||
       error.description.includes("The export keyword")
     )) {
-      const { body } = meriyah.parseScript(strToAnalyze, {
-        ...kMeriyahDefaultOptions, module: true
-      });
+      const { body } = meriyah.parseScript(
+        cleanedStrToAnalyze,
+        {
+          ...kMeriyahDefaultOptions,
+          module: true
+        }
+      );
 
       return body;
     }

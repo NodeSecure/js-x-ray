@@ -147,8 +147,9 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 
 ```ts
 interface RuntimeOptions {
-    module?: boolean;
-    isMinified?: boolean;
+  module?: boolean;
+  isMinified?: boolean;
+  removeHTMLComments?: boolean;
 }
 ```
 
@@ -156,11 +157,11 @@ The method take a first argument which is the code you want to analyse. It will 
 
 ```ts
 interface Report {
-    dependencies: ASTDeps;
-    warnings: Warning[];
-    idsLengthAvg: number;
-    stringScore: number;
-    isOneLineRequire: boolean;
+  dependencies: ASTDeps;
+  warnings: Warning[];
+  idsLengthAvg: number;
+  stringScore: number;
+  isOneLineRequire: boolean;
 }
 ```
 
@@ -171,8 +172,9 @@ interface Report {
 
 ```ts
 interface RuntimeOptions {
-    module?: boolean;
-    isMinified?: boolean;
+  module?: boolean;
+  isMinified?: boolean;
+  removeHTMLComments?: boolean;
 }
 ```
 

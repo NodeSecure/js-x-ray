@@ -24,3 +24,26 @@ test("it should not crash for JSX", (tape) => {
 
   tape.end();
 });
+
+// Regression test for https://github.com/NodeSecure/js-x-ray/issues/109
+test("it should not crash for a JavaScript file containing HTML comments (and removeHTMLComments option enabled)", (tape) => {
+  const htmlComment = readFileSync(new URL("html-comments.js", FIXTURE_URL), "utf-8");
+  runASTAnalysis(htmlComment, {
+    removeHTMLComments: true
+  });
+
+  tape.end();
+});
+
+test("it should crash for a JavaScript file containing HTML comments", (tape) => {
+  const htmlComment = readFileSync(new URL("html-comments.js", FIXTURE_URL), "utf-8");
+  try {
+    runASTAnalysis(htmlComment);
+    tape.fail();
+  }
+  catch {
+    // do nothing
+  }
+
+  tape.end();
+});
