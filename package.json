@@ -11,7 +11,7 @@
     "lint": "eslint src test",
     "prepublishOnly": "pkg-ok",
     "test-only": "cross-env esm-tape-runner 'test/**/*.spec.js' | tap-monkey",
-    "test": "c8 --all --src ./src -r html npm run test-only",
+    "test": "c8 --all --src ./src --reporter=lcov npm run test-only",
     "check": "cross-env npm run lint && npm run test-only"
   },
   "repository": {
