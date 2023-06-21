@@ -117,7 +117,7 @@ We make a call to `i18n` through the package `NodeSecure/i18n` to get the transl
 import * as jsxray from "@nodesecure/js-x-ray";
 import * as i18n from "@nodesecure/i18n";
 
-console.log(i18n.getToken(jsxray.warnings["parsing-error"].i18n));
+console.log(i18n.getTokenSync(jsxray.warnings["parsing-error"].i18n));
 ```
 
 ## Warnings Legends
