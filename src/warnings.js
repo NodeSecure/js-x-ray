@@ -2,8 +2,8 @@
 import * as utils from "./utils.js";
 
 export const warnings = Object.freeze({
-  "ast-error": {
-    i18n: "sast_warnings.ast_error",
+  "parsing-error": {
+    i18n: "sast_warnings.parsing_error",
     severity: "Information"
   },
   "unsafe-import": {
