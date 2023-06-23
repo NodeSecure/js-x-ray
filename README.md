@@ -7,7 +7,7 @@
       <img src="https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/master/package.json&query=$.version&label=Version" alt="npm version">
     </a>
     <a href="https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE">
-      <img src="https://img.shields.io/github/license/Naereen/StrapDown.js.svg?style=for-the-badge" alt="license">
+      <img src="https://img.shields.io/github/license/NodeSecure/js-x-ray.svg?style=for-the-badge" alt="license">
     </a>
     <a href="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray">
       <img src="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge" alt="ossf scorecard">
