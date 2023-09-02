@@ -124,6 +124,14 @@ function walkRequireCallExpression(nodeToWalk) {
         node.callee.name;
 
       switch (fullName) {
+        case "atob": {
+          const [element] = node.arguments;
+          if (element.type === "Literal") {
+            dependencies.add(Buffer.from(element.value, "base64").toString());
+          }
+
+          break;
+        }
         case "Buffer.from": {
           const [element] = node.arguments;
 
