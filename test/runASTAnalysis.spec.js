@@ -1,8 +1,7 @@
 // Import Node.js Dependencies
 import { readFileSync } from "node:fs";
-
-// Import Third-party Dependencies
-import test from "tape";
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { runASTAnalysis } from "../index.js";
@@ -11,7 +10,7 @@ import { getWarningKind } from "./utils/index.js";
 // CONSTANTS
 const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
 
-test("it should return all dependencies required at runtime", (tape) => {
+test("it should return all dependencies required at runtime", () => {
   const { dependencies, warnings } = runASTAnalysis(`
     const http = require("http");
     const net = require("net");
@@ -25,47 +24,57 @@ test("it should return all dependencies required at runtime", (tape) => {
     require(myVar);
   `, { module: false });
 
-  tape.strictEqual(warnings.length, 0);
-  tape.deepEqual([...dependencies],
+  assert.strictEqual(warnings.length, 0);
+  assert.deepEqual([...dependencies],
     ["http", "net", "fs", "assert", "timers", "./aFile.js", "path"]
   );
-  tape.end();
 });
 
-test("it should throw a 'suspicious-literal' warning when given a code with a suspicious string", (tape) => {
-  const suspectString = readFileSync(new URL("suspect-string.js", FIXTURE_URL), "utf-8");
+test("it should throw a 'suspicious-literal' warning when given a code with a suspicious string", () => {
+  const suspectString = readFileSync(
+    new URL("suspect-string.js", FIXTURE_URL),
+    "utf-8"
+  );
   const { warnings, stringScore } = runASTAnalysis(suspectString);
 
-  tape.deepEqual(getWarningKind(warnings), ["suspicious-literal"].sort());
-  tape.strictEqual(stringScore, 8);
-  tape.end();
+  assert.deepEqual(
+    getWarningKind(warnings),
+    ["suspicious-literal"].sort()
+  );
+  assert.strictEqual(stringScore, 8);
 });
 
-test("it should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", (tape) => {
-  const suspectString = readFileSync(new URL("suspiciousFile.js", FIXTURE_URL), "utf-8");
+test("it should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", () => {
+  const suspectString = readFileSync(
+    new URL("suspiciousFile.js", FIXTURE_URL),
+    "utf-8"
+  );
   const { warnings } = runASTAnalysis(suspectString);
 
-  tape.deepEqual(getWarningKind(warnings), ["suspicious-file"].sort());
-  tape.end();
+  assert.deepEqual(
+    getWarningKind(warnings),
+    ["suspicious-file"].sort()
+  );
 });
 
-test("it should combine same encoded-literal as one warning with multiple locations", (tape) => {
+test("it should combine same encoded-literal as one warning with multiple locations", () => {
   const { warnings } = runASTAnalysis(`
     const foo = "18c15e5c5c9dac4d16f9311a92bb8331";
     const bar = "18c15e5c5c9dac4d16f9311a92bb8331";
     const xd = "18c15e5c5c9dac4d16f9311a92bb8331";
   `);
 
-  tape.strictEqual(warnings.length, 1);
-  tape.deepEqual(getWarningKind(warnings), ["encoded-literal"].sort());
+  assert.strictEqual(warnings.length, 1);
+  assert.deepEqual(
+    getWarningKind(warnings),
+    ["encoded-literal"].sort()
+  );
 
   const [encodedLiteral] = warnings;
-  tape.strictEqual(encodedLiteral.location.length, 3);
-
-  tape.end();
+  assert.strictEqual(encodedLiteral.location.length, 3);
 });
 
-test("it should be capable to follow a malicious code with hexa computation and reassignments", (tape) => {
+test("it should be capable to follow a malicious code with hexa computation and reassignments", () => {
   const { warnings, dependencies } = runASTAnalysis(`
     function unhex(r) {
       return Buffer.from(r, "hex").toString();
@@ -78,17 +87,15 @@ test("it should be capable to follow a malicious code with hexa computation and 
     const work = evil(unhex("2e2f746573742f64617461"));
   `);
 
-  tape.deepEqual(getWarningKind(warnings), [
+  assert.deepEqual(getWarningKind(warnings), [
     "encoded-literal",
     "unsafe-import",
     "unsafe-stmt"
   ].sort());
-  tape.deepEqual([...dependencies], ["./test/data"]);
-
-  tape.end();
+  assert.deepEqual([...dependencies], ["./test/data"]);
 });
 
-test("it should throw a 'short-identifiers' warning for a code with only one-character identifiers", (tape) => {
+test("it should throw a 'short-identifiers' warning for a code with only one-character identifiers", () => {
   const { warnings } = runASTAnalysis(`
     var a = 0, b, c, d;
     for (let i = 0; i < 10; i++) {
@@ -98,11 +105,10 @@ test("it should throw a 'short-identifiers' warning for a code with only one-cha
     let x, z;
   `);
 
-  tape.deepEqual(getWarningKind(warnings), ["short-identifiers"].sort());
-  tape.end();
+  assert.deepEqual(getWarningKind(warnings), ["short-identifiers"].sort());
 });
 
-test("it should detect dependency required under a TryStatement", (tape) => {
+test("it should detect dependency required under a TryStatement", () => {
   const { dependencies: deps } = runASTAnalysis(`
     try {
       require("http");
@@ -110,15 +116,15 @@ test("it should detect dependency required under a TryStatement", (tape) => {
     catch {}
   `);
 
-  tape.ok(Reflect.has(deps.dependencies, "http"));
-  tape.ok(deps.dependencies.http.inTry);
-  tape.end();
+  assert.ok(Reflect.has(deps.dependencies, "http"));
+  assert.ok(deps.dependencies.http.inTry);
 });
 
-test("it should return isOneLineRequire true given a single line CJS export", (tape) => {
-  const { dependencies, isOneLineRequire } = runASTAnalysis("module.exports = require('foo');");
+test("it should return isOneLineRequire true given a single line CJS export", () => {
+  const { dependencies, isOneLineRequire } = runASTAnalysis(
+    "module.exports = require('foo');"
+  );
 
-  tape.ok(isOneLineRequire);
-  tape.deepEqual([...dependencies], ["foo"]);
-  tape.end();
+  assert.ok(isOneLineRequire);
+  assert.deepEqual([...dependencies], ["foo"]);
 });

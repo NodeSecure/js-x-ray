@@ -1,46 +1,41 @@
-// Import Third-party dependencies
-import test from "tape";
+// Import Node.js dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isClassDeclaration from "../../src/probes/isClassDeclaration.js";
 
-test("should detect two identifiers (class name and superClass name A.K.A extends)", (tape) => {
+test("should detect two identifiers (class name and superClass name A.K.A extends)", () => {
   const str = "class File extends Blob {}";
   const ast = parseScript(str);
   const { analysis } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  tape.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(analysis.identifiersName, [
     { name: "File", type: "class" },
     { name: "Blob", type: "class" }
   ]);
-
-  tape.end();
 });
 
-test("should detect one identifier because there is no superClass (extension)", (tape) => {
+test("should detect one identifier because there is no superClass (extension)", () => {
   const str = "class File {}";
   const ast = parseScript(str);
   const { analysis } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  tape.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(analysis.identifiersName, [
     { name: "File", type: "class" }
   ]);
-
-  tape.end();
 });
 
-test("should detect one identifier because superClass is not an Identifier but a CallExpression", (tape) => {
+test("should detect one identifier because superClass is not an Identifier but a CallExpression", () => {
   const str = "class File extends (foo()) {}";
   const ast = parseScript(str);
   const { analysis } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  tape.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(analysis.identifiersName, [
     { name: "File", type: "class" }
   ]);
-
-  tape.end();
 });

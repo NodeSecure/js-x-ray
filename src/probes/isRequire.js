@@ -123,7 +123,7 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
       const fullName = node.callee.type === "MemberExpression" ?
         [...getMemberExpressionIdentifier(node.callee)].join(".") :
         node.callee.name;
-      const tracedFullName = tracer.getDataFromIdentifier(fullName)?.name ?? fullName;
+      const tracedFullName = tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
 
       switch (tracedFullName) {
         case "atob": {
@@ -146,6 +146,7 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
           break;
         }
         case "require.resolve": {
+          console.log("require.resolve!");
           if (rootArgument.type === "Literal") {
             dependencies.add(rootArgument.value);
           }

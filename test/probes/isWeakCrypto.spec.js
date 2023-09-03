@@ -1,8 +1,7 @@
 // Import Node.js Dependencies
 import { readFileSync, promises as fs } from "node:fs";
-
-// Import Third-party Dependencies
-import test from "tape";
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { runASTAnalysis } from "../../index.js";
@@ -10,7 +9,7 @@ import { runASTAnalysis } from "../../index.js";
 // Constants
 const FIXTURE_URL = new URL("fixtures/weakCrypto/", import.meta.url);
 
-test("it should report a warning in case of `createHash(<weak-algo>)` usage", async(tape) => {
+test("it should report a warning in case of `createHash(<weak-algo>)` usage", async() => {
   const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
   const fixtureFiles = await fs.readdir(fixturesDir);
 
@@ -19,15 +18,14 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
     const [firstWarning] = outputWarnings;
-    tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(firstWarning.kind, "weak-crypto");
-    tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
-    tape.strictEqual(firstWarning.experimental, true);
+    assert.strictEqual(outputWarnings.length, 1);
+    assert.deepEqual(firstWarning.kind, "weak-crypto");
+    assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
+    assert.ok(firstWarning.experimental);
   }
-  tape.end();
 });
 
-test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async(tape) => {
+test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async() => {
   const fixturesDir = new URL("memberExpression/", FIXTURE_URL);
   const fixtureFiles = await fs.readdir(fixturesDir);
 
@@ -36,26 +34,24 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
     const { warnings: outputWarnings } = runASTAnalysis(fixture);
 
     const [firstWarning] = outputWarnings;
-    tape.strictEqual(outputWarnings.length, 1);
-    tape.deepEqual(firstWarning.kind, "weak-crypto");
-    tape.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
-    tape.strictEqual(firstWarning.experimental, true);
+    assert.strictEqual(outputWarnings.length, 1);
+    assert.deepEqual(firstWarning.kind, "weak-crypto");
+    assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
+    assert.ok(firstWarning.experimental);
   }
-  tape.end();
 });
 
-test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", (tape) => {
+test("it should NOT report a warning in case of `[expression]createHash('sha256')` usage", () => {
   const code = `
     import crypto from 'crypto';
     crypto.createHash('sha256');
   `;
   const { warnings: outputWarnings } = runASTAnalysis(code);
 
-  tape.strictEqual(outputWarnings.length, 0);
-  tape.end();
+  assert.strictEqual(outputWarnings.length, 0);
 });
 
-test("it should NOT report a warning if crypto.createHash is not imported", (tape) => {
+test("it should NOT report a warning if crypto.createHash is not imported", () => {
   const code = `
     const crypto = {
       createHash() {}
@@ -64,6 +60,5 @@ test("it should NOT report a warning if crypto.createHash is not imported", (tap
   `;
   const { warnings: outputWarnings } = runASTAnalysis(code);
 
-  tape.strictEqual(outputWarnings.length, 0);
-  tape.end();
+  assert.strictEqual(outputWarnings.length, 0);
 });
