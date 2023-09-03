@@ -352,3 +352,23 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
   assert.strictEqual(Object.keys(dependencies).length, 1);
   assert.ok("foo" in dependencies);
 });
+
+test("(require CallExpression): it should detect obfuscated atob value", (tape) => {
+  const str = `
+    const myFunc = atob;
+    const ff = myFunc('b3' + 'M=');
+    const dep = require(ff);
+  `;
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isRequire)
+    .execute(ast.body);
+
+  tape.strictEqual(sastAnalysis.warnings().length, 0);
+
+  const dependencies = sastAnalysis.dependencies();
+  tape.strictEqual(Object.keys(dependencies).length, 1);
+  tape.ok("os" in dependencies);
+
+  tape.end();
+});
+

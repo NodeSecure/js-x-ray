@@ -7,7 +7,8 @@ import {
   concatBinaryExpression,
   arrayExpressionToString,
   getMemberExpressionIdentifier,
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 
 function validateNode(node, { tracer }) {
@@ -89,7 +90,7 @@ function main(node, options) {
 
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
-      walkRequireCallExpression(arg)
+      walkRequireCallExpression(arg, tracer)
         .forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
 
       analysis.addWarning("unsafe-import", null, node.loc);
@@ -103,7 +104,7 @@ function main(node, options) {
   }
 }
 
-function walkRequireCallExpression(nodeToWalk) {
+function walkRequireCallExpression(nodeToWalk, tracer) {
   const dependencies = new Set();
 
   walk(nodeToWalk, {
@@ -122,8 +123,19 @@ function walkRequireCallExpression(nodeToWalk) {
       const fullName = node.callee.type === "MemberExpression" ?
         [...getMemberExpressionIdentifier(node.callee)].join(".") :
         node.callee.name;
+      const tracedFullName = tracer.getDataFromIdentifier(fullName)?.name ?? fullName;
 
-      switch (fullName) {
+      switch (tracedFullName) {
+        case "atob": {
+          const nodeArguments = getCallExpressionArguments(node, { tracer });
+          if (nodeArguments !== null) {
+            dependencies.add(
+              Buffer.from(nodeArguments.at(0), "base64").toString()
+            );
+          }
+
+          break;
+        }
         case "Buffer.from": {
           const [element] = node.arguments;
 
