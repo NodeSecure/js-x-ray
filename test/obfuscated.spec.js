@@ -54,7 +54,7 @@ test("should detect 'freejsobfuscator' obfuscation", () => {
   assert.strictEqual(warnings[2].value, "freejsobfuscator");
 });
 
-test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", (tape) => {
+test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", () => {
   const trycatch = readFileSync(
     new URL("obfuscatorio-hexa.js", FIXTURE_URL),
     "utf-8"
