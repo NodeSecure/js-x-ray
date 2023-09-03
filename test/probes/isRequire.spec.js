@@ -344,7 +344,11 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
   const sastAnalysis = getSastAnalysis(str, isRequire)
     .execute(ast.body);
 
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  assert.strictEqual(
+    sastAnalysis.warnings().length,
+    1,
+    "must have one unsafe-import warning"
+  );
   const warning = sastAnalysis.getWarning("unsafe-import");
   assert.strictEqual(warning.kind, "unsafe-import");
 
