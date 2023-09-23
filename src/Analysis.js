@@ -88,7 +88,7 @@ export default class Analysis {
     }
 
     // Searching for morse string like "--.- --.--."
-    if (Utils.stringCharDiversity(str, ["\n"]) >= 3 && Utils.isMorse(str)) {
+    if (Utils.isMorse(str)) {
       this.counter.morseLiteral++;
     }
   }
