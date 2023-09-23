@@ -37,11 +37,6 @@ export function isObfuscatedCode(analysis) {
     if (analysis.counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
       analysis.hasPrefixedIdentifiers = calcAvgPrefixedIdentifiers(analysis, prefix) > 80;
     }
-    // console.log(prefix);
-    // console.log(oneTimeOccurence);
-    // console.log(analysis.hasPrefixedIdentifiers);
-    // console.log(analysis.counter.identifiers);
-    // console.log(analysis.counter.encodedArrayValue);
 
     if (uPrefixNames.size === 1 && freejsobfuscator.verify(analysis, prefix)) {
       encoderName = "freejsobfuscator";
