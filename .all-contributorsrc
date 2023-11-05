@@ -103,6 +103,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "fabnguess",
+      "name": "Kouadio Fabrice Nguessan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72697416?v=4",
+      "profile": "https://github.com/fabnguess",
+      "contributions": [
+        "maintenance"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -111,5 +120,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
