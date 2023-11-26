@@ -25,6 +25,7 @@ interface WarningDefault {
   kind: WarningName;
   file?: string;
   value: string;
+  source: string; 
   location: WarningLocation | WarningLocation[];
   i18n: string;
   severity: "Information" | "Warning" | "Critical";
