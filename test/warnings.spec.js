@@ -14,6 +14,7 @@ test("Given an encoded-literal kind it should generate a warning with deep locat
   assert.deepEqual(result, {
     kind: "encoded-literal",
     value: null,
+    source: "JS-X-Ray",
     location: [
       [[0, 0], [0, 0]]
     ],
@@ -33,6 +34,7 @@ test("Given a weak-crypto kind it should generate a warning with value, simple l
     kind: "weak-crypto",
     value: "md5",
     file: "hello.js",
+    source: "JS-X-Ray",
     location: [
       [0, 0], [0, 0]
     ],

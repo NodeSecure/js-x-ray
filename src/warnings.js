@@ -54,16 +54,16 @@ export const warnings = Object.freeze({
 });
 
 export function generateWarning(kind, options) {
-  const { location, file = null, value = null } = options;
+  const { location, file = null, value = null, source = "JS-X-Ray" } = options;
 
   if (kind === "encoded-literal") {
     return Object.assign(
-      { kind, value, location: [utils.toArrayLocation(location)] },
+      { kind, value, location: [utils.toArrayLocation(location)], source },
       warnings[kind]
     );
   }
 
-  const result = { kind, location: utils.toArrayLocation(location) };
+  const result = { kind, location: utils.toArrayLocation(location), source };
   if (utils.notNullOrUndefined(file)) {
     result.file = file;
   }
