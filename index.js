@@ -122,15 +122,19 @@ function parseScriptExtended(strToAnalyze, options = {}) {
     return body;
   }
   catch (error) {
+    const isIllegalReturn = error.description.includes("Illegal return statement");
+
     if (error.name === "SyntaxError" && (
       error.description.includes("The import keyword") ||
-      error.description.includes("The export keyword")
+      error.description.includes("The export keyword") ||
+      isIllegalReturn
     )) {
       const { body } = meriyah.parseScript(
         cleanedStrToAnalyze,
         {
           ...kMeriyahDefaultOptions,
-          module: true
+          module: true,
+          globalReturn: isIllegalReturn
         }
       );
 
