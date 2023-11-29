@@ -15,7 +15,8 @@ Learn more:
 - [Why Aren’t Regexes a Lingua Franca?](https://davisjam.medium.com/why-arent-regexes-a-lingua-franca-esecfse19-a36348df3a2)
 - [Comparing regex matching algorithms](https://swtch.com/~rsc/regexp/regexp1.html)
 
-> **Note** credit goes to the `safe-regex` package author for the last three resources.
+> [!NOTE]
+> Credit goes to the `safe-regex` package author for the last three resources.
 
 ### Technical implementation
 

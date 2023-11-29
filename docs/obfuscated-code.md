@@ -6,7 +6,9 @@
 
 ## Introduction
 
-An **experimental** warning capable of detecting obfuscation and sometimes the tool used. The scanner is capable to detect:
+An **experimental** warning capable of detecting obfuscation and sometimes the tool used.
+
+JS-X-Ray is capable to detect the following internet tools:
 
 - [freejsobfuscator](http://www.freejsobfuscator.com/)
 - [jjencode](https://utf-8.jp/public/jjencode.html)
@@ -22,7 +24,8 @@ A complete G.Drive document has been written to describe the patterns of obfusca
 
 - [JSXRay - Patterns of obfuscated JavaScript code](https://docs.google.com/document/d/11ZrfW0bDQ-kd7Gr_Ixqyk8p3TGvxckmhFH3Z8dFoPhY/edit?usp=sharing)
 
-> **Note** There is no frozen implementation and this is an early implementation
+> [!CAUTION]
+> This is an early (beta) implementation
 
 ## Example
 
