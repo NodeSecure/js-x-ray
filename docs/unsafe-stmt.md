@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Warning to notify of the usage of `eval()` or `Function()` in the source code. Their use is not recommended and can be used to execute insecure code (for example to retrieve the `globalThis` / `window` object).
+Warning about the usage of <kbd>eval()</kbd> or <kbd>Function()</kdb> in the source code. Their use is not recommended and can be used to execute insecure code (for example to retrieve the **globalThis** / **window** object).
 
 - [MDN - Never use eval()!](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval#never_use_eval!)
 

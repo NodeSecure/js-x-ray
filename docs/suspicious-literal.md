@@ -41,15 +41,21 @@ function stringSuspicionScore(str) {
   }
 
   const includeSpace = str.includes(" ");
-  const includeSpaceAtStart = includeSpace ? str.slice(0, kMaxSafeStringLen).includes(" ") : false;
+  const includeSpaceAtStart = includeSpace ?
+    str.slice(0, kMaxSafeStringLen).includes(" ") :
+    false;
 
   let suspectScore = includeSpaceAtStart ? 0 : 1;
   if (strLen > kMinUnsafeStringLenThreshold) {
-    suspectScore += Math.ceil(strLen / kScoreStringLengthThreshold);
+    suspectScore += Math.ceil(
+      strLen / kScoreStringLengthThreshold
+    );
   }
 
-  return stringCharDiversity(str) >= kMaxSafeStringCharDiversity ? suspectScore + 2 : suspectScore;
+  return stringCharDiversity(str) >= kMaxSafeStringCharDiversity ?
+    suspectScore + 2 : suspectScore;
 }
 ```
 
-> **Note** The warning is generated only if the sum of all scores exceeds **three**.
+> [!IMPORTANT]
+> The warning is generated only if the sum of all scores exceeds **three**.

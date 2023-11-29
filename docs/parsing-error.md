@@ -6,9 +6,10 @@
 
 ## Introduction
 
-Parsing Error is throw when the library [meriyah](https://github.com/meriyah/meriyah) fail to parse the javascript source code into an AST. But it can also happen when the AST analysis fails because we don't manage a case properly.
+<kbd>parsing-error</kbd> warning is throw when the library [meriyah](https://github.com/meriyah/meriyah) **fail to parse** the javascript source code into an AST. But it can also happen when the AST analysis fails because we don't manage a case properly.
 
-> **Note** If you are in the second case, please open an issue [here](https://github.com/NodeSecure/js-x-ray/issues)
+> [!IMPORTANT]
+> If you are in the second case, please open an issue [here](https://github.com/NodeSecure/js-x-ray/issues)
 
 ## Example
 

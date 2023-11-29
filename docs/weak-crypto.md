@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Detect usage of weak crypto algorithm with the Node.js core `Crypto` dependency. Algorithm considered to be weak are:
+Detect usage of **weak crypto** algorithm with the Node.js core `Crypto` dependency. Algorithm considered to be weak are:
 
 - md5
 - md4

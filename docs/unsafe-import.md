@@ -6,9 +6,10 @@
 
 ## Introduction
 
-On JS-X-Ray we intensively track the use of `require` CallExpression and also ESM Import declarations. Knowing the dependencies used is really important for our analysis and that why when the SAST fail to follow an important it will throw an `unsafe-import` warning.
+JS-X-Ray intensively track the use of `require` CallExpression and also ESM Import declarations. Knowing the dependencies used is really important for our analysis and that why when the SAST fail to follow an important it will throw an `unsafe-import` warning.
 
-> **Note** Sometimes we trigger this warning on purpose because we have detected a malicious import
+> [!CAUTION]
+> Sometimes we trigger this warning on purpose because we have detected a malicious import
 
 ### CJS Note
 We analyze and trace several ways to require in Node.js (with CJS):
@@ -19,7 +20,7 @@ We analyze and trace several ways to require in Node.js (with CJS):
 
 ## Example
 
-The code below try to require Node.js core dependency `http`. JS-X-Ray sucessfully detect it and throw an `unsafe-import` warning.
+The code below try to require Node.js core dependency `http`. JS-X-Ray sucessfully detect it and throw an <kbd>unsafe-import</kbd> warning.
 
 ```js
 function unhex(r) {

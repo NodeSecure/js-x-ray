@@ -6,12 +6,12 @@
 
 ## Introduction
 
-The SAST scanner assert all Literals in the tree and search for encoded values. JS-X-Ray currently supports three types of detection:
+JS-X-Ray assert all Literals in the tree and search for **encoded values**. It currently supports `three` types of detection:
 - Hexadecimal sequence: `'\x72\x4b\x58\x6e\x75\x65\x38\x3d'`
 - Unicode sequence: `\u03B1`
 - Base64 encryption: `z0PgB0O=`
 
-Hexadecimal and Unicode sequence are tested directly on the raw Literal provided by meriyah. For base64 detection we use the npm package [is-base64](https://github.com/miguelmota/is-base64).
+Hexadecimal and Unicode sequence are tested directly on the **raw Literal** provided by meriyah. For base64 detection we use the npm package [is-base64](https://github.com/miguelmota/is-base64).
 
 Example of a JavaScript implementation:
 ```js

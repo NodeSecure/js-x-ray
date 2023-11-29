@@ -5,9 +5,10 @@
 
 ## Introduction
 
-Identify when a Literal (string) contains an URL to a domain with a suspicious extension.
+Identify when a Literal (string) contains an URL to a domain with a **suspicious extension**.
 
-> **Note** credit goes to the [guarddog](https://github.dev/DataDog/guarddog) team.
+> [!IMPORTANT]
+> Credit goes to the [guarddog](https://github.dev/DataDog/guarddog) team.
 
 ## Example
 

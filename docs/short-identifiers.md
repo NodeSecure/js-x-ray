@@ -6,8 +6,10 @@
 
 ## Introduction
 
-The SAST store in memory all Identifiers id so we are able later to sum the length of all ids. We are looking at several ESTree Node in the tree:
+JS-X-Ray store in memory all Identifiers so we are able later to sum the length of all of them. We are looking at several ESTree Node in the tree:
 - VariableDeclarator: `var boo;`
+- ClassDeclaration: `class boo {}`
+- MethodDefinition
 - AssignmentExpression: `(boo = 5)`
 - FunctionDeclaration: `function boo() {}`
 - Property of ObjectExpression: `{ boo: 5 }`
