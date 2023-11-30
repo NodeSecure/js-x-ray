@@ -20,11 +20,9 @@
     </a>
 </p>
 
-JavaScript AST analysis. This package has been created to export the [Node-Secure](https://github.com/ES-Community/nsecure) AST Analysis to enable better code evolution and allow better access to developers and researchers.
+JavaScript AST analysis. This package has been created to export the [NodeSecure](https://github.com/NodeSecure/cli) AST Analysis to enable better code evolution and allow better access to developers and researchers.
 
 The goal is to quickly identify dangerous code and patterns for developers and Security researchers. Interpreting the results of this tool will still require you to have a set of security notions.
-
-> **Note** I have no particular background in security. I'm simply becoming more and more interested and passionate about static code analysis. But I would be more than happy to learn that my work can help prevent potential future attacks (or leaks).
 
 ## Goals
 The objective of the project is to successfully detect all potentially suspicious JavaScript codes.. The target is obviously codes that are added or injected for malicious purposes..
@@ -85,7 +83,8 @@ console.log(warnings);
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
-> **Warning** There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
+> [!NOTE]
+> There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
 
 ## Warnings
 
@@ -121,8 +120,6 @@ console.log(i18n.getTokenSync(jsxray.warnings["parsing-error"].i18n));
 ```
 
 ## Warnings Legends
-
-> **Warning** versions of NodeSecure greather than v0.7.0 are no longer compatible with the warnings table below.
 
 This section describe all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
 
