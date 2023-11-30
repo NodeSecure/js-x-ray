@@ -1,0 +1,29 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - workspaces/sec-literal/**
+  pull_request:
+    paths:
+      - workspaces/sec-literal/**
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm run test
