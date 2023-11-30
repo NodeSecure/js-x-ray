@@ -194,6 +194,21 @@ export type ReportOnFile = {
 
 </details>
 
+## Workspaces
+
+Click on one of the links to access the documentation of the workspace:
+
+| name | package and link |
+| --- | --- |
+| estree-ast-util | [@nodesecure/estree-ast-util](./workspaces/estree-ast-util) |
+| sec-literal | [@nodesecure/sec-literal ](./workspaces/sec-literal) |
+
+These packages are available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
+```bash
+$ npm i @nodesecure/estree-ast-util
+# or
+$ yarn add @nodesecure/estree-ast-util
+```
 
 ## Contributors ✨
 

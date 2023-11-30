@@ -1,0 +1,35 @@
+{
+  "name": "@nodesecure/estree-ast-utils",
+  "version": "1.4.1",
+  "description": "Utilities for AST (ESTree compliant)",
+  "type": "module",
+  "exports": "./src/index.js",
+  "scripts": {
+    "lint": "eslint src test",
+    "prepublishOnly": "pkg-ok",
+    "test": "cross-env esm-tape-runner 'test/**/*.spec.js' | tap-monkey",
+    "check": "cross-env npm run lint && npm run test",
+    "coverage": "c8 -r html npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NodeSecure/estree-ast-utils.git"
+  },
+  "keywords": [
+    "estree",
+    "ast",
+    "utils"
+  ],
+  "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NodeSecure/estree-ast-utils/issues"
+  },
+  "homepage": "https://github.com/NodeSecure/estree-ast-utils#readme",
+  "devDependencies": {
+    "estree-walker": "^3.0.2"
+  },
+  "dependencies": {
+    "@nodesecure/sec-literal": "^1.1.0"
+  }
+}
