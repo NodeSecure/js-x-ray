@@ -146,7 +146,6 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
           break;
         }
         case "require.resolve": {
-          console.log("require.resolve!");
           if (rootArgument.type === "Literal") {
             dependencies.add(rootArgument.value);
           }
