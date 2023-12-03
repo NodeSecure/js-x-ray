@@ -21,15 +21,16 @@ type WarningName = WarningNameWithValue | "unsafe-import";
 
 type WarningLocation = [[number, number], [number, number]];
 
-interface WarningDefault {
-  kind: WarningName;
+interface WarningDefault<T = WarningName> {
+  kind: T;
   file?: string;
   value: string;
-  source: string; 
-  location: WarningLocation | WarningLocation[];
+  source: string;
+  location: null | WarningLocation | WarningLocation[];
   i18n: string;
   severity: "Information" | "Warning" | "Critical";
   experimental?: boolean;
 }
 
-type Warning<T extends WarningDefault = WarningDefault> = T extends { kind: WarningNameWithValue } ? T : Omit<T, "value">;
+type Warning<T extends WarningDefault = WarningDefault> =
+  T extends { kind: WarningNameWithValue } ? T : Omit<T, "value">;
