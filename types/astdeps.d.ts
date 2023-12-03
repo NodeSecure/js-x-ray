@@ -26,6 +26,7 @@ declare class ASTDeps {
   removeByName(name: string): void;
   add(depName: string): void;
   getDependenciesInTryStatement(): IterableIterator<string>;
+  [Symbol.iterator]: IterableIterator<string>;
 
   public isInTryStmt: boolean;
   public dependencies: Record<string, Dependency>;
