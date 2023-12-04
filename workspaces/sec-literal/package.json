@@ -33,7 +33,7 @@
   "dependencies": {
     "frequency-set": "^1.0.2",
     "is-base64": "^1.1.0",
-    "is-svg": "^4.3.2",
+    "is-svg": "^5.0.0",
     "string-width": "^5.1.2"
   }
 }
