@@ -1,11 +1,11 @@
 # estree-ast-utils
 
-[![version](https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/main/package.json&query=$.version&label=Version)](https://www.npmjs.com/package/@NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils)
+[![version](https://img.shields.io/github/package-json/v/NodeSecure/js-x-ray?filename=workspaces%2Festree-ast-utils%2Fpackage.json&style=for-the-badge)](https://www.npmjs.com/package/@nodesecure/estree-ast-utils)
 [![maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/graphs/commit-activity)
 [![OpenSSF
-Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils)
-[![mit](https://img.shields.io/github/license/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/blob/main/LICENSE)
-[![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/node.js.yml?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/actions?query=workflow%3A%22Node.js+CI%22)
+Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
+[![mit](https://img.shields.io/github/license/NodeSecure/js-x-ray?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/estree-ast-utils/LICENSE)
+[![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/estree-ast-utils.yml?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22estree+ast+utils+CI%22)
 
 Utilities for AST (ESTree compliant)
 

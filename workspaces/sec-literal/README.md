@@ -1,10 +1,10 @@
 # Sec-literal
-![version](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/master/package.json&query=$.version&label=Version)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/commit-activity)
+[![version](https://img.shields.io/github/package-json/v/NodeSecure/js-x-ray?filename=workspaces%2Fsec-literal%2Fpackage.json&style=for-the-badge)](https://www.npmjs.com/package/@nodesecure/sec-literal)
+[![maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/graphs/commit-activity)
 [![OpenSSF
-Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal)
-[![mit](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/blob/master/LICENSE)
-![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/node.js.yml)
+Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
+[![mit](https://img.shields.io/github/license/NodeSecure/js-x-ray?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/LICENSE)
+[![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/sec-literal.yml?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22sec+literal+CI%22)
 
 This package is a security utilities library created to analyze [ESTree Literal](https://github.com/estree/estree/blob/master/es5.md#literal) and JavaScript string primitive. This project was originally created to simplify and better test the functionalities required for the SAST Scanner [JS-X-Ray](https://github.com/fraxken/js-x-ray).
 
