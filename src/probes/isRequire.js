@@ -38,7 +38,7 @@ function main(node, options) {
     // const foo = "http"; require(foo);
     case "Identifier":
       if (analysis.tracer.literalIdentifiers.has(arg.name)) {
-        analysis.dependencies.add(
+        analysis.addDependency(
           analysis.tracer.literalIdentifiers.get(arg.name),
           node.loc
         );
@@ -50,7 +50,7 @@ function main(node, options) {
 
     // require("http")
     case "Literal":
-      analysis.dependencies.add(arg.value, node.loc);
+      analysis.addDependency(arg.value, node.loc);
       break;
 
     // require(["ht", "tp"])
@@ -63,7 +63,7 @@ function main(node, options) {
         analysis.addWarning("unsafe-import", null, node.loc);
       }
       else {
-        analysis.dependencies.add(value, node.loc);
+        analysis.addDependency(value, node.loc);
       }
       break;
     }
@@ -80,7 +80,7 @@ function main(node, options) {
           tracer, stopOnUnsupportedNode: true
         });
 
-        analysis.dependencies.add([...iter].join(""), node.loc);
+        analysis.addDependency([...iter].join(""), node.loc);
       }
       catch {
         analysis.addWarning("unsafe-import", null, node.loc);
@@ -91,7 +91,7 @@ function main(node, options) {
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
       walkRequireCallExpression(arg, tracer)
-        .forEach((depName) => analysis.dependencies.add(depName, node.loc, true));
+        .forEach((depName) => analysis.addDependency(depName, node.loc, true));
 
       analysis.addWarning("unsafe-import", null, node.loc);
 

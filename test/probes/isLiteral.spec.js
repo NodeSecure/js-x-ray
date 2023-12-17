@@ -19,7 +19,7 @@ test("should throw an unsafe-import because the hexadecimal string is equal to t
   const warning = sastAnalysis.getWarning("unsafe-import");
   assert.strictEqual(warning.kind, "unsafe-import");
 
-  assert.ok("http" in sastAnalysis.dependencies());
+  assert.ok(sastAnalysis.dependencies().has("http"));
   assert.ok(analyzeStringMock.haveBeenCalledTimes(1));
   assert.ok(analyzeStringMock.haveBeenCalledWith("http"));
 });

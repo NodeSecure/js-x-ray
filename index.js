@@ -8,7 +8,7 @@ import * as meriyah from "meriyah";
 import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
-import Analysis from "./src/Analysis.js";
+import { SourceFile } from "./src/SourceFile.js";
 import { warnings } from "./src/warnings.js";
 import * as utils from "./src/utils.js";
 
@@ -20,7 +20,10 @@ const kMeriyahDefaultOptions = {
   jsx: true
 };
 
-export function runASTAnalysis(str, options = Object.create(null)) {
+export function runASTAnalysis(
+  str,
+  options = Object.create(null)
+) {
   const {
     module = true,
     isMinified = false,
@@ -35,8 +38,7 @@ export function runASTAnalysis(str, options = Object.create(null)) {
     removeHTMLComments
   });
 
-  const sastAnalysis = new Analysis();
-  sastAnalysis.analyzeSourceString(str);
+  const source = new SourceFile(str);
 
   // we walk each AST Nodes, this is a purely synchronous I/O
   walk(body, {
@@ -46,23 +48,24 @@ export function runASTAnalysis(str, options = Object.create(null)) {
         return;
       }
 
-      const action = sastAnalysis.walk(node);
+      const action = source.walk(node);
       if (action === "skip") {
         this.skip();
       }
     }
   });
 
-  const dependencies = sastAnalysis.dependencies;
-  const { idsLengthAvg, stringScore, warnings } = sastAnalysis.getResult(isMinified);
-  const isOneLineRequire = body.length <= 1 && dependencies.size <= 1;
-
   return {
-    dependencies, warnings, idsLengthAvg, stringScore, isOneLineRequire
+    ...source.getResult(isMinified),
+    dependencies: source.dependencies,
+    isOneLineRequire: body.length <= 1 && source.dependencies.size <= 1
   };
 }
 
-export async function runASTAnalysisOnFile(pathToFile, options = {}) {
+export async function runASTAnalysisOnFile(
+  pathToFile,
+  options = {}
+) {
   try {
     const {
       packageName = null,
@@ -80,7 +83,7 @@ export async function runASTAnalysisOnFile(pathToFile, options = {}) {
       removeHTMLComments
     });
     if (packageName !== null) {
-      data.dependencies.removeByName(packageName);
+      data.dependencies.delete(packageName);
     }
 
     return {

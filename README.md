@@ -68,22 +68,19 @@ require(Buffer.from("6673", "hex").toString());
 Then use `js-x-ray` to run an analysis of the JavaScript code:
 ```js
 import { runASTAnalysis } from "@nodesecure/js-x-ray";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
-const str = readFileSync("./file.js", "utf-8");
-const { warnings, dependencies } = runASTAnalysis(str);
+const { warnings, dependencies } = runASTAnalysis(
+  readFileSync("./file.js", "utf-8")
+);
 
-const dependenciesName = [...dependencies];
-const inTryDeps = [...dependencies.getDependenciesInTryStatement()];
-
-console.log(dependenciesName);
-console.log(inTryDeps);
+console.log(dependencies);
 console.dir(warnings, { depth: null });
 ```
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
-> [!NOTE]
+> [!TIP]
 > There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
 
 ## Warnings

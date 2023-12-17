@@ -21,7 +21,7 @@ function main(node, options) {
   if (node.source.value.startsWith("data:text/javascript")) {
     analysis.addWarning("unsafe-import", node.source.value, node.loc);
   }
-  analysis.dependencies.add(node.source.value, node.loc);
+  analysis.addDependency(node.source.value, node.loc);
 }
 
 export default {

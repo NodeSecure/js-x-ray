@@ -34,7 +34,7 @@ function main(node, options) {
     // If the value we are retrieving is the name of a Node.js dependency,
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
     if (kNodeDeps.has(value)) {
-      analysis.dependencies.add(value, node.loc);
+      analysis.addDependency(value, node.loc);
       analysis.addWarning("unsafe-import", null, node.loc);
     }
     else if (value === "require" || !Hex.isSafe(node.value)) {

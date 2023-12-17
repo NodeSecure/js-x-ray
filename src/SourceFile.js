@@ -5,7 +5,6 @@ import { VariableTracer } from "@nodesecure/estree-ast-utils";
 // Import Internal Dependencies
 import { rootLocation, toArrayLocation } from "./utils.js";
 import { generateWarning } from "./warnings.js";
-import ASTDeps from "./ASTDeps.js";
 import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { runOnProbes } from "./probes/index.js";
 
@@ -18,7 +17,8 @@ const kDictionaryStrParts = [
 
 const kMaximumEncodedLiterals = 10;
 
-export default class Analysis {
+export class SourceFile {
+  inTryStatement = false;
   hasDictionaryString = false;
   hasPrefixedIdentifiers = false;
   varkinds = { var: 0, let: 0, const: 0 };
@@ -34,17 +34,35 @@ export default class Analysis {
   };
   identifiersName = [];
 
-  constructor() {
+  constructor(sourceCodeString) {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
       .trace("crypto.createHash", {
         followConsecutiveAssignment: true, moduleName: "crypto"
       });
 
-    this.dependencies = new ASTDeps();
+    this.dependencies = new Map();
     this.encodedLiterals = new Map();
     this.warnings = [];
     this.literalScores = [];
+
+    if (hasTrojanSource(sourceCodeString)) {
+      this.addWarning("obfuscated-code", "trojan-source");
+    }
+  }
+
+  addDependency(name, location = null, unsafe = false) {
+    if (typeof name !== "string" || name.trim() === "") {
+      return;
+    }
+
+    const dependencyName = name.charAt(name.length - 1) === "/" ?
+      name.slice(0, -1) : name;
+    this.dependencies.set(dependencyName, {
+      unsafe,
+      inTry: this.inTryStatement,
+      ...(location === null ? {} : { location })
+    });
   }
 
   addWarning(name, value, location = rootLocation()) {
@@ -65,12 +83,6 @@ export default class Analysis {
     this.warnings.push(generateWarning(name, { value, location }));
     if (isEncodedLiteral) {
       this.encodedLiterals.set(value, this.warnings.length - 1);
-    }
-  }
-
-  analyzeSourceString(sourceString) {
-    if (hasTrojanSource(sourceString)) {
-      this.addWarning("obfuscated-code", "trojan-source");
     }
   }
 
@@ -143,10 +155,10 @@ export default class Analysis {
 
     // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
     if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
-      this.dependencies.isInTryStmt = true;
+      this.inTryStatement = true;
     }
     else if (node.type === "CatchClause") {
-      this.dependencies.isInTryStmt = false;
+      this.inTryStatement = false;
     }
 
     return runOnProbes(node, this);
