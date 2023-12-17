@@ -80,6 +80,27 @@ console.log(dependenciesName);
 console.log(inTryDeps);
 console.log(warnings);
 ```
+---
+
+If you meant to run this example with Node.js quickly in terminal, use this example below to correctly display the ``location`` field.
+```js
+import { runASTAnalysis } from "@nodesecure/js-x-ray";
+import { readFileSync } from "fs";
+
+const str = readFileSync("./file.js", "utf-8");
+const { warnings, dependencies } = runASTAnalysis(str);
+
+const dependenciesName = [...dependencies];
+const inTryDeps = [...dependencies.getDependenciesInTryStatement()];
+
+console.log(dependenciesName);
+console.log(inTryDeps);
+console.log(JSON.stringify(warnings, null, 2));
+```
+save content above to a ``.mjs`` file and run it with this command in your terminal``
+node ./example_filename.mjs``
+
+---
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
