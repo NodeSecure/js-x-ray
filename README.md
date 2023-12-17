@@ -78,7 +78,7 @@ const inTryDeps = [...dependencies.getDependenciesInTryStatement()];
 
 console.log(dependenciesName);
 console.log(inTryDeps);
-console.log(warnings);
+console.dir(warnings, { depth: null });
 ```
 
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
