@@ -4,21 +4,12 @@ import path from "path";
 
 // Import Third-party Dependencies
 import { walk } from "estree-walker";
-import * as meriyah from "meriyah";
 import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
 import { SourceFile } from "./src/SourceFile.js";
+import { SourceParser } from "./src/SourceParser.js";
 import { warnings } from "./src/warnings.js";
-import * as utils from "./src/utils.js";
-
-// CONSTANTS
-const kMeriyahDefaultOptions = {
-  next: true,
-  loc: true,
-  raw: true,
-  jsx: true
-};
 
 export function runASTAnalysis(
   str,
@@ -30,15 +21,12 @@ export function runASTAnalysis(
     removeHTMLComments = false
   } = options;
 
-  // Note: if the file start with a shebang then we remove it because 'parseScript' may fail to parse it.
-  // Example: #!/usr/bin/env node
-  const strToAnalyze = str.charAt(0) === "#" ? str.slice(str.indexOf("\n")) : str;
-  const body = parseScriptExtended(strToAnalyze, {
-    isEcmaScriptModule: Boolean(module),
-    removeHTMLComments
+  const parser = new SourceParser(str, { removeHTMLComments });
+  const body = parser.parseScript({
+    isEcmaScriptModule: Boolean(module)
   });
 
-  const source = new SourceFile(str);
+  const source = new SourceFile(parser.raw);
 
   // we walk each AST Nodes, this is a purely synchronous I/O
   walk(body, {
@@ -100,51 +88,6 @@ export async function runASTAnalysisOnFile(
         { kind: "parsing-error", value: error.message, location: [[0, 0], [0, 0]] }
       ]
     };
-  }
-}
-
-function parseScriptExtended(strToAnalyze, options = {}) {
-  const { isEcmaScriptModule, removeHTMLComments } = options;
-
-  /**
-   * @see https://github.com/NodeSecure/js-x-ray/issues/109
-   */
-  const cleanedStrToAnalyze = removeHTMLComments ?
-    utils.removeHTMLComment(strToAnalyze) : strToAnalyze;
-
-  try {
-    const { body } = meriyah.parseScript(
-      cleanedStrToAnalyze,
-      {
-        ...kMeriyahDefaultOptions,
-        module: isEcmaScriptModule,
-        globalReturn: !isEcmaScriptModule
-      }
-    );
-
-    return body;
-  }
-  catch (error) {
-    const isIllegalReturn = error.description.includes("Illegal return statement");
-
-    if (error.name === "SyntaxError" && (
-      error.description.includes("The import keyword") ||
-      error.description.includes("The export keyword") ||
-      isIllegalReturn
-    )) {
-      const { body } = meriyah.parseScript(
-        cleanedStrToAnalyze,
-        {
-          ...kMeriyahDefaultOptions,
-          module: true,
-          globalReturn: isIllegalReturn
-        }
-      );
-
-      return body;
-    }
-
-    throw error;
   }
 }
 
