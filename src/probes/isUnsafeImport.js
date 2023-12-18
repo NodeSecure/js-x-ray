@@ -15,7 +15,7 @@ function main(node, options) {
 
   analysis.addWarning("unsafe-import", calleeName, node.loc);
 
-  return Symbol.for("skipWalk");
+  return Symbol.for("breakWalk");
 }
 
 export default {

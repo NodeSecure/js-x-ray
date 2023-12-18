@@ -19,12 +19,13 @@ export function isUnsafeCallee(node) {
 }
 
 export function isUnsafeConstEvalRequireImport(node) {
-  const isUnsafe = (node.type === "VariableDeclaration" &&
-    node.kind === "const" &&
+  const isUnsafe = (node.declarations &&
     node.declarations[0].init &&
     node.declarations[0].init.callee &&
     node.declarations[0].init.callee.callee &&
+    node.declarations[0].init.callee.callee.type === "Identifier" &&
     node.declarations[0].init.callee.callee.name === "eval" &&
+    node.declarations[0].init.callee.arguments[0].type === "Literal" &&
     node.declarations[0].init.callee.arguments[0].value === "require");
 
   return [

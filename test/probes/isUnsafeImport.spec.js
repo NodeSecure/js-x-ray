@@ -5,9 +5,11 @@ import assert from "node:assert";
 // Import Internal Dependencies
 import { parseScript, getSastAnalysis } from "../utils/index.js";
 import isUnsafeImport from "../../src/probes/isUnsafeImport.js";
+import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
 
 // CONSTANTS
 const kWarningUnsafeImport = "unsafe-import";
+const kWarningUnsafeStmt = "unsafe-stmt";
 test("should detect unsafe import", () => {
   const str = "const stream = eval('require')('stream');";
 
@@ -18,6 +20,18 @@ test("should detect unsafe import", () => {
   const result = sastAnalysis.getWarning(kWarningUnsafeImport);
   assert.equal(result.kind, kWarningUnsafeImport);
   assert.equal(result.value, "stream");
+});
+
+test("should detect unsafe statement", () => {
+  const str = "const stream = eval('require')('stream');";
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
+  assert.equal(result.kind, kWarningUnsafeStmt);
+  assert.equal(result.value, "eval");
 });
 
 test("should not detect unsafe import", () => {
