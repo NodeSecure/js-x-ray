@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../index.js";
+import { runASTAnalysis } from "../../index.js";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/163
