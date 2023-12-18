@@ -128,3 +128,17 @@ test("it should return isOneLineRequire true given a single line CJS export", ()
   assert.ok(isOneLineRequire);
   assert.deepEqual([...dependencies.keys()], ["foo"]);
 });
+
+test("it should be capable to extract dependencies name for ECMAScript Modules (ESM)", () => {
+  const { dependencies, warnings } = runASTAnalysis(`
+    import * as http from "http";
+    import fs from "fs";
+    import { foo } from "xd";
+  `, { module: true });
+
+  assert.strictEqual(warnings.length, 0);
+  assert.deepEqual(
+    [...dependencies.keys()].sort(),
+    ["http", "fs", "xd"].sort()
+  );
+});
