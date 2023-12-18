@@ -18,6 +18,21 @@ export function isUnsafeCallee(node) {
   ];
 }
 
+export function isUnsafeConstEvalRequireImport(node) {
+  const isUnsafe = (node.type === "VariableDeclaration" &&
+    node.kind === "const" &&
+    node.declarations[0].init &&
+    node.declarations[0].init.callee &&
+    node.declarations[0].init.callee.callee &&
+    node.declarations[0].init.callee.callee.name === "eval" &&
+    node.declarations[0].init.callee.arguments[0].value === "require");
+
+  return [
+    isUnsafe,
+    isUnsafe && node.declarations[0].init.arguments[0].value
+  ];
+}
+
 export function rootLocation() {
   return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
