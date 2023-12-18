@@ -25,7 +25,7 @@ test("it should return all dependencies required at runtime", () => {
   `, { module: false });
 
   assert.strictEqual(warnings.length, 0);
-  assert.deepEqual([...dependencies],
+  assert.deepEqual([...dependencies.keys()],
     ["http", "net", "fs", "assert", "timers", "./aFile.js", "path"]
   );
 });
@@ -92,7 +92,7 @@ test("it should be capable to follow a malicious code with hexa computation and 
     "unsafe-import",
     "unsafe-stmt"
   ].sort());
-  assert.deepEqual([...dependencies], ["./test/data"]);
+  assert.deepEqual([...dependencies.keys()], ["./test/data"]);
 });
 
 test("it should throw a 'short-identifiers' warning for a code with only one-character identifiers", () => {
@@ -109,15 +109,15 @@ test("it should throw a 'short-identifiers' warning for a code with only one-cha
 });
 
 test("it should detect dependency required under a TryStatement", () => {
-  const { dependencies: deps } = runASTAnalysis(`
+  const { dependencies } = runASTAnalysis(`
     try {
       require("http");
     }
     catch {}
   `);
 
-  assert.ok(Reflect.has(deps.dependencies, "http"));
-  assert.ok(deps.dependencies.http.inTry);
+  assert.ok(dependencies.has("http"));
+  assert.ok(dependencies.get("http").inTry);
 });
 
 test("it should return isOneLineRequire true given a single line CJS export", () => {
@@ -126,5 +126,5 @@ test("it should return isOneLineRequire true given a single line CJS export", ()
   );
 
   assert.ok(isOneLineRequire);
-  assert.deepEqual([...dependencies], ["foo"]);
+  assert.deepEqual([...dependencies.keys()], ["foo"]);
 });

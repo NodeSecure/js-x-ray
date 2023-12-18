@@ -12,8 +12,8 @@ test("should detect 1 dependency for an ImportNamespaceSpecifier", () => {
   const { analysis } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis.dependencies;
-  assert.ok("bar" in dependencies);
+  const { dependencies } = analysis;
+  assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency for an ImportDefaultSpecifier", () => {
@@ -22,8 +22,8 @@ test("should detect 1 dependency for an ImportDefaultSpecifier", () => {
   const { analysis } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis.dependencies;
-  assert.ok("bar" in dependencies);
+  const { dependencies } = analysis;
+  assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency for an ImportSpecifier", () => {
@@ -32,8 +32,8 @@ test("should detect 1 dependency for an ImportSpecifier", () => {
   const { analysis } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis.dependencies;
-  assert.ok("bar" in dependencies);
+  const { dependencies } = analysis;
+  assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency with no specificiers", () => {
@@ -42,8 +42,8 @@ test("should detect 1 dependency with no specificiers", () => {
   const { analysis } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis.dependencies;
-  assert.ok("bar" in dependencies);
+  const { dependencies } = analysis;
+  assert.ok(dependencies.has("bar"));
 });
 
 test("should detect an unsafe import using data:text/javascript and throw a unsafe-import warning", () => {

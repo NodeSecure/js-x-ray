@@ -26,7 +26,7 @@ test("it should be capable to extract dependencies name for ECMAScript Modules (
 
   assert.strictEqual(warnings.length, 0);
   assert.deepEqual(
-    [...dependencies].sort(),
+    [...dependencies.keys()].sort(),
     ["http", "fs", "xd"].sort()
   );
 });

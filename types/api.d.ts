@@ -1,4 +1,3 @@
-import { ASTDeps } from "./astdeps.js";
 import { Warning } from "./warnings.js";
 
 export {
@@ -9,7 +8,27 @@ export {
   RuntimeFileOptions,
 
   Report,
-  ReportOnFile
+  ReportOnFile,
+
+  SourceLocation,
+  Dependency
+}
+
+interface SourceLocation {
+  start: {
+    line: number;
+    column: number;
+  };
+  end: {
+    line: number;
+    column: number;
+  }
+}
+
+interface Dependency {
+  unsafe: boolean;
+  inTry: boolean;
+  location?: null | SourceLocation;
 }
 
 interface RuntimeOptions {
@@ -28,7 +47,7 @@ interface RuntimeOptions {
 }
 
 interface Report {
-  dependencies: ASTDeps;
+  dependencies: Map<string, Dependency>;
   warnings: Warning[];
   idsLengthAvg: number;
   stringScore: number;
@@ -50,7 +69,7 @@ interface RuntimeFileOptions {
 type ReportOnFile = {
   ok: true,
   warnings: Warning[];
-  dependencies: ASTDeps;
+  dependencies: Map<string, Dependency>;
   isMinified: boolean;
 } | {
   ok: false,

@@ -17,7 +17,7 @@ test("it should ignore require CallExpression with no (zero) arguments", () => {
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 
   const dependencies = sastAnalysis.dependencies();
-  assert.deepEqual(Object.keys(dependencies).length, 0);
+  assert.deepEqual(dependencies.size, 0);
 });
 
 test("it should execute probe using require.resolve (detected by the VariableTracer)", () => {
@@ -30,7 +30,7 @@ test("it should execute probe using require.resolve (detected by the VariableTra
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.ok("http" in dependencies);
+  assert.ok(dependencies.has("http"));
 });
 
 test("it should execute probe using process.mainModule.require (detected by the VariableTracer)", () => {
@@ -43,7 +43,7 @@ test("it should execute probe using process.mainModule.require (detected by the 
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.ok("http" in dependencies);
+  assert.ok(dependencies.has("http"));
 });
 
 test("it should execute probe on a variable reassignments of require (detected by the VariableTracer)", () => {
@@ -59,8 +59,8 @@ test("it should execute probe on a variable reassignments of require (detected b
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
 
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test("it should execute probe on a variable reassignments of require extended (detected by the VariableTracer)", () => {
@@ -78,9 +78,9 @@ test("it should execute probe on a variable reassignments of require extended (d
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
 
-  assert.strictEqual(Object.keys(dependencies).length, 2);
-  assert.ok("http" in dependencies);
-  assert.ok("fs" in dependencies);
+  assert.strictEqual(dependencies.size, 2);
+  assert.ok(dependencies.has("http"));
+  assert.ok(dependencies.has("fs"));
 });
 
 test("it should catch require with an Identifier argument pointing to the Node.js core http module", () => {
@@ -94,8 +94,8 @@ test("it should catch require with an Identifier argument pointing to the Node.j
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test("it should throw an 'unsafe-import' warning for a require with an unknown Identifier", () => {
@@ -134,8 +134,8 @@ test("it should catch require with a Literal argument having for value the Node.
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test(`it should catch require with an ArrayExpression where all Literals values concatened
@@ -149,8 +149,8 @@ are equal to the Node.js core http module`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test(`it should catch require with an ArrayExpression where all Literals values concatened
@@ -165,8 +165,8 @@ are equal to the Node.js core http module (with charCodes as values)`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("hello" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("hello"));
 });
 
 test(`it should catch require with an ArrayExpression where all Literals values concatened
@@ -183,8 +183,8 @@ are equal to the Node.js core http module (with VariableTracer usage)`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test(`it should throw an 'unsafe-import' warning for using an ArrayExpression as require argument
@@ -212,8 +212,8 @@ are equal to the Node.js core http module`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test(`it should catch require with a BinaryExpression where all level of operands flattened
@@ -230,8 +230,8 @@ are equal to the Node.js core http module (with VariableTracer usage)`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test(`it should throw an 'unsafe-import' warning for using a BinaryExpression
@@ -277,7 +277,7 @@ test("(require CallExpression): it should always throw an 'unsafe-import' warnin
   assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 0);
+  assert.strictEqual(dependencies.size, 0);
 });
 
 test(`(require CallExpression): it should catch a CallExpression containing an hexadecimal value
@@ -298,8 +298,8 @@ and then add the unobfuscated value in the dependency list`, () => {
   assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test("(require CallExpression): it should detect MemberExpression Buffer.from", () => {
@@ -315,8 +315,8 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from", 
   assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("http" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("http"));
 });
 
 test("(require CallExpression): it should detect MemberExpression Buffer.from (with ArrayExpression argument)", () => {
@@ -332,8 +332,8 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from (w
   assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("hello" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("hello"));
 });
 
 test("(require CallExpression): it should detect MemberExpression require.resolve with a Literal value", () => {
@@ -353,8 +353,8 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
   assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("foo" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("foo"));
 });
 
 test("(require CallExpression): it should detect obfuscated atob value", () => {
@@ -370,7 +370,7 @@ test("(require CallExpression): it should detect obfuscated atob value", () => {
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 
   const dependencies = sastAnalysis.dependencies();
-  assert.strictEqual(Object.keys(dependencies).length, 1);
-  assert.ok("os" in dependencies);
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("os"));
 });
 

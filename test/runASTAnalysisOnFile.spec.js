@@ -16,7 +16,7 @@ test("it remove the packageName from the dependencies list", async() => {
 
   assert.ok(result.ok);
   assert.strictEqual(result.warnings.length, 0);
-  assert.deepEqual([...result.dependencies],
+  assert.deepEqual([...result.dependencies.keys()],
     ["open"]
   );
 });

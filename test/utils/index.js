@@ -1,5 +1,5 @@
 import * as meriyah from "meriyah";
-import Analysis from "../../src/Analysis.js";
+import { SourceFile } from "../../src/SourceFile.js";
 import { walk } from "estree-walker";
 
 export function getWarningKind(warnings) {
@@ -50,9 +50,12 @@ function runOnProbes(node, analysis, probe) {
   return null;
 }
 
-export function getSastAnalysis(strSource, probe) {
+export function getSastAnalysis(
+  sourceCodeString,
+  probe
+) {
   return {
-    analysis: new Analysis(),
+    analysis: new SourceFile(sourceCodeString),
     getWarning(warning) {
       return this.analysis.warnings.find(
         (item) => item.kind === warning
@@ -62,11 +65,10 @@ export function getSastAnalysis(strSource, probe) {
       return this.analysis.warnings;
     },
     dependencies() {
-      return this.analysis.dependencies.dependencies;
+      return this.analysis.dependencies;
     },
     execute(body) {
       const self = this;
-      this.analysis.analyzeSourceString(strSource);
 
       walk(body, {
         enter(node) {
