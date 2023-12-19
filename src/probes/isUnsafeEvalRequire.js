@@ -1,5 +1,8 @@
 // Import Internal Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
+import {
+  getCallExpressionArguments,
+  getCallExpressionIdentifier
+} from "@nodesecure/estree-ast-utils";
 
 /**
  * @description Detect unsafe import
@@ -8,14 +11,18 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
  */
 function validateNode(node) {
   const identifier = getCallExpressionIdentifier(node);
+  const argument = getCallExpressionArguments(node);
 
-  const isUnsafe = (identifier &&
+  const isUnsafeEvalRequire = (
+    identifier &&
     identifier === "eval" &&
-    node.arguments.at(0).value === "stream");
+    node.callee.arguments &&
+    node.arguments.at(0).value &&
+    node.callee.arguments.at(0).value === "require");
 
   return [
-    isUnsafe,
-    isUnsafe && node.arguments.at(0).value
+    isUnsafeEvalRequire,
+    isUnsafeEvalRequire && argument[0]
   ];
 }
 
@@ -23,12 +30,10 @@ function main(node, options) {
   const { analysis, data: calleeName } = options;
 
   analysis.addWarning("unsafe-import", calleeName, node.loc);
-
-  return Symbol.for("breakWalk");
 }
 
 export default {
-  name: "isUnsafeImport",
+  name: "isUnsafeEvalRequire",
   validateNode,
   main,
   breakOnMatch: false
