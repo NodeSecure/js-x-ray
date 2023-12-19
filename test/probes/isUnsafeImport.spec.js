@@ -4,7 +4,7 @@ import assert from "node:assert";
 
 // Import Internal Dependencies
 import { parseScript, getSastAnalysis } from "../utils/index.js";
-import isUnsafeImport from "../../src/probes/isUnsafeImport.js";
+import isUnsafeImport from "../../src/probes/isUnsafeEvalRequire.js";
 import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
 
 // CONSTANTS
@@ -20,6 +20,7 @@ test("should detect unsafe import", () => {
   const result = sastAnalysis.getWarning(kWarningUnsafeImport);
   assert.equal(result.kind, kWarningUnsafeImport);
   assert.equal(result.value, "stream");
+  assert.equal(sastAnalysis.analysis.warnings.length, 1);
 });
 
 test("should detect unsafe statement", () => {
@@ -28,10 +29,10 @@ test("should detect unsafe statement", () => {
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
     .execute(ast.body);
-
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
   assert.equal(result.kind, kWarningUnsafeStmt);
   assert.equal(result.value, "eval");
+  assert.equal(sastAnalysis.analysis.warnings.length, 1);
 });
 
 test("should not detect unsafe import", () => {
@@ -43,4 +44,5 @@ test("should not detect unsafe import", () => {
 
   const result = sastAnalysis.getWarning(kWarningUnsafeImport);
   assert.equal(result, undefined);
+  assert.equal(sastAnalysis.analysis.warnings.length, 0);
 });

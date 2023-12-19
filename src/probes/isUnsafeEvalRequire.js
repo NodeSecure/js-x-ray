@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { isUnsafeConstEvalRequireImport } from "../utils.js";
+import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 /**
  * @description Detect unsafe import
@@ -7,7 +7,16 @@ import { isUnsafeConstEvalRequireImport } from "../utils.js";
  * const stream = eval('require')('stream');
  */
 function validateNode(node) {
-  return isUnsafeConstEvalRequireImport(node);
+  const identifier = getCallExpressionIdentifier(node);
+
+  const isUnsafe = (identifier &&
+    identifier === "eval" &&
+    node.arguments.at(0).value === "stream");
+
+  return [
+    isUnsafe,
+    isUnsafe && node.arguments.at(0).value
+  ];
 }
 
 function main(node, options) {
