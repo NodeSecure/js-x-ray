@@ -39,7 +39,7 @@ const kListOfProbes = [
 const kSymBreak = Symbol.for("breakWalk");
 const kSymSkip = Symbol.for("skipWalk");
 
-export function runOnProbes(node, analysis) {
+export function runOnProbes(node, sourceFile) {
   const breakedGroups = new Set();
 
   for (const probe of kListOfProbes) {
@@ -47,9 +47,15 @@ export function runOnProbes(node, analysis) {
       continue;
     }
 
-    const [isMatching, data = null] = probe.validateNode(node, analysis);
-    if (isMatching) {
-      const result = probe.main(node, { analysis, data });
+    const validationFns = Array.isArray(probe.validateNode) ?
+      probe.validateNode : [probe.validateNode];
+    for (const validateNode of validationFns) {
+      const [isMatching, data = null] = validateNode(node, sourceFile);
+      if (!isMatching) {
+        continue;
+      }
+
+      const result = probe.main(node, { analysis: sourceFile, data });
 
       if (result === kSymSkip) {
         return "skip";
