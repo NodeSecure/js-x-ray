@@ -16,7 +16,7 @@ export function getCallExpressionArguments(
 ): string[] | null;
 
 export function getCallExpressionIdentifier(
-  node: any
+  node: any, options?: { tracer?: VariableTracer, resolveCallExpression?: boolean }
 ): string | null;
 
 export function getMemberExpressionIdentifier(
