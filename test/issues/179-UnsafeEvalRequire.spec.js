@@ -21,4 +21,7 @@ test("should detect unsafe-import and unsafe-statement", () => {
   assert.equal(sastAnalysis.warnings.at(1).value, "eval");
   assert.equal(sastAnalysis.warnings.at(1).kind, kWarningUnsafeStatement);
   assert.equal(sastAnalysis.warnings.length, 2);
+  assert.equal(sastAnalysis.dependencies.has("stream"), true);
+  assert.equal(sastAnalysis.dependencies.get("stream").unsafe, true);
+  assert.equal(sastAnalysis.dependencies.size, 1);
 });

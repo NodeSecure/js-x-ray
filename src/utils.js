@@ -13,7 +13,8 @@ export function isUnsafeCallee(node) {
   // For Function we are looking for this: `Function("...")();`
   // A double CallExpression
   return [
-    identifier === "eval" || (identifier === "Function" && node.callee.type === "CallExpression"),
+    (identifier === "eval" && node.callee.type === "Identifier") ||
+    (identifier === "Function" && node.callee.type === "CallExpression"),
     identifier
   ];
 }

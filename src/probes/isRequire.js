@@ -11,31 +11,50 @@ import {
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 
-// Import Internal Dependencies
-import { ProbeSignals } from "../ProbeRunner.js";
-
-function validateNode(node, { tracer }) {
+function validateNode(node, option) {
   const id = getCallExpressionIdentifier(node);
+  const argument = getCallExpressionArguments(node);
+
   if (id === null) {
     return [false];
   }
 
-  const data = tracer.getDataFromIdentifier(id);
+  const data = option.tracer.getDataFromIdentifier(id);
+
+  if (data !== null && data.name === "require") {
+    return [
+      true,
+      data?.identifierOrMemberExpr ?? void 0
+    ];
+  }
+  else if (id === "eval" && argument[0] === "require") {
+    return [
+      true,
+      option?.identifiersName[0].name ?? void 0
+    ];
+  }
 
   return [
-    data !== null && data.name === "require",
-    data?.identifierOrMemberExpr ?? void 0
+    false,
+    null
   ];
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { analysis, data: calleeName } = options;
   const { tracer } = analysis;
 
   if (node.arguments.length === 0) {
     return;
   }
   const arg = node.arguments.at(0);
+  const id = getCallExpressionIdentifier(node);
+
+
+  if (arg.value === "require" && id === "eval") {
+    analysis.addWarning("unsafe-import", calleeName, node.loc);
+    analysis.addDependency(calleeName, node.loc, true);
+  }
 
   switch (arg.type) {
     // const foo = "http"; require(foo);
@@ -51,12 +70,14 @@ function main(node, options) {
       }
       break;
 
-    // require("http")
+      // require("http")
     case "Literal":
-      analysis.addDependency(arg.value, node.loc);
+      if (arg.value !== "require") {
+        analysis.addDependency(arg.value, node.loc);
+      }
       break;
 
-    // require(["ht", "tp"])
+      // require(["ht", "tp"])
     case "ArrayExpression": {
       const value = [...arrayExpressionToString(arg, { tracer })]
         .join("")
@@ -99,7 +120,7 @@ function main(node, options) {
       analysis.addWarning("unsafe-import", null, node.loc);
 
       // We skip walking the tree to avoid anymore warnings...
-      return ProbeSignals.Skip;
+      return Symbol.for("skipWalk");
     }
 
     default:
@@ -163,8 +184,5 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
 
 export default {
   name: "isRequire",
-  validateNode,
-  main,
-  breakOnMatch: true,
-  breakGroup: "import"
+  validateNode, main, breakOnMatch: true, breakGroup: "import"
 };
