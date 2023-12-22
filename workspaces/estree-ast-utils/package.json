@@ -4,6 +4,7 @@
   "description": "Utilities for AST (ESTree compliant)",
   "type": "module",
   "exports": "./src/index.js",
+  "types": "./src/index.d.ts",
   "scripts": {
     "lint": "eslint src test",
     "prepublishOnly": "pkg-ok",
@@ -19,6 +20,9 @@
     "estree",
     "ast",
     "utils"
+  ],
+  "files": [
+    "src"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
