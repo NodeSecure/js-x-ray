@@ -58,7 +58,7 @@ One of the options of the method is `stopOnUnsupportedNode`, if true it will thr
 
 </details>
 
-<details><summary>getCallExpressionIdentifier(node): string | null</summary>
+<details><summary>getCallExpressionIdentifier(node, options): string | null</summary>
 
 Return the identifier name of the CallExpression (or null if there is none).
 
@@ -67,6 +67,17 @@ foobar();
 ```
 
 will return `"foobar"`.
+
+One of the options of the method is `resolveCallExpression` (which is true by default).
+
+Sometimes you don't want to resolve/jump early CallExpression like in the following example:
+```js
+require('./file.js')();
+//     ^ Second     ^ First
+```
+
+With **resolveCallExpression** equal to **false** the function return `null`.
+
 
 </details>
 

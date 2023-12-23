@@ -13,7 +13,7 @@ test("given a JavaScript eval CallExpression then it must return eval", (tape) =
   tape.end();
 });
 
-test("given a JavaScript Function() CallExpression then it must return Function", (tape) => {
+test("given a Function(`...`)() Double CallExpression then it must return the Function literal identifier", (tape) => {
   const [astNode] = codeToAst("Function(\"return this\")();");
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
@@ -21,9 +21,45 @@ test("given a JavaScript Function() CallExpression then it must return Function"
   tape.end();
 });
 
+test(`given a Function("...")() Double CallExpression with resolveCallExpression options disabled
+then it must return null`, (tape) => {
+  const [astNode] = codeToAst("Function(\"return this\")();");
+  const nodeIdentifier = getCallExpressionIdentifier(
+    getExpressionFromStatement(astNode),
+    { resolveCallExpression: false }
+  );
+
+  tape.strictEqual(nodeIdentifier, null);
+  tape.end();
+});
+
 test("given a JavaScript AssignmentExpression then it must return null", (tape) => {
   const [astNode] = codeToAst("foo = 10;");
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
+
+  tape.strictEqual(nodeIdentifier, null);
+  tape.end();
+});
+
+test(`given a require statement immediatly invoked with resolveCallExpression options enabled
+then it must return require literal identifier`, (tape) => {
+  const [astNode] = codeToAst("require('foo')();");
+  const nodeIdentifier = getCallExpressionIdentifier(
+    getExpressionFromStatement(astNode),
+    { resolveCallExpression: true }
+  );
+
+  tape.strictEqual(nodeIdentifier, "require");
+  tape.end();
+});
+
+test(`given a require statement immediatly invoked with resolveCallExpression options disabled
+then it must return null`, (tape) => {
+  const [astNode] = codeToAst("require('foo')();");
+  const nodeIdentifier = getCallExpressionIdentifier(
+    getExpressionFromStatement(astNode),
+    { resolveCallExpression: false }
+  );
 
   tape.strictEqual(nodeIdentifier, null);
   tape.end();
