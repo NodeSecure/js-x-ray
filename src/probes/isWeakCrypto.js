@@ -31,5 +31,7 @@ function main(node, { analysis }) {
 
 export default {
   name: "isWeakCrypto",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

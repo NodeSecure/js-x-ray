@@ -26,5 +26,7 @@ function main(mainNode, options) {
 
 export default {
   name: "isVariableDeclaration",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

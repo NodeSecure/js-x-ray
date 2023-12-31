@@ -25,5 +25,7 @@ function main(node, options) {
 
 export default {
   name: "isObjectExpression",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

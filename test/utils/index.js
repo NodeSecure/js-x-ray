@@ -1,6 +1,10 @@
+// Import Third-party Dependencies
 import * as meriyah from "meriyah";
-import { SourceFile } from "../../src/SourceFile.js";
 import { walk } from "estree-walker";
+
+// Import Internal Dependencies
+import { SourceFile } from "../../src/SourceFile.js";
+import { ProbeRunner } from "../../src/ProbeRunner.js";
 
 export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
@@ -36,20 +40,6 @@ export function parseScript(str) {
   });
 }
 
-function runOnProbes(node, analysis, probe) {
-  const [isMatching, data = null] = probe.validateNode(node, analysis);
-
-  if (isMatching) {
-    const result = probe.main(node, { analysis, data });
-
-    if (result === Symbol.for("skipWalk")) {
-      return "skip";
-    }
-  }
-
-  return null;
-}
-
 export function getSastAnalysis(
   sourceCodeString,
   probe
@@ -68,6 +58,7 @@ export function getSastAnalysis(
       return this.analysis.dependencies;
     },
     execute(body) {
+      const probeRunner = new ProbeRunner(this.analysis, [probe]);
       const self = this;
 
       walk(body, {
@@ -79,7 +70,7 @@ export function getSastAnalysis(
 
           self.analysis.tracer.walk(node);
 
-          const action = runOnProbes(node, self.analysis, probe);
+          const action = probeRunner.walk(node);
           if (action === "skip") {
             this.skip();
           }

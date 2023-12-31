@@ -11,6 +11,9 @@ import {
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 
+// Import Internal Dependencies
+import { ProbeSignals } from "../ProbeRunner.js";
+
 function validateNode(node, { tracer }) {
   const id = getCallExpressionIdentifier(node);
   if (id === null) {
@@ -96,7 +99,7 @@ function main(node, options) {
       analysis.addWarning("unsafe-import", null, node.loc);
 
       // We skip walking the tree to avoid anymore warnings...
-      return Symbol.for("skipWalk");
+      return ProbeSignals.Skip;
     }
 
     default:
@@ -160,5 +163,8 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
 
 export default {
   name: "isRequire",
-  validateNode, main, breakOnMatch: true, breakGroup: "import"
+  validateNode,
+  main,
+  breakOnMatch: true,
+  breakGroup: "import"
 };

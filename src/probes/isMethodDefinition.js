@@ -21,5 +21,7 @@ function main(node, options) {
 
 export default {
   name: "isMethodDefinition",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };
