@@ -11,34 +11,33 @@ import {
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 
-function validateNode(node, option) {
+function validateNodeRequire(node, { tracer }) {
   const id = getCallExpressionIdentifier(node);
-  const argument = getCallExpressionArguments(node);
-
   if (id === null) {
     return [false];
   }
 
-  const data = option.tracer.getDataFromIdentifier(id);
+  const data = tracer.getDataFromIdentifier(id);
 
-  if (data !== null && data.name === "require") {
-    return [
-      true,
-      data?.identifierOrMemberExpr ?? void 0
-    ];
-  }
-  else if (id === "eval" && argument[0] === "require") {
-    return [
-      true,
-      option?.identifiersName[0].name ?? void 0
-    ];
+  return [
+    data !== null && data.name === "require",
+    data?.identifierOrMemberExpr ?? void 0
+  ];
+}
+
+function validateNodeEvalRequire(node, options) {
+  const id = getCallExpressionIdentifier(node);
+  const argument = getCallExpressionArguments(node);
+  if (id === null) {
+    return [false];
   }
 
   return [
-    false,
-    null
+    id === "eval" && argument[0] === "require",
+    options?.identifiersName[0]?.name ?? void 0
   ];
 }
+
 
 function main(node, options) {
   const { analysis, data: calleeName } = options;
@@ -70,14 +69,14 @@ function main(node, options) {
       }
       break;
 
-      // require("http")
+    // require("http")
     case "Literal":
       if (arg.value !== "require") {
         analysis.addDependency(arg.value, node.loc);
       }
       break;
 
-      // require(["ht", "tp"])
+    // require(["ht", "tp"])
     case "ArrayExpression": {
       const value = [...arrayExpressionToString(arg, { tracer })]
         .join("")
@@ -184,5 +183,5 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
 
 export default {
   name: "isRequire",
-  validateNode, main, breakOnMatch: true, breakGroup: "import"
+  validateNode: [validateNodeRequire, validateNodeEvalRequire], main, breakOnMatch: true, breakGroup: "import"
 };
