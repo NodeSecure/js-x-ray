@@ -34,5 +34,7 @@ function main(node, options) {
 
 export default {
   name: "isFunctionDeclaration",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

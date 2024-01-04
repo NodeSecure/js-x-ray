@@ -26,5 +26,8 @@ function main(node, options) {
 
 export default {
   name: "isImportDeclaration",
-  validateNode, main, breakOnMatch: true, breakGroup: "import"
+  validateNode,
+  main,
+  breakOnMatch: true,
+  breakGroup: "import"
 };

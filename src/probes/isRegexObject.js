@@ -43,5 +43,7 @@ function isRegexConstructor(node) {
 
 export default {
   name: "isRegexObject",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

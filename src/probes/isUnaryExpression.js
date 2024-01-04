@@ -22,5 +22,7 @@ function main(node, options) {
 
 export default {
   name: "isUnaryExpression",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

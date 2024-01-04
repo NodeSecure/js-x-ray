@@ -57,5 +57,7 @@ function main(node, options) {
 
 export default {
   name: "isLiteral",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

@@ -6,7 +6,7 @@ import { VariableTracer } from "@nodesecure/estree-ast-utils";
 import { rootLocation, toArrayLocation } from "./utils.js";
 import { generateWarning } from "./warnings.js";
 import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
-import { runOnProbes } from "./probes/index.js";
+import { ProbeRunner } from "./ProbeRunner.js";
 
 // CONSTANTS
 const kDictionaryStrParts = [
@@ -45,6 +45,7 @@ export class SourceFile {
     this.encodedLiterals = new Map();
     this.warnings = [];
     this.literalScores = [];
+    this.probesRunner = new ProbeRunner(this);
 
     if (hasTrojanSource(sourceCodeString)) {
       this.addWarning("obfuscated-code", "trojan-source");
@@ -161,7 +162,7 @@ export class SourceFile {
       this.inTryStatement = false;
     }
 
-    return runOnProbes(node, this);
+    return this.probesRunner.walk(node);
   }
 }
 

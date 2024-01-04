@@ -26,5 +26,7 @@ function main(node, { analysis }) {
 
 export default {
   name: "isArrayExpression",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };
