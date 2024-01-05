@@ -16,10 +16,10 @@ const kWarningUnsafeStatement = "unsafe-stmt";
 test("should detect unsafe-import and unsafe-statement", () => {
   const sastAnalysis = runASTAnalysis(kIncriminedCodeSample);
 
-  assert.equal(sastAnalysis.warnings.at(0).value, "stream");
-  assert.equal(sastAnalysis.warnings.at(0).kind, kWarningUnsafeImport);
-  assert.equal(sastAnalysis.warnings.at(1).value, "eval");
-  assert.equal(sastAnalysis.warnings.at(1).kind, kWarningUnsafeStatement);
+  assert.equal(sastAnalysis.warnings.at(0).value, "eval");
+  assert.equal(sastAnalysis.warnings.at(0).kind, kWarningUnsafeStatement);
+  assert.equal(sastAnalysis.warnings.at(1).value, "stream");
+  assert.equal(sastAnalysis.warnings.at(1).kind, kWarningUnsafeImport);
   assert.equal(sastAnalysis.warnings.length, 2);
   assert.equal(sastAnalysis.dependencies.has("stream"), true);
   assert.equal(sastAnalysis.dependencies.get("stream").unsafe, true);
