@@ -1,5 +1,6 @@
 // Import Internal Dependencies
 import { isUnsafeCallee } from "../utils.js";
+import { ProbeSignals } from "../ProbeRunner.js";
 
 /**
  * @description Detect unsafe statement
@@ -15,9 +16,13 @@ function main(node, options) {
   const { analysis, data: calleeName } = options;
 
   analysis.addWarning("unsafe-stmt", calleeName, node.loc);
+
+  return ProbeSignals.Skip;
 }
 
 export default {
   name: "isUnsafeCallee",
-  validateNode, main, breakOnMatch: false
+  validateNode,
+  main,
+  breakOnMatch: false
 };

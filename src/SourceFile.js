@@ -52,7 +52,7 @@ export class SourceFile {
     }
   }
 
-  addDependency(name, location = null, unsafe = false) {
+  addDependency(name, location = null, unsafe = this.dependencyAutoWarning) {
     if (typeof name !== "string" || name.trim() === "") {
       return;
     }
@@ -64,6 +64,10 @@ export class SourceFile {
       inTry: this.inTryStatement,
       ...(location === null ? {} : { location })
     });
+
+    if (this.dependencyAutoWarning) {
+      this.addWarning("unsafe-import", dependencyName, location);
+    }
   }
 
   addWarning(name, value, location = rootLocation()) {
