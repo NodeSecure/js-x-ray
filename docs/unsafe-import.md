@@ -17,6 +17,7 @@ We analyze and trace several ways to require in Node.js (with CJS):
 - require.main.require
 - require.mainModule.require
 - require.resolve
+- `const XX = eval('require')('XX');` (dangerous import using eval)
 
 ## Example
 
