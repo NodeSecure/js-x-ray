@@ -42,12 +42,12 @@ export class ProbeRunner {
    * @type {Probe[]}
    */
   static Defaults = [
+    isRequire,
     isUnsafeCallee,
     isLiteral,
     isLiteralRegex,
     isRegexObject,
     isVariableDeclaration,
-    isRequire,
     isImportDeclaration,
     isMemberExpression,
     isAssignmentExpression,

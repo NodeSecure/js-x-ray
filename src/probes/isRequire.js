@@ -10,11 +10,9 @@ import {
   getCallExpressionIdentifier,
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
-
-// Import Internal Dependencies
 import { ProbeSignals } from "../ProbeRunner.js";
 
-function validateNode(node, { tracer }) {
+function validateNodeRequire(node, { tracer }) {
   const id = getCallExpressionIdentifier(node);
   if (id === null) {
     return [false];
@@ -24,18 +22,45 @@ function validateNode(node, { tracer }) {
 
   return [
     data !== null && data.name === "require",
-    data?.identifierOrMemberExpr ?? void 0
+    id ?? void 0
   ];
 }
 
+function validateNodeEvalRequire(node) {
+  const id = getCallExpressionIdentifier(node);
+
+  if (id !== "eval") {
+    return [false];
+  }
+  if (node.callee.type !== "CallExpression") {
+    return [false];
+  }
+
+  const args = getCallExpressionArguments(node.callee);
+
+  return [
+    args.length > 0 && args.at(0) === "require",
+    id
+  ];
+}
+
+function teardown({ analysis }) {
+  analysis.dependencyAutoWarning = false;
+}
+
+
 function main(node, options) {
-  const { analysis } = options;
+  const { analysis, data: calleeName } = options;
   const { tracer } = analysis;
 
   if (node.arguments.length === 0) {
     return;
   }
   const arg = node.arguments.at(0);
+
+  if (calleeName === "eval") {
+    analysis.dependencyAutoWarning = true;
+  }
 
   switch (arg.type) {
     // const foo = "http"; require(foo);
@@ -163,7 +188,7 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
 
 export default {
   name: "isRequire",
-  validateNode,
+  validateNode: [validateNodeRequire, validateNodeEvalRequire],
   main,
   breakOnMatch: true,
   breakGroup: "import"

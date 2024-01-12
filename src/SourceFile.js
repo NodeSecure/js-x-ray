@@ -21,6 +21,7 @@ export class SourceFile {
   inTryStatement = false;
   hasDictionaryString = false;
   hasPrefixedIdentifiers = false;
+  dependencyAutoWarning = false;
   varkinds = { var: 0, let: 0, const: 0 };
   idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
   counter = {
@@ -52,7 +53,7 @@ export class SourceFile {
     }
   }
 
-  addDependency(name, location = null, unsafe = false) {
+  addDependency(name, location = null, unsafe = this.dependencyAutoWarning) {
     if (typeof name !== "string" || name.trim() === "") {
       return;
     }
@@ -64,6 +65,10 @@ export class SourceFile {
       inTry: this.inTryStatement,
       ...(location === null ? {} : { location })
     });
+
+    if (this.dependencyAutoWarning) {
+      this.addWarning("unsafe-import", dependencyName, location);
+    }
   }
 
   addWarning(name, value, location = rootLocation()) {

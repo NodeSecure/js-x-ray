@@ -106,3 +106,4 @@ dist
 temp.js
 temp/
 .vscode/
+.idea/
