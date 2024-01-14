@@ -21,8 +21,18 @@ test("should detect eval", () => {
   assert.equal(result.value, "eval");
 });
 
-test("should detect Function", () => {
+test("should not detect warnings for Function with return this", () => {
   const str = "Function(\"return this\")()";
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+    .execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings.length, 0);
+});
+
+test("should detect for unsafe Function statement", () => {
+  const str = "Function(\"anything in here\")()";
 
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)

@@ -131,3 +131,27 @@ test("it should be able to Trace a require Assignment with atob", (tape) => {
 
   tape.end();
 });
+
+test("it should be able to Trace a global assignment using a LogicalExpression", (tape) => {
+  const helpers = createTracer(true);
+  const assignments = helpers.getAssignmentArray();
+
+  helpers.walkOnCode(`
+    var root = freeGlobal || freeSelf || Function('return this')();
+    const foo = root.require;
+    foo("http");
+  `);
+  const foo = helpers.tracer.getDataFromIdentifier("foo");
+  tape.deepEqual(foo, {
+    name: "require",
+    identifierOrMemberExpr: "require",
+    assignmentMemory: ["foo"]
+  });
+  tape.strictEqual(assignments.length, 1);
+
+  const [eventOne] = assignments;
+  tape.strictEqual(eventOne.identifierOrMemberExpr, "require");
+  tape.strictEqual(eventOne.id, "foo");
+
+  tape.end();
+});
