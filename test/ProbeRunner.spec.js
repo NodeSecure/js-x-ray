@@ -14,12 +14,57 @@ describe("ProbeRunner", () => {
       assert.strictEqual(pr.probes, ProbeRunner.Defaults);
     });
 
-    it("should use provided probes", () => {
-      const probes = [{}];
+    it("should use provided probes with validate node as func", () => {
+      const fakeProbe = [
+        {
+          validateNode: (node) => [node.type === "CallExpression"],
+          main: mock.fn(),
+          teardown: mock.fn()
+        }
+      ];
 
-      const pr = new ProbeRunner(null, probes);
+      const pr = new ProbeRunner(null, fakeProbe);
       assert.strictEqual(pr.sourceFile, null);
-      assert.strictEqual(pr.probes, probes);
+      assert.strictEqual(pr.probes, fakeProbe);
+    });
+
+    it("should use provided probe with validate node as Array", () => {
+      const fakeProbe = [
+        {
+          validateNode: [],
+          main: mock.fn(),
+          teardown: mock.fn()
+        }];
+
+      const pr = new ProbeRunner(null, fakeProbe);
+      assert.strictEqual(pr.sourceFile, null);
+      assert.strictEqual(pr.probes, fakeProbe);
+    });
+
+    it("should fail if main not present", () => {
+      const fakeProbe = {
+        validateNode: (node) => [node.type === "CallExpression"],
+        teardown: mock.fn()
+      };
+
+      function instantiateProbeRunner() {
+        return new ProbeRunner(null, [fakeProbe]);
+      }
+
+      assert.throws(instantiateProbeRunner, Error, "Invalid probe");
+    });
+
+    it("should fail if validate not present", () => {
+      const fakeProbe = {
+        main: mock.fn(),
+        teardown: mock.fn()
+      };
+
+      function instantiateProbeRunner() {
+        return new ProbeRunner(null, [fakeProbe]);
+      }
+
+      assert.throws(instantiateProbeRunner, Error, "Invalid probe");
     });
   });
 
