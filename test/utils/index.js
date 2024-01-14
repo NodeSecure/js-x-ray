@@ -10,26 +10,6 @@ export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
 }
 
-export function mockedFunction() {
-  return {
-    called: 0,
-    args: [],
-    at(position) {
-      return this.args[position];
-    },
-    haveBeenCalledTimes(count = 0) {
-      return this.called === count;
-    },
-    haveBeenCalledWith(value) {
-      return this.args.includes(value);
-    },
-    callback(...args) {
-      this.args.push(...args);
-      this.called++;
-    }
-  };
-}
-
 export function parseScript(str) {
   return meriyah.parseScript(str, {
     next: true,

@@ -3,16 +3,15 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { getSastAnalysis, parseScript, mockedFunction } from "../utils/index.js";
+import { getSastAnalysis, parseScript } from "../utils/index.js";
 import isLiteral from "../../src/probes/isLiteral.js";
 
-test("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", () => {
+test("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", (t) => {
   const str = "const foo = '68747470'";
   const ast = parseScript(str);
 
-  const analyzeStringMock = mockedFunction();
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  sastAnalysis.analysis.analyzeString = analyzeStringMock.callback.bind(analyzeStringMock);
+  t.mock.method(sastAnalysis.analysis, "analyzeString");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -20,25 +19,27 @@ test("should throw an unsafe-import because the hexadecimal string is equal to t
   assert.strictEqual(warning.kind, "unsafe-import");
 
   assert.ok(sastAnalysis.dependencies().has("http"));
-  assert.ok(analyzeStringMock.haveBeenCalledTimes(1));
-  assert.ok(analyzeStringMock.haveBeenCalledWith("http"));
+  const calls = sastAnalysis.analysis.analyzeString.mock.calls;
+  assert.strictEqual(calls.length, 1);
+  assert.ok(calls[0].arguments.includes("http"));
 });
 
-test("should throw an encoded-literal warning because the hexadecimal value is equal to 'require'", () => {
+
+test("should throw an encoded-literal warning because the hexadecimal value is equal to 'require'", (t) => {
   const str = "const _t = globalThis['72657175697265']";
   const ast = parseScript(str);
 
-  const analyzeStringMock = mockedFunction();
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  sastAnalysis.analysis.analyzeString = analyzeStringMock.callback.bind(analyzeStringMock);
+  t.mock.method(sastAnalysis.analysis, "analyzeString");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("encoded-literal");
   assert.strictEqual(warning.value, "72657175697265");
 
-  assert.ok(analyzeStringMock.haveBeenCalledTimes(1));
-  assert.ok(analyzeStringMock.haveBeenCalledWith("require"));
+  const calls = sastAnalysis.analysis.analyzeString.mock.calls;
+  assert.strictEqual(calls.length, 1);
+  assert.ok(calls[0].arguments.includes("require"));
 });
 
 test("should not throw an encoded-literal warning because hexadecimal value is safe", () => {
@@ -62,19 +63,19 @@ test("should throw an encoded-literal warning because hexadecimal value is not s
   assert.strictEqual(warning.value, "68656c6c6f20776f726c64");
 });
 
-test("should not throw any warnings without hexadecimal value (and should call analyzeLiteral of Analysis class)", () => {
+test("should not throw any warnings without hexadecimal value (and should call analyzeLiteral of Analysis class)", (t) => {
   const str = "const foo = 'hello world!'";
   const ast = parseScript(str);
 
-  const analyzeLiteralMock = mockedFunction();
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  sastAnalysis.analysis.analyzeLiteral = analyzeLiteralMock.callback.bind(analyzeLiteralMock);
+  t.mock.method(sastAnalysis.analysis, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
-  assert.ok(analyzeLiteralMock.haveBeenCalledTimes(1));
+  const calls = sastAnalysis.analysis.analyzeLiteral.mock.calls;
+  assert.strictEqual(calls.length, 1);
 
-  const astNode = analyzeLiteralMock.args[0];
+  const astNode = calls[0].arguments[0];
   assert.strictEqual(astNode.value, "hello world!");
 });
 
