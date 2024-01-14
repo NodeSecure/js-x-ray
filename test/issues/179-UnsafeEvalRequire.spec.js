@@ -9,7 +9,7 @@ import { runASTAnalysis } from "../../index.js";
  * @see https://github.com/NodeSecure/js-x-ray/issues/179
  */
 // CONSTANTS
-const kIncriminedCodeSample = `const stream = eval('require')('stream');`;
+const kIncriminedCodeSample = "const stream = eval('require')('stream');";
 const kWarningUnsafeImport = "unsafe-import";
 const kWarningUnsafeStatement = "unsafe-stmt";
 

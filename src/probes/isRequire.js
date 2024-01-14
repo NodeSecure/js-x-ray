@@ -13,7 +13,9 @@ import {
 import { ProbeSignals } from "../ProbeRunner.js";
 
 function validateNodeRequire(node, { tracer }) {
-  const id = getCallExpressionIdentifier(node);
+  const id = getCallExpressionIdentifier(node, {
+    resolveCallExpression: false
+  });
   if (id === null) {
     return [false];
   }
