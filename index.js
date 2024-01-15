@@ -10,6 +10,7 @@ import isMinified from "is-minified-code";
 import { SourceFile } from "./src/SourceFile.js";
 import { SourceParser } from "./src/SourceParser.js";
 import { warnings } from "./src/warnings.js";
+import { isLogicalExpressionExport } from "./src/utils.js";
 
 export function runASTAnalysis(
   str,
@@ -46,7 +47,7 @@ export function runASTAnalysis(
   return {
     ...source.getResult(isMinified),
     dependencies: source.dependencies,
-    isOneLineRequire: body.length <= 1 && source.dependencies.size <= 1
+    isOneLineRequire: (body.length <= 1 && source.dependencies.size <= 1) || isLogicalExpressionExport(body)
   };
 }
 

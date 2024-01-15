@@ -33,6 +33,22 @@ export function isUnsafeCallee(node) {
   return [false, null];
 }
 
+export function isLogicalExpressionExport(body) {
+  if (body.length > 1) {
+    return false;
+  }
+
+  if (body[0].type !== "ExpressionStatement") {
+    return false;
+  }
+
+  if (body[0].expression.type !== "AssignmentExpression") {
+    return false;
+  }
+
+  return body[0].expression.right.type === "LogicalExpression";
+}
+
 export function rootLocation() {
   return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
