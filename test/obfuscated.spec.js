@@ -36,6 +36,13 @@ test("should not detect 'morse' obfuscation", () => {
   assert.strictEqual(warnings.length, 0);
 });
 
+test("should not detect 'morse' obfuscation for high number of doubles morse symbols", () => {
+  const morseSymbolDoublesString = `const a = ${"'.' + '..' +".repeat(37)} '.'`;
+  const { warnings } = runASTAnalysis(morseSymbolDoublesString);
+
+  assert.strictEqual(warnings.length, 0);
+});
+
 test("should detect 'jjencode' obfuscation", () => {
   const trycatch = readFileSync(
     new URL("jjencode.js", FIXTURE_URL),
