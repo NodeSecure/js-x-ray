@@ -1,6 +1,7 @@
 // Import Third-party Dependencies
 import {
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  getMemberExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 
 export function notNullOrUndefined(value) {
@@ -33,7 +34,7 @@ export function isUnsafeCallee(node) {
   return [false, null];
 }
 
-export function isLogicalExpressionExport(body) {
+export function isOneLineExpressionExport(body) {
   if (body.length > 1) {
     return false;
   }
@@ -46,7 +47,36 @@ export function isLogicalExpressionExport(body) {
     return false;
   }
 
-  return body[0].expression.right.type === "LogicalExpression";
+  return exportAssignmentHasRequireLeaves(body[0].expression.right);
+}
+
+export function exportAssignmentHasRequireLeaves(expr) {
+  if (expr.type === "LogicalExpression") {
+    return exportAssignmentHasRequireLeaves(expr.left) && exportAssignmentHasRequireLeaves(expr.right);
+  }
+
+  if (expr.type === "ConditionalExpression") {
+    return exportAssignmentHasRequireLeaves(expr.consequent) && exportAssignmentHasRequireLeaves(expr.alternate);
+  }
+
+  if (expr.type === "CallExpression") {
+    return getCallExpressionIdentifier(expr) === "require";
+  }
+
+  if (expr.type === "MemberExpression") {
+    let rootMember = expr.object;
+    while (rootMember.type === "MemberExpression") {
+      rootMember = rootMember.object;
+    }
+
+    if (rootMember.type !== "CallExpression") {
+      return false;
+    }
+
+    return getCallExpressionIdentifier(rootMember) === "require";
+  }
+
+  return false;
 }
 
 export function rootLocation() {
