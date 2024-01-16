@@ -30,9 +30,9 @@ export class SourceFile {
     computedMemberExpr: 0,
     memberExpr: 0,
     deepBinaryExpr: 0,
-    encodedArrayValue: 0,
-    morseLiteral: 0
+    encodedArrayValue: 0
   };
+  morseLiterals = new Set();
   identifiersName = [];
 
   constructor(sourceCodeString) {
@@ -107,7 +107,7 @@ export class SourceFile {
 
     // Searching for morse string like "--.- --.--."
     if (Utils.isMorse(str)) {
-      this.counter.morseLiteral++;
+      this.morseLiterals.add(str);
     }
   }
 

@@ -20,7 +20,7 @@ export function isObfuscatedCode(analysis) {
   else if (jjencode.verify(analysis)) {
     encoderName = "jjencode";
   }
-  else if (analysis.counter.morseLiteral >= 36) {
+  else if (analysis.morseLiterals.size >= 36) {
     encoderName = "morse";
   }
   else {
