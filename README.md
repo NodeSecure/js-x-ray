@@ -207,7 +207,7 @@ $ yarn add @nodesecure/estree-ast-util
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -232,6 +232,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/targos"><img src="https://avatars.githubusercontent.com/u/2352663?v=4?s=100" width="100px;" alt="Michaël Zasso"/><br /><sub><b>Michaël Zasso</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=targos" title="Code">💻</a> <a href="https://github.com/NodeSecure/js-x-ray/issues?q=author%3Atargos" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/fabnguess"><img src="https://avatars.githubusercontent.com/u/72697416?v=4?s=100" width="100px;" alt="Kouadio Fabrice Nguessan"/><br /><sub><b>Kouadio Fabrice Nguessan</b></sub></a><br /><a href="#maintenance-fabnguess" title="Maintenance">🚧</a> <a href="https://github.com/NodeSecure/js-x-ray/commits?author=fabnguess" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jean-michelet"><img src="https://avatars.githubusercontent.com/u/110341611?v=4?s=100" width="100px;" alt="Jean"/><br /><sub><b>Jean</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=jean-michelet" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tchapacan"><img src="https://avatars.githubusercontent.com/u/28821702?v=4?s=100" width="100px;" alt="tchapacan"/><br /><sub><b>tchapacan</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=tchapacan" title="Code">💻</a> <a href="https://github.com/NodeSecure/js-x-ray/commits?author=tchapacan" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
