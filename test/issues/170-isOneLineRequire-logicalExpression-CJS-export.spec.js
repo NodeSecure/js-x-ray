@@ -7,21 +7,30 @@ import { runASTAnalysis } from "../../index.js";
 
 const validTestCases = [
   ["module.exports = require('fs') || require('constants');", ["fs", "constants"]],
-  ["module.exports = foo === foo ? require('fs').constants.foo || require('constants') : require('someModule');",
-    ["fs", "constants", "someModule"]
-  ],
-  ["module.exports = !ok ? require('fs') : require('someModule').constants.foo || require('constants');",
-    ["fs", "someModule", "constants"]
-  ],
-  ["module.exports = !ok ? require('fs') : require('someModule').constants.foo ? require('constants') : require('foo');",
-    ["fs", "someModule", "constants", "foo"]
-  ],
-  // Actually, if dependencies are equal or less than one, leaves that are not require callees are ignored
-  ["module.exports = notRequire('fs') || require('constants');", ["constants"]],
+  ["module.exports = require('constants') ? require('fs') : require('foo');", ["constants", "fs", "foo"]],
+
+  // should have at least one branch has a `require` callee
+  ["module.exports = require('constants') || {};", ["constants"]],
+  ["module.exports = {} || require('constants');", ["constants"]],
+  ["module.exports = require('constants') ? require('fs') : {};", ["constants", "fs"]],
+  ["module.exports = require('constants') ? {} : require('fs');", ["constants", "fs"]],
+
+  // should apply to nested conditions
+  ["module.exports = (require('constants') || {}) || (require('foo') || {});", ["constants", "foo"]],
+  ["module.exports = require('constants') ? (require('fs') || {}) : ({} || require('foo'));", ["constants", "fs", "foo"]],
+  ["module.exports = require('constants') ? ({} || require('fs')) : (require('foo') || {});", ["constants", "fs", "foo"]],
+  ["module.exports = require('constants') ? (require('fs') ? {} : require('bar')) : {};", ["constants", "fs", "bar"]],
+  ["module.exports = require('constants') ? {} : (require('fs') ? {} : require('bar'));", ["constants", "fs", "bar"]],
 
   // test condition that are not `require` callees, here `notRequire('someModule')`, are ignored
-  ["module.exports = !ok ? require('fs') : notRequire('someModule') ? require('constants') : require('foo');",
-    ["fs", "constants", "foo"]
+  ["module.exports = notRequire('someModule') ? require('constants') : require('foo');",
+    ["constants", "foo"]
+  ],
+  ["module.exports = ok ? (notRequire('someModule') ? require('constants') : require('foo')) : {};",
+    ["constants", "foo"]
+  ],
+  ["module.exports = ok ? {} : (notRequire('someModule') ? require('constants') : require('foo'));",
+    ["constants", "foo"]
   ]
 ];
 
@@ -36,15 +45,16 @@ test("it should return isOneLineRequire true given a single line CJS export with
 });
 
 const invalidTestCases = [
-  ["module.exports = foo === foo ? require('fs').constants.foo || notRequire('constants') : require('someModule');",
-    ["fs", "someModule"]
-  ],
-  ["module.exports = !ok ? notRequire('fs') : require('someModule').constants.foo || require('constants');",
-    ["someModule", "constants"]
-  ],
-  ["module.exports = !ok ? require('fs') : require('someModule') ? notRequire('constants') : require('foo');",
-    ["fs", "someModule", "foo"]
-  ]
+  // should have at least one `require` callee
+  ["module.exports = notRequire('foo') || {};", []],
+  ["module.exports = {} || notRequire('foo');", []],
+  ["module.exports = require('constants') ? {} : {};", ["constants"]],
+
+  // same behavior should apply to nested conditions
+  ["module.exports = (notRequire('foo') || {}) || (notRequire('foo') || {});", []],
+  ["module.exports = require('constants') ? (notRequire('foo') || {}) : (notRequire('foo') || {});", ["constants"]],
+  ["module.exports = require('constants') ? (notRequire('foo') || {}) : (notRequire('foo') || {});", ["constants"]],
+  ["module.exports = require('constants') ? (require('constants') ? {} : {}) : (require('constants') ? {} : {});", ["constants"]]
 ];
 
 test("it should return isOneLineRequire false given a single line CJS export with illegal callees", () => {

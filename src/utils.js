@@ -1,7 +1,6 @@
 // Import Third-party Dependencies
 import {
-  getCallExpressionIdentifier,
-  getMemberExpressionIdentifier
+  getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 
 export function notNullOrUndefined(value) {
@@ -47,16 +46,16 @@ export function isOneLineExpressionExport(body) {
     return false;
   }
 
-  return exportAssignmentHasRequireLeaves(body[0].expression.right);
+  return exportAssignmentHasRequireLeave(body[0].expression.right);
 }
 
-export function exportAssignmentHasRequireLeaves(expr) {
+export function exportAssignmentHasRequireLeave(expr) {
   if (expr.type === "LogicalExpression") {
-    return exportAssignmentHasRequireLeaves(expr.left) && exportAssignmentHasRequireLeaves(expr.right);
+    return atLeastOneBranchHasRequireLeave(expr.left, expr.right);
   }
 
   if (expr.type === "ConditionalExpression") {
-    return exportAssignmentHasRequireLeaves(expr.consequent) && exportAssignmentHasRequireLeaves(expr.alternate);
+    return atLeastOneBranchHasRequireLeave(expr.consequent, expr.alternate);
   }
 
   if (expr.type === "CallExpression") {
@@ -77,6 +76,13 @@ export function exportAssignmentHasRequireLeaves(expr) {
   }
 
   return false;
+}
+
+function atLeastOneBranchHasRequireLeave(left, right) {
+  return [
+    exportAssignmentHasRequireLeave(left),
+    exportAssignmentHasRequireLeave(right)
+  ].some((hasRequire) => hasRequire);
 }
 
 export function rootLocation() {

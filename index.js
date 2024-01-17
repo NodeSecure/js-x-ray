@@ -47,7 +47,7 @@ export function runASTAnalysis(
   return {
     ...source.getResult(isMinified),
     dependencies: source.dependencies,
-    isOneLineRequire: source.dependencies.size <= 1 || isOneLineExpressionExport(body)
+    isOneLineRequire: isOneLineExpressionExport(body)
   };
 }
 
