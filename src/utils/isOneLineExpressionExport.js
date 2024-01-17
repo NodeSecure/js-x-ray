@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { exportAssignmentHasRequireLeave } from "./exportAssignmentHasRequireLeave";
+import { exportAssignmentHasRequireLeave } from "./exportAssignmentHasRequireLeave.js";
 
 export function isOneLineExpressionExport(body) {
   if (body.length > 1) {

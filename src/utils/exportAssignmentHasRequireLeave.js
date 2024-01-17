@@ -1,4 +1,4 @@
-/// Import Third-party Dependencies
+// Import Third-party Dependencies
 import {
   getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";

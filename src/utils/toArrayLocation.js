@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { rootLocation } from "./rootLocation.js"
+import { rootLocation } from "./rootLocation.js";
 
 export function toArrayLocation(location = rootLocation()) {
   const { start, end = start } = location;
