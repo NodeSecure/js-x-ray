@@ -19,7 +19,7 @@ const validTestCases = [
   // Actually, if dependencies are equal or less than one, leaves that are not require callees are ignored
   ["module.exports = notRequire('fs') || require('constants');", ["constants"]],
 
-  // tests that are not require callees are ignored
+  // test condition that are not `require` callees, here `notRequire('someModule')`, are ignored
   ["module.exports = !ok ? require('fs') : notRequire('someModule') ? require('constants') : require('foo');",
     ["fs", "constants", "foo"]
   ]
