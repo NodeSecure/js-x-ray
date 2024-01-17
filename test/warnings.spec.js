@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { rootLocation } from "../src/utils.js";
+import { rootLocation } from "../src/utils/index.js";
 import { generateWarning } from "../src/warnings.js";
 
 test("Given an encoded-literal kind it should generate a warning with deep location array", () => {

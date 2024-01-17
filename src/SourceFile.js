@@ -3,7 +3,7 @@ import { Utils, Literal } from "@nodesecure/sec-literal";
 import { VariableTracer } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
-import { rootLocation, toArrayLocation } from "./utils.js";
+import { rootLocation, toArrayLocation } from "./utils/index.js";
 import { generateWarning } from "./warnings.js";
 import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { ProbeRunner } from "./ProbeRunner.js";

@@ -10,7 +10,7 @@ import isMinified from "is-minified-code";
 import { SourceFile } from "./src/SourceFile.js";
 import { SourceParser } from "./src/SourceParser.js";
 import { warnings } from "./src/warnings.js";
-import { isOneLineExpressionExport } from "./src/utils.js";
+import { isOneLineExpressionExport } from "./src/utils/index.js";
 
 export function runASTAnalysis(
   str,
