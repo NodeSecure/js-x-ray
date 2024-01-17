@@ -33,6 +33,58 @@ export function isUnsafeCallee(node) {
   return [false, null];
 }
 
+export function isOneLineExpressionExport(body) {
+  if (body.length > 1) {
+    return false;
+  }
+
+  if (body[0].type !== "ExpressionStatement") {
+    return false;
+  }
+
+  if (body[0].expression.type !== "AssignmentExpression") {
+    return false;
+  }
+
+  return exportAssignmentHasRequireLeave(body[0].expression.right);
+}
+
+export function exportAssignmentHasRequireLeave(expr) {
+  if (expr.type === "LogicalExpression") {
+    return atLeastOneBranchHasRequireLeave(expr.left, expr.right);
+  }
+
+  if (expr.type === "ConditionalExpression") {
+    return atLeastOneBranchHasRequireLeave(expr.consequent, expr.alternate);
+  }
+
+  if (expr.type === "CallExpression") {
+    return getCallExpressionIdentifier(expr) === "require";
+  }
+
+  if (expr.type === "MemberExpression") {
+    let rootMember = expr.object;
+    while (rootMember.type === "MemberExpression") {
+      rootMember = rootMember.object;
+    }
+
+    if (rootMember.type !== "CallExpression") {
+      return false;
+    }
+
+    return getCallExpressionIdentifier(rootMember) === "require";
+  }
+
+  return false;
+}
+
+function atLeastOneBranchHasRequireLeave(left, right) {
+  return [
+    exportAssignmentHasRequireLeave(left),
+    exportAssignmentHasRequireLeave(right)
+  ].some((hasRequire) => hasRequire);
+}
+
 export function rootLocation() {
   return { start: { line: 0, column: 0 }, end: { line: 0, column: 0 } };
 }
