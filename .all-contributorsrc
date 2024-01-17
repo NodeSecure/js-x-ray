@@ -132,6 +132,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "mkarkkainen",
+      "name": "mkarkkainen",
+      "avatar_url": "https://avatars.githubusercontent.com/u/65869801?v=4",
+      "profile": "http://miikkak.dev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
