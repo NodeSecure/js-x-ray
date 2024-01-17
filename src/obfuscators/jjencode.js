@@ -1,5 +1,5 @@
 // Require Internal Dependencies
-import { notNullOrUndefined } from "../utils.js";
+import { notNullOrUndefined } from "../utils/index.js";
 
 // CONSTANTS
 const kJJRegularSymbols = new Set(["$", "_"]);

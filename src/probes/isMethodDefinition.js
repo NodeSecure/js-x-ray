@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { extractNode } from "../utils.js";
+import { extractNode } from "../utils/index.js";
 
 // CONSTANTS
 const kIdExtractor = extractNode("Identifier");

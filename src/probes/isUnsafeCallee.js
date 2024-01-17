@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { isUnsafeCallee } from "../utils.js";
+import { isUnsafeCallee } from "../utils/index.js";
 import { ProbeSignals } from "../ProbeRunner.js";
 
 /**

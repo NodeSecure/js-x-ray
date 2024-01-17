@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import * as utils from "./utils.js";
+import * as utils from "./utils/index.js";
 
 export const warnings = Object.freeze({
   "parsing-error": {
