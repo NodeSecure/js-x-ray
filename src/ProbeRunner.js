@@ -1,3 +1,6 @@
+// Import Native Dependencies
+import assert from "node:assert";
+
 // Import all the probes
 import isUnsafeCallee from "./probes/isUnsafeCallee.js";
 import isLiteral from "./probes/isLiteral.js";
@@ -71,7 +74,17 @@ export class ProbeRunner {
   ) {
     this.sourceFile = sourceFile;
 
-    // TODO: Assert/validate all probes? (Good first issue)
+    for (const probe of probes) {
+      assert(
+        typeof probe.validateNode === "function" || Array.isArray(probe.validateNode),
+        `Invalid probe ${probe.name}: validateNode must be a function or an array of functions`
+      );
+      assert(
+        typeof probe.main === "function",
+        `Invalid probe ${probe.name}: main must be a function`
+      );
+    }
+
     this.probes = probes;
   }
 
