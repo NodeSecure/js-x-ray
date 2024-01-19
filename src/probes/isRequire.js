@@ -11,6 +11,7 @@ import {
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 import { ProbeSignals } from "../ProbeRunner.js";
+import path from "path";
 
 function validateNodeRequire(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, {
@@ -120,10 +121,12 @@ function main(node, options) {
 
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
-      walkRequireCallExpression(arg, tracer)
-        .forEach((depName) => analysis.addDependency(depName, node.loc, true));
+      const { dependencies, triggerWarning } = walkRequireCallExpression(arg, tracer);
+      dependencies.forEach((depName) => analysis.addDependency(depName, node.loc, true));
 
-      analysis.addWarning("unsafe-import", null, node.loc);
+      if (triggerWarning) {
+        analysis.addWarning("unsafe-import", null, node.loc);
+      }
 
       // We skip walking the tree to avoid anymore warnings...
       return ProbeSignals.Skip;
@@ -136,6 +139,7 @@ function main(node, options) {
 
 function walkRequireCallExpression(nodeToWalk, tracer) {
   const dependencies = new Set();
+  let triggerWarning = true;
 
   walk(nodeToWalk, {
     enter(node) {
@@ -181,11 +185,23 @@ function walkRequireCallExpression(nodeToWalk, tracer) {
           }
           break;
         }
+
+        case "path.join": {
+          if (!node.arguments.every((arg) => arg.type === "Literal" && typeof arg.value === "string")) {
+            break;
+          }
+
+          const constructedPath = path.posix.join(...node.arguments.map((arg) => arg.value));
+          dependencies.add(constructedPath);
+
+          triggerWarning = false;
+          break;
+        }
       }
     }
   });
 
-  return [...dependencies];
+  return { dependencies, triggerWarning };
 }
 
 export default {
