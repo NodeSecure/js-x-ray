@@ -13,7 +13,7 @@ const validTestCases = [
   "const bin = require.resolve(path.join('..', './bin.js'));"
 ];
 
-test("should not detect unsafe-import of path.join every argument is a Literal string", () => {
+test("should not detect unsafe-import for path.join if every argument is a string literal", () => {
   validTestCases.forEach((test) => {
     const { warnings, dependencies } = runASTAnalysis(test);
 
@@ -29,7 +29,7 @@ const invalidTestCases = [
   "const bin = require.resolve(path.join(3, '..', './bin.js'));"
 ];
 
-test("should detect unsafe-import of path.join if not every argument is a Literal string", () => {
+test("should detect unsafe-import of path.join if not every argument is a string literal", () => {
   invalidTestCases.forEach((test) => {
     const { warnings } = runASTAnalysis(test);
 
