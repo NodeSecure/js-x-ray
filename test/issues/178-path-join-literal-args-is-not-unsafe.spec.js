@@ -8,7 +8,6 @@ import { runASTAnalysis } from "../../index.js";
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/178
  */
-
 const validTestCases = [
   "const bin = require(path.join('..', './bin.js'));",
   "const bin = require.resolve(path.join('..', './bin.js'));"
