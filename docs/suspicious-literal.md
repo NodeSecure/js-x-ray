@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Thats one of the most interesting JS-X-Ray warning. We designed it with the idea of detecting long strings of characters that are very common in malicious obfuscated/encrypted codes like in [smith-and-wesson-skimmer](https://badjs.org/posts/smith-and-wesson-skimmer/).
+Thats one of the most interesting JS-X-Ray warning. We designed it with the idea of detecting long strings of characters that are very common in malicious obfuscated/encrypted codes like in [smith-and-wesson-skimmer](https://web.archive.org/web/20200804103413/https://badjs.org/posts/smith-and-wesson-skimmer/).
 
 The basic idea is to say that any string longer than 45 characters with no space is very suspicious... Then we establish a suspicion score that will be incremented according to several criteria:
 
