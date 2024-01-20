@@ -1,4 +1,6 @@
 /* eslint-disable consistent-return */
+// Import Node.js Dependencies
+import path from "node:path";
 
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
@@ -11,7 +13,6 @@ import {
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
 import { ProbeSignals } from "../ProbeRunner.js";
-import path from "path";
 
 function validateNodeRequire(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, {
