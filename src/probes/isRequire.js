@@ -1,4 +1,5 @@
 /* eslint-disable consistent-return */
+
 // Import Node.js Dependencies
 import path from "node:path";
 
