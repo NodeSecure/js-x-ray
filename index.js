@@ -8,9 +8,9 @@ import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
 import { SourceFile } from "./src/SourceFile.js";
-import { SourceParser } from "./src/SourceParser.js";
 import { warnings } from "./src/warnings.js";
 import { isOneLineExpressionExport } from "./src/utils/index.js";
+import { JsSourceParser } from "./src/JsSourceParser.js";
 
 export function runASTAnalysis(
   str,
@@ -22,7 +22,7 @@ export function runASTAnalysis(
     removeHTMLComments = false
   } = options;
 
-  const parser = new SourceParser(str, { removeHTMLComments });
+  const parser = new JsSourceParser(str, { removeHTMLComments });
   const body = parser.parseScript({
     isEcmaScriptModule: Boolean(module)
   });
