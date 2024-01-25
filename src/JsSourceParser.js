@@ -2,7 +2,15 @@
 import * as meriyah from "meriyah";
 
 // Import Internal Dependencies
-import { SourceParser, kParsingOptions } from "./SourceParser.js";
+import { SourceParser } from "./SourceParser.js";
+
+// CONSTANTS
+const kParsingOptions = {
+  next: true,
+  loc: true,
+  raw: true,
+  jsx: true
+};
 
 export class JsSourceParser extends SourceParser {
   /**

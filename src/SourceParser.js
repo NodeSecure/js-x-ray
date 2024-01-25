@@ -1,11 +1,3 @@
-// CONSTANTS
-export const kParsingOptions = {
-  next: true,
-  loc: true,
-  raw: true,
-  jsx: true
-};
-
 export class SourceParser {
   /**
    * @param {!string} source
