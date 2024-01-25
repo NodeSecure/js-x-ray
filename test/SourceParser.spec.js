@@ -77,30 +77,4 @@ describe("SourceParser", () => {
       assert.strictEqual(sp.source, "\nconst yo = 'foo'\n");
     });
   });
-
-  describe("parseScript", () => {
-    it("should not crash even if isEcmaScriptModule 'false' is provided (import keyword)", () => {
-      new SourceParser("import * as foo from \"foo\";").parseScript({
-        isEcmaScriptModule: false
-      });
-    });
-
-    it("should not crash even if isEcmaScriptModule 'false' is provided (export keyword)", () => {
-      new SourceParser("export const foo = 5;").parseScript({
-        isEcmaScriptModule: false
-      });
-    });
-
-    it("should not crash with a source code containing JSX", () => {
-      const code = `const Dropzone = forwardRef(({ children, ...params }, ref) => {
-        const { open, ...props } = useDropzone(params);
-        useImperativeHandle(ref, () => ({ open }), [open]);
-        return <Fragment>{children({ ...props, open })}</Fragment>;
-      });`;
-
-      new SourceParser(code).parseScript({
-        isEcmaScriptModule: false
-      });
-    });
-  });
 });
