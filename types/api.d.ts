@@ -1,3 +1,4 @@
+import { ESTree } from "meriyah";
 import { Warning } from "./warnings.js";
 
 export {
