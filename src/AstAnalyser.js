@@ -96,6 +96,11 @@ export class AstAnalyser {
     }
   }
 
+  /**
+   * @param {!string} source
+   * @param {object} options
+   * @param {boolean} [options.removeHTMLComments=false]
+   */
   prepareSource(source, options = {}) {
     if (typeof source !== "string") {
       throw new TypeError("source must be a string");
@@ -107,13 +112,17 @@ export class AstAnalyser {
      * @example
      * #!/usr/bin/env node
      */
-    const rawNoShebang = source.charAt(0) === "#" ?
+    const rawNoShebang = source.startsWith("#") ?
       source.slice(source.indexOf("\n") + 1) : source;
 
     return removeHTMLComments ?
       this.#removeHTMLComment(rawNoShebang) : rawNoShebang;
   }
 
+  /**
+   * @param {!string} str
+   * @returns {string}
+   */
   #removeHTMLComment(str) {
     return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
   }
