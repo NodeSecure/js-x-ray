@@ -96,11 +96,6 @@ export class AstAnalyser {
     }
   }
 
-  /**
-   * @param {!string} source
-   * @param {object} options
-   * @param {boolean} [options.removeHTMLComments=false]
-   */
   prepareSource(source, options = {}) {
     if (typeof source !== "string") {
       throw new TypeError("source must be a string");
@@ -119,10 +114,6 @@ export class AstAnalyser {
       this.#removeHTMLComment(rawNoShebang) : rawNoShebang;
   }
 
-  /**
-   * @param {!string} str
-   * @returns {string}
-   */
   #removeHTMLComment(str) {
     return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
   }
