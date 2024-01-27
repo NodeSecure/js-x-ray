@@ -77,8 +77,8 @@ interface SourceParser {
   parse(source: string, options: unknown): ESTree.Program;
 }
 
-interface AstAnalyser {
-  constructor(parser: SourceParser): void;
+declare class AstAnalyser {
+  constructor(parser: SourceParser);
   analyse: (str: string, options?: Omit<RuntimeOptions, "customParser">) => Report;
   analyzeFile(pathToFile: string, options?: Omit<RuntimeFileOptions, "customParser">): Promise<ReportOnFile>;
 }
