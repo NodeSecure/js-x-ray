@@ -1,5 +1,5 @@
-import { ESTree } from "meriyah";
 import { Warning } from "./warnings.js";
+import { Statement } from "meriyah/dist/src/estree.js";
 
 export {
   AstAnalyser,
@@ -74,7 +74,7 @@ type ReportOnFile = {
 }
 
 interface SourceParser {
-  parse(source: string, options: unknown): ESTree.Program;
+  parse(source: string, options: unknown): Statement[];
 }
 
 declare class AstAnalyser {

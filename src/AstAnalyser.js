@@ -26,7 +26,7 @@ export class AstAnalyser {
       removeHTMLComments = false
     } = options;
 
-    const { body } = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
+    const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
 

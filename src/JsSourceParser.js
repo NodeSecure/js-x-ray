@@ -20,7 +20,7 @@ export class JsSourceParser {
     } = options;
 
     try {
-      return meriyah.parseScript(
+      const { body } = meriyah.parseScript(
         source,
         {
           ...kParsingOptions,
@@ -28,6 +28,8 @@ export class JsSourceParser {
           globalReturn: !isEcmaScriptModule
         }
       );
+
+      return body;
     }
     catch (error) {
       const isIllegalReturn = error.description.includes("Illegal return statement");
@@ -37,7 +39,7 @@ export class JsSourceParser {
         error.description.includes("The export keyword") ||
         isIllegalReturn
       )) {
-        return meriyah.parseScript(
+        const { body } = meriyah.parseScript(
           source,
           {
             ...kParsingOptions,
@@ -45,6 +47,8 @@ export class JsSourceParser {
             globalReturn: isIllegalReturn
           }
         );
+
+        return body;
       }
 
       throw error;
