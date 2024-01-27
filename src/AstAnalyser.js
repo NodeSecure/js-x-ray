@@ -13,7 +13,7 @@ import { isOneLineExpressionExport } from "./utils/index.js";
 export class AstAnalyser {
   /**
    * @constructor
-   * @param { Parser } parser
+   * @param { SourceParser } parser
    */
   constructor(parser) {
     this.parser = parser;
