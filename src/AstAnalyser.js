@@ -124,6 +124,6 @@ export class AstAnalyser {
    * @returns {string}
    */
   #removeHTMLComment(str) {
-    return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
+    return str.replace(/<!--[\s\S]*?-->/g, "");
   }
 }
