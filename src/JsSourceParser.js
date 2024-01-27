@@ -1,9 +1,6 @@
 // Import Third-party Dependencies
 import * as meriyah from "meriyah";
 
-// Import Internal Dependencies
-import { SourceParser } from "./SourceParser.js";
-
 // CONSTANTS
 const kParsingOptions = {
   next: true,
@@ -12,27 +9,25 @@ const kParsingOptions = {
   jsx: true
 };
 
-export class JsSourceParser extends SourceParser {
+export class JsSourceParser {
   /**
    * @param {object} options
    * @param {boolean} options.isEcmaScriptModule
    */
-  parseScript(options = {}) {
+  parse(source, options = {}) {
     const {
       isEcmaScriptModule
     } = options;
 
     try {
-      const { body } = meriyah.parseScript(
-        this.source,
+      return meriyah.parseScript(
+        source,
         {
           ...kParsingOptions,
           module: isEcmaScriptModule,
           globalReturn: !isEcmaScriptModule
         }
       );
-
-      return body;
     }
     catch (error) {
       const isIllegalReturn = error.description.includes("Illegal return statement");
@@ -42,20 +37,17 @@ export class JsSourceParser extends SourceParser {
         error.description.includes("The export keyword") ||
         isIllegalReturn
       )) {
-        const { body } = meriyah.parseScript(
-          this.source,
+        return meriyah.parseScript(
+          source,
           {
             ...kParsingOptions,
             module: true,
             globalReturn: isIllegalReturn
           }
         );
-
-        return body;
       }
 
       throw error;
     }
   }
 }
-

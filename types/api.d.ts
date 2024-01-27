@@ -1,6 +1,8 @@
 import { Warning } from "./warnings.js";
 
 export {
+  AstAnalyser,
+  SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
 
@@ -44,6 +46,8 @@ interface RuntimeOptions {
    * @default false
    */
   removeHTMLComments?: boolean;
+  
+  customParser?: SourceParser;
 }
 
 interface Report {
@@ -54,16 +58,8 @@ interface Report {
   isOneLineRequire: boolean;
 }
 
-interface RuntimeFileOptions {
+interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
   packageName?: string;
-  /**
-   * @default true
-   */
-  module?: boolean;
-  /**
-   * @default false
-   */
-  removeHTMLComments?: boolean;
 }
 
 type ReportOnFile = {
@@ -74,6 +70,16 @@ type ReportOnFile = {
 } | {
   ok: false,
   warnings: Warning[];
+}
+
+interface SourceParser {
+  parse(source: string, options: unknown): ESTree.Program;
+}
+
+interface AstAnalyser {
+  constructor(parser: SourceParser): void;
+  analyse: (str: string, options?: Omit<RuntimeOptions, "customParser">) => Report;
+  analyzeFile(pathToFile: string, options?: Omit<RuntimeFileOptions, "customParser">): Promise<ReportOnFile>;
 }
 
 declare function runASTAnalysis(str: string, options?: RuntimeOptions): Report;

@@ -1,4 +1,6 @@
 import {
+  AstAnalyser,
+  SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
   Report,
@@ -20,6 +22,8 @@ declare const warnings: Record<WarningName, Pick<WarningDefault, "experimental" 
 
 export {
   warnings,
+  AstAnalyser,
+  SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
   Report,
