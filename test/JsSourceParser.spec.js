@@ -5,15 +5,15 @@ import { describe, it } from "node:test";
 import { JsSourceParser } from "../src/JsSourceParser.js";
 
 describe("JsSourceParser", () => {
-  describe("parseScript", () => {
+  describe("parse", () => {
     it("should not crash even if isEcmaScriptModule 'false' is provided (import keyword)", () => {
-      new JsSourceParser("import * as foo from \"foo\";").parseScript({
+      new JsSourceParser().parse("import * as foo from \"foo\";", {
         isEcmaScriptModule: false
       });
     });
 
     it("should not crash even if isEcmaScriptModule 'false' is provided (export keyword)", () => {
-      new JsSourceParser("export const foo = 5;").parseScript({
+      new JsSourceParser().parse("export const foo = 5;", {
         isEcmaScriptModule: false
       });
     });
@@ -25,7 +25,7 @@ describe("JsSourceParser", () => {
         return <Fragment>{children({ ...props, open })}</Fragment>;
       });`;
 
-      new JsSourceParser(code).parseScript({
+      new JsSourceParser().parse(code, {
         isEcmaScriptModule: false
       });
     });
