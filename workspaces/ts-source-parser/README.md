@@ -8,7 +8,6 @@ Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-
 
 This package provide a TypeScript source parser for the `@nodesecure/js-x-ray` project.
 
-
 ## Getting Started
 
 This package is available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
