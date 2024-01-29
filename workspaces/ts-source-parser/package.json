@@ -1,0 +1,37 @@
+{
+    "name": "@nodesecure/ts-source-parser",
+    "version": "1.0.0",
+    "description": "TypeScript parser for AST XRay analysis",
+    "type": "module",
+    "exports": "./index.js",
+    "types": "./index.d.ts",
+    "scripts": {
+        "lint": "eslint src test",
+        "prepublishOnly": "pkg-ok",
+        "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
+        "test": "c8 --all --src ./src -r html npm run test-only",
+        "check": "cross-env npm run lint && npm run test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/NodeSecure/js-x-ray.git"
+    },
+    "keywords": [
+        "typescript",
+        "estree",
+        "ast",
+        "utils"
+    ],
+    "files": [
+        "src"
+    ],
+    "author": "Michelet Jean <jean.antoine.michelet@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/NodeSecure/js-x-ray/issues"
+    },
+    "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/ts-source-parser#readme",
+    "dependencies": {
+        "@typescript-eslint/typescript-estree": "^6.19.1"
+    }
+}
