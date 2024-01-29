@@ -10,7 +10,7 @@ describe("TsSourceParser", () => {
     const parser = new TsSourceParser();
 
     it("should correctly parse with default options", () => {
-      const source = "const x = 5;";
+      const source = "const x: number = 5;";
       const body = parser.parse(source);
 
       assert.strictEqual(body[0].type, "VariableDeclaration");
@@ -19,7 +19,7 @@ describe("TsSourceParser", () => {
     });
 
     it("should correctly parse with custom options", () => {
-      const source = "const x = 5;";
+      const source = "const x: number = 5;";
       const body = parser.parse(source, { loc: false, range: true });
 
       assert.strictEqual(body[0].type, "VariableDeclaration");

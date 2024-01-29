@@ -1,8 +1,6 @@
 // Import Third-party Dependencies
 import { parse } from "@typescript-eslint/typescript-estree";
 
-// Import Internal Dependencies
-
 // CONSTANTS
 export const tsParsingOptions = {
   jsDocParsingMode: "none",
