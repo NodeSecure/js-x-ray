@@ -1,4 +1,4 @@
-# Suspicious literal
+# Suspicious file
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
