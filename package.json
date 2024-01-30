@@ -20,7 +20,8 @@
   },
   "workspaces": [
     "workspaces/estree-ast-utils",
-    "workspaces/sec-literal"
+    "workspaces/sec-literal",
+    "workspaces/ts-source-parser"
   ],
   "keywords": [
     "ast",
