@@ -9,6 +9,7 @@ import { getMemberExpressionIdentifier } from "../getMemberExpressionIdentifier.
 import { getCallExpressionIdentifier } from "../getCallExpressionIdentifier.js";
 import { getVariableDeclarationIdentifiers } from "../getVariableDeclarationIdentifiers.js";
 import { getCallExpressionArguments } from "../getCallExpressionArguments.js";
+import { extractLogicalExpression } from "../extractLogicalExpression.js";
 
 // CONSTANTS
 const kGlobalIdentifiersToTrace = new Set([
@@ -233,10 +234,8 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkRequireCallExpression(variableDeclaratorNode) {
-    const { init, id } = variableDeclaratorNode;
-
-    const moduleNameLiteral = init.arguments
+  #walkRequireCallExpression(node, id) {
+    const moduleNameLiteral = node.arguments
       .find((argumentNode) => argumentNode.type === "Literal" && this.#traced.has(argumentNode.value));
     if (!moduleNameLiteral) {
       return;
@@ -256,17 +255,48 @@ export class VariableTracer extends EventEmitter {
   }
 
   #walkVariableDeclarationWithIdentifier(variableDeclaratorNode) {
-    const { init, id } = variableDeclaratorNode;
+    const { init } = variableDeclaratorNode;
 
     switch (init.type) {
+      /**
+       * var root = freeGlobal || freeSelf || Function('return this')();
+       */
+      case "LogicalExpression": {
+        for (const { node } of extractLogicalExpression(init)) {
+          this.#walkVariableDeclarationInitialization(
+            variableDeclaratorNode,
+            node
+          );
+        }
+
+        return void 0;
+      }
+
+      default:
+        return this.#walkVariableDeclarationInitialization(
+          variableDeclaratorNode
+        );
+    }
+  }
+
+  #walkVariableDeclarationInitialization(
+    variableDeclaratorNode,
+    childNode = variableDeclaratorNode.init
+  ) {
+    const { id } = variableDeclaratorNode;
+
+    switch (childNode.type) {
       // let foo = "10"; <-- "foo" is the key and "10" the value
       case "Literal":
-        this.literalIdentifiers.set(id.name, init.value);
+        this.literalIdentifiers.set(id.name, childNode.value);
         break;
 
-      // const g = eval("this");
+      /**
+       * const g = eval("this");
+       * const g = Function("return this")();
+       */
       case "CallExpression": {
-        const fullIdentifierPath = getCallExpressionIdentifier(init);
+        const fullIdentifierPath = getCallExpressionIdentifier(childNode);
         if (fullIdentifierPath === null) {
           break;
         }
@@ -277,7 +307,7 @@ export class VariableTracer extends EventEmitter {
         // const id = Function.prototype.call.call(require, require, "http");
         if (this.#neutralCallable.has(identifierName) || isEvilIdentifierPath(fullIdentifierPath)) {
           // TODO: make sure we are walking on a require CallExpr here ?
-          this.#walkRequireCallExpression(variableDeclaratorNode);
+          this.#walkRequireCallExpression(childNode, id);
         }
         else if (kUnsafeGlobalCallExpression.has(identifierName)) {
           this.#variablesRefToGlobal.add(id.name);
@@ -285,10 +315,10 @@ export class VariableTracer extends EventEmitter {
         // const foo = require("crypto");
         // const bar = require.call(null, "crypto");
         else if (kRequirePatterns.has(identifierName)) {
-          this.#walkRequireCallExpression(variableDeclaratorNode);
+          this.#walkRequireCallExpression(childNode, id);
         }
         else if (tracedFullIdentifierName === "atob") {
-          const callExprArguments = getCallExpressionArguments(init, { tracer: this });
+          const callExprArguments = getCallExpressionArguments(childNode, { tracer: this });
           if (callExprArguments === null) {
             break;
           }
@@ -307,9 +337,9 @@ export class VariableTracer extends EventEmitter {
 
       // const r = require
       case "Identifier": {
-        const identifierName = init.name;
+        const identifierName = childNode.name;
         if (this.#traced.has(identifierName)) {
-          this.#declareNewAssignment(identifierName, variableDeclaratorNode.id);
+          this.#declareNewAssignment(identifierName, id);
         }
         else if (this.#isGlobalVariableIdentifier(identifierName)) {
           this.#variablesRefToGlobal.add(id.name);
@@ -321,22 +351,22 @@ export class VariableTracer extends EventEmitter {
       // process.mainModule and require.resolve
       case "MemberExpression": {
         // Example: ["process", "mainModule"]
-        const memberExprParts = [...getMemberExpressionIdentifier(init, { tracer: this })];
+        const memberExprParts = [...getMemberExpressionIdentifier(childNode, { tracer: this })];
         const memberExprFullname = memberExprParts.join(".");
 
         // Function.prototype.call
         if (isNeutralCallable(memberExprFullname)) {
-          this.#neutralCallable.add(variableDeclaratorNode.id.name);
+          this.#neutralCallable.add(id.name);
         }
         else if (this.#traced.has(memberExprFullname)) {
-          this.#declareNewAssignment(memberExprFullname, variableDeclaratorNode.id);
+          this.#declareNewAssignment(memberExprFullname, id);
         }
         else {
           const alternativeMemberExprParts = this.#searchForMemberExprAlternative(memberExprParts);
           const alternativeMemberExprFullname = alternativeMemberExprParts.join(".");
 
           if (this.#traced.has(alternativeMemberExprFullname)) {
-            this.#declareNewAssignment(alternativeMemberExprFullname, variableDeclaratorNode.id);
+            this.#declareNewAssignment(alternativeMemberExprFullname, id);
           }
         }
 
@@ -359,14 +389,14 @@ export class VariableTracer extends EventEmitter {
 
         // const {} = Function.prototype.call.call(require, require, "http");
         if (isEvilIdentifierPath(fullIdentifierPath)) {
-          this.#walkRequireCallExpression(variableDeclaratorNode);
+          this.#walkRequireCallExpression(init, id);
         }
         else if (kUnsafeGlobalCallExpression.has(identifierName)) {
           this.#autoTraceId(id);
         }
         // const { createHash } = require("crypto");
         else if (kRequirePatterns.has(identifierName)) {
-          this.#walkRequireCallExpression(variableDeclaratorNode);
+          this.#walkRequireCallExpression(init, id);
         }
 
         break;

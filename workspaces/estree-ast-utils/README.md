@@ -115,6 +115,27 @@ Return `true` if the given Node is a Literal Regex Node.
 
 </details>
 
+<details><summary>extractLogicalExpression(node)</summary>
+
+Extract all LogicalExpression recursively and return an IterableIterator of 
+
+```ts
+{ operator: "||" | "&&" | "??", node: any }
+```
+
+For the following code example
+
+```js
+freeGlobal || freeSelf || Function('return this')();
+```
+
+The extract will return three parts
+- freeGlobal
+- freeSelf
+- and finally `Function('return this')();`
+
+</details>
+
 ## License
 
 MIT

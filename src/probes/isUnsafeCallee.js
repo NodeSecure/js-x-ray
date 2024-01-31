@@ -15,6 +15,13 @@ function validateNode(node) {
 function main(node, options) {
   const { analysis, data: calleeName } = options;
 
+  if (
+    calleeName === "Function" &&
+    node.callee.arguments.length > 0 &&
+    node.callee.arguments[0].value === "return this"
+  ) {
+    return ProbeSignals.Skip;
+  }
   analysis.addWarning("unsafe-stmt", calleeName, node.loc);
 
   return ProbeSignals.Skip;

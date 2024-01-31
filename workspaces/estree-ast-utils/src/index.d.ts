@@ -3,6 +3,10 @@ import { VariableTracer } from "./utils/VariableTracer";
 
 export { VariableTracer };
 
+export function extractLogicalExpression(
+  node: any
+): IterableIterator<{ operator: "||" | "&&" | "??", node: any }>;
+
 export function arrayExpressionToString(
   node: any, options?: { tracer?: VariableTracer }
 ): IterableIterator<string>;
