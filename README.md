@@ -135,7 +135,6 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
 
 ## API
-
 <details>
 <summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
 
@@ -165,10 +164,10 @@ interface Report {
 <summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise< ReportOnFile ></summary>
 
 ```ts
-interface RuntimeOptions {
+interface RuntimeFileOptions {
   module?: boolean;
-  isMinified?: boolean;
   removeHTMLComments?: boolean;
+  packageName?: string;
 }
 ```
 
@@ -196,6 +195,7 @@ Click on one of the links to access the documentation of the workspace:
 | --- | --- |
 | estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
 | sec-literal | [@nodesecure/sec-literal ](./workspaces/sec-literal) |
+| ts-source-parser | [@nodesecure/ts-source-parser ](./workspaces/ts-source-parser) |
 
 These packages are available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 ```bash
