@@ -135,7 +135,6 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
 
 ## API
-
 <details>
 <summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
 
@@ -165,10 +164,10 @@ interface Report {
 <summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise< ReportOnFile ></summary>
 
 ```ts
-interface RuntimeOptions {
+interface RuntimeFileOptions {
   module?: boolean;
-  isMinified?: boolean;
   removeHTMLComments?: boolean;
+  packageName?: string;
 }
 ```
 
