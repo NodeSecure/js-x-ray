@@ -9,36 +9,36 @@ import isMemberExpression from "../../src/probes/isMemberExpression.js";
 test("should detect 1 member expression", () => {
   const str = "process.mainModule";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMemberExpression)
+  const { sourceFile } = getSastAnalysis(str, isMemberExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.counter.memberExpr, 1);
+  assert.equal(sourceFile.counter.memberExpr, 1);
 });
 
 test("should detect 2 members expressions", () => {
   const str = "process.mainModule.foo";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMemberExpression)
+  const { sourceFile } = getSastAnalysis(str, isMemberExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.counter.memberExpr, 2);
+  assert.equal(sourceFile.counter.memberExpr, 2);
 });
 
 test("should detect 1 member expression and 2 nodes", () => {
   const str = "process.mainModule['foo']['bar']";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMemberExpression)
+  const { sourceFile } = getSastAnalysis(str, isMemberExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.counter.memberExpr, 1);
-  assert.equal(analysis.counter.computedMemberExpr, 2);
+  assert.equal(sourceFile.counter.memberExpr, 1);
+  assert.equal(sourceFile.counter.computedMemberExpr, 2);
 });
 
 test("should detect 0 member expression", () => {
   const str = "process";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMemberExpression)
+  const { sourceFile } = getSastAnalysis(str, isMemberExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.counter.memberExpr, 0);
+  assert.equal(sourceFile.counter.memberExpr, 0);
 });

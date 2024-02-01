@@ -14,14 +14,14 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   // Searching for dangerous import "data:text/javascript;..." statement.
   // see: https://2ality.com/2019/10/eval-via-import.html
   if (node.source.value.startsWith("data:text/javascript")) {
-    analysis.addWarning("unsafe-import", node.source.value, node.loc);
+    sourceFile.addWarning("unsafe-import", node.source.value, node.loc);
   }
-  analysis.addDependency(node.source.value, node.loc);
+  sourceFile.addDependency(node.source.value, node.loc);
 }
 
 export default {

@@ -11,10 +11,10 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   kIdExtractor(
-    ({ name }) => analysis.identifiersName.push({ name, type: "method" }),
+    ({ name }) => sourceFile.identifiersName.push({ name, type: "method" }),
     [node.key]
   );
 }

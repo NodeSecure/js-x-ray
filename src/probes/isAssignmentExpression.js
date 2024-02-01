@@ -15,11 +15,11 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
-  analysis.idtypes.assignExpr++;
+  sourceFile.idtypes.assignExpr++;
   for (const { name } of getVariableDeclarationIdentifiers(node.left)) {
-    analysis.identifiersName.push({ name, type: "assignExpr" });
+    sourceFile.identifiersName.push({ name, type: "assignExpr" });
   }
 }
 

@@ -9,40 +9,40 @@ import isImportDeclaration from "../../src/probes/isImportDeclaration.js";
 test("should detect 1 dependency for an ImportNamespaceSpecifier", () => {
   const str = "import * as foo from \"bar\"";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis;
+  const { dependencies } = sourceFile;
   assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency for an ImportDefaultSpecifier", () => {
   const str = "import foo from \"bar\"";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis;
+  const { dependencies } = sourceFile;
   assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency for an ImportSpecifier", () => {
   const str = "import { xd } from \"bar\"";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis;
+  const { dependencies } = sourceFile;
   assert.ok(dependencies.has("bar"));
 });
 
 test("should detect 1 dependency with no specificiers", () => {
   const str = "import \"bar\"";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  const { dependencies } = analysis;
+  const { dependencies } = sourceFile;
   assert.ok(dependencies.has("bar"));
 });
 

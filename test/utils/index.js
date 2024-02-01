@@ -25,20 +25,20 @@ export function getSastAnalysis(
   probe
 ) {
   return {
-    analysis: new SourceFile(sourceCodeString),
+    sourceFile: new SourceFile(sourceCodeString),
     getWarning(warning) {
-      return this.analysis.warnings.find(
+      return this.sourceFile.warnings.find(
         (item) => item.kind === warning
       );
     },
     warnings() {
-      return this.analysis.warnings;
+      return this.sourceFile.warnings;
     },
     dependencies() {
-      return this.analysis.dependencies;
+      return this.sourceFile.dependencies;
     },
     execute(body) {
-      const probeRunner = new ProbeRunner(this.analysis, [probe]);
+      const probeRunner = new ProbeRunner(this.sourceFile, [probe]);
       const self = this;
 
       walk(body, {
@@ -48,7 +48,7 @@ export function getSastAnalysis(
             return;
           }
 
-          self.analysis.tracer.walk(node);
+          self.sourceFile.tracer.walk(node);
 
           const action = probeRunner.walk(node);
           if (action === "skip") {

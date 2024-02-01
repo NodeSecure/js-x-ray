@@ -13,7 +13,7 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis, data: calleeName } = options;
+  const { sourceFile, data: calleeName } = options;
 
   if (
     calleeName === "Function" &&
@@ -22,7 +22,7 @@ function main(node, options) {
   ) {
     return ProbeSignals.Skip;
   }
-  analysis.addWarning("unsafe-stmt", calleeName, node.loc);
+  sourceFile.addWarning("unsafe-stmt", calleeName, node.loc);
 
   return ProbeSignals.Skip;
 }

@@ -11,15 +11,15 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   for (const property of node.properties) {
     if (property.type !== "Property" || property.key.type !== "Identifier") {
       continue;
     }
 
-    analysis.idtypes.property++;
-    analysis.identifiersName.push({ name: property.key.name, type: "property" });
+    sourceFile.idtypes.property++;
+    sourceFile.identifiersName.push({ name: property.key.name, type: "property" });
   }
 }
 

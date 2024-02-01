@@ -5,9 +5,9 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
-  analysis.counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
+  sourceFile.counter[node.computed ? "computedMemberExpr" : "memberExpr"]++;
 }
 
 export default {

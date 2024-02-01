@@ -15,11 +15,11 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   // We use the safe-regex package to detect whether or not regex is safe!
   if (!safeRegex(node.regex.pattern)) {
-    analysis.addWarning("unsafe-regex", node.regex.pattern, node.loc);
+    sourceFile.addWarning("unsafe-regex", node.regex.pattern, node.loc);
   }
 }
 

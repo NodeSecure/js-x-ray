@@ -9,10 +9,10 @@ import isClassDeclaration from "../../src/probes/isClassDeclaration.js";
 test("should detect two identifiers (class name and superClass name A.K.A extends)", () => {
   const str = "class File extends Blob {}";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isClassDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  assert.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(sourceFile.identifiersName, [
     { name: "File", type: "class" },
     { name: "Blob", type: "class" }
   ]);
@@ -21,10 +21,10 @@ test("should detect two identifiers (class name and superClass name A.K.A extend
 test("should detect one identifier because there is no superClass (extension)", () => {
   const str = "class File {}";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isClassDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  assert.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(sourceFile.identifiersName, [
     { name: "File", type: "class" }
   ]);
 });
@@ -32,10 +32,10 @@ test("should detect one identifier because there is no superClass (extension)", 
 test("should detect one identifier because superClass is not an Identifier but a CallExpression", () => {
   const str = "class File extends (foo()) {}";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isClassDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isClassDeclaration)
     .execute(ast.body);
 
-  assert.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(sourceFile.identifiersName, [
     { name: "File", type: "class" }
   ]);
 });

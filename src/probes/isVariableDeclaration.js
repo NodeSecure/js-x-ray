@@ -12,14 +12,14 @@ function validateNode(node) {
 }
 
 function main(mainNode, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
-  analysis.varkinds[mainNode.kind]++;
+  sourceFile.varkinds[mainNode.kind]++;
 
   for (const node of mainNode.declarations) {
-    analysis.idtypes.variableDeclarator++;
+    sourceFile.idtypes.variableDeclarator++;
     for (const { name } of getVariableDeclarationIdentifiers(node.id)) {
-      analysis.identifiersName.push({ name, type: "variableDeclarator" });
+      sourceFile.identifiersName.push({ name, type: "variableDeclarator" });
     }
   }
 }

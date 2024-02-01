@@ -4,15 +4,15 @@ import { notNullOrUndefined } from "../utils/index.js";
 // CONSTANTS
 const kJJRegularSymbols = new Set(["$", "_"]);
 
-export function verify(analysis) {
-  if (analysis.counter.variableDeclarator > 0 || analysis.counter.functionDeclaration > 0) {
+export function verify(sourceFile) {
+  if (sourceFile.counter.variableDeclarator > 0 || sourceFile.counter.functionDeclaration > 0) {
     return false;
   }
-  if (analysis.idtypes.assignExpr > analysis.idtypes.property) {
+  if (sourceFile.idtypes.assignExpr > sourceFile.idtypes.property) {
     return false;
   }
 
-  const matchCount = analysis.identifiersName.filter(({ name }) => {
+  const matchCount = sourceFile.identifiersName.filter(({ name }) => {
     if (!notNullOrUndefined(name)) {
       return false;
     }
@@ -20,7 +20,7 @@ export function verify(analysis) {
 
     return charsCode.every((char) => kJJRegularSymbols.has(char));
   }).length;
-  const pourcent = ((matchCount / analysis.identifiersName.length) * 100);
+  const pourcent = ((matchCount / sourceFile.identifiersName.length) * 100);
 
   return pourcent > 80;
 }

@@ -24,34 +24,34 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   // We are searching for value obfuscated as hex of a minimum length of 4.
   if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
     const value = Buffer.from(node.value, "hex").toString();
-    analysis.analyzeString(value);
+    sourceFile.analyzeString(value);
 
     // If the value we are retrieving is the name of a Node.js dependency,
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
     if (kNodeDeps.has(value)) {
-      analysis.addDependency(value, node.loc);
-      analysis.addWarning("unsafe-import", null, node.loc);
+      sourceFile.addDependency(value, node.loc);
+      sourceFile.addWarning("unsafe-import", null, node.loc);
     }
     else if (value === "require" || !Hex.isSafe(node.value)) {
-      analysis.addWarning("encoded-literal", node.value, node.loc);
+      sourceFile.addWarning("encoded-literal", node.value, node.loc);
     }
   }
   // Else we are checking all other string with our suspect method
   else {
     for (const regex of kShadyLinkRegExps) {
       if (regex.test(node.value)) {
-        analysis.addWarning("shady-link", node.value, node.loc);
+        sourceFile.addWarning("shady-link", node.value, node.loc);
 
         return;
       }
     }
 
-    analysis.analyzeLiteral(node);
+    sourceFile.analyzeLiteral(node);
   }
 }
 
