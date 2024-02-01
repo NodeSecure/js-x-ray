@@ -7,7 +7,7 @@ import isLiteral from "./probes/isLiteral.js";
 import isLiteralRegex from "./probes/isLiteralRegex.js";
 import isRegexObject from "./probes/isRegexObject.js";
 import isVariableDeclaration from "./probes/isVariableDeclaration.js";
-import isRequire from "./probes/isRequire.js";
+import isRequire from "./probes/isRequire/isRequire.js";
 import isImportDeclaration from "./probes/isImportDeclaration.js";
 import isMemberExpression from "./probes/isMemberExpression.js";
 import isArrayExpression from "./probes/isArrayExpression.js";
