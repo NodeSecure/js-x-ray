@@ -367,6 +367,11 @@ test("(require CallExpression): it should detect obfuscated atob value", () => {
   const sastAnalysis = getSastAnalysis(str, isRequire)
     .execute(ast.body);
 
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("unsafe-import");
+  assert.strictEqual(warning.kind, "unsafe-import");
+
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("os"));
 });
