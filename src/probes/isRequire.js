@@ -49,14 +49,14 @@ function validateNodeEvalRequire(node) {
   ];
 }
 
-function teardown({ analysis }) {
-  analysis.dependencyAutoWarning = false;
+function teardown({ sourceFile }) {
+  sourceFile.dependencyAutoWarning = false;
 }
 
 
 function main(node, options) {
-  const { analysis, data: calleeName } = options;
-  const { tracer } = analysis;
+  const { sourceFile, data: calleeName } = options;
+  const { tracer } = sourceFile;
 
   if (node.arguments.length === 0) {
     return;
@@ -64,26 +64,26 @@ function main(node, options) {
   const arg = node.arguments.at(0);
 
   if (calleeName === "eval") {
-    analysis.dependencyAutoWarning = true;
+    sourceFile.dependencyAutoWarning = true;
   }
 
   switch (arg.type) {
     // const foo = "http"; require(foo);
     case "Identifier":
-      if (analysis.tracer.literalIdentifiers.has(arg.name)) {
-        analysis.addDependency(
-          analysis.tracer.literalIdentifiers.get(arg.name),
+      if (sourceFile.tracer.literalIdentifiers.has(arg.name)) {
+        sourceFile.addDependency(
+          sourceFile.tracer.literalIdentifiers.get(arg.name),
           node.loc
         );
       }
       else {
-        analysis.addWarning("unsafe-import", null, node.loc);
+        sourceFile.addWarning("unsafe-import", null, node.loc);
       }
       break;
 
     // require("http")
     case "Literal":
-      analysis.addDependency(arg.value, node.loc);
+      sourceFile.addDependency(arg.value, node.loc);
       break;
 
     // require(["ht", "tp"])
@@ -93,10 +93,10 @@ function main(node, options) {
         .trim();
 
       if (value === "") {
-        analysis.addWarning("unsafe-import", null, node.loc);
+        sourceFile.addWarning("unsafe-import", null, node.loc);
       }
       else {
-        analysis.addDependency(value, node.loc);
+        sourceFile.addDependency(value, node.loc);
       }
       break;
     }
@@ -104,7 +104,7 @@ function main(node, options) {
     // require("ht" + "tp");
     case "BinaryExpression": {
       if (arg.operator !== "+") {
-        analysis.addWarning("unsafe-import", null, node.loc);
+        sourceFile.addWarning("unsafe-import", null, node.loc);
         break;
       }
 
@@ -113,10 +113,10 @@ function main(node, options) {
           tracer, stopOnUnsupportedNode: true
         });
 
-        analysis.addDependency([...iter].join(""), node.loc);
+        sourceFile.addDependency([...iter].join(""), node.loc);
       }
       catch {
-        analysis.addWarning("unsafe-import", null, node.loc);
+        sourceFile.addWarning("unsafe-import", null, node.loc);
       }
       break;
     }
@@ -124,10 +124,10 @@ function main(node, options) {
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
       const { dependencies, triggerWarning } = walkRequireCallExpression(arg, tracer);
-      dependencies.forEach((depName) => analysis.addDependency(depName, node.loc, true));
+      dependencies.forEach((depName) => sourceFile.addDependency(depName, node.loc, true));
 
       if (triggerWarning) {
-        analysis.addWarning("unsafe-import", null, node.loc);
+        sourceFile.addWarning("unsafe-import", null, node.loc);
       }
 
       // We skip walking the tree to avoid anymore warnings...
@@ -135,7 +135,7 @@ function main(node, options) {
     }
 
     default:
-      analysis.addWarning("unsafe-import", null, node.loc);
+      sourceFile.addWarning("unsafe-import", null, node.loc);
   }
 }
 

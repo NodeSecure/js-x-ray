@@ -15,7 +15,7 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   const arg = node.arguments[0];
   /**
@@ -29,7 +29,7 @@ function main(node, options) {
 
   // We use the safe-regex package to detect whether or not regex is safe!
   if (!safeRegex(pattern)) {
-    analysis.addWarning("unsafe-regex", pattern, node.loc);
+    sourceFile.addWarning("unsafe-regex", pattern, node.loc);
   }
 }
 

@@ -89,12 +89,12 @@ describe("ProbeRunner", () => {
 
       assert.strictEqual(fakeProbe.main.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0).arguments, [
-        astNode, { analysis: sourceFile, data: null }
+        astNode, { sourceFile, data: null }
       ]);
 
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.teardown.mock.calls.at(0).arguments, [
-        { analysis: sourceFile }
+        { sourceFile }
       ]);
     });
 

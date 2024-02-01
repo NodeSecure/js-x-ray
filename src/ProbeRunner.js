@@ -104,7 +104,7 @@ export class ProbeRunner {
 
       if (isMatching) {
         return probe.main(node, {
-          analysis: this.sourceFile,
+          sourceFile: this.sourceFile,
           data
         });
       }
@@ -144,7 +144,7 @@ export class ProbeRunner {
       }
       finally {
         if (probe.teardown) {
-          probe.teardown({ analysis: this.sourceFile });
+          probe.teardown({ sourceFile: this.sourceFile });
         }
       }
     }

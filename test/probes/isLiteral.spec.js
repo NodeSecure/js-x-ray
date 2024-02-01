@@ -11,7 +11,7 @@ test("should throw an unsafe-import because the hexadecimal string is equal to t
   const ast = parseScript(str);
 
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  t.mock.method(sastAnalysis.analysis, "analyzeString");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeString");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -19,7 +19,7 @@ test("should throw an unsafe-import because the hexadecimal string is equal to t
   assert.strictEqual(warning.kind, "unsafe-import");
 
   assert.ok(sastAnalysis.dependencies().has("http"));
-  const calls = sastAnalysis.analysis.analyzeString.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeString.mock.calls;
   assert.strictEqual(calls.length, 1);
   assert.ok(calls[0].arguments.includes("http"));
 });
@@ -30,14 +30,14 @@ test("should throw an encoded-literal warning because the hexadecimal value is e
   const ast = parseScript(str);
 
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  t.mock.method(sastAnalysis.analysis, "analyzeString");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeString");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("encoded-literal");
   assert.strictEqual(warning.value, "72657175697265");
 
-  const calls = sastAnalysis.analysis.analyzeString.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeString.mock.calls;
   assert.strictEqual(calls.length, 1);
   assert.ok(calls[0].arguments.includes("require"));
 });
@@ -68,11 +68,11 @@ test("should not throw any warnings without hexadecimal value (and should call a
   const ast = parseScript(str);
 
   const sastAnalysis = getSastAnalysis(str, isLiteral);
-  t.mock.method(sastAnalysis.analysis, "analyzeLiteral");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
-  const calls = sastAnalysis.analysis.analyzeLiteral.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeLiteral.mock.calls;
   assert.strictEqual(calls.length, 1);
 
   const astNode = calls[0].arguments[0];

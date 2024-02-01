@@ -9,17 +9,17 @@ import isAssignmentExpression from "../../src/probes/isAssignmentExpression.js";
 test("should detect 1 assignment expression", () => {
   const str = "obj = { foo: 1 }";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isAssignmentExpression)
+  const { sourceFile } = getSastAnalysis(str, isAssignmentExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.idtypes.assignExpr, 1);
+  assert.equal(sourceFile.idtypes.assignExpr, 1);
 });
 
 test("should detect 0 assignment expression", () => {
   const str = "Object.assign(obj, { foo: 1 })";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isAssignmentExpression)
+  const { sourceFile } = getSastAnalysis(str, isAssignmentExpression)
     .execute(ast.body);
 
-  assert.equal(analysis.idtypes.assignExpr, 0);
+  assert.equal(sourceFile.idtypes.assignExpr, 0);
 });
