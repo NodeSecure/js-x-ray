@@ -153,6 +153,15 @@
         "doc",
         "code"
       ]
+    },
+    {
+      "login": "madina0801",
+      "name": "Madina",
+      "avatar_url": "https://avatars.githubusercontent.com/u/101329759?v=4",
+      "profile": "https://github.com/madina0801",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
