@@ -229,7 +229,7 @@ describe("AstAnalyser", (t) => {
   describe("constructor", () => {
     it("should not throw an error when instantiated without a custom parser", () => {
       assert.doesNotThrow(() => {
-        const analyser = getAnalyser();
+        const analyser = new AstAnalyser();
         // perform basic operations
         const result = analyser.analyse("const foo = 'bar';");
         // compare array of keys to an empty array to ensure there are no dependencies in result
