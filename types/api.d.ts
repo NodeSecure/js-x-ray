@@ -78,7 +78,7 @@ interface SourceParser {
 }
 
 declare class AstAnalyser {
-  constructor(parser: SourceParser);
+  constructor(parser?: SourceParser);
   analyse: (str: string, options?: Omit<RuntimeOptions, "customParser">) => Report;
   analyzeFile(pathToFile: string, options?: Omit<RuntimeFileOptions, "customParser">): Promise<ReportOnFile>;
 }

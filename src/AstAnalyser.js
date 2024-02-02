@@ -9,13 +9,14 @@ import isMinified from "is-minified-code";
 // Import Internal Dependencies
 import { SourceFile } from "./SourceFile.js";
 import { isOneLineExpressionExport } from "./utils/index.js";
+import { JsSourceParser } from "./JsSourceParser.js";
 
 export class AstAnalyser {
   /**
    * @constructor
-   * @param { SourceParser } parser
+   * @param { SourceParser } [parser]
    */
-  constructor(parser) {
+  constructor(parser = new JsSourceParser()) {
     this.parser = parser;
   }
 
@@ -35,7 +36,7 @@ export class AstAnalyser {
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
       enter(node) {
-      // Skip the root of the AST.
+        // Skip the root of the AST.
         if (Array.isArray(node)) {
           return;
         }
