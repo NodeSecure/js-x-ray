@@ -18,18 +18,18 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   kIdExtractor(
-    ({ name }) => analysis.identifiersName.push({ name, type: "params" }),
+    ({ name }) => sourceFile.identifiersName.push({ name, type: "params" }),
     node.params
   );
 
   if (node.id === null || node.id.type !== "Identifier") {
     return;
   }
-  analysis.idtypes.functionDeclaration++;
-  analysis.identifiersName.push({ name: node.id.name, type: "functionDeclaration" });
+  sourceFile.idtypes.functionDeclaration++;
+  sourceFile.identifiersName.push({ name: node.id.name, type: "functionDeclaration" });
 }
 
 export default {

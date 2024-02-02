@@ -12,12 +12,12 @@ test("it should trigger analyzeLiteral method one time", (t) => {
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isArrayExpression);
 
-  t.mock.method(sastAnalysis.analysis, "analyzeLiteral");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 
-  const calls = sastAnalysis.analysis.analyzeLiteral.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeLiteral.mock.calls;
   assert.strictEqual(calls.length, 1);
 
   const literalNode = calls[0].arguments[0];
@@ -30,10 +30,10 @@ test("it should trigger analyzeLiteral method two times (ignoring the holey betw
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isArrayExpression);
 
-  t.mock.method(sastAnalysis.analysis, "analyzeLiteral");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
 
-  const calls = sastAnalysis.analysis.analyzeLiteral.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeLiteral.mock.calls;
   assert.strictEqual(calls.length, 2);
   assert.strictEqual(calls[0].arguments[0].value, 5);
   assert.strictEqual(calls[1].arguments[0].value, 10);
@@ -45,10 +45,10 @@ test("it should trigger analyzeLiteral one time (ignoring non-literal Node)", (t
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isArrayExpression);
 
-  t.mock.method(sastAnalysis.analysis, "analyzeLiteral");
+  t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
 
-  const calls = sastAnalysis.analysis.analyzeLiteral.mock.calls;
+  const calls = sastAnalysis.sourceFile.analyzeLiteral.mock.calls;
   assert.strictEqual(calls.length, 1);
 
   const literalNode = calls[0].arguments[0];

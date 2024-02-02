@@ -12,10 +12,10 @@ test("should detect two identifiers (constructor and one method definition)", ()
     foo() {}
   }`;
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMethodDefinition)
+  const { sourceFile } = getSastAnalysis(str, isMethodDefinition)
     .execute(ast.body);
 
-  assert.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(sourceFile.identifiersName, [
     { name: "constructor", type: "method" },
     { name: "foo", type: "method" }
   ]);
@@ -27,10 +27,10 @@ test("should detect two identifiers (getter and setter)", () => {
     set bar(value) {}
   }`;
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isMethodDefinition)
+  const { sourceFile } = getSastAnalysis(str, isMethodDefinition)
     .execute(ast.body);
 
-  assert.deepEqual(analysis.identifiersName, [
+  assert.deepEqual(sourceFile.identifiersName, [
     { name: "foo", type: "method" },
     { name: "bar", type: "method" }
   ]);

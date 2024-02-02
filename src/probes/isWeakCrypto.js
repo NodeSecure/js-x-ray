@@ -21,11 +21,11 @@ function validateNode(node, { tracer }) {
   return [data !== null && data.identifierOrMemberExpr === "crypto.createHash"];
 }
 
-function main(node, { analysis }) {
+function main(node, { sourceFile }) {
   const arg = node.arguments.at(0);
 
   if (kWeakAlgorithms.has(arg.value)) {
-    analysis.addWarning("weak-crypto", arg.value, node.loc);
+    sourceFile.addWarning("weak-crypto", arg.value, node.loc);
   }
 }
 

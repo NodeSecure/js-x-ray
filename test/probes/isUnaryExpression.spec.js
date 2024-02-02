@@ -9,17 +9,17 @@ import isUnaryExpression from "../../src/probes/isUnaryExpression.js";
 test("should detect one UnaryArray", () => {
   const str = "!![]";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isUnaryExpression)
+  const { sourceFile } = getSastAnalysis(str, isUnaryExpression)
     .execute(ast.body);
 
-  assert.strictEqual(analysis.counter.doubleUnaryArray, 1);
+  assert.strictEqual(sourceFile.counter.doubleUnaryArray, 1);
 });
 
 test("should not detect any UnaryArray", () => {
   const str = "![]";
   const ast = parseScript(str);
-  const { analysis } = getSastAnalysis(str, isUnaryExpression)
+  const { sourceFile } = getSastAnalysis(str, isUnaryExpression)
     .execute(ast.body);
 
-  assert.strictEqual(analysis.counter.doubleUnaryArray, 0);
+  assert.strictEqual(sourceFile.counter.doubleUnaryArray, 0);
 });

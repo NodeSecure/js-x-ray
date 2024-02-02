@@ -12,11 +12,11 @@ function validateNode(node) {
 }
 
 function main(node, options) {
-  const { analysis } = options;
+  const { sourceFile } = options;
 
   const [binaryExprDeepness, hasUnaryExpression] = walkBinaryExpression(node);
   if (binaryExprDeepness >= 3 && hasUnaryExpression) {
-    analysis.counter.deepBinaryExpr++;
+    sourceFile.counter.deepBinaryExpr++;
   }
 }
 

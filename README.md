@@ -236,7 +236,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://miikkak.dev"><img src="https://avatars.githubusercontent.com/u/65869801?v=4?s=100" width="100px;" alt="mkarkkainen"/><br /><sub><b>mkarkkainen</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=mkarkkainen" title="Code">💻</a></td>
     </tr>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/FredGuiou"><img src="https://avatars.githubusercontent.com/u/99122562?v=4?s=100" width="100px;" alt="FredGuiou"/><br /><sub><b>FredGuiou</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=FredGuiou" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/FredGuiou"><img src="https://avatars.githubusercontent.com/u/99122562?v=4?s=100" width="100px;" alt="FredGuiou"/><br /><sub><b>FredGuiou</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=FredGuiou" title="Documentation">📖</a> <a href="https://github.com/NodeSecure/js-x-ray/commits?author=FredGuiou" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

@@ -17,9 +17,9 @@ function validateNode(node) {
   ];
 }
 
-function main(node, { analysis }) {
+function main(node, { sourceFile }) {
   kLiteralExtractor(
-    (literalNode) => analysis.analyzeLiteral(literalNode, true),
+    (literalNode) => sourceFile.analyzeLiteral(literalNode, true),
     node.elements
   );
 }
