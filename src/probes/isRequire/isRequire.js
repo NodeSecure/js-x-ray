@@ -1,19 +1,13 @@
 /* eslint-disable consistent-return */
 
-// Import Node.js Dependencies
-import path from "node:path";
-
-// Import Third-party Dependencies
-import { Hex } from "@nodesecure/sec-literal";
-import { walk } from "estree-walker";
 import {
   concatBinaryExpression,
   arrayExpressionToString,
-  getMemberExpressionIdentifier,
   getCallExpressionIdentifier,
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
-import { ProbeSignals } from "../ProbeRunner.js";
+import { ProbeSignals } from "../../ProbeRunner.js";
+import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.js";
 
 function validateNodeRequire(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, {
@@ -52,7 +46,6 @@ function validateNodeEvalRequire(node) {
 function teardown({ sourceFile }) {
   sourceFile.dependencyAutoWarning = false;
 }
-
 
 function main(node, options) {
   const { sourceFile, data: calleeName } = options;
@@ -123,7 +116,8 @@ function main(node, options) {
 
     // require(Buffer.from("...", "hex").toString());
     case "CallExpression": {
-      const { dependencies, triggerWarning } = walkRequireCallExpression(arg, tracer);
+      const walker = new RequireCallExpressionWalker(tracer);
+      const { dependencies, triggerWarning } = walker.walk(arg);
       dependencies.forEach((depName) => sourceFile.addDependency(depName, node.loc, true));
 
       if (triggerWarning) {
@@ -137,73 +131,6 @@ function main(node, options) {
     default:
       sourceFile.addWarning("unsafe-import", null, node.loc);
   }
-}
-
-function walkRequireCallExpression(nodeToWalk, tracer) {
-  const dependencies = new Set();
-  let triggerWarning = true;
-
-  walk(nodeToWalk, {
-    enter(node) {
-      if (node.type !== "CallExpression" || node.arguments.length === 0) {
-        return;
-      }
-
-      const rootArgument = node.arguments.at(0);
-      if (rootArgument.type === "Literal" && Hex.isHex(rootArgument.value)) {
-        dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
-
-        return this.skip();
-      }
-
-      const fullName = node.callee.type === "MemberExpression" ?
-        [...getMemberExpressionIdentifier(node.callee)].join(".") :
-        node.callee.name;
-      const tracedFullName = tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
-
-      switch (tracedFullName) {
-        case "atob": {
-          const nodeArguments = getCallExpressionArguments(node, { tracer });
-          if (nodeArguments !== null) {
-            dependencies.add(
-              Buffer.from(nodeArguments.at(0), "base64").toString()
-            );
-          }
-
-          break;
-        }
-        case "Buffer.from": {
-          const [element] = node.arguments;
-
-          if (element.type === "ArrayExpression") {
-            const depName = [...arrayExpressionToString(element)].join("").trim();
-            dependencies.add(depName);
-          }
-          break;
-        }
-        case "require.resolve": {
-          if (rootArgument.type === "Literal") {
-            dependencies.add(rootArgument.value);
-          }
-          break;
-        }
-
-        case "path.join": {
-          if (!node.arguments.every((arg) => arg.type === "Literal" && typeof arg.value === "string")) {
-            break;
-          }
-
-          const constructedPath = path.posix.join(...node.arguments.map((arg) => arg.value));
-          dependencies.add(constructedPath);
-
-          triggerWarning = false;
-          break;
-        }
-      }
-    }
-  });
-
-  return { dependencies, triggerWarning };
 }
 
 export default {

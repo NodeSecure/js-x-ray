@@ -4,7 +4,7 @@ import assert from "node:assert";
 
 // Import Internal Dependencies
 import { getSastAnalysis, parseScript } from "../utils/index.js";
-import isRequire from "../../src/probes/isRequire.js";
+import isRequire from "../../src/probes/isRequire/isRequire.js";
 
 test("it should ignore require CallExpression with no (zero) arguments", () => {
   const str = `
@@ -360,17 +360,18 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
 test("(require CallExpression): it should detect obfuscated atob value", () => {
   const str = `
     const myFunc = atob;
-    const ff = myFunc('b3' + 'M=');
-    const dep = require(ff);
+    const dep = require(myFunc('b3' + 'M='));
   `;
+
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(str, isRequire)
     .execute(ast.body);
 
-  assert.strictEqual(sastAnalysis.warnings().length, 0);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("unsafe-import");
+  assert.strictEqual(warning.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
   assert.ok(dependencies.has("os"));
 });
-
