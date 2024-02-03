@@ -11,7 +11,7 @@ import * as trojan from "./trojan-source.js";
 // CONSTANTS
 const kMinimumIdsCount = 5;
 
-export function isObfuscatedCode(sourceFile) {
+export function isObfuscatedCode(sourceFile, identifiersLength) {
   let encoderName = null;
 
   if (jsfuck.verify(sourceFile)) {
@@ -34,8 +34,12 @@ export function isObfuscatedCode(sourceFile) {
     );
     const uPrefixNames = new Set(Object.keys(prefix));
 
-    if (sourceFile.counter.identifiers > kMinimumIdsCount && uPrefixNames.size > 0) {
-      sourceFile.hasPrefixedIdentifiers = calcAvgPrefixedIdentifiers(sourceFile, prefix) > 80;
+    if (identifiersLength > kMinimumIdsCount && uPrefixNames.size > 0) {
+      sourceFile.hasPrefixedIdentifiers = calcAvgPrefixedIdentifiers(
+        sourceFile,
+        identifiersLength,
+        prefix
+      ) > 80;
     }
 
     if (uPrefixNames.size === 1 && freejsobfuscator.verify(sourceFile, prefix)) {
@@ -44,7 +48,7 @@ export function isObfuscatedCode(sourceFile) {
     else if (obfuscatorio.verify(sourceFile)) {
       encoderName = "obfuscator.io";
     }
-    // else if ((sourceFile.counter.identifiers > (kMinimumIdsCount * 3) && sourceFile.hasPrefixedIdentifiers)
+    // else if ((identifiersLength > (kMinimumIdsCount * 3) && sourceFile.hasPrefixedIdentifiers)
     //     && (oneTimeOccurence <= 3 || sourceFile.counter.encodedArrayValue > 0)) {
     //     encoderName = "unknown";
     // }
@@ -57,13 +61,17 @@ export function hasTrojanSource(sourceString) {
   return trojan.verify(sourceString);
 }
 
-function calcAvgPrefixedIdentifiers(sourceFile, prefix) {
+function calcAvgPrefixedIdentifiers(
+  sourceFile,
+  identifiersLength,
+  prefix
+) {
   const valuesArr = Object.values(prefix).slice().sort((left, right) => left - right);
   if (valuesArr.length === 0) {
     return 0;
   }
   const nbOfPrefixedIds = valuesArr.length === 1 ? valuesArr.pop() : (valuesArr.pop() + valuesArr.pop());
-  const maxIds = sourceFile.counter.identifiers - sourceFile.idtypes.property;
+  const maxIds = identifiersLength - sourceFile.idtypes.property;
 
   return ((nbOfPrefixedIds / maxIds) * 100);
 }

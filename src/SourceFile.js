@@ -25,7 +25,6 @@ export class SourceFile {
   varkinds = { var: 0, let: 0, const: 0 };
   idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
   counter = {
-    identifiers: 0,
     doubleUnaryArray: 0,
     computedMemberExpr: 0,
     memberExpr: 0,
@@ -129,8 +128,7 @@ export class SourceFile {
   }
 
   getResult(isMinified) {
-    this.counter.identifiers = this.identifiersName.length;
-    const [isObfuscated, kind] = isObfuscatedCode(this);
+    const [isObfuscated, kind] = isObfuscatedCode(this, this.identifiersName.length);
     if (isObfuscated) {
       this.addWarning("obfuscated-code", kind);
     }
