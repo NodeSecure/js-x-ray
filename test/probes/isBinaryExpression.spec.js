@@ -12,7 +12,7 @@ test("should detect 1 deep binary expression", () => {
   const { sourceFile } = getSastAnalysis(str, isBinaryExpression)
     .execute(ast.body);
 
-  assert.equal(sourceFile.counter.deepBinaryExpr, 1);
+  assert.equal(sourceFile.deobfuscator.deepBinaryExpression, 1);
 });
 
 test("should not detect deep binary expression", () => {
@@ -21,5 +21,5 @@ test("should not detect deep binary expression", () => {
   const { sourceFile } = getSastAnalysis(str, isBinaryExpression)
     .execute(ast.body);
 
-  assert.equal(sourceFile.counter.deepBinaryExpr, 0);
+  assert.equal(sourceFile.deobfuscator.deepBinaryExpression, 0);
 });

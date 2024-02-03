@@ -29,7 +29,7 @@ function main(node, options) {
   // We are searching for value obfuscated as hex of a minimum length of 4.
   if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
     const value = Buffer.from(node.value, "hex").toString();
-    sourceFile.analyzeString(value);
+    sourceFile.deobfuscator.analyzeString(value);
 
     // If the value we are retrieving is the name of a Node.js dependency,
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.

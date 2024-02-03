@@ -6,18 +6,11 @@ import isUnsafeCallee from "./probes/isUnsafeCallee.js";
 import isLiteral from "./probes/isLiteral.js";
 import isLiteralRegex from "./probes/isLiteralRegex.js";
 import isRegexObject from "./probes/isRegexObject.js";
-import isVariableDeclaration from "./probes/isVariableDeclaration.js";
 import isRequire from "./probes/isRequire/isRequire.js";
 import isImportDeclaration from "./probes/isImportDeclaration.js";
-import isMemberExpression from "./probes/isMemberExpression.js";
-import isArrayExpression from "./probes/isArrayExpression.js";
-import isFunction from "./probes/isFunction.js";
-import isAssignmentExpression from "./probes/isAssignmentExpression.js";
-import isObjectExpression from "./probes/isObjectExpression.js";
-import isUnaryExpression from "./probes/isUnaryExpression.js";
 import isWeakCrypto from "./probes/isWeakCrypto.js";
-import isClassDeclaration from "./probes/isClassDeclaration.js";
-import isMethodDefinition from "./probes/isMethodDefinition.js";
+import isBinaryExpression from "./probes/isBinaryExpression.js";
+import isArrayExpression from "./probes/isArrayExpression.js";
 
 // Import Internal Dependencies
 import { SourceFile } from "./SourceFile.js";
@@ -50,17 +43,10 @@ export class ProbeRunner {
     isLiteral,
     isLiteralRegex,
     isRegexObject,
-    isVariableDeclaration,
     isImportDeclaration,
-    isMemberExpression,
-    isAssignmentExpression,
-    isObjectExpression,
-    isArrayExpression,
-    isFunction,
-    isUnaryExpression,
     isWeakCrypto,
-    isClassDeclaration,
-    isMethodDefinition
+    isBinaryExpression,
+    isArrayExpression
   ];
 
   /**
