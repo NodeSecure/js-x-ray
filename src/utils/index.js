@@ -5,3 +5,4 @@ export * from "./isUnsafeCallee.js";
 export * from "./notNullOrUndefined.js";
 export * from "./rootLocation.js";
 export * from "./toArrayLocation.js";
+export * from "./isNode.js";

@@ -1,18 +1,18 @@
-// Require Internal Dependencies
+// Import Internal Dependencies
 import { notNullOrUndefined } from "../utils/index.js";
 
 // CONSTANTS
 const kJJRegularSymbols = new Set(["$", "_"]);
 
-export function verify(sourceFile) {
-  if (sourceFile.counter.variableDeclarator > 0 || sourceFile.counter.functionDeclaration > 0) {
+export function verify(identifiers, counters) {
+  if (counters.VariableDeclarator > 0 || counters.FunctionDeclaration > 0) {
     return false;
   }
-  if (sourceFile.idtypes.assignExpr > sourceFile.idtypes.property) {
+  if (counters.AssignmentExpression > counters.Property) {
     return false;
   }
 
-  const matchCount = sourceFile.identifiersName.filter(({ name }) => {
+  const matchCount = identifiers.filter(({ name }) => {
     if (!notNullOrUndefined(name)) {
       return false;
     }
@@ -20,7 +20,7 @@ export function verify(sourceFile) {
 
     return charsCode.every((char) => kJJRegularSymbols.has(char));
   }).length;
-  const pourcent = ((matchCount / sourceFile.identifiersName.length) * 100);
+  const pourcent = ((matchCount / identifiers.length) * 100);
 
   return pourcent > 80;
 }

@@ -5,35 +5,20 @@ import { VariableTracer } from "@nodesecure/estree-ast-utils";
 // Import Internal Dependencies
 import { rootLocation, toArrayLocation } from "./utils/index.js";
 import { generateWarning } from "./warnings.js";
-import { isObfuscatedCode, hasTrojanSource } from "./obfuscators/index.js";
 import { ProbeRunner } from "./ProbeRunner.js";
+import { Deobfuscator } from "./Deobfuscator.js";
+import * as trojan from "./obfuscators/trojan-source.js";
 
 // CONSTANTS
-const kDictionaryStrParts = [
-  "abcdefghijklmnopqrstuvwxyz",
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  "0123456789"
-];
-
 const kMaximumEncodedLiterals = 10;
 
 export class SourceFile {
   inTryStatement = false;
-  hasDictionaryString = false;
-  hasPrefixedIdentifiers = false;
   dependencyAutoWarning = false;
-  varkinds = { var: 0, let: 0, const: 0 };
-  idtypes = { assignExpr: 0, property: 0, variableDeclarator: 0, functionDeclaration: 0 };
-  counter = {
-    identifiers: 0,
-    doubleUnaryArray: 0,
-    computedMemberExpr: 0,
-    memberExpr: 0,
-    deepBinaryExpr: 0,
-    encodedArrayValue: 0
-  };
-  morseLiterals = new Set();
-  identifiersName = [];
+  deobfuscator = new Deobfuscator();
+  dependencies = new Map();
+  encodedLiterals = new Map();
+  warnings = [];
 
   constructor(sourceCodeString) {
     this.tracer = new VariableTracer()
@@ -42,13 +27,8 @@ export class SourceFile {
         followConsecutiveAssignment: true, moduleName: "crypto"
       });
 
-    this.dependencies = new Map();
-    this.encodedLiterals = new Map();
-    this.warnings = [];
-    this.literalScores = [];
     this.probesRunner = new ProbeRunner(this);
-
-    if (hasTrojanSource(sourceCodeString)) {
+    if (trojan.verify(sourceCodeString)) {
       this.addWarning("obfuscated-code", "trojan-source");
     }
   }
@@ -92,35 +72,16 @@ export class SourceFile {
     }
   }
 
-  analyzeString(str) {
-    const score = Utils.stringSuspicionScore(str);
-    if (score !== 0) {
-      this.literalScores.push(score);
-    }
-
-    if (!this.hasDictionaryString) {
-      const isDictionaryStr = kDictionaryStrParts.every((word) => str.includes(word));
-      if (isDictionaryStr) {
-        this.hasDictionaryString = true;
-      }
-    }
-
-    // Searching for morse string like "--.- --.--."
-    if (Utils.isMorse(str)) {
-      this.morseLiterals.add(str);
-    }
-  }
-
   analyzeLiteral(node, inArrayExpr = false) {
     if (typeof node.value !== "string" || Utils.isSvg(node)) {
       return;
     }
-    this.analyzeString(node.value);
+    this.deobfuscator.analyzeString(node.value);
 
     const { hasHexadecimalSequence, hasUnicodeSequence, isBase64 } = Literal.defaultAnalysis(node);
     if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
       if (inArrayExpr) {
-        this.counter.encodedArrayValue++;
+        this.deobfuscator.encodedArrayValue++;
       }
       else {
         this.addWarning("encoded-literal", node.value, node.loc);
@@ -129,17 +90,19 @@ export class SourceFile {
   }
 
   getResult(isMinified) {
-    this.counter.identifiers = this.identifiersName.length;
-    const [isObfuscated, kind] = isObfuscatedCode(this);
-    if (isObfuscated) {
-      this.addWarning("obfuscated-code", kind);
+    const obfuscatorName = this.deobfuscator.assertObfuscation(this);
+    if (obfuscatorName !== null) {
+      this.addWarning("obfuscated-code", obfuscatorName);
     }
 
-    const identifiersLengthArr = this.identifiersName
-      .filter((value) => value.type !== "property" && typeof value.name === "string")
+    const identifiersLengthArr = this.deobfuscator.identifiers
+      .filter((value) => value.type !== "Property" && typeof value.name === "string")
       .map((value) => value.name.length);
 
-    const [idsLengthAvg, stringScore] = [sum(identifiersLengthArr), sum(this.literalScores)];
+    const [idsLengthAvg, stringScore] = [
+      sum(identifiersLengthArr),
+      sum(this.deobfuscator.literalScores)
+    ];
     if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
       this.addWarning("short-identifiers", idsLengthAvg);
     }
@@ -158,6 +121,7 @@ export class SourceFile {
 
   walk(node) {
     this.tracer.walk(node);
+    this.deobfuscator.walk(node);
 
     // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
     if (node.type === "TryStatement" && typeof node.handler !== "undefined") {

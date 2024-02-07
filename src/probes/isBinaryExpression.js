@@ -16,7 +16,7 @@ function main(node, options) {
 
   const [binaryExprDeepness, hasUnaryExpression] = walkBinaryExpression(node);
   if (binaryExprDeepness >= 3 && hasUnaryExpression) {
-    sourceFile.counter.deepBinaryExpr++;
+    sourceFile.deobfuscator.deepBinaryExpression++;
   }
 }
 

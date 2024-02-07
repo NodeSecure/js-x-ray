@@ -1,11 +1,11 @@
 // CONSTANTS
 const kJSFuckMinimumDoubleUnaryExpr = 5;
 
-export function verify(sourceFile) {
-  const hasZeroAssign = sourceFile.idtypes.assignExpr === 0
-    && sourceFile.idtypes.functionDeclaration === 0
-    && sourceFile.idtypes.property === 0
-    && sourceFile.idtypes.variableDeclarator === 0;
+export function verify(counters) {
+  const hasZeroAssign = counters.AssignmentExpression === 0
+    && counters.FunctionDeclaration === 0
+    && counters.Property === 0
+    && counters.VariableDeclarator === 0;
 
-  return hasZeroAssign && sourceFile.counter.doubleUnaryArray >= kJSFuckMinimumDoubleUnaryExpr;
+  return hasZeroAssign && counters.DoubleUnaryExpression >= kJSFuckMinimumDoubleUnaryExpr;
 }
