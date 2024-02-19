@@ -1,44 +1,39 @@
 // Import Node.js Dependencies
 import { randomBytes } from "node:crypto";
-
-// Import Third-party Dependencies
-import test from "tape";
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { isLiteral, toValue, toRaw, defaultAnalysis } from "../src/literal.js";
 import { createLiteral } from "./utils/index.js";
 
-test("isLiteral must return true for a valid ESTree Literal Node", (tape) => {
+test("isLiteral must return true for a valid ESTree Literal Node", () => {
   const literalSample = createLiteral("boo");
 
-  tape.strictEqual(isLiteral(literalSample), true);
-  tape.strictEqual(isLiteral("hey"), false);
-  tape.strictEqual(isLiteral({ type: "fake", value: "boo" }), false);
-  tape.end();
+  assert.strictEqual(isLiteral(literalSample), true);
+  assert.strictEqual(isLiteral("hey"), false);
+  assert.strictEqual(isLiteral({ type: "fake", value: "boo" }), false);
 });
 
-test("toValue must return a string when we give a valid EStree Literal", (tape) => {
+test("toValue must return a string when we give a valid EStree Literal", () => {
   const literalSample = createLiteral("boo");
 
-  tape.strictEqual(toValue(literalSample), "boo");
-  tape.strictEqual(toValue("hey"), "hey");
-  tape.end();
+  assert.strictEqual(toValue(literalSample), "boo");
+  assert.strictEqual(toValue("hey"), "hey");
 });
 
-test("toRaw must return a string when we give a valid EStree Literal", (tape) => {
+test("toRaw must return a string when we give a valid EStree Literal", () => {
   const literalSample = createLiteral("boo", true);
 
-  tape.strictEqual(toRaw(literalSample), "boo");
-  tape.strictEqual(toRaw("hey"), "hey");
-  tape.end();
+  assert.strictEqual(toRaw(literalSample), "boo");
+  assert.strictEqual(toRaw("hey"), "hey");
 });
 
-test("defaultAnalysis() of something else than a Literal must always return null", (tape) => {
-  tape.strictEqual(defaultAnalysis(10), null);
-  tape.end();
+test("defaultAnalysis() of something else than a Literal must always return null", () => {
+  assert.strictEqual(defaultAnalysis(10), null);
 });
 
-test("defaultAnalysis() of an Hexadecimal value", (tape) => {
+test("defaultAnalysis() of an Hexadecimal value", () => {
   const hexValue = randomBytes(10).toString("hex");
 
   const result = defaultAnalysis(createLiteral(hexValue, true));
@@ -46,11 +41,10 @@ test("defaultAnalysis() of an Hexadecimal value", (tape) => {
     isBase64: true, hasHexadecimalSequence: false, hasUnicodeSequence: false
   };
 
-  tape.deepEqual(result, expected);
-  tape.end();
+  assert.deepEqual(result, expected);
 });
 
-test("defaultAnalysis() of an Base64 value", (tape) => {
+test("defaultAnalysis() of an Base64 value", () => {
   const hexValue = randomBytes(10).toString("base64");
 
   const result = defaultAnalysis(createLiteral(hexValue, true));
@@ -58,11 +52,10 @@ test("defaultAnalysis() of an Base64 value", (tape) => {
     isBase64: true, hasHexadecimalSequence: false, hasUnicodeSequence: false
   };
 
-  tape.deepEqual(result, expected);
-  tape.end();
+  assert.deepEqual(result, expected);
 });
 
-test("defaultAnalysis() of an Unicode Sequence", (tape) => {
+test("defaultAnalysis() of an Unicode Sequence", () => {
   const unicodeSequence = createLiteral("'\\u0024\\u0024'", true);
 
   const result = defaultAnalysis(unicodeSequence);
@@ -70,11 +63,10 @@ test("defaultAnalysis() of an Unicode Sequence", (tape) => {
     isBase64: false, hasHexadecimalSequence: false, hasUnicodeSequence: true
   };
 
-  tape.deepEqual(result, expected);
-  tape.end();
+  assert.deepEqual(result, expected);
 });
 
-test("defaultAnalysis() of an Unicode Sequence", (tape) => {
+test("defaultAnalysis() of an Unicode Sequence", () => {
   const hexSequence = createLiteral("'\\x64\\x61\\x74\\x61'", true);
 
   const result = defaultAnalysis(hexSequence);
@@ -82,11 +74,10 @@ test("defaultAnalysis() of an Unicode Sequence", (tape) => {
     isBase64: false, hasHexadecimalSequence: true, hasUnicodeSequence: false
   };
 
-  tape.deepEqual(result, expected);
-  tape.end();
+  assert.deepEqual(result, expected);
 });
 
-test("defaultAnalysis() with a Literal with no 'raw' property must return two null values", (tape) => {
+test("defaultAnalysis() with a Literal with no 'raw' property must return two null values", () => {
   const hexValue = randomBytes(10).toString("base64");
 
   const result = defaultAnalysis(createLiteral(hexValue));
@@ -94,6 +85,5 @@ test("defaultAnalysis() with a Literal with no 'raw' property must return two nu
     isBase64: true, hasHexadecimalSequence: null, hasUnicodeSequence: null
   };
 
-  tape.deepEqual(result, expected);
-  tape.end();
+  assert.deepEqual(result, expected);
 });
