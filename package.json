@@ -55,15 +55,12 @@
   },
   "devDependencies": {
     "@nodesecure/eslint-config": "^1.6.0",
-    "@small-tech/esm-tape-runner": "^2.0.0",
-    "@small-tech/tap-monkey": "^1.4.0",
     "@types/node": "^20.6.2",
     "c8": "^9.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.31.0",
     "glob": "^10.3.4",
     "iterator-matcher": "^2.1.0",
-    "pkg-ok": "^3.0.0",
-    "tape": "^5.7.2"
+    "pkg-ok": "^3.0.0"
   }
 }
