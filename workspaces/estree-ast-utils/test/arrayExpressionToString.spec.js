@@ -1,12 +1,15 @@
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
+
 // Import Third-party Dependencies
-import test from "tape";
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
 import { arrayExpressionToString } from "../src/index.js";
 import { codeToAst, getExpressionFromStatement, createTracer } from "./utils.js";
 
-test("given an ArrayExpression with two Literals then the iterable must return them one by one", (tape) => {
+test("given an ArrayExpression with two Literals then the iterable must return them one by one", () => {
   const [astNode] = codeToAst("['foo', 'bar']");
   const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
@@ -15,12 +18,11 @@ test("given an ArrayExpression with two Literals then the iterable must return t
     .expect("bar")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
 
-test("given an ArrayExpression with two Identifiers then the iterable must return value from the Tracer", (tape) => {
+test("given an ArrayExpression with two Identifiers then the iterable must return value from the Tracer", () => {
   const { tracer } = createTracer();
   tracer.literalIdentifiers.set("foo", "1");
   tracer.literalIdentifiers.set("bar", "2");
@@ -33,14 +35,13 @@ test("given an ArrayExpression with two Identifiers then the iterable must retur
     .expect("2")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
 
 test(`given an ArrayExpression with two numbers
   then the function must convert them as char code
-  and return them in the iterable`, (tape) => {
+  and return them in the iterable`, () => {
   const [astNode] = codeToAst("[65, 66]");
   const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
@@ -49,27 +50,24 @@ test(`given an ArrayExpression with two numbers
     .expect("B")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
 
-test("given an ArrayExpression with empty Literals then the iterable must return no values", (tape) => {
+test("given an ArrayExpression with empty Literals then the iterable must return no values", () => {
   const [astNode] = codeToAst("['', '']");
   const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
   const iterResult = [...iter];
 
-  tape.strictEqual(iterResult.length, 0);
-  tape.end();
+  assert.strictEqual(iterResult.length, 0);
 });
 
-test("given an AST that is not an ArrayExpression then it must return immediately", (tape) => {
+test("given an AST that is not an ArrayExpression then it must return immediately", () => {
   const [astNode] = codeToAst("const foo = 5;");
   const iter = arrayExpressionToString(astNode);
 
   const iterResult = [...iter];
 
-  tape.strictEqual(iterResult.length, 0);
-  tape.end();
+  assert.strictEqual(iterResult.length, 0);
 });

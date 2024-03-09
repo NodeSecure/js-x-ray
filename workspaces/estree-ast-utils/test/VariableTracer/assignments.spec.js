@@ -1,10 +1,11 @@
-// Import Third-party Dependencies
-import test from "tape";
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { createTracer } from "../utils.js";
 
-test("it should be able to Trace a require Assignment (using a global variable)", (tape) => {
+test("it should be able to Trace a require Assignment (using a global variable)", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -15,21 +16,19 @@ test("it should be able to Trace a require Assignment (using a global variable)"
   `);
 
   const foo = helpers.tracer.getDataFromIdentifier("foo");
-  tape.deepEqual(foo, {
+  assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require",
     assignmentMemory: ["foo"]
   });
-  tape.strictEqual(assignments.length, 1);
+  assert.strictEqual(assignments.length, 1);
 
   const [eventOne] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "require");
-  tape.strictEqual(eventOne.id, "foo");
-
-  tape.end();
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "require");
+  assert.strictEqual(eventOne.id, "foo");
 });
 
-test("it should be able to Trace a require Assignment (using a MemberExpression)", (tape) => {
+test("it should be able to Trace a require Assignment (using a MemberExpression)", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -39,21 +38,19 @@ test("it should be able to Trace a require Assignment (using a MemberExpression)
   `);
 
   const foo = helpers.tracer.getDataFromIdentifier("foo");
-  tape.deepEqual(foo, {
+  assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require.resolve",
     assignmentMemory: ["foo"]
   });
-  tape.strictEqual(assignments.length, 1);
+  assert.strictEqual(assignments.length, 1);
 
   const [eventOne] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "require.resolve");
-  tape.strictEqual(eventOne.id, "foo");
-
-  tape.end();
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "require.resolve");
+  assert.strictEqual(eventOne.id, "foo");
 });
 
-test("it should be able to Trace a global Assignment using an ESTree ObjectPattern", (tape) => {
+test("it should be able to Trace a global Assignment using an ESTree ObjectPattern", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -65,24 +62,22 @@ test("it should be able to Trace a global Assignment using an ESTree ObjectPatte
 
   const boo = helpers.tracer.getDataFromIdentifier("boo");
 
-  tape.deepEqual(boo, {
+  assert.deepEqual(boo, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
     assignmentMemory: ["yoo", "boo"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "process");
-  tape.strictEqual(eventOne.id, "yoo");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "process");
+  assert.strictEqual(eventOne.id, "yoo");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
-  tape.strictEqual(eventTwo.id, "boo");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
+  assert.strictEqual(eventTwo.id, "boo");
 });
 
-test("it should be able to Trace an Unsafe Function() Assignment using an ESTree ObjectPattern", (tape) => {
+test("it should be able to Trace an Unsafe Function() Assignment using an ESTree ObjectPattern", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -94,24 +89,22 @@ test("it should be able to Trace an Unsafe Function() Assignment using an ESTree
 
   const boo = helpers.tracer.getDataFromIdentifier("boo");
 
-  tape.deepEqual(boo, {
+  assert.deepEqual(boo, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
     assignmentMemory: ["yoo", "boo"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "process");
-  tape.strictEqual(eventOne.id, "yoo");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "process");
+  assert.strictEqual(eventOne.id, "yoo");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
-  tape.strictEqual(eventTwo.id, "boo");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
+  assert.strictEqual(eventTwo.id, "boo");
 });
 
-test("it should be able to Trace a require Assignment with atob", (tape) => {
+test("it should be able to Trace a require Assignment with atob", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -120,19 +113,17 @@ test("it should be able to Trace a require Assignment with atob", (tape) => {
     const yo = 'b3M=';
     const ff = xo(yo);
   `);
-  tape.strictEqual(assignments.length, 1);
+  assert.strictEqual(assignments.length, 1);
 
   const [eventOne] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "atob");
-  tape.strictEqual(eventOne.id, "xo");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "atob");
+  assert.strictEqual(eventOne.id, "xo");
 
-  tape.true(helpers.tracer.literalIdentifiers.has("ff"));
-  tape.strictEqual(helpers.tracer.literalIdentifiers.get("ff"), "os");
-
-  tape.end();
+  assert.ok(helpers.tracer.literalIdentifiers.has("ff"));
+  assert.strictEqual(helpers.tracer.literalIdentifiers.get("ff"), "os");
 });
 
-test("it should be able to Trace a global assignment using a LogicalExpression", (tape) => {
+test("it should be able to Trace a global assignment using a LogicalExpression", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -142,16 +133,14 @@ test("it should be able to Trace a global assignment using a LogicalExpression",
     foo("http");
   `);
   const foo = helpers.tracer.getDataFromIdentifier("foo");
-  tape.deepEqual(foo, {
+  assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require",
     assignmentMemory: ["foo"]
   });
-  tape.strictEqual(assignments.length, 1);
+  assert.strictEqual(assignments.length, 1);
 
   const [eventOne] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "require");
-  tape.strictEqual(eventOne.id, "foo");
-
-  tape.end();
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "require");
+  assert.strictEqual(eventOne.id, "foo");
 });

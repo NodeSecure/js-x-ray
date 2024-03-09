@@ -1,19 +1,19 @@
-// Import Third-party Dependencies
-import test from "tape";
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { createTracer } from "../utils.js";
 
-test("getDataFromIdentifier must return primitive null is there is no kwown traced identifier", (tape) => {
+test("getDataFromIdentifier must return primitive null is there is no kwown traced identifier", () => {
   const helpers = createTracer(true);
 
   const result = helpers.tracer.getDataFromIdentifier("foobar");
 
-  tape.strictEqual(result, null);
-  tape.end();
+  assert.strictEqual(result, null);
 });
 
-test("it should be able to Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", (tape) => {
+test("it should be able to Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -27,24 +27,22 @@ test("it should be able to Trace a malicious code with Global, BinaryExpr, Assig
   `);
 
   const evil = helpers.tracer.getDataFromIdentifier("evil");
-  tape.deepEqual(evil, {
+  assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
     assignmentMemory: ["p", "evil"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "process");
-  tape.strictEqual(eventOne.id, "p");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "process");
+  assert.strictEqual(eventOne.id, "p");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
-  tape.strictEqual(eventTwo.id, "evil");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule.require");
+  assert.strictEqual(eventTwo.id, "evil");
 });
 
-test("it should be able to Trace a malicious CallExpression by recombining segments of the MemberExpression", (tape) => {
+test("it should be able to Trace a malicious CallExpression by recombining segments of the MemberExpression", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -57,36 +55,32 @@ test("it should be able to Trace a malicious CallExpression by recombining segme
   `);
 
   const evil = helpers.tracer.getDataFromIdentifier("r.require");
-  tape.deepEqual(evil, {
+  assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
     assignmentMemory: ["g", "r", "c"]
   });
-  tape.strictEqual(assignments.length, 3);
+  assert.strictEqual(assignments.length, 3);
 
   const [eventOne, eventTwo, eventThree] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "process");
-  tape.strictEqual(eventOne.id, "g");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "process");
+  assert.strictEqual(eventOne.id, "g");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule");
-  tape.strictEqual(eventTwo.id, "r");
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "process.mainModule");
+  assert.strictEqual(eventTwo.id, "r");
 
-  tape.strictEqual(eventThree.identifierOrMemberExpr, "process.mainModule.require");
-  tape.strictEqual(eventThree.id, "c");
-
-  tape.end();
+  assert.strictEqual(eventThree.identifierOrMemberExpr, "process.mainModule.require");
+  assert.strictEqual(eventThree.id, "c");
 });
 
-test("given a MemberExpression segment that doesn't match anything then it should return null", (tape) => {
+test("given a MemberExpression segment that doesn't match anything then it should return null", () => {
   const helpers = createTracer(true);
 
   const result = helpers.tracer.getDataFromIdentifier("foo.bar");
-  tape.strictEqual(result, null);
-
-  tape.end();
+  assert.strictEqual(result, null);
 });
 
-test("it should be able to Trace a require using Function.prototype.call", (tape) => {
+test("it should be able to Trace a require using Function.prototype.call", () => {
   const helpers = createTracer();
   helpers.tracer.trace("http");
   const assignments = helpers.getAssignmentArray();
@@ -97,17 +91,15 @@ test("it should be able to Trace a require using Function.prototype.call", (tape
 
   const proto = helpers.tracer.getDataFromIdentifier("proto");
 
-  tape.strictEqual(proto, null);
-  tape.strictEqual(assignments.length, 1);
+  assert.strictEqual(proto, null);
+  assert.strictEqual(assignments.length, 1);
 
   const [eventOne] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "http");
-  tape.strictEqual(eventOne.id, "proto");
-
-  tape.end();
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "http");
+  assert.strictEqual(eventOne.id, "proto");
 });
 
-test("it should be able to Trace an unsafe crypto.createHash using Function.prototype.call reassignment", (tape) => {
+test("it should be able to Trace an unsafe crypto.createHash using Function.prototype.call reassignment", () => {
   const helpers = createTracer(true);
   helpers.tracer.trace("crypto.createHash", { followConsecutiveAssignment: true });
   const assignments = helpers.getAssignmentArray();
@@ -122,24 +114,22 @@ test("it should be able to Trace an unsafe crypto.createHash using Function.prot
   `);
 
   const createHashBis = helpers.tracer.getDataFromIdentifier("createHashBis");
-  tape.deepEqual(createHashBis, {
+  assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
     assignmentMemory: ["crr", "createHashBis"]
   });
 
-  tape.strictEqual(helpers.tracer.importedModules.has("crypto"), true);
-  tape.strictEqual(assignments.length, 3);
+  assert.strictEqual(helpers.tracer.importedModules.has("crypto"), true);
+  assert.strictEqual(assignments.length, 3);
 
   const [eventOne, eventTwo, eventThree] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "require");
-  tape.strictEqual(eventOne.id, "bB");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "require");
+  assert.strictEqual(eventOne.id, "bB");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "crypto");
-  tape.strictEqual(eventTwo.id, "crr");
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "crypto");
+  assert.strictEqual(eventTwo.id, "crr");
 
-  tape.strictEqual(eventThree.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventThree.id, "createHashBis");
-
-  tape.end();
+  assert.strictEqual(eventThree.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventThree.id, "createHashBis");
 });

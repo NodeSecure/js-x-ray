@@ -1,10 +1,11 @@
-// Import Third-party Dependencies
-import test from "tape";
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { createTracer } from "../utils.js";
 
-test("it should be able to Trace crypto.createHash when imported with an ESTree ImportNamespaceSpecifier (ESM)", (tape) => {
+test("it should be able to Trace crypto.createHash when imported with an ESTree ImportNamespaceSpecifier (ESM)", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -22,24 +23,22 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
 
   const createHashBis = helpers.tracer.getDataFromIdentifier("createHashBis");
 
-  tape.deepEqual(createHashBis, {
+  assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
     assignmentMemory: ["cryptoBis", "createHashBis"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "crypto");
-  tape.strictEqual(eventOne.id, "cryptoBis");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "crypto");
+  assert.strictEqual(eventOne.id, "cryptoBis");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventTwo.id, "createHashBis");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace createHash when required (CommonJS) and destructured with an ESTree ObjectPattern", (tape) => {
+test("it should be able to Trace createHash when required (CommonJS) and destructured with an ESTree ObjectPattern", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -60,24 +59,22 @@ test("it should be able to Trace createHash when required (CommonJS) and destruc
 
   const createHashBis = helpers.tracer.getDataFromIdentifier("createHashBis");
 
-  tape.deepEqual(createHashBis, {
+  assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
     assignmentMemory: ["createHash", "createHashBis"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventOne.id, "createHash");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventOne.id, "createHash");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventTwo.id, "createHashBis");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace crypto.createHash when imported with an ESTree ImportSpecifier (ESM)", (tape) => {
+test("it should be able to Trace crypto.createHash when imported with an ESTree ImportSpecifier (ESM)", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -94,24 +91,22 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
 
   const createHashBis = helpers.tracer.getDataFromIdentifier("createHashBis");
 
-  tape.deepEqual(createHashBis, {
+  assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
     assignmentMemory: ["createHash", "createHashBis"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventOne.id, "createHash");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventOne.id, "createHash");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventTwo.id, "createHashBis");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace crypto.createHash with CommonJS require and with a computed method with a Literal", (tape) => {
+test("it should be able to Trace crypto.createHash with CommonJS require and with a computed method with a Literal", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -128,28 +123,26 @@ test("it should be able to Trace crypto.createHash with CommonJS require and wit
     createHashBis("md5");
   `);
 
-  tape.strictEqual(helpers.tracer.importedModules.has("crypto"), true);
+  assert.strictEqual(helpers.tracer.importedModules.has("crypto"), true);
 
   const createHashBis = helpers.tracer.getDataFromIdentifier("createHashBis");
 
-  tape.deepEqual(createHashBis, {
+  assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
     assignmentMemory: ["createHashBis"]
   });
-  tape.strictEqual(assignments.length, 2);
+  assert.strictEqual(assignments.length, 2);
 
   const [eventOne, eventTwo] = assignments;
-  tape.strictEqual(eventOne.identifierOrMemberExpr, "crypto");
-  tape.strictEqual(eventOne.id, "crypto");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "crypto");
+  assert.strictEqual(eventOne.id, "crypto");
 
-  tape.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
-  tape.strictEqual(eventTwo.id, "createHashBis");
-
-  tape.end();
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "crypto.createHash");
+  assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should not detect variable assignment since the crypto module is not imported", (tape) => {
+test("it should not detect variable assignment since the crypto module is not imported", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -166,13 +159,11 @@ test("it should not detect variable assignment since the crypto module is not im
     _t("md5");
   `);
 
-  tape.strictEqual(helpers.tracer.importedModules.has("crypto"), false);
-  tape.strictEqual(assignments.length, 0);
-
-  tape.end();
+  assert.strictEqual(helpers.tracer.importedModules.has("crypto"), false);
+  assert.strictEqual(assignments.length, 0);
 });
 
-test("it should return null because crypto.createHash is not imported from a module", (tape) => {
+test("it should return null because crypto.createHash is not imported from a module", () => {
   const helpers = createTracer(true);
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -188,7 +179,5 @@ test("it should return null because crypto.createHash is not imported from a mod
   `);
 
   const result = helpers.tracer.getDataFromIdentifier("crypto.createHash");
-  tape.strictEqual(result, null);
-
-  tape.end();
+  assert.strictEqual(result, null);
 });
