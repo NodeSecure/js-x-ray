@@ -16,8 +16,9 @@ export class AstAnalyser {
    * @constructor
    * @param { SourceParser } [parser]
    */
-  constructor(parser = new JsSourceParser()) {
+  constructor(parser = new JsSourceParser(), customProbes = []) {
     this.parser = parser;
+    this.customProbes = customProbes;
   }
 
   analyse(str, options = Object.create(null)) {
@@ -31,7 +32,7 @@ export class AstAnalyser {
       isEcmaScriptModule: Boolean(module)
     });
 
-    const source = new SourceFile(str);
+    const source = new SourceFile(str, this.customProbes);
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
