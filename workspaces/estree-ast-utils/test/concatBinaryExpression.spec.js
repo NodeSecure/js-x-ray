@@ -1,12 +1,15 @@
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
+
 // Import Third-party Dependencies
-import test from "tape";
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "../src/index.js";
 import { codeToAst, getExpressionFromStatement, createTracer } from "./utils.js";
 
-test("given a BinaryExpression of two literals then the iterable must return Literal values", (tape) => {
+test("given a BinaryExpression of two literals then the iterable must return Literal values", () => {
   const [astNode] = codeToAst("'foo' + 'bar' + 'xd'");
   const iter = concatBinaryExpression(getExpressionFromStatement(astNode));
 
@@ -16,12 +19,11 @@ test("given a BinaryExpression of two literals then the iterable must return Lit
     .expect("xd")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 3);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 3);
 });
 
-test("given a BinaryExpression of two ArrayExpression then the iterable must return Array values as string", (tape) => {
+test("given a BinaryExpression of two ArrayExpression then the iterable must return Array values as string", () => {
   const [astNode] = codeToAst("['A'] + ['B']");
   const iter = concatBinaryExpression(getExpressionFromStatement(astNode));
 
@@ -30,12 +32,11 @@ test("given a BinaryExpression of two ArrayExpression then the iterable must ret
     .expect("B")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
 
-test("given a BinaryExpression of two Identifiers then the iterable must the tracer values", (tape) => {
+test("given a BinaryExpression of two Identifiers then the iterable must the tracer values", () => {
   const { tracer } = createTracer();
   tracer.literalIdentifiers.set("foo", "A");
   tracer.literalIdentifiers.set("bar", "B");
@@ -48,13 +49,11 @@ test("given a BinaryExpression of two Identifiers then the iterable must the tra
     .expect("B")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
 
-test("given a one level BinaryExpression with an unsupported node it should throw an Error", (tape) => {
-  tape.plan(1);
+test("given a one level BinaryExpression with an unsupported node it should throw an Error", () => {
   const { tracer } = createTracer();
 
   const [astNode] = codeToAst("evil() + 's'");
@@ -66,14 +65,11 @@ test("given a one level BinaryExpression with an unsupported node it should thro
     iter.next();
   }
   catch (error) {
-    tape.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
+    assert.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
   }
-
-  tape.end();
 });
 
-test("given a Deep BinaryExpression with an unsupported node it should throw an Error", (tape) => {
-  tape.plan(1);
+test("given a Deep BinaryExpression with an unsupported node it should throw an Error", () => {
   const { tracer } = createTracer();
 
   const [astNode] = codeToAst("'a' + evil() + 's'");
@@ -85,8 +81,6 @@ test("given a Deep BinaryExpression with an unsupported node it should throw an 
     iter.next();
   }
   catch (error) {
-    tape.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
+    assert.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
   }
-
-  tape.end();
 });

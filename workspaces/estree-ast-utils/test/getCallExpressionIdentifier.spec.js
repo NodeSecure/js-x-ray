@@ -1,66 +1,61 @@
-// Import Third-party Dependencies
-import test from "tape";
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
 
 // Import Internal Dependencies
 import { getCallExpressionIdentifier } from "../src/index.js";
 import { codeToAst, getExpressionFromStatement } from "./utils.js";
 
-test("given a JavaScript eval CallExpression then it must return eval", (tape) => {
+test("given a JavaScript eval CallExpression then it must return eval", () => {
   const [astNode] = codeToAst("eval(\"this\");");
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
-  tape.strictEqual(nodeIdentifier, "eval");
-  tape.end();
+  assert.strictEqual(nodeIdentifier, "eval");
 });
 
-test("given a Function(`...`)() Double CallExpression then it must return the Function literal identifier", (tape) => {
+test("given a Function(`...`)() Double CallExpression then it must return the Function literal identifier", () => {
   const [astNode] = codeToAst("Function(\"return this\")();");
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
-  tape.strictEqual(nodeIdentifier, "Function");
-  tape.end();
+  assert.strictEqual(nodeIdentifier, "Function");
 });
 
 test(`given a Function("...")() Double CallExpression with resolveCallExpression options disabled
-then it must return null`, (tape) => {
+then it must return null`, () => {
   const [astNode] = codeToAst("Function(\"return this\")();");
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: false }
   );
 
-  tape.strictEqual(nodeIdentifier, null);
-  tape.end();
+  assert.strictEqual(nodeIdentifier, null);
 });
 
-test("given a JavaScript AssignmentExpression then it must return null", (tape) => {
+test("given a JavaScript AssignmentExpression then it must return null", () => {
   const [astNode] = codeToAst("foo = 10;");
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
-  tape.strictEqual(nodeIdentifier, null);
-  tape.end();
+  assert.strictEqual(nodeIdentifier, null);
 });
 
 test(`given a require statement immediatly invoked with resolveCallExpression options enabled
-then it must return require literal identifier`, (tape) => {
+then it must return require literal identifier`, () => {
   const [astNode] = codeToAst("require('foo')();");
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: true }
   );
 
-  tape.strictEqual(nodeIdentifier, "require");
-  tape.end();
+  assert.strictEqual(nodeIdentifier, "require");
 });
 
 test(`given a require statement immediatly invoked with resolveCallExpression options disabled
-then it must return null`, (tape) => {
+then it must return null`, () => {
   const [astNode] = codeToAst("require('foo')();");
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: false }
   );
 
-  tape.strictEqual(nodeIdentifier, null);
-  tape.end();
+  assert.strictEqual(nodeIdentifier, null);
 });

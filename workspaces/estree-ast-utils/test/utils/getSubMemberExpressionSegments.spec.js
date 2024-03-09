@@ -1,11 +1,14 @@
+// Import Node.js Dependencies
+import { test } from "node:test";
+import assert from "node:assert";
+
 // Import Third-party Dependencies
-import test from "tape";
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
 import { getSubMemberExpressionSegments } from "../../src/utils/index.js";
 
-test("given a MemberExpression then it should return each segments (except the last one)", (tape) => {
+test("given a MemberExpression then it should return each segments (except the last one)", () => {
   const iter = getSubMemberExpressionSegments("foo.bar.xd");
 
   const iterResult = new IteratorMatcher()
@@ -13,7 +16,6 @@ test("given a MemberExpression then it should return each segments (except the l
     .expect("foo.bar")
     .execute(iter, { allowNoMatchingValues: false });
 
-  tape.strictEqual(iterResult.isMatching, true);
-  tape.strictEqual(iterResult.elapsedSteps, 2);
-  tape.end();
+  assert.strictEqual(iterResult.isMatching, true);
+  assert.strictEqual(iterResult.elapsedSteps, 2);
 });
