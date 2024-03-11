@@ -6,6 +6,7 @@ import assert from "node:assert";
 import { JsSourceParser } from "../../src/JsSourceParser.js";
 import { AstAnalyser } from "../../src/AstAnalyser.js";
 import { ProbeSignals } from "../../src/ProbeRunner.js";
+import { runASTAnalysis } from "../../index.js";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/221
@@ -37,7 +38,7 @@ const customProbes = [
 ];
 
 test("should append to list of probes (default)", () => {
-  const analyser = new AstAnalyser(new JsSourceParser(), customProbes);
+  const analyser = new AstAnalyser(new JsSourceParser(), { customProbes });
   const result = analyser.analyse(kIncriminedCodeSample);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
@@ -47,8 +48,25 @@ test("should append to list of probes (default)", () => {
 });
 
 test("should replace list of probes", () => {
-  const analyser = new AstAnalyser(new JsSourceParser(), customProbes, "replace");
+  const analyser = new AstAnalyser(new JsSourceParser(), { customProbes, isReplacing: true });
   const result = analyser.analyse(kIncriminedCodeSample);
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings.length, 1);
+});
+
+
+test("should append list of probes using runASTAnalysis", () => {
+  const result = runASTAnalysis(kIncriminedCodeSample, { astOptions: { isReplacing: false, customProbes } });
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
+  assert.equal(result.warnings[2].kind, kWarningUnsafeStmt);
+  assert.equal(result.warnings.length, 3);
+});
+
+test("should replace list of probes using runASTAnalysis", () => {
+  const result = runASTAnalysis(kIncriminedCodeSample, { astOptions: { isReplacing: true, customProbes } });
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);

@@ -20,21 +20,18 @@ export class SourceFile {
   encodedLiterals = new Map();
   warnings = [];
 
-  constructor(sourceCodeString, customProbes = [], mergeMode = "append") {
+  constructor(sourceCodeString, astOptions = { isReplacing: false, customProbes: [] }) {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
       .trace("crypto.createHash", {
         followConsecutiveAssignment: true, moduleName: "crypto"
       });
 
-    let mergedProbes;
-    if (Array.isArray(customProbes) && customProbes.length > 0) {
-      mergedProbes = mergeMode === "replace" ? customProbes : [...ProbeRunner.Defaults, ...customProbes];
+    let probes = ProbeRunner.Defaults;
+    if (Array.isArray(astOptions.customProbes) && astOptions.customProbes.length > 0) {
+      probes = astOptions.isReplacing === true ? astOptions.customProbes : [...probes, ...astOptions.customProbes];
     }
-    else {
-      mergedProbes = ProbeRunner.Defaults;
-    }
-    this.probesRunner = new ProbeRunner(this, mergedProbes);
+    this.probesRunner = new ProbeRunner(this, probes);
 
     if (trojan.verify(sourceCodeString)) {
       this.addWarning("obfuscated-code", "trojan-source");

@@ -14,12 +14,12 @@ import { JsSourceParser } from "./JsSourceParser.js";
 export class AstAnalyser {
   /**
    * @constructor
-   * @param { SourceParser } [parser]
+   * @param {SourceParser} [parser]
+   * @param astOptions
    */
-  constructor(parser = new JsSourceParser(), customProbes = [], mergeMode = "append") {
+  constructor(parser = new JsSourceParser(), astOptions = { isReplacing: false, customProbe: [] }) {
     this.parser = parser;
-    this.customProbes = customProbes;
-    this.mergeMode = mergeMode;
+    this.astOptions = astOptions;
   }
 
   analyse(str, options = Object.create(null)) {
@@ -33,7 +33,7 @@ export class AstAnalyser {
       isEcmaScriptModule: Boolean(module)
     });
 
-    const source = new SourceFile(str, this.customProbes, this.mergeMode);
+    const source = new SourceFile(str, this.astOptions);
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {

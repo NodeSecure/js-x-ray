@@ -206,7 +206,7 @@ describe("AstAnalyser", (t) => {
       const preparedSource = getAnalyser().prepareSource(`
       <!--
     // == fake comment == //
-  
+
     const yo = 5;
     //-->
     `, {
@@ -235,6 +235,12 @@ describe("AstAnalyser", (t) => {
         // compare array of keys to an empty array to ensure there are no dependencies in result
         assert.deepEqual([...result.dependencies.keys()], []);
       });
+    });
+
+    it("should instantiate with correct default ASTOptions", () => {
+      const analyser = new AstAnalyser();
+      assert.strictEqual(analyser.astOptions.isReplacing, false);
+      assert.deepStrictEqual(analyser.astOptions.customProbe, []);
     });
   });
 });

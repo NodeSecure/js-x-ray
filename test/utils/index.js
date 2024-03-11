@@ -38,8 +38,7 @@ export function getSastAnalysis(
       return this.sourceFile.dependencies;
     },
     execute(body) {
-      const probes = Array.isArray(probe) ? probe : [probe];
-      const probeRunner = new ProbeRunner(this.sourceFile, probes);
+      const probeRunner = new ProbeRunner(this.sourceFile, [probe]);
       const self = this;
 
       walk(body, {
