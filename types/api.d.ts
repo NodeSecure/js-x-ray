@@ -1,6 +1,5 @@
 import { Warning } from "./warnings.js";
 import { Statement } from "meriyah/dist/src/estree.js";
-import {validateFunctionName} from "meriyah/dist/src/common";
 
 export {
   AstAnalyser,
@@ -35,18 +34,7 @@ interface Dependency {
   location?: null | SourceLocation;
 }
 
-interface RootOptions {
-  /**
-   * @default ASTOptions
-   */
-  ASTOptions?: ASTOptions;
-  /**
-   * @default RuntimeOptions
-   */
-  RuntimeOptions?: RuntimeOptions;
-}
-
-interface RuntimeOptions {
+interface RuntimeCommonOptions {
   /**
    * @default true
    */
@@ -54,25 +42,37 @@ interface RuntimeOptions {
   /**
    * @default false
    */
-  isMinified?: boolean;
+  removeHTMLComments?: boolean;
+}
+
+interface RuntimeDefaultOptions extends RuntimeCommonOptions {
   /**
    * @default false
    */
-  removeHTMLComments?: boolean;
-
-  customParser?: SourceParser;
+  isMinified?: boolean;
 }
 
-interface ASTOptions {
+interface RuntimeFileOptions extends RuntimeCommonOptions {
+  packageName?: string;
+}
+
+interface RuntimeAnalyzerOptions {
+  /**
+   * @default JsSourceParser
+   */
+  customParser?: SourceParser;
+  /**
+   * @default []
+   */
+  customProbe?: Probe[] | null;
   /**
    * @default false
    */
   isReplacing?: boolean;
-  /**
-   * @default []
-   */
-  customParser?: Probe[] | null;
 }
+
+type RuntimeOptions = RuntimeAnalyzerOptions & (RuntimeDefaultOptions | RuntimeFileOptions);
+
 
 interface Probe {
   validate: Function[] | Function;
@@ -85,10 +85,6 @@ interface Report {
   idsLengthAvg: number;
   stringScore: number;
   isOneLineRequire: boolean;
-}
-
-interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
-  packageName?: string;
 }
 
 type ReportOnFile = {
@@ -106,10 +102,10 @@ interface SourceParser {
 }
 
 declare class AstAnalyser {
-  constructor(parser?: SourceParser, astOptions?: ASTOptions);
-  analyse: (str: string, options?: Omit<RuntimeOptions, "customParser">) => Report;
-  analyzeFile(pathToFile: string, options?: Omit<RuntimeFileOptions, "customParser">): Promise<ReportOnFile>;
+  constructor(options?: RuntimeOptions);
+  analyse: (str: string, options?: RuntimeDefaultOptions) => Report;
+  analyzeFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
 }
 
-declare function runASTAnalysis(str: string, options?: RootOptions): Report;
-declare function runASTAnalysisOnFile(pathToFile: string, options?: RootOptions): Promise<ReportOnFile>;
+declare function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
+declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeOptions): Promise<ReportOnFile>;

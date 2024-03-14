@@ -1,6 +1,7 @@
 // Import Node.js Dependencies
 import fs from "node:fs/promises";
 import path from "node:path";
+import assert from "node:assert";
 
 // Import Third-party Dependencies
 import { walk } from "estree-walker";
@@ -14,12 +15,25 @@ import { JsSourceParser } from "./JsSourceParser.js";
 export class AstAnalyser {
   /**
    * @constructor
-   * @param {SourceParser} [parser]
-   * @param astOptions
+   * @param options
    */
-  constructor(parser = new JsSourceParser(), astOptions = { isReplacing: false, customProbe: [] }) {
-    this.parser = parser;
-    this.astOptions = astOptions;
+  constructor(options = {}) {
+    if (options.customParser !== undefined) {
+      assert(options.customParser instanceof JsSourceParser || typeof options.customParser === "object",
+        `customParser must be an instance of JsSourceParser or an object`);
+    }
+    if (options.customProbe !== undefined) {
+      assert(Array.isArray(options.customProbe), `customProbe must be an array`);
+    }
+    if (options.isReplacing !== undefined) {
+      assert(typeof options.isReplacing === "boolean", `isReplacing must be a boolean`);
+    }
+
+    this.parser = options.customParser || new JsSourceParser();
+    this.options = {
+      isReplacing: options.isReplacing || false,
+      customProbe: options.customProbe || []
+    };
   }
 
   analyse(str, options = Object.create(null)) {
@@ -33,7 +47,7 @@ export class AstAnalyser {
       isEcmaScriptModule: Boolean(module)
     });
 
-    const source = new SourceFile(str, this.astOptions);
+    const source = new SourceFile(str, this.options);
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {

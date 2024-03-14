@@ -20,7 +20,7 @@ export class SourceFile {
   encodedLiterals = new Map();
   warnings = [];
 
-  constructor(sourceCodeString, astOptions = { isReplacing: false, customProbes: [] }) {
+  constructor(sourceCodeString, options = {}) {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
       .trace("crypto.createHash", {
@@ -28,8 +28,8 @@ export class SourceFile {
       });
 
     let probes = ProbeRunner.Defaults;
-    if (Array.isArray(astOptions.customProbes) && astOptions.customProbes.length > 0) {
-      probes = astOptions.isReplacing === true ? astOptions.customProbes : [...probes, ...astOptions.customProbes];
+    if (Array.isArray(options.customProbe) && options.customProbe.length > 0) {
+      probes = options.isReplacing === true ? options.customProbe : [...probes, ...options.customProbe];
     }
     this.probesRunner = new ProbeRunner(this, probes);
 

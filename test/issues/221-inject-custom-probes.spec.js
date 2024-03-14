@@ -20,9 +20,7 @@ const kWarningUnsafeStmt = "unsafe-stmt";
 const customProbes = [
   {
     name: "customProbeUnsafeDanger",
-    validateNode: (node, sourceFile) => {
-      return [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"];
-    }
+    validateNode: (node, sourceFile) => [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"]
     ,
     main: (node, options) => {
       const { sourceFile, data: calleeName } = options;
@@ -38,7 +36,7 @@ const customProbes = [
 ];
 
 test("should append to list of probes (default)", () => {
-  const analyser = new AstAnalyser(new JsSourceParser(), { customProbes });
+  const analyser = new AstAnalyser({ parser: new JsSourceParser(), customProbe: customProbes });
   const result = analyser.analyse(kIncriminedCodeSample);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
@@ -48,16 +46,18 @@ test("should append to list of probes (default)", () => {
 });
 
 test("should replace list of probes", () => {
-  const analyser = new AstAnalyser(new JsSourceParser(), { customProbes, isReplacing: true });
+  const analyser = new AstAnalyser({ parser: new JsSourceParser(), customProbe: customProbes, isReplacing: true });
   const result = analyser.analyse(kIncriminedCodeSample);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);
 });
 
-
 test("should append list of probes using runASTAnalysis", () => {
-  const result = runASTAnalysis(kIncriminedCodeSample, { astOptions: { isReplacing: false, customProbes } });
+  const result = runASTAnalysis(
+    kIncriminedCodeSample,
+    { parser: new JsSourceParser(), customProbe: customProbes, isReplacing: false }
+  );
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
@@ -66,7 +66,10 @@ test("should append list of probes using runASTAnalysis", () => {
 });
 
 test("should replace list of probes using runASTAnalysis", () => {
-  const result = runASTAnalysis(kIncriminedCodeSample, { astOptions: { isReplacing: true, customProbes } });
+  const result = runASTAnalysis(
+    kIncriminedCodeSample,
+    { parser: new JsSourceParser(), customProbe: customProbes, isReplacing: true }
+  );
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);

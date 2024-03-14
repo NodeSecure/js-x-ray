@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
-import assert from "node:assert";
+import assert, { AssertionError } from "node:assert";
 import { readFileSync } from "node:fs";
 
 // Import Internal Dependencies
@@ -239,8 +239,27 @@ describe("AstAnalyser", (t) => {
 
     it("should instantiate with correct default ASTOptions", () => {
       const analyser = new AstAnalyser();
-      assert.strictEqual(analyser.astOptions.isReplacing, false);
-      assert.deepStrictEqual(analyser.astOptions.customProbe, []);
+      assert(analyser.parser instanceof JsSourceParser || typeof analyser.parser.customParser === "object");
+      assert.deepStrictEqual(analyser.options.customProbe, []);
+      assert.strictEqual(analyser.options.isReplacing, false);
+    });
+
+    it("should throw an error if customParser is not an instance of JsSourceParser", () => {
+      assert.throws(() => {
+        new AstAnalyser({ customParser: "new JsSourceParser()" });
+      }, AssertionError);
+    });
+
+    it("should throw an error if customProbe is not an array", () => {
+      assert.throws(() => {
+        new AstAnalyser({ customProbe: "notArray" });
+      }, AssertionError);
+    });
+
+    it("should throw an error if isReplacing is not a boolean", () => {
+      assert.throws(() => {
+        new AstAnalyser({ isReplacing: "false" });
+      }, AssertionError);
     });
   });
 });

@@ -9,11 +9,12 @@ function runASTAnalysis(
 ) {
   const {
     customParser = new JsSourceParser(),
-    astOptions = { isReplacing: false, customProbe: [] },
+    customProbe = [],
+    isReplacing = false,
     ...opts
   } = options;
 
-  const analyser = new AstAnalyser(customParser, options.astOptions);
+  const analyser = new AstAnalyser(options);
 
   return analyser.analyse(str, opts);
 }
@@ -24,11 +25,12 @@ async function runASTAnalysisOnFile(
 ) {
   const {
     customParser = new JsSourceParser(),
-    astOptions = { isReplacing: false, customProbe: [] },
+    customProbe = [],
+    isReplacing = false,
     ...opts
   } = options;
 
-  const analyser = new AstAnalyser(customParser, options.astOptions);
+  const analyser = new AstAnalyser(options);
 
   return analyser.analyseFile(pathToFile, opts);
 }
