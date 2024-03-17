@@ -64,11 +64,11 @@ interface RuntimeAnalyzerOptions {
   /**
    * @default []
    */
-  customProbe?: Probe[] | null;
+  customProbes?: Probe[] | null;
   /**
    * @default false
    */
-  isReplacing?: boolean;
+  skipDefaultProbes?: boolean;
 }
 
 type RuntimeOptions = RuntimeAnalyzerOptions & (RuntimeDefaultOptions | RuntimeFileOptions);

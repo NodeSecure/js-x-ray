@@ -36,7 +36,7 @@ const customProbes = [
 ];
 
 test("should append to list of probes (default)", () => {
-  const analyser = new AstAnalyser({ parser: new JsSourceParser(), customProbe: customProbes });
+  const analyser = new AstAnalyser({ customParser: new JsSourceParser(), customProbes });
   const result = analyser.analyse(kIncriminedCodeSample);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
@@ -46,8 +46,14 @@ test("should append to list of probes (default)", () => {
 });
 
 test("should replace list of probes", () => {
-  const analyser = new AstAnalyser({ parser: new JsSourceParser(), customProbe: customProbes, isReplacing: true });
+  const analyser = new AstAnalyser({
+    parser: new JsSourceParser(),
+    customProbes,
+    skipDefaultProbes: true
+  });
   const result = analyser.analyse(kIncriminedCodeSample);
+
+  console.log(analyser);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);
@@ -56,7 +62,11 @@ test("should replace list of probes", () => {
 test("should append list of probes using runASTAnalysis", () => {
   const result = runASTAnalysis(
     kIncriminedCodeSample,
-    { parser: new JsSourceParser(), customProbe: customProbes, isReplacing: false }
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: false
+    }
   );
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
@@ -68,7 +78,11 @@ test("should append list of probes using runASTAnalysis", () => {
 test("should replace list of probes using runASTAnalysis", () => {
   const result = runASTAnalysis(
     kIncriminedCodeSample,
-    { parser: new JsSourceParser(), customProbe: customProbes, isReplacing: true }
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: true
+    }
   );
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);

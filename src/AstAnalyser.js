@@ -15,24 +15,16 @@ import { JsSourceParser } from "./JsSourceParser.js";
 export class AstAnalyser {
   /**
    * @constructor
-   * @param options
+   * @param {object} [options={}]
+   * @param {JsSourceParser} [options.customParser]
+   * @param {Array<object>} [options.customProbes]
+   * @param {boolean} [options.skipDefaultProbes=false]
    */
   constructor(options = {}) {
-    if (options.customParser !== undefined) {
-      assert(options.customParser instanceof JsSourceParser || typeof options.customParser === "object",
-        `customParser must be an instance of JsSourceParser or an object`);
-    }
-    if (options.customProbe !== undefined) {
-      assert(Array.isArray(options.customProbe), `customProbe must be an array`);
-    }
-    if (options.isReplacing !== undefined) {
-      assert(typeof options.isReplacing === "boolean", `isReplacing must be a boolean`);
-    }
-
-    this.parser = options.customParser || new JsSourceParser();
-    this.options = {
-      isReplacing: options.isReplacing || false,
-      customProbe: options.customProbe || []
+    this.parser = options.customParser ?? new JsSourceParser();
+    this.probesOptions = {
+      customProbes: options.customProbes ?? [],
+      skipDefaultProbes: options.skipDefaultProbes ?? false
     };
   }
 
@@ -47,7 +39,7 @@ export class AstAnalyser {
       isEcmaScriptModule: Boolean(module)
     });
 
-    const source = new SourceFile(str, this.options);
+    const source = new SourceFile(str, this.probesOptions);
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {

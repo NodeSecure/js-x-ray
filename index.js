@@ -9,8 +9,8 @@ function runASTAnalysis(
 ) {
   const {
     customParser = new JsSourceParser(),
-    customProbe = [],
-    isReplacing = false,
+    customProbes = [],
+    skipDefaultProbes = false,
     ...opts
   } = options;
 
@@ -25,8 +25,8 @@ async function runASTAnalysisOnFile(
 ) {
   const {
     customParser = new JsSourceParser(),
-    customProbe = [],
-    isReplacing = false,
+    customProbes = [],
+    skipDefaultProbes = false,
     ...opts
   } = options;
 
