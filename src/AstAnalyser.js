@@ -18,6 +18,11 @@ export class AstAnalyser {
    */
   constructor(parser = new JsSourceParser()) {
     this.parser = parser;
+    this.analyzedFiles = new Map();
+  }
+
+  reset() {
+    this.analyzedFiles = new Map();
   }
 
   analyse(str, options = Object.create(null)) {
@@ -59,6 +64,13 @@ export class AstAnalyser {
     pathToFile,
     options = {}
   ) {
+    const filePath = pathToFile instanceof URL ? pathToFile.href.replace(/^file:\/\//, "") : pathToFile;
+    const filePathString = path.resolve(filePath);
+
+    if (this.analyzedFiles.has(filePathString)) {
+      return this.analyzedFiles.get(filePathString);
+    }
+
     try {
       const {
         packageName = null,
@@ -67,8 +79,6 @@ export class AstAnalyser {
       } = options;
 
       const str = await fs.readFile(pathToFile, "utf-8");
-      const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
-
       const isMin = filePathString.includes(".min") || isMinified(str);
       const data = this.analyse(str, {
         isMinified: isMin,
@@ -80,12 +90,16 @@ export class AstAnalyser {
         data.dependencies.delete(packageName);
       }
 
-      return {
+      const report = {
         ok: true,
         dependencies: data.dependencies,
         warnings: data.warnings,
         isMinified: !data.isOneLineRequire && isMin
       };
+
+      this.analyzedFiles.set(filePathString, report);
+
+      return report;
     }
     catch (error) {
       return {

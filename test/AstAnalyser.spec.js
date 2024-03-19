@@ -160,6 +160,44 @@ describe("AstAnalyser", (t) => {
     );
   });
 
+  it("should not analyze the same file twice", async(t) => {
+    const analyser = new AstAnalyser(new JsSourceParser());
+
+    t.mock.method(AstAnalyser.prototype, "analyse");
+
+    const result1 = await analyser.analyseFile(
+      new URL("depName.js", FIXTURE_URL),
+      { module: false, packageName: "foobar" }
+    );
+
+    const result2 = await analyser.analyseFile(
+      new URL("depName.js", FIXTURE_URL),
+      { module: false, packageName: "foobar" }
+    );
+
+    const result3 = await analyser.analyseFile(
+      "test/fixtures/searchRuntimeDependencies/depName.js",
+      { module: false, packageName: "foobar" }
+    );
+
+    assert.deepEqual(result1, result2);
+    assert.deepEqual(result2, result3);
+
+    let calls = AstAnalyser.prototype.analyse.mock.calls;
+    assert.strictEqual(calls.length, 1);
+
+    // should remove the cache and call AstAnalyser.analyse again
+    analyser.reset();
+
+    await analyser.analyseFile(
+      "test/fixtures/searchRuntimeDependencies/depName.js",
+      { module: false, packageName: "foobar" }
+    );
+
+    calls = AstAnalyser.prototype.analyse.mock.calls;
+    assert.strictEqual(calls.length, 2);
+  });
+
   it("should fail with a parsing error", async() => {
     const result = await getAnalyser().analyseFile(
       new URL("parsingError.js", FIXTURE_URL),
