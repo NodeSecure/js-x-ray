@@ -14,7 +14,11 @@ function runASTAnalysis(
     ...opts
   } = options;
 
-  const analyser = new AstAnalyser(options);
+  const analyser = new AstAnalyser({
+    customParser,
+    customProbes,
+    skipDefaultProbes
+  });
 
   return analyser.analyse(str, opts);
 }
@@ -30,7 +34,11 @@ async function runASTAnalysisOnFile(
     ...opts
   } = options;
 
-  const analyser = new AstAnalyser(options);
+  const analyser = new AstAnalyser({
+    customParser,
+    customProbes,
+    skipDefaultProbes
+  });
 
   return analyser.analyseFile(pathToFile, opts);
 }

@@ -1,7 +1,6 @@
 // Import Node.js Dependencies
 import fs from "node:fs/promises";
 import path from "node:path";
-import assert from "node:assert";
 
 // Import Third-party Dependencies
 import { walk } from "estree-walker";
@@ -16,7 +15,7 @@ export class AstAnalyser {
   /**
    * @constructor
    * @param {object} [options={}]
-   * @param {JsSourceParser} [options.customParser]
+   * @param {SourceParser} [options.customParser]
    * @param {Array<object>} [options.customProbes]
    * @param {boolean} [options.skipDefaultProbes=false]
    */

@@ -53,8 +53,6 @@ test("should replace list of probes", () => {
   });
   const result = analyser.analyse(kIncriminedCodeSample);
 
-  console.log(analyser);
-
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);
 });

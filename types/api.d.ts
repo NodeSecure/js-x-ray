@@ -34,7 +34,7 @@ interface Dependency {
   location?: null | SourceLocation;
 }
 
-interface RuntimeCommonOptions {
+interface RuntimeOptions {
   /**
    * @default true
    */
@@ -43,20 +43,17 @@ interface RuntimeCommonOptions {
    * @default false
    */
   removeHTMLComments?: boolean;
-}
-
-interface RuntimeDefaultOptions extends RuntimeCommonOptions {
   /**
    * @default false
    */
   isMinified?: boolean;
 }
 
-interface RuntimeFileOptions extends RuntimeCommonOptions {
+interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
   packageName?: string;
 }
 
-interface RuntimeAnalyzerOptions {
+interface AstAnalyserOptions {
   /**
    * @default JsSourceParser
    */
@@ -64,19 +61,16 @@ interface RuntimeAnalyzerOptions {
   /**
    * @default []
    */
-  customProbes?: Probe[] | null;
+  customProbes?: Probe[];
   /**
    * @default false
    */
   skipDefaultProbes?: boolean;
 }
 
-type RuntimeOptions = RuntimeAnalyzerOptions & (RuntimeDefaultOptions | RuntimeFileOptions);
-
-
 interface Probe {
-  validate: Function[] | Function;
-  main: Function[] | Function;
+  validateNode: Function | Function[];
+  main: Function;
 }
 
 interface Report {
@@ -102,10 +96,10 @@ interface SourceParser {
 }
 
 declare class AstAnalyser {
-  constructor(options?: RuntimeOptions);
-  analyse: (str: string, options?: RuntimeDefaultOptions) => Report;
+  constructor(options?: AstAnalyserOptions);
+  analyse: (str: string, options?: RuntimeOptions) => Report;
   analyzeFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
 }
 
-declare function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeOptions): Promise<ReportOnFile>;
+declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report;
+declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise<ReportOnFile>;

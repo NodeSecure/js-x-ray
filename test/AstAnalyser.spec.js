@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
-import assert, { AssertionError } from "node:assert";
+import assert from "node:assert";
 import { readFileSync } from "node:fs";
 
 // Import Internal Dependencies
