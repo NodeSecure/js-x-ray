@@ -16,9 +16,10 @@ export class AstAnalyser {
    * @constructor
    * @param { SourceParser } [parser]
    */
-  constructor(parser = new JsSourceParser()) {
+  constructor(parser = new JsSourceParser(), entryFiles = []) {
     this.parser = parser;
     this.analyzedFiles = new Map();
+    this.entryFiles = entryFiles.map((entry) => path.resolve(entry));
   }
 
   reset() {
@@ -69,6 +70,11 @@ export class AstAnalyser {
 
     if (this.analyzedFiles.has(filePathString)) {
       return this.analyzedFiles.get(filePathString);
+    }
+
+    const toSkip = this.#toSkip(filePathString);
+    if (toSkip) {
+      return { ok: true, isSkipped: true };
     }
 
     try {
@@ -140,5 +146,19 @@ export class AstAnalyser {
    */
   #removeHTMLComment(str) {
     return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
+  }
+
+  #toSkip(filePathString) {
+    if (!this.entryFiles.length) {
+      return false;
+    }
+
+    for (const dir of this.entryFiles) {
+      if (filePathString.startsWith(dir)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

@@ -198,6 +198,44 @@ describe("AstAnalyser", (t) => {
     assert.strictEqual(calls.length, 2);
   });
 
+  it("should skip files that are not part of entry files", async(t) => {
+    const FIXTURE_URL = new URL("fixtures/entryFiles/", import.meta.url);
+
+    const analyser = new AstAnalyser(new JsSourceParser(), [
+      "test/fixtures/entryFiles/src",
+      "test/fixtures/entryFiles/src2"
+    ]);
+
+    const validTestFiles = [
+      "src/foo.js",
+      "src/bar/bar.js",
+      "src2/foo.js",
+      "src2/bar/bar.js"
+    ];
+
+    validTestFiles.forEach(async(file) => {
+      const result = await analyser.analyseFile(
+        new URL(file, FIXTURE_URL)
+      );
+
+      assert.ok(result.ok);
+    });
+
+    const invalidTestFiles = [
+      "test/foo.js",
+      "test/bar/bar.js"
+    ];
+
+    invalidTestFiles.forEach(async(file) => {
+      const result = await analyser.analyseFile(
+        new URL(file, FIXTURE_URL)
+      );
+
+      assert.ok(result.ok);
+      assert.ok(result.isSkipped);
+    });
+  });
+
   it("should fail with a parsing error", async() => {
     const result = await getAnalyser().analyseFile(
       new URL("parsingError.js", FIXTURE_URL),
