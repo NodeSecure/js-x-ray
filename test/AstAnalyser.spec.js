@@ -186,7 +186,7 @@ describe("AstAnalyser", (t) => {
     let calls = AstAnalyser.prototype.analyse.mock.calls;
     assert.strictEqual(calls.length, 1);
 
-    // should remove the cache and call AstAnalyser.analyse again
+    // should remove the cache
     analyser.reset();
 
     await analyser.analyseFile(
