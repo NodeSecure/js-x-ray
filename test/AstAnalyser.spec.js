@@ -180,8 +180,8 @@ describe("AstAnalyser", (t) => {
       { module: false, packageName: "foobar" }
     );
 
-    assert.deepEqual(result1, result2);
-    assert.deepEqual(result2, result3);
+    assert.equal(result1, result2);
+    assert.equal(result2, result3);
 
     let calls = AstAnalyser.prototype.analyse.mock.calls;
     assert.strictEqual(calls.length, 1);
