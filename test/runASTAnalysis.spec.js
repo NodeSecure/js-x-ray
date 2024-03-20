@@ -7,6 +7,13 @@ import { runASTAnalysis } from "../index.js";
 import { AstAnalyser } from "../src/AstAnalyser.js";
 import { JsSourceParser } from "../src/JsSourceParser.js";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
+import {
+  customProbes,
+  kIncriminedCodeSampleCustomProbe,
+  kWarningUnsafeDanger,
+  kWarningUnsafeImport,
+  kWarningUnsafeStmt
+} from "./utils/index.js";
 
 it("should call AstAnalyser.analyse with the expected arguments", (t) => {
   t.mock.method(AstAnalyser.prototype, "analyse");
@@ -36,4 +43,34 @@ it("should instantiate AstAnalyser with the expected parser", (t) => {
 
   assert.strictEqual(JsSourceParser.prototype.parse.mock.calls.length, 1);
   assert.strictEqual(FakeSourceParser.prototype.parse.mock.calls.length, 1);
+});
+
+it("should append list of probes using runASTAnalysis", () => {
+  const result = runASTAnalysis(
+    kIncriminedCodeSampleCustomProbe,
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: false
+    }
+  );
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
+  assert.equal(result.warnings[2].kind, kWarningUnsafeStmt);
+  assert.equal(result.warnings.length, 3);
+});
+
+it("should replace list of probes using runASTAnalysis", () => {
+  const result = runASTAnalysis(
+    kIncriminedCodeSampleCustomProbe,
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: true
+    }
+  );
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings.length, 1);
 });

@@ -4,7 +4,7 @@ import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import { SourceFile } from "../../src/SourceFile.js";
-import { ProbeRunner } from "../../src/ProbeRunner.js";
+import { ProbeRunner, ProbeSignals } from "../../src/ProbeRunner.js";
 
 export function getWarningKind(warnings) {
   return warnings.slice().map((warn) => warn.kind).sort();
@@ -61,3 +61,26 @@ export function getSastAnalysis(
     }
   };
 }
+
+export const customProbes = [
+  {
+    name: "customProbeUnsafeDanger",
+    validateNode: (node, sourceFile) => [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"]
+    ,
+    main: (node, options) => {
+      const { sourceFile, data: calleeName } = options;
+      if (node.declarations[0].init.value === "danger") {
+        sourceFile.addWarning("unsafe-danger", calleeName, node.loc);
+
+        return ProbeSignals.Skip;
+      }
+
+      return null;
+    }
+  }
+];
+
+export const kIncriminedCodeSampleCustomProbe = "const danger = 'danger'; const stream = eval('require')('stream');";
+export const kWarningUnsafeDanger = "unsafe-danger";
+export const kWarningUnsafeImport = "unsafe-import";
+export const kWarningUnsafeStmt = "unsafe-stmt";
