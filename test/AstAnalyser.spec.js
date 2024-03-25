@@ -266,9 +266,9 @@ describe("AstAnalyser", (t) => {
       });
     });
 
-    it("should instantiate with correct default ASTOptions", () => {
+    it("should instantiate with correct default options", () => {
       const analyser = new AstAnalyser();
-      assert(analyser.parser instanceof JsSourceParser || typeof analyser.parser.customParser === "object");
+      assert.ok(analyser.parser instanceof JsSourceParser);
       assert.deepStrictEqual(analyser.probesOptions.customProbes, []);
       assert.strictEqual(analyser.probesOptions.skipDefaultProbes, false);
     });
