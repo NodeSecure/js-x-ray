@@ -145,8 +145,9 @@ Below a basic probe that detect a string assignation to `danger`:
 export const customProbes = [
   {
     name: "customProbeUnsafeDanger",
-    validateNode: (node, sourceFile) => [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"]
-    ,
+    validateNode: (node, sourceFile) => [
+      node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
+    ],
     main: (node, options) => {
       const { sourceFile, data: calleeName } = options;
       if (node.declarations[0].init.value === "danger") {
@@ -197,11 +198,12 @@ Result:
 
 Congrats, you have created your first custom probe! 🎉
 
+> [!TIP]
 > Check the types in [index.d.ts](index.d.ts) and [types/api.d.ts](types/api.d.ts) for more details about the `options`
-> 
+
 ## API
 <details>
-<summary>declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report</summary>
+<summary>runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report</summary>
 
 ```ts
 interface RuntimeOptions {
@@ -234,7 +236,7 @@ interface Report {
 </details>
 
 <details>
-<summary>declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise< ReportOnFile ></summary>
+<summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise< ReportOnFile ></summary>
 
 ```ts
 interface RuntimeFileOptions {
