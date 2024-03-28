@@ -6,7 +6,14 @@ import { readFileSync } from "node:fs";
 // Import Internal Dependencies
 import { AstAnalyser } from "../src/AstAnalyser.js";
 import { JsSourceParser } from "../src/JsSourceParser.js";
-import { getWarningKind } from "./utils/index.js";
+import {
+  customProbes,
+  getWarningKind,
+  kIncriminedCodeSampleCustomProbe,
+  kWarningUnsafeDanger,
+  kWarningUnsafeImport,
+  kWarningUnsafeStmt
+} from "./utils/index.js";
 
 // CONSTANTS
 const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
@@ -145,6 +152,28 @@ describe("AstAnalyser", (t) => {
         ["http", "fs", "xd"].sort()
       );
     });
+
+    it("should append to list of probes (default)", () => {
+      const analyser = new AstAnalyser({ customParser: new JsSourceParser(), customProbes });
+      const result = analyser.analyse(kIncriminedCodeSampleCustomProbe);
+
+      assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+      assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
+      assert.equal(result.warnings[2].kind, kWarningUnsafeStmt);
+      assert.equal(result.warnings.length, 3);
+    });
+
+    it("should replace list of probes", () => {
+      const analyser = new AstAnalyser({
+        parser: new JsSourceParser(),
+        customProbes,
+        skipDefaultProbes: true
+      });
+      const result = analyser.analyse(kIncriminedCodeSampleCustomProbe);
+
+      assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+      assert.equal(result.warnings.length, 1);
+    });
   });
 
   it("remove the packageName from the dependencies list", async() => {
@@ -206,7 +235,7 @@ describe("AstAnalyser", (t) => {
       const preparedSource = getAnalyser().prepareSource(`
       <!--
     // == fake comment == //
-  
+
     const yo = 5;
     //-->
     `, {
@@ -235,6 +264,13 @@ describe("AstAnalyser", (t) => {
         // compare array of keys to an empty array to ensure there are no dependencies in result
         assert.deepEqual([...result.dependencies.keys()], []);
       });
+    });
+
+    it("should instantiate with correct default options", () => {
+      const analyser = new AstAnalyser();
+      assert.ok(analyser.parser instanceof JsSourceParser);
+      assert.deepStrictEqual(analyser.probesOptions.customProbes, []);
+      assert.strictEqual(analyser.probesOptions.skipDefaultProbes, false);
     });
   });
 });

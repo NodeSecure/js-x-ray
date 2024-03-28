@@ -134,15 +134,90 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [weak-crypto](./docs/weak-crypto.md) | ✔️ | The code probably contains a weak crypto algorithm (md5, sha1...) |
 | [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
 
+## Custom Probes
+
+You can also create custom probes to detect specific pattern in the code you are analyzing.
+
+A probe is a pair of two functions (`validateNode` and `main`) that will be called on each node of the AST. It will return a warning if the pattern is detected.
+Below a basic probe that detect a string assignation to `danger`:
+
+```ts
+export const customProbes = [
+  {
+    name: "customProbeUnsafeDanger",
+    validateNode: (node, sourceFile) => [
+      node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
+    ],
+    main: (node, options) => {
+      const { sourceFile, data: calleeName } = options;
+      if (node.declarations[0].init.value === "danger") {
+        sourceFile.addWarning("unsafe-danger", calleeName, node.loc);
+
+        return ProbeSignals.Skip;
+      }
+
+      return null;
+    }
+  }
+];
+```
+
+You can pass an array of probes to the `runASTAnalysis/runASTAnalysisOnFile` functions as `options`, or directly to the `AstAnalyser` constructor.
+
+| Name             | Type                             | Description                                                           | Default Value   |
+|------------------|----------------------------------|-----------------------------------------------------------------------|-----------------|
+| `customParser`   | `SourceParser \| undefined`      | An optional custom parser to be used for parsing the source code.    | `JsSourceParser` |
+| `customProbes`   | `Probe[] \| undefined`           | An array of custom probes to be used during AST analysis.            | `[]`            |
+| `skipDefaultProbes` | `boolean \| undefined`        | If `true`, default probes will be skipped and only custom probes will be used. | `false`         |
+
+
+Here using the example probe upper:
+
+```ts
+import { runASTAnalysis } from "@nodesecure/js-x-ray";
+
+// add your customProbes here (see example above)
+
+const result = runASTAnalysis("const danger = 'danger';", { customProbes, skipDefaultProbes: true });
+
+console.log(result);
+```
+
+Result:
+
+```sh
+✗ node example.js
+{
+  idsLengthAvg: 0,
+  stringScore: 0,
+  warnings: [ { kind: 'unsafe-danger', location: [Array], source: 'JS-X-Ray' } ],
+  dependencies: Map(0) {},
+  isOneLineRequire: false
+}
+```
+
+Congrats, you have created your first custom probe! 🎉
+
+> [!TIP]
+> Check the types in [index.d.ts](index.d.ts) and [types/api.d.ts](types/api.d.ts) for more details about the `options`
+
 ## API
 <details>
-<summary>runASTAnalysis(str: string, options?: RuntimeOptions): Report</summary>
+<summary>runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report</summary>
 
 ```ts
 interface RuntimeOptions {
   module?: boolean;
-  isMinified?: boolean;
   removeHTMLComments?: boolean;
+  isMinified?: boolean;
+}
+```
+
+```ts
+interface AstAnalyserOptions {
+  customParser?: SourceParser;
+  customProbes?: Probe[];
+  skipDefaultProbes?: boolean;
 }
 ```
 
@@ -161,13 +236,21 @@ interface Report {
 </details>
 
 <details>
-<summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise< ReportOnFile ></summary>
+<summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise< ReportOnFile ></summary>
 
 ```ts
 interface RuntimeFileOptions {
   module?: boolean;
   removeHTMLComments?: boolean;
   packageName?: string;
+}
+```
+
+```ts
+interface AstAnalyserOptions {
+  customParser?: SourceParser;
+  customProbes?: Probe[];
+  skipDefaultProbes?: boolean;
 }
 ```
 

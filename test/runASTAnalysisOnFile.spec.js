@@ -7,6 +7,7 @@ import { runASTAnalysisOnFile } from "../index.js";
 import { AstAnalyser } from "../src/AstAnalyser.js";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
 import { JsSourceParser } from "../src/JsSourceParser.js";
+import { customProbes, kWarningUnsafeDanger, kWarningUnsafeImport, kWarningUnsafeStmt } from "./utils/index.js";
 
 // CONSTANTS
 const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
@@ -49,4 +50,34 @@ it("should instantiate AstAnalyser with the expected parser", async(t) => {
 
   assert.strictEqual(JsSourceParser.prototype.parse.mock.calls.length, 1);
   assert.strictEqual(FakeSourceParser.prototype.parse.mock.calls.length, 1);
+});
+
+it("should append list of probes using runASTAnalysisOnFile", async() => {
+  const result = await runASTAnalysisOnFile(
+    new URL("customProbe.js", FIXTURE_URL),
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: false
+    }
+  );
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
+  assert.equal(result.warnings[2].kind, kWarningUnsafeStmt);
+  assert.equal(result.warnings.length, 3);
+});
+
+it("should replace list of probes using runASTAnalysisOnFile", async() => {
+  const result = await runASTAnalysisOnFile(
+    new URL("customProbe.js", FIXTURE_URL),
+    {
+      parser: new JsSourceParser(),
+      customProbes,
+      skipDefaultProbes: true
+    }
+  );
+
+  assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+  assert.equal(result.warnings.length, 1);
 });

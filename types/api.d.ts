@@ -42,13 +42,35 @@ interface RuntimeOptions {
   /**
    * @default false
    */
-  isMinified?: boolean;
+  removeHTMLComments?: boolean;
   /**
    * @default false
    */
-  removeHTMLComments?: boolean;
-  
+  isMinified?: boolean;
+}
+
+interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
+  packageName?: string;
+}
+
+interface AstAnalyserOptions {
+  /**
+   * @default JsSourceParser
+   */
   customParser?: SourceParser;
+  /**
+   * @default []
+   */
+  customProbes?: Probe[];
+  /**
+   * @default false
+   */
+  skipDefaultProbes?: boolean;
+}
+
+interface Probe {
+  validateNode: Function | Function[];
+  main: Function;
 }
 
 interface Report {
@@ -57,10 +79,6 @@ interface Report {
   idsLengthAvg: number;
   stringScore: number;
   isOneLineRequire: boolean;
-}
-
-interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
-  packageName?: string;
 }
 
 type ReportOnFile = {
@@ -78,10 +96,10 @@ interface SourceParser {
 }
 
 declare class AstAnalyser {
-  constructor(parser?: SourceParser);
-  analyse: (str: string, options?: Omit<RuntimeOptions, "customParser">) => Report;
-  analyzeFile(pathToFile: string, options?: Omit<RuntimeFileOptions, "customParser">): Promise<ReportOnFile>;
+  constructor(options?: AstAnalyserOptions);
+  analyse: (str: string, options?: RuntimeOptions) => Report;
+  analyzeFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
 }
 
-declare function runASTAnalysis(str: string, options?: RuntimeOptions): Report;
-declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
+declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report;
+declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise<ReportOnFile>;
