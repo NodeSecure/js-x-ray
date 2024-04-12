@@ -13,15 +13,17 @@ describe("EntryFilesAnalyser", () => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("entry.js", FIXTURE_URL);
     const deepEntryUrl = new URL("deps/deepEntry.js", FIXTURE_URL);
-    const entryFiles = [entryUrl, deepEntryUrl];
 
     t.mock.method(AstAnalyser.prototype, "analyseFile");
-    const generator = entryFilesAnalyser.analyse(entryFiles);
+    const generator = entryFilesAnalyser.analyse([entryUrl, deepEntryUrl]);
 
+    // First entry
     await assertReport(generator, entryUrl, true);
     await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL), true);
     await assertReport(generator, new URL("shared.js", FIXTURE_URL), true);
     await assertReport(generator, new URL("deps/dep2.js", FIXTURE_URL), true);
+
+    // Second entry
     await assertReport(generator, deepEntryUrl, true);
     await assertReport(generator, new URL("deps/dep3.js", FIXTURE_URL), true);
 
@@ -33,9 +35,8 @@ describe("EntryFilesAnalyser", () => {
   it("should detect internal deps that failed to be analyzed", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("entryWithInvalidDep.js", FIXTURE_URL);
-    const entryFiles = [entryUrl];
 
-    const generator = entryFilesAnalyser.analyse(entryFiles);
+    const generator = entryFilesAnalyser.analyse([entryUrl]);
 
     await assertReport(generator, entryUrl, true);
 
