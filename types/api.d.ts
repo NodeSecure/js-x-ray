@@ -3,13 +3,13 @@ import { Statement } from "meriyah/dist/src/estree.js";
 
 export {
   AstAnalyser,
+  AstAnalyserOptions,
   EntryFilesAnalyser,
+  EntryFilesAnalyserOptions,
   SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
 
-  AstAnalyserOptions,
-  EntryFilesAnalyserOptions,
   RuntimeOptions,
   RuntimeFileOptions,
 
