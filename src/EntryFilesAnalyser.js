@@ -24,7 +24,7 @@ export class EntryFilesAnalyser {
   /**
    * Analyzes a set of entry files asynchronously, yielding analysis reports.
    *
-   * @param {string[] | URL[]} entryFiles
+   * @param {(string | URL)[]} entryFiles
    * @yields {Object} - Yields an object containing the analysis results for each file.
   */
   async* analyse(entryFiles) {
