@@ -27,6 +27,8 @@ describe("EntryFilesAnalyser", () => {
     await assertReport(generator, deepEntryUrl, true);
     await assertReport(generator, new URL("deps/dep3.js", FIXTURE_URL), true);
 
+    await assertAllReportsYielded(generator);
+
     // Check that shared dependencies are not analyzed several times
     const calls = AstAnalyser.prototype.analyseFile.mock.calls;
     assert.strictEqual(calls.length, 6);
@@ -46,6 +48,9 @@ describe("EntryFilesAnalyser", () => {
     assert.strictEqual(invalidDepReport.value.warnings[0].kind, "parsing-error");
 
     await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL), true);
+    await assertReport(generator, new URL("shared.js", FIXTURE_URL), true);
+
+    await assertAllReportsYielded(generator);
   });
 
   it("should extends default extensions", async() => {
@@ -62,7 +67,7 @@ describe("EntryFilesAnalyser", () => {
     await assertReport(generator, new URL("deps/default.node", FIXTURE_URL), true);
     await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL), true);
 
-    assert.strictEqual((await generator.next()).value, undefined);
+    await assertAllReportsYielded(generator);
   });
 
   it("should override default extensions", async() => {
@@ -75,12 +80,16 @@ describe("EntryFilesAnalyser", () => {
     await assertReport(generator, entryUrl, true);
     await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL), true);
 
-    assert.strictEqual((await generator.next()).value, undefined);
+    await assertAllReportsYielded(generator);
   });
 
   async function assertReport(generator, expectedUrl, expectedOk) {
     const report = await generator.next();
     assert.strictEqual(report.value.url, expectedUrl.pathname);
     assert.strictEqual(report.value.ok, expectedOk);
+  }
+
+  async function assertAllReportsYielded(generator) {
+    assert.strictEqual((await generator.next()).value, undefined);
   }
 });
