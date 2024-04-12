@@ -62,7 +62,11 @@ export class EntryFilesAnalyser {
   async #getInternalDepPath(name, basePath) {
     const depPath = path.join(basePath, name);
     const existingExt = path.extname(name);
-    if (existingExt !== "" && this.allowedExtensions.includes(existingExt.slice(1))) {
+    if (existingExt !== "") {
+      if (!this.allowedExtensions.includes(existingExt.slice(1))) {
+        return null;
+      }
+
       if (await this.#fileExists(depPath)) {
         return depPath;
       }
