@@ -1,1 +1,1 @@
-invalidJs@
+@invalidJs
