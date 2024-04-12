@@ -22,10 +22,10 @@ export class EntryFilesAnalyser {
   }
 
   /**
-   * Analyzes a set of entry files asynchronously, yielding analysis reports.
+   * Asynchronously analyze a set of entry files yielding analysis reports.
    *
    * @param {(string | URL)[]} entryFiles
-   * @yields {Object} - Yields an object containing the analysis results for each file.
+   * @yields {Object} - Yields an object containing the analysis report for each file.
   */
   async* analyse(entryFiles) {
     this.analyzedDeps = new Set();
