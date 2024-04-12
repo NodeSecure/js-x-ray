@@ -1,0 +1,1 @@
+import internalDep from 'internalDep';

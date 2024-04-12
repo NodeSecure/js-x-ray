@@ -1,0 +1,2 @@
+require("../shared");
+require("externalDep");
