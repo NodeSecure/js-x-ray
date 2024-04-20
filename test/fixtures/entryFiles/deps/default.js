@@ -1,1 +1,1 @@
-require('internalDep')
+require('externalDep')
