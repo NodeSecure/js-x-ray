@@ -1,1 +1,1 @@
-import internalDep from 'internalDep';
+import externalDep from 'externalDep';
