@@ -1,0 +1,1 @@
+import externalDep from 'externalDep';
