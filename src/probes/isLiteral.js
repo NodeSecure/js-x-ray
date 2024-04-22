@@ -7,6 +7,8 @@ import { Hex } from "@nodesecure/sec-literal";
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
 const kShadyLinkRegExps = [
+  /^(https?:\/\/)(?!127\.)((?!0{2,3}\.)(?!0{1,3}\.0{1,3}\.)(?!25[6-9]\.)(?!25[6-9]\.25[6-9]\.)(?!25[6-9]\.25[6-9]\.25[6-9])((?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5]))(\/[^\s]*)?$/,
+  /^(https?:\/\/)((?!\[::1\])(?!.*:[a-fA-F\d]+:[a-fA-F\d]+:[a-fA-F\d]+:[a-fA-F\d]+:[a-fA-F\d]+:[a-fA-F\d]+:[a-fA-F\d]+)(?:(?:[a-fA-F\d]{1,4}:){7}[a-fA-F\d]{1,4}))(\/[^\s]*)?$/,
   /(http[s]?:\/\/bit\.ly.*)$/,
   /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
 ];
