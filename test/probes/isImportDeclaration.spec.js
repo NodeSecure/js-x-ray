@@ -46,16 +46,32 @@ test("should detect 1 dependency with no specificiers", () => {
   assert.ok(dependencies.has("bar"));
 });
 
-test("should detect an unsafe import using data:text/javascript and throw a unsafe-import warning", () => {
-  const expectedValue = "data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==";
-  const str = `import '${expectedValue}';`;
-
+test("should detect 1 dependency for an ImportExpression", () => {
+  const str = "import(\"bar\")";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
     .execute(ast.body);
 
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const { dependencies } = sourceFile;
+  assert.ok(dependencies.has("bar"));
+});
 
-  const unsafeImport = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(unsafeImport.value, expectedValue);
+test("should detect an unsafe import using data:text/javascript and throw a unsafe-import warning", () => {
+  const expectedValue = "data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==";
+
+  const importNodes = [
+    `import '${expectedValue}';`,
+    `import('${expectedValue}');`
+  ];
+
+  importNodes.forEach((str) => {
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(str, isImportDeclaration)
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.warnings().length, 1);
+
+    const unsafeImport = sastAnalysis.getWarning("unsafe-import");
+    assert.strictEqual(unsafeImport.value, expectedValue);
+  });
 });

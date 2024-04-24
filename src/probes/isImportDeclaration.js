@@ -9,7 +9,7 @@
 function validateNode(node) {
   return [
     // Note: the source property is the right-side Literal part of the Import
-    node.type === "ImportDeclaration" && node.source.type === "Literal"
+    ["ImportDeclaration", "ImportExpression"].includes(node.type) && node.source.type === "Literal"
   ];
 }
 
