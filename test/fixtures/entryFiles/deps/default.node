@@ -1,1 +1,1 @@
-module.exports = require('some/addon');
+module.exports = require('dep.node');
