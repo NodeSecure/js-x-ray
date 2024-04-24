@@ -91,7 +91,7 @@ describe("EntryFilesAnalyser", () => {
   async function assertReport(generator, expectedUrl) {
     const report = await generator.next();
     assert.strictEqual(report.value.url, expectedUrl.pathname);
-    assert.strictEqual(report.value.ok, true);
+    assert.ok(report.value.ok);
   }
 
   async function assertAllReportsYielded(generator) {
