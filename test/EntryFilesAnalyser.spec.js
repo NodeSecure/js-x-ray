@@ -18,14 +18,14 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse([entryUrl, deepEntryUrl]);
 
     // First entry
-    await assertReport(generator, entryUrl, true);
-    await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL), true);
-    await assertReport(generator, new URL("shared.js", FIXTURE_URL), true);
-    await assertReport(generator, new URL("deps/dep2.js", FIXTURE_URL), true);
+    await assertReport(generator, entryUrl);
+    await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL));
+    await assertReport(generator, new URL("shared.js", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep2.js", FIXTURE_URL));
 
     // Second entry
-    await assertReport(generator, deepEntryUrl, true);
-    await assertReport(generator, new URL("deps/dep3.js", FIXTURE_URL), true);
+    await assertReport(generator, deepEntryUrl);
+    await assertReport(generator, new URL("deps/dep3.js", FIXTURE_URL));
 
     await assertAllReportsYielded(generator);
 
@@ -40,15 +40,15 @@ describe("EntryFilesAnalyser", () => {
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
 
-    await assertReport(generator, entryUrl, true);
+    await assertReport(generator, entryUrl);
 
     const invalidDepReport = await generator.next();
     assert.ok(!invalidDepReport.value.ok);
     assert.strictEqual(invalidDepReport.value.url, new URL("deps/invalidDep.js", FIXTURE_URL).pathname);
     assert.strictEqual(invalidDepReport.value.warnings[0].kind, "parsing-error");
 
-    await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL), true);
-    await assertReport(generator, new URL("shared.js", FIXTURE_URL), true);
+    await assertReport(generator, new URL("deps/dep1.js", FIXTURE_URL));
+    await assertReport(generator, new URL("shared.js", FIXTURE_URL));
 
     await assertAllReportsYielded(generator);
   });
@@ -60,12 +60,16 @@ describe("EntryFilesAnalyser", () => {
     const entryUrl = new URL("entryWithVariousDepExtensions.js", FIXTURE_URL);
     const generator = entryFilesAnalyser.analyse([entryUrl]);
 
-    await assertReport(generator, entryUrl, true);
-    await assertReport(generator, new URL("deps/default.js", FIXTURE_URL), true);
-    await assertReport(generator, new URL("deps/default.cjs", FIXTURE_URL), true);
-    await assertReport(generator, new URL("deps/default.mjs", FIXTURE_URL), true);
-    await assertReport(generator, new URL("deps/default.node", FIXTURE_URL), true);
-    await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL), true);
+    await assertReport(generator, entryUrl);
+    await assertReport(generator, new URL("deps/default.js", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/default.cjs", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep.cjs", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/default.mjs", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep.mjs", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/default.node", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep.node", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep.jsx", FIXTURE_URL));
 
     await assertAllReportsYielded(generator);
   });
@@ -77,16 +81,17 @@ describe("EntryFilesAnalyser", () => {
     const entryUrl = new URL("entryWithVariousDepExtensions.js", FIXTURE_URL);
     const generator = entryFilesAnalyser.analyse([entryUrl]);
 
-    await assertReport(generator, entryUrl, true);
-    await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL), true);
+    await assertReport(generator, entryUrl);
+    await assertReport(generator, new URL("deps/default.jsx", FIXTURE_URL));
+    await assertReport(generator, new URL("deps/dep.jsx", FIXTURE_URL));
 
     await assertAllReportsYielded(generator);
   });
 
-  async function assertReport(generator, expectedUrl, expectedOk) {
+  async function assertReport(generator, expectedUrl) {
     const report = await generator.next();
     assert.strictEqual(report.value.url, expectedUrl.pathname);
-    assert.strictEqual(report.value.ok, expectedOk);
+    assert.ok(report.value.ok);
   }
 
   async function assertAllReportsYielded(generator) {
