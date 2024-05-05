@@ -99,3 +99,65 @@ test("should detect shady link when an URL has a suspicious domain", () => {
   const warning = sastAnalysis.getWarning("shady-link");
   assert.strictEqual(warning.value, "http://foobar.link");
 });
+
+
+test("should not mark suspicious links the IPv4 address range 127.0.0.0/8 (localhost 127.0.0.1)", () => {
+  const str = "const IPv4URL = ['http://127.0.0.1/script', 'http://127.7.7.7/script']";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  
+  assert.ok(!sastAnalysis.warnings().length);
+});
+
+
+test("should not be considered suspicious a link with a raw IPv4 address 127.0.0.1 and a port", () => {
+  const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  
+  assert.ok(!sastAnalysis.warnings().length);
+});
+
+test("should detect the link as suspicious when a URL contains a raw IPv4 address", () => {
+  const str = "const IPv4URL = 'http://77.244.210.247/burpcollaborator.txt'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://77.244.210.247/burpcollaborator.txt");
+});
+
+
+
+test("should detect suspicious links when a URL contains a raw IPv4 address with port", () => {
+  const str = "const IPv4URL = 'http://77.244.210.247:8080/script'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://77.244.210.247:8080/script");
+});
+
+
+test("should detect suspicious links when a URL contains a raw IPv6 address", () => {
+  const str = "const IPv6URL = 'http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/index.html'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/index.html");
+});
+
+
+test("should detect suspicious links when a URL contains a raw IPv6 address with port", () => {
+  const str = "const IPv6URL = 'http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:100/script'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:100/script");
+});
