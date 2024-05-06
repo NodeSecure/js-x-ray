@@ -5,15 +5,15 @@ import { builtinModules } from "repl";
 import { Hex } from "@nodesecure/sec-literal";
 
 const kMapRegexIps = Object.freeze({
-  regexIPv4With: /^(https?:\/\/)(?!127\.)(?!.*:(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9]))((?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])(?::\d{1,5})?(\/[^\s]*)?$/,
-  regexIPv6With: /^(https?:\/\/)(\[[0-9A-Fa-f:]+\])(?::\d{1,5})?(\/[^\s]*)?$/
+  regexIPv4: /^(https?:\/\/)(?!127\.)(?!.*:(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9]))((?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])(?::\d{1,5})?(\/[^\s]*)?$/,
+  regexIPv6: /^(https?:\/\/)(\[[0-9A-Fa-f:]+\])(?::\d{1,5})?(\/[^\s]*)?$/
 });
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
 const kShadyLinkRegExps = [
-  kMapRegexIps.regexIPv4With,
-  kMapRegexIps.regexIPv6With,
+  kMapRegexIps.regexIPv4,
+  kMapRegexIps.regexIPv6,
   /(http[s]?:\/\/bit\.ly.*)$/,
   /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
 ];
