@@ -67,11 +67,13 @@ require(Buffer.from("6673", "hex").toString());
 
 Then use `js-x-ray` to run an analysis of the JavaScript code:
 ```js
-import { runASTAnalysis } from "@nodesecure/js-x-ray";
+import { AstAnalyser } from "@nodesecure/js-x-ray";
 import { readFileSync } from "node:fs";
 
-const { warnings, dependencies } = runASTAnalysis(
-  readFileSync("./file.js", "utf-8")
+const scanner = new AstAnalyser();
+
+const { warnings, dependencies } = await scanner.analyseFile(
+  "./file.js"
 );
 
 console.log(dependencies);
@@ -174,11 +176,16 @@ You can pass an array of probes to the `runASTAnalysis/runASTAnalysisOnFile` fun
 Here using the example probe upper:
 
 ```ts
-import { runASTAnalysis } from "@nodesecure/js-x-ray";
+import { AstAnalyser } from "@nodesecure/js-x-ray";
 
 // add your customProbes here (see example above)
 
-const result = runASTAnalysis("const danger = 'danger';", { customProbes, skipDefaultProbes: true });
+const scanner = new AstAnalyser({
+  customProbes,
+  skipDefaultProbes: true
+});
+
+const result = scanner.analyse("const danger = 'danger';");
 
 console.log(result);
 ```
@@ -202,6 +209,12 @@ Congrats, you have created your first custom probe! 🎉
 > Check the types in [index.d.ts](index.d.ts) and [types/api.d.ts](types/api.d.ts) for more details about the `options`
 
 ## API
+
+- [AstAnalyser](./docs/api/AstAnalyser.md)
+- [EntryFilesAnalyser](./docs/api/EntryFilesAnalyser.md)
+
+Legacy APIs waiting to be deprecated;
+
 <details>
 <summary>runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report</summary>
 

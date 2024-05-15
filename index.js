@@ -2,6 +2,7 @@
 import { warnings } from "./src/warnings.js";
 import { JsSourceParser } from "./src/JsSourceParser.js";
 import { AstAnalyser } from "./src/AstAnalyser.js";
+import { EntryFilesAnalyser } from "./src/EntryFilesAnalyser.js";
 
 function runASTAnalysis(
   str,
@@ -28,8 +29,8 @@ async function runASTAnalysisOnFile(
   options = {}
 ) {
   const {
-    customParser = new JsSourceParser(),
     customProbes = [],
+    customParser = new JsSourceParser(),
     skipDefaultProbes = false,
     ...opts
   } = options;
@@ -46,6 +47,8 @@ async function runASTAnalysisOnFile(
 export {
   warnings,
   AstAnalyser,
+  EntryFilesAnalyser,
+  JsSourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile
 };

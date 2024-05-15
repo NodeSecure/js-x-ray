@@ -6,6 +6,7 @@ import {
   EntryFilesAnalyserOptions,
 
   SourceParser,
+  JsSourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
   Report,
@@ -31,6 +32,7 @@ export {
   AstAnalyserOptions,
   EntryFilesAnalyser,
   EntryFilesAnalyserOptions,
+  JsSourceParser,
   SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
