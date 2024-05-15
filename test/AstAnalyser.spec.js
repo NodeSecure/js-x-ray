@@ -177,6 +177,7 @@ describe("AstAnalyser", (t) => {
 
     describe("intialize", () => {
       const analyser = new AstAnalyser();
+
       it("should throw if initialize is not a function", () => {
         assert.throws(() => {
           analyser.analyse("const foo = 'bar';", {
@@ -185,29 +186,24 @@ describe("AstAnalyser", (t) => {
         });
       });
 
-      it("should call the initialize function", () => {
-        let hasBeenCalled = false;
-        const initialize = () => {
-          assert.strictEqual(hasBeenCalled, false);
-          hasBeenCalled = true;
-        };
+      it("should call the initialize function", (t) => {
+        const initialize = t.mock.fn();
 
         analyser.analyse("const foo = 'bar';", {
           initialize
         });
-        assert.strictEqual(hasBeenCalled, true);
+
+        assert.strictEqual(initialize.mock.callCount(), 1);
       });
 
-      it("should pass the source file as first argument", () => {
-        let hasBeenCalled = false;
-        const initialize = (source) => {
-          assert.strictEqual(source instanceof SourceFile, true);
-        };
+      it("should pass the source file as first argument", (t) => {
+        const initialize = t.mock.fn();
 
         analyser.analyse("const foo = 'bar';", {
           initialize
         });
-        assert.strictEqual(hasBeenCalled, true);
+
+        assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
       });
     });
 
@@ -221,29 +217,24 @@ describe("AstAnalyser", (t) => {
         });
       });
 
-      it("should call the finalize function", () => {
-        let hasBeenCalled = false;
-        const finalize = () => {
-          assert.strictEqual(hasBeenCalled, false);
-          hasBeenCalled = true;
-        };
+      it("should call the finalize function", (t) => {
+        const finalize = t.mock.fn();
 
         analyser.analyse("const foo = 'bar';", {
           finalize
         });
-        assert.strictEqual(hasBeenCalled, true);
+
+        assert.strictEqual(finalize.mock.callCount(), 1);
       });
 
-      it("should pass the source file as first argument", () => {
-        let hasBeenCalled = false;
-        const finalize = (source) => {
-          assert.strictEqual(source instanceof SourceFile, true);
-        };
+      it("should pass the source file as first argument", (t) => {
+        const finalize = t.mock.fn();
 
         analyser.analyse("const foo = 'bar';", {
           finalize
         });
-        assert.strictEqual(hasBeenCalled, true);
+
+        assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
       });
     });
   });
