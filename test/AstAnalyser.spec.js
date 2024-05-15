@@ -174,9 +174,81 @@ describe("AstAnalyser", (t) => {
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings.length, 1);
     });
+
+    describe("intialize", () => {
+      const analyser = new AstAnalyser();
+      it("should throw if initialize is not a function", () => {
+        assert.throws(() => {
+          analyser.analyse("const foo = 'bar';", {
+            initialize: "foo"
+          });
+        });
+      });
+
+      it("should call the initialize function", () => {
+        let hasBeenCalled = false;
+        const initialize = () => {
+          assert.strictEqual(hasBeenCalled, false);
+          hasBeenCalled = true;
+        };
+
+        analyser.analyse("const foo = 'bar';", {
+          initialize
+        });
+        assert.strictEqual(hasBeenCalled, true);
+      });
+
+      it("should pass the source file as first argument", () => {
+        let hasBeenCalled = false;
+        const initialize = (source) => {
+          assert.strictEqual(source instanceof SourceFile, true);
+        };
+
+        analyser.analyse("const foo = 'bar';", {
+          initialize
+        });
+        assert.strictEqual(hasBeenCalled, true);
+      });
+    });
+
+    describe("finalize", () => {
+      const analyser = new AstAnalyser();
+      it("should throw if finalize is not a function", () => {
+        assert.throws(() => {
+          analyser.analyse("const foo = 'bar';", {
+            finalize: "foo"
+          });
+        });
+      });
+
+      it("should call the finalize function", () => {
+        let hasBeenCalled = false;
+        const finalize = () => {
+          assert.strictEqual(hasBeenCalled, false);
+          hasBeenCalled = true;
+        };
+
+        analyser.analyse("const foo = 'bar';", {
+          finalize
+        });
+        assert.strictEqual(hasBeenCalled, true);
+      });
+
+      it("should pass the source file as first argument", () => {
+        let hasBeenCalled = false;
+        const finalize = (source) => {
+          assert.strictEqual(source instanceof SourceFile, true);
+        };
+
+        analyser.analyse("const foo = 'bar';", {
+          finalize
+        });
+        assert.strictEqual(hasBeenCalled, true);
+      });
+    });
   });
 
-  it("remove the packageName from the dependencies list", async() => {
+  it("remove the packageName from the dependencies list", async () => {
     const result = await getAnalyser().analyseFile(
       new URL("depName.js", FIXTURE_URL),
       { module: false, packageName: "foobar" }
@@ -189,7 +261,7 @@ describe("AstAnalyser", (t) => {
     );
   });
 
-  it("should fail with a parsing error", async() => {
+  it("should fail with a parsing error", async () => {
     const result = await getAnalyser().analyseFile(
       new URL("parsingError.js", FIXTURE_URL),
       { module: false, packageName: "foobar" }
@@ -248,8 +320,8 @@ describe("AstAnalyser", (t) => {
     it("should remove multiple HTML comments", () => {
       const preparedSource = getAnalyser().prepareSource(
         "<!-- const yo = 5; -->\nconst yo = 'foo'\n<!-- const yo = 5; -->", {
-          removeHTMLComments: true
-        });
+        removeHTMLComments: true
+      });
 
       assert.strictEqual(preparedSource, "\nconst yo = 'foo'\n");
     });
