@@ -4,8 +4,11 @@ import { Statement } from "meriyah/dist/src/estree.js";
 export {
   AstAnalyser,
   AstAnalyserOptions,
+
   EntryFilesAnalyser,
   EntryFilesAnalyserOptions,
+
+  JsSourceParser,
   SourceParser,
   runASTAnalysis,
   runASTAnalysisOnFile,
@@ -101,7 +104,7 @@ interface SourceParser {
 declare class AstAnalyser {
   constructor(options?: AstAnalyserOptions);
   analyse: (str: string, options?: RuntimeOptions) => Report;
-  analyzeFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
+  analyseFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
 }
 
 interface EntryFilesAnalyserOptions {
@@ -117,6 +120,8 @@ declare class EntryFilesAnalyser {
    */
   analyse(entryFiles: (string | URL)[]): AsyncGenerator<ReportOnFile & { url: string }>;
 }
+
+declare class JsSourceParser implements SourceParser {}
 
 declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report;
 declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise<ReportOnFile>;
