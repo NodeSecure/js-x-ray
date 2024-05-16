@@ -8,9 +8,9 @@ import safeRegex from "safe-regex";
  * @example
  * new RegExp("...");
  */
-function validateNode(node, { tracer }) {
+function validateNode(node) {
   return [
-    isRegexConstructor(node, tracer) && node.arguments.length > 0
+    isProxy(node) && node.arguments.length > 1
   ];
 }
 
@@ -18,6 +18,7 @@ function main(node, options) {
   const { sourceFile } = options;
 
   const arg = node.arguments[0];
+
   /**
    * Note: RegExp Object can contain a RegExpLiteral
    * @see https://github.com/estree/estree/blob/master/es5.md#regexpliteral
@@ -33,22 +34,16 @@ function main(node, options) {
   }
 }
 
-function isRegexConstructor(node, tracer) {
-  if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
+function isProxy(node) {
+  if (node.type !== "NewExpression") {
     return false;
   }
 
-  if (node.callee.name === "RegExp") {
-    return true;
-  }
-
-  const data = tracer.getDataFromIdentifier(node.callee.name);
-
-  return data?.superClassMemory.includes("RegExp");
+  return node.callee.name === "Proxy";
 }
 
 export default {
-  name: "isRegexObject",
+  name: "isRegexProxy",
   validateNode,
   main,
   breakOnMatch: false

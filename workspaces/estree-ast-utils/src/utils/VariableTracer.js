@@ -68,7 +68,8 @@ export class VariableTracer extends EventEmitter {
     const {
       followConsecutiveAssignment = false,
       moduleName = null,
-      name = identifierOrMemberExpr
+      name = identifierOrMemberExpr,
+      superClassMemory = []
     } = options;
 
     this.#traced.set(identifierOrMemberExpr, {
@@ -76,8 +77,10 @@ export class VariableTracer extends EventEmitter {
       identifierOrMemberExpr,
       followConsecutiveAssignment,
       assignmentMemory: [],
+      superClassMemory,
       moduleName
     });
+
 
     if (identifierOrMemberExpr.includes(".")) {
       const exprs = [...getSubMemberExpressionSegments(identifierOrMemberExpr)]
@@ -126,7 +129,8 @@ export class VariableTracer extends EventEmitter {
     return {
       name: tracedIdentifier.name,
       identifierOrMemberExpr: tracedIdentifier.identifierOrMemberExpr,
-      assignmentMemory
+      assignmentMemory,
+      superClassMemory: tracedIdentifier.superClassMemory
     };
   }
 
@@ -154,8 +158,10 @@ export class VariableTracer extends EventEmitter {
       name: tracedVariant.name,
       identifierOrMemberExpr: tracedVariant.identifierOrMemberExpr,
       id: newIdentiferName,
+      superClassMemory: tracedVariant.superClassMemory,
       location: id.loc
     };
+
     this.emit(VariableTracer.AssignmentEvent, assignmentEventPayload);
     this.emit(tracedVariant.identifierOrMemberExpr, assignmentEventPayload);
 
@@ -414,6 +420,23 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
+  #walkClassDeclaration(classDeclarationNode) {
+    const { id, superClass } = classDeclarationNode;
+    if (!superClass) {
+      return;
+    }
+
+    let superClassMemory = [superClass.name];
+    const data = this.getDataFromIdentifier(superClass.name);
+    if (!superClassMemory.includes("RegExp")) {
+      superClassMemory = [...superClassMemory, ...data.superClassMemory];
+    }
+
+    if (superClassMemory.includes("RegExp")) {
+      this.trace(id.name, { followConsecutiveAssignment: true, superClassMemory });
+    }
+  }
+
   walk(node) {
     switch (node.type) {
       case "ImportDeclaration": {
@@ -435,6 +458,9 @@ export class VariableTracer extends EventEmitter {
           }
         }
         break;
+      }
+      case "ClassDeclaration": {
+        this.#walkClassDeclaration(node);
       }
     }
   }

@@ -16,14 +16,29 @@ test("should not throw a warning because the given Literal RegExp is considered 
 });
 
 test("should throw a 'unsafe-regex' warning because the given RegExp Object is unsafe", () => {
-  const str = "const foo = new RegExp('(a+){10}');";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRegexObject)
-    .execute(ast.body);
+  const testCases = [
+    "const foo = new RegExp('(a+){10}');",
+    `
+      class MyRegExp extends RegExp {} 
+      const y = MyRegExp; 
+      new y('(a+){10}');`,
+    `
+      class MyRegExp extends RegExp {}
+      class MyRegExp2 extends MyRegExp {}
+      const d = MyRegExp2;
+      new d('(a+){10}');
+    `
+  ];
 
-  assert.equal(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("unsafe-regex");
-  assert.equal(warning.value, "(a+){10}");
+  testCases.forEach((str) => {
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(str, isRegexObject)
+      .execute(ast.body);
+
+    assert.equal(sastAnalysis.warnings().length, 1);
+    const warning = sastAnalysis.getWarning("unsafe-regex");
+    assert.equal(warning.value, "(a+){10}");
+  });
 });
 
 test("should throw a 'unsafe-regex' warning because the given RegExp Object (with RegExpLiteral) is unsafe", () => {
