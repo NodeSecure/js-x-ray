@@ -1,5 +1,5 @@
 // Import Third-party Dependencies
-import { isLiteralRegex } from "@nodesecure/estree-ast-utils";
+import { getMemberExpressionIdentifier, isLiteralRegex } from "@nodesecure/estree-ast-utils";
 import safeRegex from "safe-regex";
 
 /**
@@ -34,15 +34,24 @@ function main(node, options) {
 }
 
 function isRegexConstructor(node, tracer) {
-  if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
+  if (node.type !== "NewExpression") {
     return false;
   }
 
-  if (node.callee.name === "RegExp") {
+  let name = "";
+  if (node.callee.type === "Identifier") {
+    name = node.callee.name;
+  }
+  else {
+    name = [...getMemberExpressionIdentifier(node.callee)].join(".");
+  }
+
+  if (name === "RegExp") {
     return true;
   }
 
-  const data = tracer.getDataFromIdentifier(node.callee.name);
+  const data = tracer.getDataFromIdentifier(name);
+
 
   return data?.superClassMemory.includes("RegExp");
 }

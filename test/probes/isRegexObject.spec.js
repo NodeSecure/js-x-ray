@@ -27,6 +27,13 @@ test("should throw a 'unsafe-regex' warning because the given RegExp Object is u
       class MyRegExp2 extends MyRegExp {}
       const d = MyRegExp2;
       new d('(a+){10}');
+    `,
+    `
+      class MyRegExp extends RegExp {}
+
+      const y = { d: { z: MyRegExp } }
+
+      new y.d.z('(a+){10}');
     `
   ];
 
