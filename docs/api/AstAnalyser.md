@@ -64,3 +64,29 @@ type ReportOnFile = {
   warnings: Warning[];
 }
 ```
+
+## Examples
+
+### `initialize`/`finalize` Hooks
+
+The `analyse` method allows for the integration of two hooks: `initialize` and `finalize`. 
+These hooks are triggered before and after the analysis process, respectively.
+
+Below is an example of how to use these hooks within the `AstAnalyser` class:
+
+```js
+import { AstAnalyser } from "@nodesecure/js-x-ray";
+
+const scanner = new AstAnalyser();
+
+scanner.analyse("const foo = 'bar';", {
+  initialize(sourceFile) {
+    // Code to execute before analysis starts
+    sourceFile.tracer.trace("Starting analysis...");
+  },
+  finalize(sourceFile) {
+    // Code to execute after analysis completes
+    console.log("Analysis complete.");
+  }
+});
+```

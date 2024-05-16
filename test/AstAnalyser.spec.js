@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 // Import Internal Dependencies
 import { AstAnalyser } from "../src/AstAnalyser.js";
 import { JsSourceParser } from "../src/JsSourceParser.js";
+import { SourceFile } from "../src/SourceFile.js";
 import {
   customProbes,
   getWarningKind,
@@ -174,9 +175,86 @@ describe("AstAnalyser", (t) => {
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings.length, 1);
     });
+
+    describe("hooks", () => {
+      describe("initialize", () => {
+        const analyser = new AstAnalyser();
+
+        it("should throw if initialize is not a function", () => {
+          assert.throws(() => {
+            analyser.analyse("const foo = 'bar';", {
+              initialize: "foo"
+            });
+          });
+        });
+
+        it("should call the initialize function", (t) => {
+          const initialize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", (t) => {
+          const initialize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+      describe("finalize", () => {
+        const analyser = new AstAnalyser();
+        it("should throw if finalize is not a function", () => {
+          assert.throws(() => {
+            analyser.analyse("const foo = 'bar';", {
+              finalize: "foo"
+            });
+          });
+        });
+
+        it("should call the finalize function", (t) => {
+          const finalize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", (t) => {
+          const finalize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+      it("intialize should be called before finalize", () => {
+        const calls = [];
+        const analyser = new AstAnalyser();
+
+        analyser.analyse("const foo = 'bar';", {
+          initialize: () => calls.push("initialize"),
+          finalize: () => calls.push("finalize")
+        });
+
+        assert.deepEqual(calls, ["initialize", "finalize"]);
+      });
+    });
   });
 
-  it("remove the packageName from the dependencies list", async() => {
+  it("remove the packageName from the dependencies list", async () => {
     const result = await getAnalyser().analyseFile(
       new URL("depName.js", FIXTURE_URL),
       { module: false, packageName: "foobar" }
@@ -189,7 +267,7 @@ describe("AstAnalyser", (t) => {
     );
   });
 
-  it("should fail with a parsing error", async() => {
+  it("should fail with a parsing error", async () => {
     const result = await getAnalyser().analyseFile(
       new URL("parsingError.js", FIXTURE_URL),
       { module: false, packageName: "foobar" }
@@ -248,8 +326,8 @@ describe("AstAnalyser", (t) => {
     it("should remove multiple HTML comments", () => {
       const preparedSource = getAnalyser().prepareSource(
         "<!-- const yo = 5; -->\nconst yo = 'foo'\n<!-- const yo = 5; -->", {
-          removeHTMLComments: true
-        });
+        removeHTMLComments: true
+      });
 
       assert.strictEqual(preparedSource, "\nconst yo = 'foo'\n");
     });

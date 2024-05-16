@@ -31,14 +31,22 @@ export class AstAnalyser {
     const {
       isMinified = false,
       module = true,
-      removeHTMLComments = false
+      removeHTMLComments = false,
+      initialize,
+      finalize
     } = options;
 
     const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
-
     const source = new SourceFile(str, this.probesOptions);
+
+    if (initialize) {
+      if (typeof initialize !== "function") {
+        throw new TypeError("options.initialize must be a function");
+      }
+      initialize(source);
+    }
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     walk(body, {
@@ -54,6 +62,13 @@ export class AstAnalyser {
         }
       }
     });
+
+    if (finalize) {
+      if (typeof finalize !== "function") {
+        throw new TypeError("options.initialize must be a function");
+      }
+      finalize(source);
+    }
 
     return {
       ...source.getResult(isMinified),

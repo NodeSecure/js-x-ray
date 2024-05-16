@@ -53,6 +53,8 @@ interface RuntimeOptions {
    * @default false
    */
   isMinified?: boolean;
+  initialize?: (sourceFile: SourceFile) => void;
+  finalize?: (sourceFile: SourceFile) => void;
 }
 
 interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {

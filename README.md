@@ -223,6 +223,8 @@ interface RuntimeOptions {
   module?: boolean;
   removeHTMLComments?: boolean;
   isMinified?: boolean;
+  initialize?: (sourceFile: SourceFile) => void;
+  finalize?: (sourceFile: SourceFile) => void;
 }
 ```
 
