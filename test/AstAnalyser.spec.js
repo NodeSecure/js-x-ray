@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 // Import Internal Dependencies
 import { AstAnalyser } from "../src/AstAnalyser.js";
 import { JsSourceParser } from "../src/JsSourceParser.js";
+import { SourceFile } from "../src/SourceFile.js";
 import {
   customProbes,
   getWarningKind,
