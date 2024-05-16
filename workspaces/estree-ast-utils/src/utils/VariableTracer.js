@@ -377,6 +377,24 @@ export class VariableTracer extends EventEmitter {
 
         break;
       }
+
+      case "ObjectExpression": {
+        this.#walkObjectExpression(id, childNode);
+      }
+    }
+  }
+
+  #walkObjectExpression(id, node) {
+    for (const prop of node.properties) {
+      const newId = { ...id, name: id.name + "." + prop.key.name };
+      if (prop.value.type === "Identifier") {
+        if (this.#traced.has(prop.value.name)) {
+          this.#declareNewAssignment(prop.value.name, newId);
+        }
+      }
+      else if (prop.value.type === "ObjectExpression") {
+        this.#walkObjectExpression(newId, prop.value);
+      }
     }
   }
 
@@ -458,8 +476,16 @@ export class VariableTracer extends EventEmitter {
         }
         break;
       }
+      case "AssignmentExpression": {
+        console.log("TODO");
+
+        break;
+      }
+
       case "ClassDeclaration": {
         this.#walkClassDeclaration(node);
+
+        break;
       }
     }
   }
