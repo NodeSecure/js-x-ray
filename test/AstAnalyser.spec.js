@@ -176,66 +176,80 @@ describe("AstAnalyser", (t) => {
       assert.equal(result.warnings.length, 1);
     });
 
-    describe("intialize", () => {
-      const analyser = new AstAnalyser();
+    describe("hooks", () => {
+      describe("initialize", () => {
+        const analyser = new AstAnalyser();
 
-      it("should throw if initialize is not a function", () => {
-        assert.throws(() => {
-          analyser.analyse("const foo = 'bar';", {
-            initialize: "foo"
+        it("should throw if initialize is not a function", () => {
+          assert.throws(() => {
+            analyser.analyse("const foo = 'bar';", {
+              initialize: "foo"
+            });
           });
         });
-      });
 
-      it("should call the initialize function", (t) => {
-        const initialize = t.mock.fn();
+        it("should call the initialize function", (t) => {
+          const initialize = t.mock.fn();
 
-        analyser.analyse("const foo = 'bar';", {
-          initialize
-        });
-
-        assert.strictEqual(initialize.mock.callCount(), 1);
-      });
-
-      it("should pass the source file as first argument", (t) => {
-        const initialize = t.mock.fn();
-
-        analyser.analyse("const foo = 'bar';", {
-          initialize
-        });
-
-        assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
-      });
-    });
-
-    describe("finalize", () => {
-      const analyser = new AstAnalyser();
-      it("should throw if finalize is not a function", () => {
-        assert.throws(() => {
           analyser.analyse("const foo = 'bar';", {
-            finalize: "foo"
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", (t) => {
+          const initialize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+      describe("finalize", () => {
+        const analyser = new AstAnalyser();
+        it("should throw if finalize is not a function", () => {
+          assert.throws(() => {
+            analyser.analyse("const foo = 'bar';", {
+              finalize: "foo"
+            });
           });
         });
-      });
 
-      it("should call the finalize function", (t) => {
-        const finalize = t.mock.fn();
+        it("should call the finalize function", (t) => {
+          const finalize = t.mock.fn();
 
-        analyser.analyse("const foo = 'bar';", {
-          finalize
+          analyser.analyse("const foo = 'bar';", {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.callCount(), 1);
         });
 
-        assert.strictEqual(finalize.mock.callCount(), 1);
+        it("should pass the source file as first argument", (t) => {
+          const finalize = t.mock.fn();
+
+          analyser.analyse("const foo = 'bar';", {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
       });
 
-      it("should pass the source file as first argument", (t) => {
-        const finalize = t.mock.fn();
+      it("intialize should be called before finalize", () => {
+        const calls = [];
+        const analyser = new AstAnalyser();
 
         analyser.analyse("const foo = 'bar';", {
-          finalize
+          initialize: () => calls.push("initialize"),
+          finalize: () => calls.push("finalize")
         });
 
-        assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        assert.deepEqual(calls, ["initialize", "finalize"]);
       });
     });
   });
