@@ -19,7 +19,8 @@ test("it should be able to Trace a require Assignment (using a global variable)"
   assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require",
-    assignmentMemory: ["foo"]
+    assignmentMemory: ["foo"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 1);
 
@@ -41,7 +42,8 @@ test("it should be able to Trace a require Assignment (using a MemberExpression)
   assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require.resolve",
-    assignmentMemory: ["foo"]
+    assignmentMemory: ["foo"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 1);
 
@@ -65,7 +67,8 @@ test("it should be able to Trace a global Assignment using an ESTree ObjectPatte
   assert.deepEqual(boo, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["yoo", "boo"]
+    assignmentMemory: ["yoo", "boo"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -92,7 +95,8 @@ test("it should be able to Trace an Unsafe Function() Assignment using an ESTree
   assert.deepEqual(boo, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["yoo", "boo"]
+    assignmentMemory: ["yoo", "boo"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -136,7 +140,8 @@ test("it should be able to Trace a global assignment using a LogicalExpression",
   assert.deepEqual(foo, {
     name: "require",
     identifierOrMemberExpr: "require",
-    assignmentMemory: ["foo"]
+    assignmentMemory: ["foo"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 1);
 

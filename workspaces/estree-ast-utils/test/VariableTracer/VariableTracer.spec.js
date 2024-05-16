@@ -30,7 +30,8 @@ test("it should be able to Trace a malicious code with Global, BinaryExpr, Assig
   assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["p", "evil"]
+    assignmentMemory: ["p", "evil"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -58,7 +59,8 @@ test("it should be able to Trace a malicious CallExpression by recombining segme
   assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["g", "r", "c"]
+    assignmentMemory: ["g", "r", "c"],
+    superClassMemory: []
   });
   assert.strictEqual(assignments.length, 3);
 
@@ -117,7 +119,8 @@ test("it should be able to Trace an unsafe crypto.createHash using Function.prot
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["crr", "createHashBis"]
+    assignmentMemory: ["crr", "createHashBis"],
+    superClassMemory: []
   });
 
   assert.strictEqual(helpers.tracer.importedModules.has("crypto"), true);

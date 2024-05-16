@@ -81,7 +81,6 @@ export class VariableTracer extends EventEmitter {
       moduleName
     });
 
-
     if (identifierOrMemberExpr.includes(".")) {
       const exprs = [...getSubMemberExpressionSegments(identifierOrMemberExpr)]
         .filter((expr) => !this.#traced.has(expr));
@@ -428,7 +427,7 @@ export class VariableTracer extends EventEmitter {
 
     let superClassMemory = [superClass.name];
     const data = this.getDataFromIdentifier(superClass.name);
-    if (!superClassMemory.includes("RegExp")) {
+    if (!superClassMemory.includes("RegExp") && data?.superClassMemory) {
       superClassMemory = [...superClassMemory, ...data.superClassMemory];
     }
 
