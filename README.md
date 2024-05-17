@@ -258,6 +258,8 @@ interface RuntimeFileOptions {
   module?: boolean;
   removeHTMLComments?: boolean;
   packageName?: string;
+  initialize?: (sourceFile: SourceFile) => void;
+  finalize?: (sourceFile: SourceFile) => void;
 }
 ```
 

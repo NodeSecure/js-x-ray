@@ -41,6 +41,8 @@ export class AstAnalyser {
     });
     const source = new SourceFile(str, this.probesOptions);
 
+    // TODO: this check should be factorized in a way that we reuse it
+    // on analyze and anlyseFile
     if (initialize) {
       if (typeof initialize !== "function") {
         throw new TypeError("options.initialize must be a function");
@@ -63,9 +65,11 @@ export class AstAnalyser {
       }
     });
 
+    // TODO: this check should be factorized in a way that we reuse it
+    // on analyze and anlyseFile
     if (finalize) {
       if (typeof finalize !== "function") {
-        throw new TypeError("options.initialize must be a function");
+        throw new TypeError("options.finalize must be a function");
       }
       finalize(source);
     }
@@ -85,7 +89,9 @@ export class AstAnalyser {
       const {
         packageName = null,
         module = true,
-        removeHTMLComments = false
+        removeHTMLComments = false,
+        initialize,
+        finalize
       } = options;
 
       const str = await fs.readFile(pathToFile, "utf-8");
@@ -95,7 +101,9 @@ export class AstAnalyser {
       const data = this.analyse(str, {
         isMinified: isMin,
         module: path.extname(filePathString) === ".mjs" ? true : module,
-        removeHTMLComments
+        removeHTMLComments,
+        initialize,
+        finalize
       });
 
       if (packageName !== null) {
