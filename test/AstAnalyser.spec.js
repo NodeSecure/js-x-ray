@@ -185,7 +185,7 @@ describe("AstAnalyser", (t) => {
             analyser.analyse("const foo = 'bar';", {
               initialize: "foo"
             });
-          });
+          }, /options.initialize must be a function/);
         });
 
         it("should call the initialize function", (t) => {
@@ -216,7 +216,7 @@ describe("AstAnalyser", (t) => {
             analyser.analyse("const foo = 'bar';", {
               finalize: "foo"
             });
-          });
+          }, /options.finalize must be a function/);
         });
 
         it("should call the finalize function", (t) => {
@@ -254,30 +254,115 @@ describe("AstAnalyser", (t) => {
     });
   });
 
-  it("remove the packageName from the dependencies list", async () => {
-    const result = await getAnalyser().analyseFile(
-      new URL("depName.js", FIXTURE_URL),
-      { module: false, packageName: "foobar" }
-    );
+  describe("analyseFile", () => {
+    it("remove the packageName from the dependencies list", async () => {
+      const result = await getAnalyser().analyseFile(
+        new URL("depName.js", FIXTURE_URL),
+        { module: false, packageName: "foobar" }
+      );
 
-    assert.ok(result.ok);
-    assert.strictEqual(result.warnings.length, 0);
-    assert.deepEqual([...result.dependencies.keys()],
-      ["open"]
-    );
-  });
+      assert.ok(result.ok);
+      assert.strictEqual(result.warnings.length, 0);
+      assert.deepEqual([...result.dependencies.keys()],
+        ["open"]
+      );
+    });
 
-  it("should fail with a parsing error", async () => {
-    const result = await getAnalyser().analyseFile(
-      new URL("parsingError.js", FIXTURE_URL),
-      { module: false, packageName: "foobar" }
-    );
+    it("should fail with a parsing error", async () => {
+      const result = await getAnalyser().analyseFile(
+        new URL("parsingError.js", FIXTURE_URL),
+        { module: false, packageName: "foobar" }
+      );
 
-    assert.strictEqual(result.ok, false);
-    assert.strictEqual(result.warnings.length, 1);
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(result.warnings.length, 1);
 
-    const parsingError = result.warnings[0];
-    assert.strictEqual(parsingError.kind, "parsing-error");
+      const parsingError = result.warnings[0];
+      assert.strictEqual(parsingError.kind, "parsing-error");
+    });
+
+    describe("hooks", () => {
+      const analyser = new AstAnalyser();
+      const url = new URL("depName.js", FIXTURE_URL);
+
+      describe("initialize", () => {
+        it("should throw if initialize is not a function", async () => {
+          const res = await analyser.analyseFile(
+            url, {
+            initialize: "foo"
+          });
+
+          assert.strictEqual(res.ok, false);
+          assert.strictEqual(res.warnings[0].value, "options.initialize must be a function");
+          assert.strictEqual(res.warnings[0].kind, "parsing-error");
+        });
+
+        it("should call the initialize function", async (t) => {
+          const initialize = t.mock.fn();
+
+          await analyser.analyseFile(url, {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", async (t) => {
+          const initialize = t.mock.fn();
+
+          await analyser.analyseFile(url, {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+      describe("finalize", () => {
+        it("should throw if finalize is not a function", async () => {
+          const res = await analyser.analyseFile(
+            url, {
+            finalize: "foo"
+          });
+
+          assert.strictEqual(res.ok, false);
+          assert.strictEqual(res.warnings[0].value, "options.finalize must be a function");
+          assert.strictEqual(res.warnings[0].kind, "parsing-error");
+        });
+
+        it("should call the finalize function", async (t) => {
+          const finalize = t.mock.fn();
+
+          await analyser.analyseFile(url, {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", async (t) => {
+          const finalize = t.mock.fn();
+
+          await analyser.analyseFile(url, {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+
+      it("intialize should be called before finalize", async () => {
+        const calls = [];
+
+        await analyser.analyseFile(url, {
+          initialize: () => calls.push("initialize"),
+          finalize: () => calls.push("finalize")
+        });
+
+        assert.deepEqual(calls, ["initialize", "finalize"]);
+      });
+    });
   });
 
   describe("prepareSource", () => {
