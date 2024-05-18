@@ -1,11 +1,11 @@
+/* eslint-disable max-nested-callbacks */
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../src/AstAnalyser.js";
-import { JsSourceParser } from "../src/JsSourceParser.js";
+import { AstAnalyser, JsSourceParser } from "../index.js";
 import { SourceFile } from "../src/SourceFile.js";
 import {
   customProbes,
@@ -255,7 +255,7 @@ describe("AstAnalyser", (t) => {
   });
 
   describe("analyseFile", () => {
-    it("remove the packageName from the dependencies list", async () => {
+    it("remove the packageName from the dependencies list", async() => {
       const result = await getAnalyser().analyseFile(
         new URL("depName.js", FIXTURE_URL),
         { module: false, packageName: "foobar" }
@@ -268,7 +268,7 @@ describe("AstAnalyser", (t) => {
       );
     });
 
-    it("should fail with a parsing error", async () => {
+    it("should fail with a parsing error", async() => {
       const result = await getAnalyser().analyseFile(
         new URL("parsingError.js", FIXTURE_URL),
         { module: false, packageName: "foobar" }
@@ -286,18 +286,18 @@ describe("AstAnalyser", (t) => {
       const url = new URL("depName.js", FIXTURE_URL);
 
       describe("initialize", () => {
-        it("should throw if initialize is not a function", async () => {
+        it("should throw if initialize is not a function", async() => {
           const res = await analyser.analyseFile(
             url, {
-            initialize: "foo"
-          });
+              initialize: "foo"
+            });
 
           assert.strictEqual(res.ok, false);
           assert.strictEqual(res.warnings[0].value, "options.initialize must be a function");
           assert.strictEqual(res.warnings[0].kind, "parsing-error");
         });
 
-        it("should call the initialize function", async (t) => {
+        it("should call the initialize function", async(t) => {
           const initialize = t.mock.fn();
 
           await analyser.analyseFile(url, {
@@ -307,7 +307,7 @@ describe("AstAnalyser", (t) => {
           assert.strictEqual(initialize.mock.callCount(), 1);
         });
 
-        it("should pass the source file as first argument", async (t) => {
+        it("should pass the source file as first argument", async(t) => {
           const initialize = t.mock.fn();
 
           await analyser.analyseFile(url, {
@@ -319,18 +319,18 @@ describe("AstAnalyser", (t) => {
       });
 
       describe("finalize", () => {
-        it("should throw if finalize is not a function", async () => {
+        it("should throw if finalize is not a function", async() => {
           const res = await analyser.analyseFile(
             url, {
-            finalize: "foo"
-          });
+              finalize: "foo"
+            });
 
           assert.strictEqual(res.ok, false);
           assert.strictEqual(res.warnings[0].value, "options.finalize must be a function");
           assert.strictEqual(res.warnings[0].kind, "parsing-error");
         });
 
-        it("should call the finalize function", async (t) => {
+        it("should call the finalize function", async(t) => {
           const finalize = t.mock.fn();
 
           await analyser.analyseFile(url, {
@@ -340,7 +340,7 @@ describe("AstAnalyser", (t) => {
           assert.strictEqual(finalize.mock.callCount(), 1);
         });
 
-        it("should pass the source file as first argument", async (t) => {
+        it("should pass the source file as first argument", async(t) => {
           const finalize = t.mock.fn();
 
           await analyser.analyseFile(url, {
@@ -352,7 +352,7 @@ describe("AstAnalyser", (t) => {
       });
 
 
-      it("intialize should be called before finalize", async () => {
+      it("intialize should be called before finalize", async() => {
         const calls = [];
 
         await analyser.analyseFile(url, {
@@ -411,8 +411,8 @@ describe("AstAnalyser", (t) => {
     it("should remove multiple HTML comments", () => {
       const preparedSource = getAnalyser().prepareSource(
         "<!-- const yo = 5; -->\nconst yo = 'foo'\n<!-- const yo = 5; -->", {
-        removeHTMLComments: true
-      });
+          removeHTMLComments: true
+        });
 
       assert.strictEqual(preparedSource, "\nconst yo = 'foo'\n");
     });

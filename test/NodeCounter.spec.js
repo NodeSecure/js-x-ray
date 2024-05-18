@@ -7,8 +7,8 @@ import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import { NodeCounter } from "../src/NodeCounter.js";
-import { JsSourceParser } from "../src/JsSourceParser.js";
 import { isNode } from "../src/utils/index.js";
+import { JsSourceParser } from "../index.js";
 
 describe("NodeCounter", () => {
   describe("constructor", () => {

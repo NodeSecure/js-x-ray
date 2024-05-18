@@ -7,7 +7,7 @@ import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import { Deobfuscator } from "../src/Deobfuscator.js";
-import { JsSourceParser } from "../src/JsSourceParser.js";
+import { JsSourceParser } from "../index.js";
 
 describe("Deobfuscator", () => {
   describe("identifiers and counters", () => {

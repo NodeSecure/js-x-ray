@@ -3,9 +3,7 @@ import { it } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../index.js";
-import { AstAnalyser } from "../src/AstAnalyser.js";
-import { JsSourceParser } from "../src/JsSourceParser.js";
+import { runASTAnalysis, AstAnalyser, JsSourceParser } from "../index.js";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
 import {
   customProbes,
