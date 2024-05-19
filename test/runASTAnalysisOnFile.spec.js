@@ -3,10 +3,8 @@ import { it } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysisOnFile } from "../index.js";
-import { AstAnalyser } from "../src/AstAnalyser.js";
+import { runASTAnalysisOnFile, AstAnalyser, JsSourceParser } from "../index.js";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
-import { JsSourceParser } from "../src/JsSourceParser.js";
 import { customProbes, kWarningUnsafeDanger, kWarningUnsafeImport, kWarningUnsafeStmt } from "./utils/index.js";
 
 // CONSTANTS
