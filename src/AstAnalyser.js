@@ -1,5 +1,6 @@
 // Import Node.js Dependencies
 import fs from "node:fs/promises";
+import fsSync from "node:fs";
 import path from "node:path";
 
 // Import Third-party Dependencies
@@ -95,6 +96,52 @@ export class AstAnalyser {
       } = options;
 
       const str = await fs.readFile(pathToFile, "utf-8");
+      const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
+
+      const isMin = filePathString.includes(".min") || isMinified(str);
+      const data = this.analyse(str, {
+        isMinified: isMin,
+        module: path.extname(filePathString) === ".mjs" ? true : module,
+        removeHTMLComments,
+        initialize,
+        finalize
+      });
+
+      if (packageName !== null) {
+        data.dependencies.delete(packageName);
+      }
+
+      return {
+        ok: true,
+        dependencies: data.dependencies,
+        warnings: data.warnings,
+        isMinified: !data.isOneLineRequire && isMin
+      };
+    }
+    catch (error) {
+      return {
+        ok: false,
+        warnings: [
+          { kind: "parsing-error", value: error.message, location: [[0, 0], [0, 0]] }
+        ]
+      };
+    }
+  }
+
+  analyseFileSync(
+    pathToFile,
+    options = {}
+  ) {
+    try {
+      const {
+        packageName = null,
+        module = true,
+        removeHTMLComments = false,
+        initialize,
+        finalize
+      } = options;
+
+      const str = fsSync.readFileSync(pathToFile, "utf-8");
       const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
 
       const isMin = filePathString.includes(".min") || isMinified(str);
