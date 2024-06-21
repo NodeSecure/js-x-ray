@@ -365,6 +365,116 @@ describe("AstAnalyser", (t) => {
     });
   });
 
+  describe("analyseFileSync", () => {
+    it("remove the packageName from the dependencies list", () => {
+      const result = getAnalyser().analyseFileSync(
+        new URL("depName.js", FIXTURE_URL),
+        { module: false, packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(result.warnings.length, 0);
+      assert.deepEqual([...result.dependencies.keys()],
+        ["open"]
+      );
+    });
+
+    it("should fail with a parsing error", () => {
+      const result = getAnalyser().analyseFileSync(
+        new URL("parsingError.js", FIXTURE_URL),
+        { module: false, packageName: "foobar" }
+      );
+
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(result.warnings.length, 1);
+
+      const parsingError = result.warnings[0];
+      assert.strictEqual(parsingError.kind, "parsing-error");
+    });
+
+    describe("hooks", () => {
+      const url = new URL("depName.js", FIXTURE_URL);
+
+      describe("initialize", () => {
+        it("should throw if initialize is not a function", () => {
+          const res = getAnalyser().analyseFileSync(
+            url, {
+              initialize: "foo"
+            });
+
+          assert.strictEqual(res.ok, false);
+          assert.strictEqual(res.warnings[0].value, "options.initialize must be a function");
+          assert.strictEqual(res.warnings[0].kind, "parsing-error");
+        });
+
+        it("should call the initialize function", (t) => {
+          const initialize = t.mock.fn();
+
+          getAnalyser().analyseFileSync(url, {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", (t) => {
+          const initialize = t.mock.fn();
+
+          getAnalyser().analyseFileSync(url, {
+            initialize
+          });
+
+          assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+      describe("finalize", () => {
+        it("should throw if finalize is not a function", () => {
+          const res = getAnalyser().analyseFileSync(
+            url, {
+              finalize: "foo"
+            });
+
+          assert.strictEqual(res.ok, false);
+          assert.strictEqual(res.warnings[0].value, "options.finalize must be a function");
+          assert.strictEqual(res.warnings[0].kind, "parsing-error");
+        });
+
+        it("should call the finalize function", (t) => {
+          const finalize = t.mock.fn();
+
+          getAnalyser().analyseFileSync(url, {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.callCount(), 1);
+        });
+
+        it("should pass the source file as first argument", (t) => {
+          const finalize = t.mock.fn();
+
+          getAnalyser().analyseFileSync(url, {
+            finalize
+          });
+
+          assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+      });
+
+
+      it("intialize should be called before finalize", () => {
+        const calls = [];
+
+        getAnalyser().analyseFileSync(url, {
+          initialize: () => calls.push("initialize"),
+          finalize: () => calls.push("finalize")
+        });
+
+        assert.deepEqual(calls, ["initialize", "finalize"]);
+      });
+    });
+  });
+
   describe("prepareSource", () => {
     it("should remove shebang at the start of the file", (t) => {
       const source = "#!/usr/bin/env node\nconst hello = \"world\";";
