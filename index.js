@@ -8,6 +8,14 @@ function runASTAnalysis(
   str,
   options = Object.create(null)
 ) {
+  process.emitWarning(
+    'The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.',
+    {
+      code: 'DeprecationWarning',
+      detail: 'The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.'
+    }
+  );
+
   const {
     customParser = new JsSourceParser(),
     customProbes = [],
@@ -28,6 +36,14 @@ async function runASTAnalysisOnFile(
   pathToFile,
   options = {}
 ) {
+  process.emitWarning(
+    'The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.',
+    {
+      code: 'DeprecationWarning',
+      detail: 'The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.'
+    }
+  );
+
   const {
     customProbes = [],
     customParser = new JsSourceParser(),
