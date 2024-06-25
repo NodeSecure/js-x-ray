@@ -307,7 +307,7 @@ $ yarn add @nodesecure/estree-ast-util
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-18-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -339,6 +339,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/FredGuiou"><img src="https://avatars.githubusercontent.com/u/99122562?v=4?s=100" width="100px;" alt="FredGuiou"/><br /><sub><b>FredGuiou</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=FredGuiou" title="Documentation">📖</a> <a href="https://github.com/NodeSecure/js-x-ray/commits?author=FredGuiou" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/madina0801"><img src="https://avatars.githubusercontent.com/u/101329759?v=4?s=100" width="100px;" alt="Madina"/><br /><sub><b>Madina</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=madina0801" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/sairuss7"><img src="https://avatars.githubusercontent.com/u/87803528?v=4?s=100" width="100px;" alt="SairussDev"/><br /><sub><b>SairussDev</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=sairuss7" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/fless-lab"><img src="https://avatars.githubusercontent.com/u/71844440?v=4?s=100" width="100px;" alt="Abdou-Raouf ATARMLA"/><br /><sub><b>Abdou-Raouf ATARMLA</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=fless-lab" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
