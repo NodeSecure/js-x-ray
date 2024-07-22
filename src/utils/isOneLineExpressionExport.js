@@ -2,17 +2,23 @@
 import { exportAssignmentHasRequireLeave } from "./exportAssignmentHasRequireLeave.js";
 
 export function isOneLineExpressionExport(body) {
-  if (body.length > 1) {
+  if (body.length === 0 || body.length > 1) {
     return false;
   }
 
-  if (body[0].type !== "ExpressionStatement") {
+  const [firstNode] = body;
+  if (firstNode.type !== "ExpressionStatement") {
     return false;
   }
 
-  if (body[0].expression.type !== "AssignmentExpression") {
-    return false;
+  switch (firstNode.expression.type) {
+    // module.exports = require('...');
+    case "AssignmentExpression":
+      return exportAssignmentHasRequireLeave(firstNode.expression.right);
+    // require('...');
+    case "CallExpression":
+      return exportAssignmentHasRequireLeave(firstNode.expression);
+    default:
+      return false;
   }
-
-  return exportAssignmentHasRequireLeave(body[0].expression.right);
 }
