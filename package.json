@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@nodesecure/eslint-config": "^1.6.0",
-    "@types/node": "^20.6.2",
+    "@types/node": "^22.0.0",
     "c8": "^10.1.2",
     "cross-env": "^7.0.3",
     "eslint": "^9.0.0",
