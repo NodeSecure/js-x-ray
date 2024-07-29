@@ -49,7 +49,7 @@
     "estree-walker": "^3.0.1",
     "frequency-set": "^1.0.2",
     "is-minified-code": "^2.0.0",
-    "meriyah": "^4.3.3",
+    "meriyah": "^5.0.0",
     "safe-regex": "^2.1.1",
     "ts-pattern": "^5.0.6"
   },
