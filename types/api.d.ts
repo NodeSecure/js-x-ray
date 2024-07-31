@@ -1,5 +1,8 @@
-import { Warning } from "./warnings.js";
-import { Statement } from "meriyah/dist/src/estree.js";
+import {
+  Warning,
+  WarningName
+} from "./warnings.js";
+import { Statement } from "meriyah";
 
 export {
   AstAnalyser,
@@ -114,6 +117,15 @@ interface EntryFilesAnalyserOptions {
   loadExtensions?: (defaults: string[]) => string[];
 }
 
+declare class SourceFile {
+  constructor(source: string, options: any);
+  addDependency(name: string, location?: string | null, unsafe?: boolean): void;
+  addWarning(name: WarningName, value: string, location?: any): void;
+  analyzeLiteral(node: any, inArrayExpr?: boolean): void;
+  getResult(isMinified: boolean): any;
+  walk(node: any): "skip" | null;
+}
+
 declare class EntryFilesAnalyser {
   constructor(options?: EntryFilesAnalyserOptions);
 
@@ -123,7 +135,9 @@ declare class EntryFilesAnalyser {
   analyse(entryFiles: (string | URL)[]): AsyncGenerator<ReportOnFile & { url: string }>;
 }
 
-declare class JsSourceParser implements SourceParser {}
+declare class JsSourceParser implements SourceParser {
+  parse(source: string, options: unknown): Statement[];
+}
 
 declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report;
 declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise<ReportOnFile>;
