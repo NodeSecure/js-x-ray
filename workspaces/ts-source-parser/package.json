@@ -32,6 +32,6 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/ts-source-parser#readme",
   "dependencies": {
-    "@typescript-eslint/typescript-estree": "^7.1.1"
+    "@typescript-eslint/typescript-estree": "^8.0.0"
   }
 }
