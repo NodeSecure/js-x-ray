@@ -108,8 +108,18 @@ interface SourceParser {
 
 declare class AstAnalyser {
   constructor(options?: AstAnalyserOptions);
-  analyse: (str: string, options?: RuntimeOptions) => Report;
-  analyseFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
+  analyse: (
+    str: string,
+    options?: RuntimeOptions
+  ) => Report;
+  analyseFile(
+    pathToFile: string,
+    options?: RuntimeFileOptions
+  ): Promise<ReportOnFile>;
+  analyseFileSync(
+    pathToFile: string,
+    options?: RuntimeFileOptions
+  ): ReportOnFile;
 }
 
 interface EntryFilesAnalyserOptions {
@@ -119,8 +129,16 @@ interface EntryFilesAnalyserOptions {
 
 declare class SourceFile {
   constructor(source: string, options: any);
-  addDependency(name: string, location?: string | null, unsafe?: boolean): void;
-  addWarning(name: WarningName, value: string, location?: any): void;
+  addDependency(
+    name: string,
+    location?: string | null,
+    unsafe?: boolean
+  ): void;
+  addWarning(
+    name: WarningName,
+    value: string,
+    location?: any
+  ): void;
   analyzeLiteral(node: any, inArrayExpr?: boolean): void;
   getResult(isMinified: boolean): any;
   walk(node: any): "skip" | null;
@@ -132,12 +150,21 @@ declare class EntryFilesAnalyser {
   /**
    * Asynchronously analyze a set of entry files yielding analysis reports.
    */
-  analyse(entryFiles: (string | URL)[]): AsyncGenerator<ReportOnFile & { url: string }>;
+  analyse(
+    entryFiles: Iterable<string | URL>,
+    options?: RuntimeFileOptions
+  ): AsyncGenerator<ReportOnFile & { url: string }>;
 }
 
 declare class JsSourceParser implements SourceParser {
   parse(source: string, options: unknown): Statement[];
 }
 
-declare function runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report;
-declare function runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise<ReportOnFile>;
+declare function runASTAnalysis(
+  str: string,
+  options?: RuntimeOptions & AstAnalyserOptions
+): Report;
+declare function runASTAnalysisOnFile(
+  pathToFile: string,
+  options?: RuntimeFileOptions & AstAnalyserOptions
+): Promise<ReportOnFile>;
