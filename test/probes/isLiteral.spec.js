@@ -24,7 +24,6 @@ test("should throw an unsafe-import because the hexadecimal string is equal to t
   assert.ok(calls[0].arguments.includes("http"));
 });
 
-
 test("should throw an encoded-literal warning because the hexadecimal value is equal to 'require'", (t) => {
   const str = "const _t = globalThis['72657175697265']";
   const ast = parseScript(str);
@@ -89,7 +88,6 @@ test("should detect shady link when an URL is bit.ly", () => {
   assert.strictEqual(warning.value, "http://bit.ly/foo");
 });
 
-
 test("should detect shady link when an URL has a suspicious domain", () => {
   const str = "const foo = 'http://foobar.link'";
   const ast = parseScript(str);
@@ -100,7 +98,6 @@ test("should detect shady link when an URL has a suspicious domain", () => {
   assert.strictEqual(warning.value, "http://foobar.link");
 });
 
-
 test("should not mark suspicious links the IPv4 address range 127.0.0.0/8 (localhost 127.0.0.1)", () => {
   const str = "const IPv4URL = ['http://127.0.0.1/script', 'http://127.7.7.7/script']";
   const ast = parseScript(str);
@@ -108,7 +105,6 @@ test("should not mark suspicious links the IPv4 address range 127.0.0.0/8 (local
 
   assert.ok(!sastAnalysis.warnings().length);
 });
-
 
 test("should not be considered suspicious a link with a raw IPv4 address 127.0.0.1 and a port", () => {
   const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
@@ -127,7 +123,6 @@ test("should detect the link as suspicious when a URL contains a raw IPv4 addres
   const warning = sastAnalysis.getWarning("shady-link");
   assert.strictEqual(warning.value, "http://77.244.210.247/burpcollaborator.txt");
 });
-
 
 test("should detect suspicious links when a URL contains a raw IPv4 address with port", () => {
   const str = "const IPv4URL = 'http://77.244.210.247:8080/script'";

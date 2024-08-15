@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 // Constants
 const FIXTURE_URL = new URL("fixtures/weakCrypto/", import.meta.url);
@@ -15,7 +15,7 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
 
   for (const fixtureFile of fixtureFiles) {
     const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
-    const { warnings: outputWarnings } = runASTAnalysis(fixture);
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(fixture);
 
     const [firstWarning] = outputWarnings;
     assert.strictEqual(outputWarnings.length, 1);
@@ -31,7 +31,7 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
 
   for (const fixtureFile of fixtureFiles) {
     const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
-    const { warnings: outputWarnings } = runASTAnalysis(fixture);
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(fixture);
 
     const [firstWarning] = outputWarnings;
     assert.strictEqual(outputWarnings.length, 1);
@@ -46,7 +46,7 @@ test("it should NOT report a warning in case of `[expression]createHash('sha256'
     import crypto from 'crypto';
     crypto.createHash('sha256');
   `;
-  const { warnings: outputWarnings } = runASTAnalysis(code);
+  const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
 
   assert.strictEqual(outputWarnings.length, 0);
 });
@@ -58,7 +58,7 @@ test("it should NOT report a warning if crypto.createHash is not imported", () =
     }
     crypto.createHash('md5');
   `;
-  const { warnings: outputWarnings } = runASTAnalysis(code);
+  const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
 
   assert.strictEqual(outputWarnings.length, 0);
 });

@@ -7,9 +7,8 @@
   "types": "./src/index.d.ts",
   "scripts": {
     "lint": "eslint src test",
-    "prepublishOnly": "pkg-ok",
     "test": "node --test",
-    "check": "cross-env npm run lint && npm run test",
+    "check": "npm run lint && npm run test",
     "coverage": "c8 -r html npm test"
   },
   "repository": {

@@ -5,7 +5,9 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis, runASTAnalysisOnFile } from "../index.js";
+import {
+  AstAnalyser
+} from "../index.js";
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
@@ -13,7 +15,7 @@ const FIXTURE_URL = new URL("fixtures/obfuscated/", import.meta.url);
 
 test("should detect 'jsfuck' obfuscation", () => {
   const trycatch = readFileSync(new URL("jsfuck.js", FIXTURE_URL), "utf-8");
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
   assert.deepEqual(getWarningKind(warnings), ["obfuscated-code"].sort());
@@ -22,7 +24,7 @@ test("should detect 'jsfuck' obfuscation", () => {
 
 test("should detect 'morse' obfuscation", () => {
   const trycatch = readFileSync(new URL("morse.js", FIXTURE_URL), "utf-8");
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
   assert.deepEqual(getWarningKind(warnings), ["obfuscated-code"].sort());
@@ -31,14 +33,14 @@ test("should detect 'morse' obfuscation", () => {
 
 test("should not detect 'morse' obfuscation", () => {
   const trycatch = readFileSync(new URL("notMorse.js", FIXTURE_URL), "utf-8");
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 0);
 });
 
 test("should not detect 'morse' obfuscation for high number of doubles morse symbols", () => {
   const morseSymbolDoublesString = `const a = ${"'.' + '..' +".repeat(37)} '.'`;
-  const { warnings } = runASTAnalysis(morseSymbolDoublesString);
+  const { warnings } = new AstAnalyser().analyse(morseSymbolDoublesString);
 
   assert.strictEqual(warnings.length, 0);
 });
@@ -48,7 +50,7 @@ test("should detect 'jjencode' obfuscation", () => {
     new URL("jjencode.js", FIXTURE_URL),
     "utf-8"
   );
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
   assert.deepEqual(getWarningKind(warnings), ["obfuscated-code"].sort());
@@ -60,7 +62,7 @@ test("should detect 'freejsobfuscator' obfuscation", () => {
     new URL("freejsobfuscator.js", FIXTURE_URL),
     "utf-8"
   );
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.deepEqual(getWarningKind(warnings), [
     "encoded-literal", "encoded-literal", "obfuscated-code"
@@ -73,7 +75,7 @@ test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", (
     new URL("obfuscatorio-hexa.js", FIXTURE_URL),
     "utf-8"
   );
-  const { warnings } = runASTAnalysis(trycatch);
+  const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
   assert.deepEqual(getWarningKind(warnings), [
@@ -83,7 +85,7 @@ test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", (
 });
 
 test("should not detect 'trojan-source' when providing safe control character", () => {
-  const { warnings } = runASTAnalysis(`
+  const { warnings } = new AstAnalyser().analyse(`
     const simpleStringWithControlCharacters = "Its only a \u0008backspace";
   `);
 
@@ -91,7 +93,7 @@ test("should not detect 'trojan-source' when providing safe control character", 
 });
 
 test("should detect 'trojan-source' when there is one unsafe unicode control char", () => {
-  const { warnings } = runASTAnalysis(`
+  const { warnings } = new AstAnalyser().analyse(`
     const role = "ROLE_ADMIN⁦" // Dangerous control char;
   `);
 
@@ -100,8 +102,8 @@ test("should detect 'trojan-source' when there is one unsafe unicode control cha
   assert.deepEqual(warnings[0].value, "trojan-source");
 });
 
-test("should detect 'trojan-source' when there is atleast one unsafe unicode control char", async() => {
-  const { warnings } = await runASTAnalysisOnFile(
+test("should detect 'trojan-source' when there is atleast one unsafe unicode control char", () => {
+  const { warnings } = new AstAnalyser().analyseFileSync(
     fileURLToPath(new URL("unsafe-unicode-chars.js", FIXTURE_URL))
   );
 

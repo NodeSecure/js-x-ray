@@ -17,10 +17,10 @@ it("should call AstAnalyser.analyse with the expected arguments", (t) => {
   t.mock.method(AstAnalyser.prototype, "analyse");
 
   const source = "const http = require(\"http\");";
-  runASTAnalysis(source, { module: true, removeHTMLComments: true });
+  new AstAnalyser().analyse(source, { module: true, removeHTMLComments: true });
 
   const source2 = "const fs = require(\"fs\");";
-  runASTAnalysis(source2, { module: false, removeHTMLComments: false });
+  new AstAnalyser().analyse(source2, { module: false, removeHTMLComments: false });
 
   const calls = AstAnalyser.prototype.analyse.mock.calls;
   assert.strictEqual(calls.length, 2);
@@ -33,10 +33,12 @@ it("should instantiate AstAnalyser with the expected parser", (t) => {
   t.mock.method(JsSourceParser.prototype, "parse");
   t.mock.method(FakeSourceParser.prototype, "parse");
 
-  runASTAnalysis("const http = require(\"http\");", { module: true, removeHTMLComments: true });
+  new AstAnalyser().analyse("const http = require(\"http\");", { module: true, removeHTMLComments: true });
 
-  runASTAnalysis("const fs = require(\"fs\");",
-    { module: false, removeHTMLComments: false, customParser: new FakeSourceParser() }
+  new AstAnalyser({
+    customParser: new FakeSourceParser()
+  }).analyse("const fs = require(\"fs\");",
+    { module: false, removeHTMLComments: false }
   );
 
   assert.strictEqual(JsSourceParser.prototype.parse.mock.calls.length, 1);
@@ -44,14 +46,13 @@ it("should instantiate AstAnalyser with the expected parser", (t) => {
 });
 
 it("should append list of probes using runASTAnalysis", () => {
-  const result = runASTAnalysis(
-    kIncriminedCodeSampleCustomProbe,
+  const result = new AstAnalyser(
     {
       parser: new JsSourceParser(),
       customProbes,
       skipDefaultProbes: false
     }
-  );
+  ).analyse(kIncriminedCodeSampleCustomProbe);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
@@ -60,14 +61,13 @@ it("should append list of probes using runASTAnalysis", () => {
 });
 
 it("should replace list of probes using runASTAnalysis", () => {
-  const result = runASTAnalysis(
-    kIncriminedCodeSampleCustomProbe,
+  const result = new AstAnalyser(
     {
       parser: new JsSourceParser(),
       customProbes,
       skipDefaultProbes: true
     }
-  );
+  ).analyse(kIncriminedCodeSampleCustomProbe);
 
   assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
   assert.equal(result.warnings.length, 1);

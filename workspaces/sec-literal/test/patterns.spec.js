@@ -9,28 +9,39 @@ import {
   commonHexadecimalPrefix
 } from "../src/patterns.js";
 
-
 describe("commonStringPrefix()", () => {
   test("must return null for two strings that have no common prefix", () => {
-    assert.strictEqual(commonStringPrefix("boo", "foo"), null,
-      "there is no common prefix between 'boo' and 'foo' so the result must be null");
+    assert.strictEqual(
+      commonStringPrefix("boo", "foo"),
+      null,
+      "there is no common prefix between 'boo' and 'foo' so the result must be null"
+    );
   });
 
   test("should return the common prefix for strings with a shared prefix", () => {
-    assert.strictEqual(commonStringPrefix("bromance", "brother"), "bro",
-      "the common prefix between bromance and brother must be 'bro'.");
+    assert.strictEqual(
+      commonStringPrefix("bromance", "brother"),
+      "bro",
+      "the common prefix between bromance and brother must be 'bro'."
+    );
   });
 });
 
 describe("commonStringSuffix()", () => {
   test("must return the common suffix for the two strings with a shared suffix", () => {
-    assert.strictEqual(commonStringSuffix("boo", "foo"), "oo",
-      "the common suffix between boo and foo must be 'oo'");
+    assert.strictEqual(
+      commonStringSuffix("boo", "foo"),
+      "oo",
+      "the common suffix between boo and foo must be 'oo'"
+    );
   });
 
   test("must return null for two strings with no common suffix", () => {
-    assert.strictEqual(commonStringSuffix("bromance", "brother"), null,
-      "there is no common suffix between 'bromance' and 'brother' so the result must be null");
+    assert.strictEqual(
+      commonStringSuffix("bromance", "brother"),
+      null,
+      "there is no common suffix between 'bromance' and 'brother' so the result must be null"
+    );
   });
 });
 

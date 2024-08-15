@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-
 // Import Node.js Dependencies
 import { randomBytes } from "node:crypto";
 import { test } from "node:test";
@@ -9,8 +7,11 @@ import assert from "node:assert";
 import { stringCharDiversity, isSvg, isSvgPath, stringSuspicionScore } from "../src/utils.js";
 
 test("stringCharDiversity must return the number of unique chars in a given string", () => {
-  assert.strictEqual(stringCharDiversity("helloo!"), 5,
-    "the following string 'helloo!' contains five unique chars: h, e, l, o and !");
+  assert.strictEqual(
+    stringCharDiversity("helloo!"),
+    5,
+    "the following string 'helloo!' contains five unique chars: h, e, l, o and !"
+  );
 });
 
 test("stringCharDiversity must return the number of unique chars in a given string (but with exclusions of given chars)", () => {
@@ -40,7 +41,11 @@ test("isSvgPath must return true when we give a valid svg path and false when th
   assert.strictEqual(isSvgPath("M150 0 L75 200 L225 200 Z"), true);
   assert.strictEqual(isSvgPath("M150"), false, "the length of an svg path must be always higher than four characters");
   assert.strictEqual(isSvgPath("hello world!"), false);
-  assert.strictEqual(isSvgPath(10), false, "isSvgPath argument must always return false for anything that is not a string primitive");
+  assert.strictEqual(
+    isSvgPath(10),
+    false,
+    "isSvgPath argument must always return false for anything that is not a string primitive"
+  );
 });
 
 test("stringSuspicionScore must always return 0 if the string length if below 45", () => {
@@ -58,7 +63,8 @@ test("stringSuspicionScore must return one if the str is between 45 and 200 char
   assert.strictEqual(stringSuspicionScore(randomStrWithNoSpaces), 1);
 });
 
-test("stringSuspicionScore must return zero if the str is between 45 and 200 chars and has at least one space in the first 45 chars", () => {
+test(`stringSuspicionScore must return zero if the str is between 45 and 200 char
+  and has at least one space in the first 45 chars`, () => {
   const randomStrWithSpaces = randomBytes(10).toString("hex") + " -_- " + randomBytes(30).toString("hex");
 
   assert.strictEqual(stringSuspicionScore(randomStrWithSpaces), 0);

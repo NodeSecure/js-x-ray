@@ -6,9 +6,9 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "lint": "eslint --ext .js",
+    "lint": "eslint src",
     "test-only": "node --test",
-    "test": "cross-env npm run lint && npm run test-only"
+    "test": "npm run lint && npm run test-only"
   },
   "repository": {
     "type": "git",

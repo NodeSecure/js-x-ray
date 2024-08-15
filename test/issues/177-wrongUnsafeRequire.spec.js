@@ -3,13 +3,13 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/177
  */
 test("should detect unsafe-import and unsafe-statement", () => {
-  const { warnings, dependencies } = runASTAnalysis(`const help = require('help-me')({
+  const { warnings, dependencies } = new AstAnalyser().analyse(`const help = require('help-me')({
     dir: path.join(__dirname, 'help'),
     ext: '.txt'
   })`);
