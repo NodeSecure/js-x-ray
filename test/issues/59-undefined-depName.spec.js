@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 // CONSTANTS
 const FIXTURE_URL = new URL("../fixtures/issues/", import.meta.url);
@@ -14,5 +14,5 @@ test("it should not crash for prop-types", () => {
     new URL("prop-types.min.js", FIXTURE_URL),
     "utf-8"
   );
-  runASTAnalysis(propTypes);
+  new AstAnalyser().analyse(propTypes);
 });

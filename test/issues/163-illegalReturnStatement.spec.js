@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/163
@@ -23,9 +23,9 @@ if (!argv.length) {
 
 test("it should not throw error whatever module is true or false", () => {
   assert.doesNotThrow(() => {
-    runASTAnalysis(kIncriminedCodeSample, { module: false });
+    new AstAnalyser().analyse(kIncriminedCodeSample, { module: false });
   });
   assert.doesNotThrow(() => {
-    runASTAnalysis(kIncriminedCodeSample, { module: true });
+    new AstAnalyser().analyse(kIncriminedCodeSample, { module: true });
   });
 });

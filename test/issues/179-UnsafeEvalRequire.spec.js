@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/179
@@ -14,7 +14,7 @@ const kWarningUnsafeImport = "unsafe-import";
 const kWarningUnsafeStatement = "unsafe-stmt";
 
 test("should detect unsafe-import and unsafe-statement", () => {
-  const sastAnalysis = runASTAnalysis(kIncriminedCodeSample);
+  const sastAnalysis = new AstAnalyser().analyse(kIncriminedCodeSample);
 
   assert.equal(sastAnalysis.warnings.at(0).value, "stream");
   assert.equal(sastAnalysis.warnings.at(0).kind, kWarningUnsafeImport);

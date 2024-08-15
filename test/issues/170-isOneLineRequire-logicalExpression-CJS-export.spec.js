@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { runASTAnalysis } from "../../index.js";
+import { AstAnalyser } from "../../index.js";
 
 const validTestCases = [
   ["module.exports = require('fs') || require('constants');", ["fs", "constants"]],
@@ -37,7 +37,7 @@ const validTestCases = [
 test("it should return isOneLineRequire true given a single line CJS export with a valid assignment", () => {
   validTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, isOneLineRequire } = runASTAnalysis(source);
+    const { dependencies, isOneLineRequire } = new AstAnalyser().analyse(source);
 
     assert.ok(isOneLineRequire);
     assert.deepEqual([...dependencies.keys()], modules);
@@ -60,7 +60,7 @@ const invalidTestCases = [
 test("it should return isOneLineRequire false given a single line CJS export with illegal callees", () => {
   invalidTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, isOneLineRequire } = runASTAnalysis(source);
+    const { dependencies, isOneLineRequire } = new AstAnalyser().analyse(source);
 
     assert.ok(isOneLineRequire === false);
     assert.deepEqual([...dependencies.keys()], modules);

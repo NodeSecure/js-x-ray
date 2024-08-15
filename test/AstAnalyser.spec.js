@@ -351,7 +351,6 @@ describe("AstAnalyser", (t) => {
         });
       });
 
-
       it("intialize should be called before finalize", async() => {
         const calls = [];
 
@@ -460,7 +459,6 @@ describe("AstAnalyser", (t) => {
           assert.strictEqual(finalize.mock.calls[0].arguments[0] instanceof SourceFile, true);
         });
       });
-
 
       it("intialize should be called before finalize", () => {
         const calls = [];

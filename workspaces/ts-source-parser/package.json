@@ -7,10 +7,9 @@
   "types": "./index.d.ts",
   "scripts": {
     "lint": "eslint src test",
-    "prepublishOnly": "pkg-ok",
     "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
     "test": "c8 --all --src ./src -r html npm run test-only",
-    "check": "cross-env npm run lint && npm run test"
+    "check": "npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
