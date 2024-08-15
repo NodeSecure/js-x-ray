@@ -4,6 +4,9 @@ import { JsSourceParser } from "./src/JsSourceParser.js";
 import { AstAnalyser } from "./src/AstAnalyser.js";
 import { EntryFilesAnalyser } from "./src/EntryFilesAnalyser.js";
 
+/**
+ * @deprecated
+ */
 function runASTAnalysis(
   str,
   options = Object.create(null)
@@ -32,6 +35,9 @@ function runASTAnalysis(
   return analyser.analyse(str, opts);
 }
 
+/**
+ * @deprecated
+ */
 async function runASTAnalysisOnFile(
   pathToFile,
   options = {}

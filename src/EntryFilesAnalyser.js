@@ -10,12 +10,6 @@ import { AstAnalyser } from "./AstAnalyser.js";
 const kDefaultExtensions = ["js", "cjs", "mjs", "node"];
 
 export class EntryFilesAnalyser {
-  /**
-   * @constructor
-   * @param {object} [options={}]
-   * @param {AstAnalyser} [options.astAnalyzer=new AstAnalyser()]
-   * @param {function} [options.loadExtensions]
-  */
   constructor(options = {}) {
     this.astAnalyzer = options.astAnalyzer ?? new AstAnalyser();
     const rawAllowedExtensions = options.loadExtensions
@@ -25,23 +19,23 @@ export class EntryFilesAnalyser {
     this.allowedExtensions = new Set(rawAllowedExtensions);
   }
 
-  /**
-   * Asynchronously analyze a set of entry files yielding analysis reports.
-   *
-   * @param {(string | URL)[]} entryFiles
-   * @yields {Object} - Yields an object containing the analysis report for each file.
-  */
-  async* analyse(entryFiles) {
+  async* analyse(
+    entryFiles,
+    analyseFileOptions
+  ) {
     this.analyzedDeps = new Set();
 
     for (const file of entryFiles) {
-      yield* this.#analyzeFile(file);
+      yield* this.#analyseFile(file, analyseFileOptions);
     }
   }
 
-  async* #analyzeFile(file) {
+  async* #analyseFile(
+    file,
+    options
+  ) {
     const filePath = file instanceof URL ? fileURLToPath(file) : file;
-    const report = await this.astAnalyzer.analyseFile(file);
+    const report = await this.astAnalyzer.analyseFile(file, options);
 
     yield { url: filePath, ...report };
 
@@ -49,20 +43,16 @@ export class EntryFilesAnalyser {
       return;
     }
 
-    yield* this.#analyzeDeps(
-      report.dependencies,
-      path.dirname(filePath)
-    );
-  }
-
-  async* #analyzeDeps(deps, basePath) {
-    for (const [name] of deps) {
-      const depPath = await this.#getInternalDepPath(name, basePath);
+    for (const [name] of report.dependencies) {
+      const depPath = await this.#getInternalDepPath(
+        name,
+        path.dirname(filePath)
+      );
 
       if (depPath && !this.analyzedDeps.has(depPath)) {
         this.analyzedDeps.add(depPath);
 
-        yield* this.#analyzeFile(depPath);
+        yield* this.#analyseFile(depPath, options);
       }
     }
   }
