@@ -7,8 +7,6 @@ import {
 
   SourceParser,
   JsSourceParser,
-  runASTAnalysis,
-  runASTAnalysisOnFile,
   Report,
   ReportOnFile,
   RuntimeFileOptions,
@@ -34,8 +32,6 @@ export {
   EntryFilesAnalyserOptions,
   JsSourceParser,
   SourceParser,
-  runASTAnalysis,
-  runASTAnalysisOnFile,
   Report,
   ReportOnFile,
   RuntimeFileOptions,

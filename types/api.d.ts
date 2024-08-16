@@ -17,8 +17,6 @@ export {
 
   JsSourceParser,
   SourceParser,
-  runASTAnalysis,
-  runASTAnalysisOnFile,
 
   RuntimeOptions,
   RuntimeFileOptions,
@@ -168,12 +166,3 @@ declare class EntryFilesAnalyser {
 declare class JsSourceParser implements SourceParser {
   parse(source: string, options: unknown): Statement[];
 }
-
-declare function runASTAnalysis(
-  str: string,
-  options?: RuntimeOptions & AstAnalyserOptions
-): Report;
-declare function runASTAnalysisOnFile(
-  pathToFile: string,
-  options?: RuntimeFileOptions & AstAnalyserOptions
-): Promise<ReportOnFile>;

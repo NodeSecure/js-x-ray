@@ -30,7 +30,7 @@ console.log(body);
 
 ## Usage with `js-x-ray` 
 ```js
-import { runASTAnalysis } from "@nodesecure/js-x-ray";
+import { AstAnalyser } from "@nodesecure/js-x-ray";
 import { readFileSync } from "node:fs";
 
 const { warnings, dependencies } = runASTAnalysis(
