@@ -12,10 +12,10 @@ function runASTAnalysis(
   options = Object.create(null)
 ) {
   process.emitWarning(
-    'The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.',
+    "The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.",
     {
-      code: 'DeprecationWarning',
-      detail: 'The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.'
+      code: "DeprecationWarning",
+      detail: "The runASTAnalysis API is deprecated and will be removed in v8. Please use the AstAnalyser class instead."
     }
   );
 
@@ -43,10 +43,10 @@ async function runASTAnalysisOnFile(
   options = {}
 ) {
   process.emitWarning(
-    'The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.',
+    "The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.",
     {
-      code: 'DeprecationWarning',
-      detail: 'The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead.'
+      code: "DeprecationWarning",
+      detail: "The runASTAnalysisOnFile API is deprecated and will be removed in v8. Please use the AstAnalyser class instead."
     }
   );
 

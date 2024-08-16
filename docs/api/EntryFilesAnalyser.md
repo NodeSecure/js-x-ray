@@ -21,6 +21,7 @@ The constructor options is described by the following TS interface
 interface EntryFilesAnalyserOptions {
   astAnalyzer?: AstAnalyser;
   loadExtensions?: (defaults: string[]) => string[];
+  rootPath?: string | URL;
 }
 ```
 
@@ -30,8 +31,19 @@ Default files extensions are `.js`, `.cjs`, `.mjs` and `.node`
 
 ```ts
 declare class EntryFilesAnalyser {
+  public astAnalyzer: AstAnalyser;
+  public allowedExtensions: Set<string>;
+  public dependencies: DiGraph<VertexDefinition<VertexBody>>;
+
   constructor(options?: EntryFilesAnalyserOptions);
-  analyse(entryFiles: (string | URL)[]): AsyncGenerator<ReportOnFile & { url: string }>;
+
+  /**
+   * Asynchronously analyze a set of entry files yielding analysis reports.
+   */
+  analyse(
+    entryFiles: Iterable<string | URL>,
+    options?: RuntimeFileOptions
+  ): AsyncGenerator<ReportOnFile & { file: string }>;
 }
 ```
 

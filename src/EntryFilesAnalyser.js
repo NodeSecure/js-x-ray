@@ -3,6 +3,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+// Import Third-party Dependencies
+import { DiGraph } from "digraph-js";
+
 // Import Internal Dependencies
 import { AstAnalyser } from "./AstAnalyser.js";
 
@@ -10,60 +13,106 @@ import { AstAnalyser } from "./AstAnalyser.js";
 const kDefaultExtensions = ["js", "cjs", "mjs", "node"];
 
 export class EntryFilesAnalyser {
+  #rootPath = null;
+
   constructor(options = {}) {
-    this.astAnalyzer = options.astAnalyzer ?? new AstAnalyser();
-    const rawAllowedExtensions = options.loadExtensions
-      ? options.loadExtensions(kDefaultExtensions)
+    const {
+      astAnalyzer = new AstAnalyser(),
+      loadExtensions,
+      rootPath = null
+    } = options;
+
+    this.astAnalyzer = astAnalyzer;
+    const rawAllowedExtensions = loadExtensions
+      ? loadExtensions(kDefaultExtensions)
       : kDefaultExtensions;
 
     this.allowedExtensions = new Set(rawAllowedExtensions);
+    this.#rootPath = options.rootPath === null ?
+      null : fileURLToPathExtended(rootPath);
   }
 
   async* analyse(
     entryFiles,
-    analyseFileOptions
+    options = {}
   ) {
-    this.analyzedDeps = new Set();
+    this.dependencies = new DiGraph();
 
-    for (const file of entryFiles) {
-      yield* this.#analyseFile(file, analyseFileOptions);
+    for (const entryFile of new Set(entryFiles)) {
+      const normalizedEntryFile = path.normalize(
+        fileURLToPathExtended(entryFile)
+      );
+
+      yield* this.#analyseFile(
+        normalizedEntryFile,
+        this.#getRelativeFilePath(normalizedEntryFile),
+        options
+      );
     }
+  }
+
+  #getRelativeFilePath(file) {
+    return this.#rootPath ? path.relative(this.#rootPath, file) : file;
   }
 
   async* #analyseFile(
     file,
+    relativeFile,
     options
   ) {
-    const filePath = file instanceof URL ? fileURLToPath(file) : file;
-    const report = await this.astAnalyzer.analyseFile(file, options);
+    this.dependencies.addVertex({
+      id: relativeFile,
+      adjacentTo: [],
+      body: {}
+    });
 
-    yield { url: filePath, ...report };
+    const report = await this.astAnalyzer.analyseFile(
+      file,
+      options
+    );
+    yield { file: relativeFile, ...report };
 
     if (!report.ok) {
       return;
     }
 
     for (const [name] of report.dependencies) {
-      const depPath = await this.#getInternalDepPath(
-        name,
-        path.dirname(filePath)
+      const depFile = await this.#getInternalDepPath(
+        path.join(path.dirname(file), name)
       );
-
-      if (depPath && !this.analyzedDeps.has(depPath)) {
-        this.analyzedDeps.add(depPath);
-
-        yield* this.#analyseFile(depPath, options);
+      if (depFile === null) {
+        continue;
       }
+
+      const depRelativeFile = this.#getRelativeFilePath(depFile);
+      if (!this.dependencies.hasVertex(depRelativeFile)) {
+        this.dependencies.addVertex({
+          id: depRelativeFile,
+          adjacentTo: [],
+          body: {}
+        });
+
+        yield* this.#analyseFile(
+          depFile,
+          depRelativeFile,
+          options
+        );
+      }
+
+      this.dependencies.addEdge({
+        from: relativeFile, to: depRelativeFile
+      });
     }
   }
 
-  async #getInternalDepPath(name, basePath) {
-    const depPath = path.join(basePath, name);
-    const existingExt = path.extname(name);
+  async #getInternalDepPath(
+    filePath
+  ) {
+    const fileExtension = path.extname(filePath);
 
-    if (existingExt === "") {
+    if (fileExtension === "") {
       for (const ext of this.allowedExtensions) {
-        const depPathWithExt = `${depPath}.${ext}`;
+        const depPathWithExt = `${filePath}.${ext}`;
 
         const fileExist = await this.#fileExists(depPathWithExt);
         if (fileExist) {
@@ -72,22 +121,24 @@ export class EntryFilesAnalyser {
       }
     }
     else {
-      if (!this.allowedExtensions.has(existingExt.slice(1))) {
+      if (!this.allowedExtensions.has(fileExtension.slice(1))) {
         return null;
       }
 
-      const fileExist = await this.#fileExists(depPath);
+      const fileExist = await this.#fileExists(filePath);
       if (fileExist) {
-        return depPath;
+        return filePath;
       }
     }
 
     return null;
   }
 
-  async #fileExists(path) {
+  async #fileExists(
+    filePath
+  ) {
     try {
-      await fs.access(path, fs.constants.R_OK);
+      await fs.access(filePath, fs.constants.R_OK);
 
       return true;
     }
@@ -99,4 +150,12 @@ export class EntryFilesAnalyser {
       return false;
     }
   }
+}
+
+function fileURLToPathExtended(
+  file
+) {
+  return file instanceof URL ?
+    fileURLToPath(file) :
+    file;
 }

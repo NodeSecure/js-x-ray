@@ -1,12 +1,14 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
 import assert from "node:assert";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Import Internal Dependencies
 import { EntryFilesAnalyser, AstAnalyser } from "../index.js";
 
 const FIXTURE_URL = new URL("fixtures/entryFiles/", import.meta.url);
+const FIXTURE_URL_PATH = fileURLToPath(FIXTURE_URL);
 
 describe("EntryFilesAnalyser", () => {
   it("should analyze internal dependencies recursively", async(t) => {
@@ -23,7 +25,7 @@ describe("EntryFilesAnalyser", () => {
     const reports = await fromAsync(generator);
 
     assert.deepEqual(
-      reports.map((report) => report.url),
+      reports.map((report) => report.file),
       [
         entryUrl,
         new URL("deps/dep1.js", FIXTURE_URL),
@@ -47,7 +49,7 @@ describe("EntryFilesAnalyser", () => {
     const reports = await fromAsync(generator);
 
     assert.deepEqual(
-      reports.map((report) => report.url),
+      reports.map((report) => report.file),
       [
         entryUrl,
         new URL("deps/invalidDep.js", FIXTURE_URL),
@@ -74,7 +76,7 @@ describe("EntryFilesAnalyser", () => {
     const reports = await fromAsync(generator);
 
     assert.deepEqual(
-      reports.map((report) => report.url),
+      reports.map((report) => report.file),
       [
         entryUrl,
         new URL("deps/default.js", FIXTURE_URL),
@@ -100,13 +102,60 @@ describe("EntryFilesAnalyser", () => {
     const reports = await fromAsync(generator);
 
     assert.deepEqual(
-      reports.map((report) => report.url),
+      reports.map((report) => report.file),
       [
         entryUrl,
         new URL("deps/default.jsx", FIXTURE_URL),
         new URL("deps/dep.jsx", FIXTURE_URL)
       ].map((url) => fileURLToPath(url))
     );
+  });
+
+  it("should detect recursive dependencies using DiGraph (with rootPath)", async() => {
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: FIXTURE_URL
+    });
+    const entryUrl = new URL("recursive/A.js", FIXTURE_URL);
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl]
+    );
+    await fromAsync(generator);
+
+    assert.deepEqual(
+      [...entryFilesAnalyser.dependencies.findCycles()],
+      [
+        ["recursive/A.js", "recursive/B.js"].map((str) => path.normalize(str))
+      ]
+    );
+
+    assert.deepEqual(
+      [
+        ...entryFilesAnalyser.dependencies.getDeepChildren(
+          path.normalize("recursive/A.js"), 1
+        )
+      ],
+      [
+        path.normalize("recursive/B.js")
+      ]
+    );
+  });
+
+  it("should detect recursive dependencies using DiGraph but without rootPath everything is absolute", async() => {
+    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryUrl = new URL("recursive/A.js", FIXTURE_URL);
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl]
+    );
+    await fromAsync(generator);
+
+    for (const [from, to] of [...entryFilesAnalyser.dependencies.findCycles()]) {
+      assert.ok(path.isAbsolute(from));
+      assert.ok(path.isAbsolute(to));
+      assert.ok(from.startsWith(FIXTURE_URL_PATH));
+      assert.ok(to.startsWith(FIXTURE_URL_PATH));
+    }
   });
 });
 

@@ -1,8 +1,12 @@
+// Third-party
+import type { DiGraph, VertexDefinition, VertexBody } from "digraph-js";
+import { Statement } from "meriyah";
+
+// Internal
 import {
   Warning,
   WarningName
 } from "./warnings.js";
-import { Statement } from "meriyah";
 
 export {
   AstAnalyser,
@@ -122,11 +126,6 @@ declare class AstAnalyser {
   ): ReportOnFile;
 }
 
-interface EntryFilesAnalyserOptions {
-  astAnalyzer?: AstAnalyser;
-  loadExtensions?: (defaults: string[]) => string[];
-}
-
 declare class SourceFile {
   constructor(source: string, options: any);
   addDependency(
@@ -144,7 +143,17 @@ declare class SourceFile {
   walk(node: any): "skip" | null;
 }
 
+interface EntryFilesAnalyserOptions {
+  astAnalyzer?: AstAnalyser;
+  loadExtensions?: (defaults: string[]) => string[];
+  rootPath?: string | URL;
+}
+
 declare class EntryFilesAnalyser {
+  public astAnalyzer: AstAnalyser;
+  public allowedExtensions: Set<string>;
+  public dependencies: DiGraph<VertexDefinition<VertexBody>>;
+
   constructor(options?: EntryFilesAnalyserOptions);
 
   /**
@@ -153,7 +162,7 @@ declare class EntryFilesAnalyser {
   analyse(
     entryFiles: Iterable<string | URL>,
     options?: RuntimeFileOptions
-  ): AsyncGenerator<ReportOnFile & { url: string }>;
+  ): AsyncGenerator<ReportOnFile & { file: string }>;
 }
 
 declare class JsSourceParser implements SourceParser {
