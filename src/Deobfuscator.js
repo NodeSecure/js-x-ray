@@ -63,6 +63,9 @@ export class Deobfuscator {
    * @param {*} node
    */
   #extractCounterIdentifiers(nc, node) {
+    if (node === null) {
+      return;
+    }
     const { type } = nc;
 
     switch (type) {
