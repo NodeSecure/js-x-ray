@@ -1,6 +1,13 @@
 // Import Node.js Dependencies
 import EventEmitter from "node:events";
 
+export interface DataIdentifierOptions {
+  /**
+   * @default false
+   */
+  removeGlobalIdentifier?: boolean;
+}
+
 declare class VariableTracer extends EventEmitter {
   static AssignmentEvent: Symbol;
 
@@ -14,11 +21,12 @@ declare class VariableTracer extends EventEmitter {
     moduleName?: string;
     name?: string;
   }): VariableTracer;
-  getDataFromIdentifier(identifierOrMemberExpr: string): null | {
+  removeGlobalIdentifier(identifierOrMemberExpr: string): string;
+  getDataFromIdentifier(identifierOrMemberExpr: string, options: DataIdentifierOptions): null | {
     name: string;
     identifierOrMemberExpr: string;
     assignmentMemory: string[];
-  }
+  };
   walk(node: any): void;
 }
 
