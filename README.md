@@ -136,10 +136,10 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexa value, unicode sequence or a base64 string) |
 | [short-identifiers](./docs/short-identifiers.md) | ❌ | This mean that all identifiers has an average length below 1.5. |
 | [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code. |
-| [suspicious-file](./docs/suspicious-file.md) | ✔️ | A suspicious file with more than ten encoded-literal in it |
+| [suspicious-file](./docs/suspicious-file.md) | ❌ | A suspicious file with more than ten encoded-literal in it |
 | [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
-| [weak-crypto](./docs/weak-crypto.md) | ✔️ | The code probably contains a weak crypto algorithm (md5, sha1...) |
-| [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
+| [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (md5, sha1...) |
+| [shady-link](./docs/shady-link.md) | ❌ | The code contains shady/unsafe link |
 
 ## Workspaces
 

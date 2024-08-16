@@ -34,7 +34,7 @@ export const warnings = Object.freeze({
   "suspicious-file": {
     i18n: "sast_warnings.suspicious_file",
     severity: "Critical",
-    experimental: true
+    experimental: false
   },
   "obfuscated-code": {
     i18n: "sast_warnings.obfuscated_code",
@@ -44,12 +44,12 @@ export const warnings = Object.freeze({
   "weak-crypto": {
     i18n: "sast_warnings.weak_crypto",
     severity: "Information",
-    experimental: true
+    experimental: false
   },
   "shady-link": {
     i18n: "sast_warnings.shady_link",
     severity: "Warning",
-    experimental: true
+    experimental: false
   }
 });
 
