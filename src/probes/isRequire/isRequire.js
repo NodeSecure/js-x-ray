@@ -17,7 +17,9 @@ function validateNodeRequire(node, { tracer }) {
     return [false];
   }
 
-  const data = tracer.getDataFromIdentifier(id);
+  const data = tracer.getDataFromIdentifier(id, {
+    removeGlobalIdentifier: true
+  });
 
   return [
     data !== null && data.name === "require",
@@ -135,8 +137,12 @@ function main(node, options) {
 
 export default {
   name: "isRequire",
-  validateNode: [validateNodeRequire, validateNodeEvalRequire],
+  validateNode: [
+    validateNodeRequire,
+    validateNodeEvalRequire
+  ],
   main,
+  teardown,
   breakOnMatch: true,
   breakGroup: "import"
 };

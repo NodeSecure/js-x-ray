@@ -46,6 +46,27 @@ test("it should execute probe using process.mainModule.require (detected by the 
   assert.ok(dependencies.has("http"));
 });
 
+test("it should execute probe using process.getBuiltinModule (detected by the VariableTracer)", () => {
+  const str = `
+    if (globalThis.process?.getBuiltinModule) {
+      const fs = globalThis.process.getBuiltinModule('fs');
+      const module = globalThis.process.getBuiltinModule('module');
+      const require = module.createRequire(import.meta.url);
+      const foo = require('foo');
+    }
+  `;
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isRequire)
+    .execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings().length, 0);
+  const dependencies = sastAnalysis.dependencies();
+  assert.deepEqual(
+    [...dependencies.keys()],
+    ["fs", "module", "foo"]
+  );
+});
+
 test("it should execute probe on a variable reassignments of require (detected by the VariableTracer)", () => {
   const str = `
     const r = require;

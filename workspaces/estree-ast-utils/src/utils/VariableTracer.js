@@ -13,10 +13,18 @@ import { extractLogicalExpression } from "../extractLogicalExpression.js";
 
 // CONSTANTS
 const kGlobalIdentifiersToTrace = new Set([
-  "global", "globalThis", "root", "GLOBAL", "window"
+  "globalThis",
+  "global",
+  "root",
+  "GLOBAL",
+  "window"
 ]);
 const kRequirePatterns = new Set([
-  "require", "require.resolve", "require.main", "process.mainModule.require"
+  "require",
+  "require.resolve",
+  "require.main",
+  "process.mainModule.require",
+  "process.getBuiltinModule"
 ]);
 const kUnsafeGlobalCallExpression = new Set(["eval", "Function"]);
 
@@ -96,7 +104,33 @@ export class VariableTracer extends EventEmitter {
   /**
    * @param {!string} identifierOrMemberExpr An identifier like "foo" or "foo.bar"
    */
-  getDataFromIdentifier(identifierOrMemberExpr) {
+  removeGlobalIdentifier(identifierOrMemberExpr) {
+    if (!identifierOrMemberExpr.includes(".")) {
+      return identifierOrMemberExpr;
+    }
+
+    const globalIdentifier = [...kGlobalIdentifiersToTrace]
+      .find((globalId) => identifierOrMemberExpr.startsWith(globalId));
+
+    return globalIdentifier ?
+      identifierOrMemberExpr.slice(globalIdentifier.length + 1) :
+      identifierOrMemberExpr;
+  }
+
+  /**
+   * @param {!string} identifierOrMemberExpr An identifier like "foo" or "foo.bar"
+   * @param {object} [options={}]
+   */
+  getDataFromIdentifier(
+    identifierOrMemberExpr,
+    options = {}
+  ) {
+    const { removeGlobalIdentifier = false } = options;
+    if (removeGlobalIdentifier) {
+      // eslint-disable-next-line no-param-reassign
+      identifierOrMemberExpr = this.removeGlobalIdentifier(identifierOrMemberExpr);
+    }
+
     const isMemberExpr = identifierOrMemberExpr.includes(".");
     const isTracingIdentifier = this.#traced.has(identifierOrMemberExpr);
 

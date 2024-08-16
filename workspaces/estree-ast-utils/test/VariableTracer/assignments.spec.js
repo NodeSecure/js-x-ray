@@ -144,3 +144,42 @@ test("it should be able to Trace a global assignment using a LogicalExpression",
   assert.strictEqual(eventOne.identifierOrMemberExpr, "require");
   assert.strictEqual(eventOne.id, "foo");
 });
+
+test("it should be able to Trace assignment of process.getBuiltinModule", () => {
+  const helpers = createTracer(true);
+  const assignments = helpers.getAssignmentArray();
+
+  helpers.walkOnCode(`
+    if (globalThis.process?.getBuiltinModule) {
+      const foo = globalThis.process.getBuiltinModule;
+      const fs = foo('fs');
+    }
+  `);
+
+  const foo = helpers.tracer.getDataFromIdentifier("foo");
+  assert.deepEqual(foo, {
+    name: "require",
+    identifierOrMemberExpr: "process.getBuiltinModule",
+    assignmentMemory: ["foo"]
+  });
+  assert.strictEqual(assignments.length, 1);
+
+  const [eventOne] = assignments;
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "process.getBuiltinModule");
+  assert.strictEqual(eventOne.id, "foo");
+
+  assert.strictEqual(
+    helpers.tracer.getDataFromIdentifier("globalThis.process.getBuiltinModule"),
+    null
+  );
+
+  const getBuiltinModule = helpers.tracer.getDataFromIdentifier(
+    "globalThis.process.getBuiltinModule",
+    { removeGlobalIdentifier: true }
+  );
+  assert.deepEqual(getBuiltinModule, {
+    name: "require",
+    identifierOrMemberExpr: "process.getBuiltinModule",
+    assignmentMemory: ["foo"]
+  });
+});
