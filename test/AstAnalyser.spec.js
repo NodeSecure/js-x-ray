@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../index.js";
+import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
 import { SourceFile } from "../src/SourceFile.js";
 import {
   customProbes,
@@ -176,6 +177,22 @@ describe("AstAnalyser", (t) => {
       assert.equal(result.warnings.length, 1);
     });
 
+    it("should call with the expected arguments", (t) => {
+      t.mock.method(AstAnalyser.prototype, "analyse");
+
+      const source = "const http = require(\"http\");";
+      new AstAnalyser().analyse(source, { module: true, removeHTMLComments: true });
+
+      const source2 = "const fs = require(\"fs\");";
+      new AstAnalyser().analyse(source2, { module: false, removeHTMLComments: false });
+
+      const calls = AstAnalyser.prototype.analyse.mock.calls;
+      assert.strictEqual(calls.length, 2);
+
+      assert.deepEqual(calls[0].arguments, [source, { module: true, removeHTMLComments: true }]);
+      assert.deepEqual(calls[1].arguments, [source2, { module: false, removeHTMLComments: false }]);
+    });
+
     describe("hooks", () => {
       describe("initialize", () => {
         const analyser = new AstAnalyser();
@@ -279,6 +296,56 @@ describe("AstAnalyser", (t) => {
 
       const parsingError = result.warnings[0];
       assert.strictEqual(parsingError.kind, "parsing-error");
+    });
+
+    it("should call the method with the expected arguments", async(t) => {
+      t.mock.method(AstAnalyser.prototype, "analyseFile");
+
+      const url = new URL("depName.js", FIXTURE_URL);
+      await new AstAnalyser().analyseFile(
+        url,
+        { module: false, packageName: "foobar" }
+      );
+
+      const url2 = new URL("parsingError.js", FIXTURE_URL);
+      await new AstAnalyser().analyseFile(
+        url,
+        { module: true, packageName: "foobar2" }
+      );
+
+      const calls = AstAnalyser.prototype.analyseFile.mock.calls;
+      assert.strictEqual(calls.length, 2);
+
+      assert.deepEqual(calls[0].arguments, [url, { module: false, packageName: "foobar" }]);
+      assert.deepEqual(calls[1].arguments, [url2, { module: true, packageName: "foobar2" }]);
+    });
+
+    it("should implement new customProbes while keeping default probes", async() => {
+      const result = await new AstAnalyser(
+        {
+          parser: new JsSourceParser(),
+          customProbes,
+          skipDefaultProbes: false
+        }
+      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+
+      assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+      assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
+      assert.equal(result.warnings[2].kind, kWarningUnsafeStmt);
+      assert.equal(result.warnings.length, 3);
+    });
+
+    it("should implement new customProbes while skipping/removing default probes", async() => {
+      const result = await new AstAnalyser(
+        {
+          parser: new JsSourceParser(),
+          customProbes,
+          skipDefaultProbes: true
+        }
+      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+
+      assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
+      assert.equal(result.warnings.length, 1);
     });
 
     describe("hooks", () => {
@@ -542,6 +609,42 @@ describe("AstAnalyser", (t) => {
       assert.ok(analyser.parser instanceof JsSourceParser);
       assert.deepStrictEqual(analyser.probesOptions.customProbes, []);
       assert.strictEqual(analyser.probesOptions.skipDefaultProbes, false);
+    });
+
+    it("should properly instanciate default or custom parser (using analyseFile)", async(t) => {
+      t.mock.method(JsSourceParser.prototype, "parse");
+      t.mock.method(FakeSourceParser.prototype, "parse");
+
+      await new AstAnalyser().analyseFile(
+        new URL("depName.js", FIXTURE_URL),
+        { module: false, packageName: "foobar" }
+      );
+
+      await new AstAnalyser(
+        { customParser: new FakeSourceParser() }
+      ).analyseFile(
+        new URL("parsingError.js", FIXTURE_URL),
+        { module: true, packageName: "foobar2" }
+      );
+
+      assert.strictEqual(JsSourceParser.prototype.parse.mock.calls.length, 1);
+      assert.strictEqual(FakeSourceParser.prototype.parse.mock.calls.length, 1);
+    });
+
+    it("should properly instanciate default or custom parser (using analyse)", (t) => {
+      t.mock.method(JsSourceParser.prototype, "parse");
+      t.mock.method(FakeSourceParser.prototype, "parse");
+
+      new AstAnalyser().analyse("const http = require(\"http\");", { module: true, removeHTMLComments: true });
+
+      new AstAnalyser({
+        customParser: new FakeSourceParser()
+      }).analyse("const fs = require(\"fs\");",
+        { module: false, removeHTMLComments: false }
+      );
+
+      assert.strictEqual(JsSourceParser.prototype.parse.mock.calls.length, 1);
+      assert.strictEqual(FakeSourceParser.prototype.parse.mock.calls.length, 1);
     });
   });
 });

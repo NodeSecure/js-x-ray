@@ -21,7 +21,6 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
     assert.strictEqual(outputWarnings.length, 1);
     assert.deepEqual(firstWarning.kind, "weak-crypto");
     assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
-    assert.ok(firstWarning.experimental);
   }
 });
 
@@ -37,7 +36,6 @@ test("it should report a warning in case of `[expression]createHash(<weak-algo>)
     assert.strictEqual(outputWarnings.length, 1);
     assert.deepEqual(firstWarning.kind, "weak-crypto");
     assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
-    assert.ok(firstWarning.experimental);
   }
 });
 

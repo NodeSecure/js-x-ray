@@ -85,6 +85,11 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 > [!TIP]
 > There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
 
+## API
+
+- [AstAnalyser](./docs/api/AstAnalyser.md)
+- [EntryFilesAnalyser](./docs/api/EntryFilesAnalyser.md)
+
 ## Warnings
 
 This section describes how use `warnings` export.
@@ -118,7 +123,7 @@ import * as i18n from "@nodesecure/i18n";
 console.log(i18n.getTokenSync(jsxray.warnings["parsing-error"].i18n));
 ```
 
-## Warnings Legends
+### Legends
 
 This section describe all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
 
@@ -131,161 +136,10 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexa value, unicode sequence or a base64 string) |
 | [short-identifiers](./docs/short-identifiers.md) | ❌ | This mean that all identifiers has an average length below 1.5. |
 | [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code. |
-| [suspicious-file](./docs/suspicious-file.md) | ✔️ | A suspicious file with more than ten encoded-literal in it |
+| [suspicious-file](./docs/suspicious-file.md) | ❌ | A suspicious file with more than ten encoded-literal in it |
 | [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
-| [weak-crypto](./docs/weak-crypto.md) | ✔️ | The code probably contains a weak crypto algorithm (md5, sha1...) |
-| [shady-link](./docs/shady-link.md) | ✔️ | The code contains shady/unsafe link |
-
-## Custom Probes
-
-You can also create custom probes to detect specific pattern in the code you are analyzing.
-
-A probe is a pair of two functions (`validateNode` and `main`) that will be called on each node of the AST. It will return a warning if the pattern is detected.
-Below a basic probe that detect a string assignation to `danger`:
-
-```ts
-export const customProbes = [
-  {
-    name: "customProbeUnsafeDanger",
-    validateNode: (node, sourceFile) => [
-      node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
-    ],
-    main: (node, options) => {
-      const { sourceFile, data: calleeName } = options;
-      if (node.declarations[0].init.value === "danger") {
-        sourceFile.addWarning("unsafe-danger", calleeName, node.loc);
-
-        return ProbeSignals.Skip;
-      }
-
-      return null;
-    }
-  }
-];
-```
-
-You can pass an array of probes to the `runASTAnalysis/runASTAnalysisOnFile` functions as `options`, or directly to the `AstAnalyser` constructor.
-
-| Name             | Type                             | Description                                                           | Default Value   |
-|------------------|----------------------------------|-----------------------------------------------------------------------|-----------------|
-| `customParser`   | `SourceParser \| undefined`      | An optional custom parser to be used for parsing the source code.    | `JsSourceParser` |
-| `customProbes`   | `Probe[] \| undefined`           | An array of custom probes to be used during AST analysis.            | `[]`            |
-| `skipDefaultProbes` | `boolean \| undefined`        | If `true`, default probes will be skipped and only custom probes will be used. | `false`         |
-
-
-Here using the example probe upper:
-
-```ts
-import { AstAnalyser } from "@nodesecure/js-x-ray";
-
-// add your customProbes here (see example above)
-
-const scanner = new AstAnalyser({
-  customProbes,
-  skipDefaultProbes: true
-});
-
-const result = scanner.analyse("const danger = 'danger';");
-
-console.log(result);
-```
-
-Result:
-
-```sh
-✗ node example.js
-{
-  idsLengthAvg: 0,
-  stringScore: 0,
-  warnings: [ { kind: 'unsafe-danger', location: [Array], source: 'JS-X-Ray' } ],
-  dependencies: Map(0) {},
-  isOneLineRequire: false
-}
-```
-
-Congrats, you have created your first custom probe! 🎉
-
-> [!TIP]
-> Check the types in [index.d.ts](index.d.ts) and [types/api.d.ts](types/api.d.ts) for more details about the `options`
-
-## API
-
-- [AstAnalyser](./docs/api/AstAnalyser.md)
-- [EntryFilesAnalyser](./docs/api/EntryFilesAnalyser.md)
-
-Legacy APIs waiting to be deprecated;
-
-<details>
-<summary>runASTAnalysis(str: string, options?: RuntimeOptions & AstAnalyserOptions): Report</summary>
-
-```ts
-interface RuntimeOptions {
-  module?: boolean;
-  removeHTMLComments?: boolean;
-  isMinified?: boolean;
-  initialize?: (sourceFile: SourceFile) => void;
-  finalize?: (sourceFile: SourceFile) => void;
-}
-```
-
-```ts
-interface AstAnalyserOptions {
-  customParser?: SourceParser;
-  customProbes?: Probe[];
-  skipDefaultProbes?: boolean;
-}
-```
-
-The method take a first argument which is the code you want to analyse. It will return a Report Object:
-
-```ts
-interface Report {
-  dependencies: ASTDeps;
-  warnings: Warning[];
-  idsLengthAvg: number;
-  stringScore: number;
-  isOneLineRequire: boolean;
-}
-```
-
-</details>
-
-<details>
-<summary>runASTAnalysisOnFile(pathToFile: string, options?: RuntimeFileOptions & AstAnalyserOptions): Promise< ReportOnFile ></summary>
-
-```ts
-interface RuntimeFileOptions {
-  module?: boolean;
-  removeHTMLComments?: boolean;
-  packageName?: string;
-  initialize?: (sourceFile: SourceFile) => void;
-  finalize?: (sourceFile: SourceFile) => void;
-}
-```
-
-```ts
-interface AstAnalyserOptions {
-  customParser?: SourceParser;
-  customProbes?: Probe[];
-  skipDefaultProbes?: boolean;
-}
-```
-
-Run the SAST scanner on a given JavaScript file.
-
-```ts
-export type ReportOnFile = {
-  ok: true,
-  warnings: Warning[];
-  dependencies: ASTDeps;
-  isMinified: boolean;
-} | {
-  ok: false,
-  warnings: Warning[];
-}
-```
-
-</details>
+| [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (md5, sha1...) |
+| [shady-link](./docs/shady-link.md) | ❌ | The code contains shady/unsafe link |
 
 ## Workspaces
 

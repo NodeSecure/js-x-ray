@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| suspicious-file | `Critical` | `sast_warnings.suspicious_file` | ✔️ | 
+| suspicious-file | `Critical` | `sast_warnings.suspicious_file` | ❌ | 
 
 ## Introduction
 

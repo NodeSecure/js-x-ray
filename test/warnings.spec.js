@@ -40,6 +40,6 @@ test("Given a weak-crypto kind it should generate a warning with value, simple l
     ],
     i18n: "sast_warnings.weak_crypto",
     severity: "Information",
-    experimental: true
+    experimental: false
   });
 });

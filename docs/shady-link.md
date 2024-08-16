@@ -1,7 +1,7 @@
 # Shady link
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| shady-link | `Warning` | `sast_warnings.shady_link` | ✔️ | 
+| shady-link | `Warning` | `sast_warnings.shady_link` | ❌ | 
 
 ## Introduction
 

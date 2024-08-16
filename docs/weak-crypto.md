@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| weak-crypto | `Information` | `sast_warnings.weak_crypto` | ✔️ | 
+| weak-crypto | `Information` | `sast_warnings.weak_crypto` | ❌ | 
 
 ## Introduction
 
