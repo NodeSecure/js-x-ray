@@ -309,7 +309,7 @@ describe("AstAnalyser", (t) => {
 
       const url2 = new URL("parsingError.js", FIXTURE_URL);
       await new AstAnalyser().analyseFile(
-        url,
+        url2,
         { module: true, packageName: "foobar2" }
       );
 
