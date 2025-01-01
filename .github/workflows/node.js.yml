@@ -31,7 +31,7 @@ jobs:
       - name: Run tests
         run: npm run test
       - name: Send coverage report to Codecov
-        uses: codecov/codecov-action@015f24e6818733317a2da2edd6290ab26238649a # v4.0.0-beta.3
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303 # v4.0.0-beta.3
   automerge:
     if: >
       github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
