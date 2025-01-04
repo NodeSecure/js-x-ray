@@ -41,6 +41,30 @@ describe("EntryFilesAnalyser", () => {
     assert.strictEqual(calls.length, 6);
   });
 
+  it("should analyze ESM export statements recursively", async(t) => {
+    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryUrl = new URL("export.js", FIXTURE_URL);
+
+    t.mock.method(AstAnalyser.prototype, "analyseFile");
+
+    const generator = entryFilesAnalyser.analyse([
+      entryUrl
+    ]);
+    const reports = await fromAsync(generator);
+
+    assert.deepEqual(
+      reports.map((report) => report.file),
+      [
+        entryUrl,
+        new URL("shared.js", FIXTURE_URL)
+      ].map((url) => fileURLToPath(url))
+    );
+
+    // Check that shared dependencies are not analyzed several times
+    const calls = AstAnalyser.prototype.analyseFile.mock.calls;
+    assert.strictEqual(calls.length, 2);
+  });
+
   it("should detect internal deps that failed to be analyzed", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("entryWithInvalidDep.js", FIXTURE_URL);

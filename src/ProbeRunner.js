@@ -11,6 +11,7 @@ import isImportDeclaration from "./probes/isImportDeclaration.js";
 import isWeakCrypto from "./probes/isWeakCrypto.js";
 import isBinaryExpression from "./probes/isBinaryExpression.js";
 import isArrayExpression from "./probes/isArrayExpression.js";
+import isESMExport from "./probes/isESMExport.js";
 
 // Import Internal Dependencies
 import { SourceFile } from "./SourceFile.js";
@@ -39,6 +40,7 @@ export class ProbeRunner {
    */
   static Defaults = [
     isRequire,
+    isESMExport,
     isUnsafeCallee,
     isLiteral,
     isLiteralRegex,
