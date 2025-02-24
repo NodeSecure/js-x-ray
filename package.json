@@ -54,7 +54,7 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
-    "@openally/config.eslint": "^1.0.0",
+    "@openally/config.eslint": "^2.0.0",
     "@types/node": "^22.0.0",
     "c8": "^10.1.2",
     "glob": "^11.0.0",
