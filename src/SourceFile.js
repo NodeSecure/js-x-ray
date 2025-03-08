@@ -129,7 +129,7 @@ export class SourceFile {
     this.deobfuscator.walk(node);
 
     // Detect TryStatement and CatchClause to known which dependency is required in a Try {} clause
-    if (node.type === "TryStatement" && typeof node.handler !== "undefined") {
+    if (node.type === "TryStatement" && node.handler) {
       this.inTryStatement = true;
     }
     else if (node.type === "CatchClause") {

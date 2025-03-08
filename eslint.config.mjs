@@ -4,7 +4,8 @@ export default [
   {
     ignores: [
       "**/test/fixtures/**/*",
-      "**/test/probes/fixtures/**/*.js"
+      "**/test/probes/fixtures/**/*.js",
+      "**/examples/*.js"
     ]
   },
   ...ESLintConfig,
