@@ -1,5 +1,5 @@
 // Import Node.js Dependencies
-import { builtinModules } from "repl";
+import { builtinModules } from "module";
 
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
