@@ -180,6 +180,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "clemgbld",
+      "name": "Clement Gombauld",
+      "avatar_url": "https://avatars.githubusercontent.com/u/91478082?v=4",
+      "profile": "https://clementgombauld.netlify.app/",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
