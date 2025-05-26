@@ -22,6 +22,7 @@ interface EntryFilesAnalyserOptions {
   astAnalyzer?: AstAnalyser;
   loadExtensions?: (defaults: string[]) => string[];
   rootPath?: string | URL;
+  ignoreENOENT?: boolean;
 }
 ```
 

@@ -19,7 +19,8 @@ export class EntryFilesAnalyser {
     const {
       astAnalyzer = new AstAnalyser(),
       loadExtensions,
-      rootPath = null
+      rootPath = null,
+      ignoreENOENT = false
     } = options;
 
     this.astAnalyzer = astAnalyzer;
@@ -30,6 +31,7 @@ export class EntryFilesAnalyser {
     this.allowedExtensions = new Set(rawAllowedExtensions);
     this.#rootPath = options.rootPath === null ?
       null : fileURLToPathExtended(rootPath);
+    this.ignoreENOENT = ignoreENOENT;
   }
 
   async* analyse(
@@ -42,6 +44,10 @@ export class EntryFilesAnalyser {
       const normalizedEntryFile = path.normalize(
         fileURLToPathExtended(entryFile)
       );
+
+      if (this.ignoreENOENT && !await this.#fileExists(normalizedEntryFile)) {
+        return;
+      }
 
       yield* this.#analyseFile(
         normalizedEntryFile,

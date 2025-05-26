@@ -183,6 +183,23 @@ describe("EntryFilesAnalyser", () => {
   });
 });
 
+it("should ignore file that does not exist when option ignoreENOENT is provided", async() => {
+  const entryFilesAnalyser = new EntryFilesAnalyser({
+    ignoreENOENT: true,
+    rootPath: FIXTURE_URL
+  });
+
+  const entryUrl = new URL("does-not-exists.js", FIXTURE_URL);
+
+  const generator = entryFilesAnalyser.analyse(
+    [entryUrl]
+  );
+
+  const reports = await fromAsync(generator);
+  assert.strictEqual(reports.length, 0);
+  assert.strictEqual(entryFilesAnalyser.dependencies.hasVertex("does-not-exists.js"), false);
+});
+
 // TODO: replace with Array.fromAsync when droping Node.js 20
 async function fromAsync(asyncIter) {
   const items = [];
