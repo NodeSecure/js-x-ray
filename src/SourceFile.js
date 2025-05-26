@@ -19,6 +19,8 @@ export class SourceFile {
   dependencies = new Map();
   encodedLiterals = new Map();
   warnings = [];
+  /** @type {Set<string>} */
+  flags = new Set();
 
   constructor(sourceCodeString, probesOptions = {}) {
     this.tracer = new VariableTracer()

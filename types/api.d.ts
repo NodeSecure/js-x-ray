@@ -24,9 +24,13 @@ export {
   Report,
   ReportOnFile,
 
+  SourceFlags,
   SourceLocation,
   Dependency
 }
+
+type SourceFlags =
+  | "fetch";
 
 interface SourceLocation {
   start: {
@@ -89,6 +93,7 @@ interface Probe {
 interface Report {
   dependencies: Map<string, Dependency>;
   warnings: Warning[];
+  flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
   isOneLineRequire: boolean;
@@ -98,6 +103,7 @@ type ReportOnFile = {
   ok: true,
   warnings: Warning[];
   dependencies: Map<string, Dependency>;
+  flags: Set<SourceFlags>;
   isMinified: boolean;
 } | {
   ok: false,
@@ -125,6 +131,8 @@ declare class AstAnalyser {
 }
 
 declare class SourceFile {
+  flags: Set<SourceFlags>;
+
   constructor(source: string, options: any);
   addDependency(
     name: string,

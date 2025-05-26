@@ -78,6 +78,7 @@ export class AstAnalyser {
     return {
       ...source.getResult(isMinified),
       dependencies: source.dependencies,
+      flags: source.flags,
       isOneLineRequire: isOneLineExpressionExport(body)
     };
   }
@@ -115,6 +116,7 @@ export class AstAnalyser {
         ok: true,
         dependencies: data.dependencies,
         warnings: data.warnings,
+        flags: data.flags,
         isMinified: !data.isOneLineRequire && isMin
       };
     }

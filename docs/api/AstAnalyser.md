@@ -36,11 +36,20 @@ By default the AstAnalyser class is capable of parsing JavaScript source code us
 ## API
 
 ```ts
-declare class AstAnalyser {
+class AstAnalyser {
   constructor(options?: AstAnalyserOptions);
-  analyse: (str: string, options?: RuntimeOptions) => Report;
-  analyseFile(pathToFile: string, options?: RuntimeFileOptions): Promise<ReportOnFile>;
-  analyseFileSync(pathToFile: string, options?: RuntimeFileOptions): ReportOnFile;
+  analyse: (
+    str: string,
+    options?: RuntimeOptions
+  ) => Report;
+  analyseFile(
+    pathToFile: string,
+    options?: RuntimeFileOptions
+  ): Promise<ReportOnFile>;
+  analyseFileSync(
+    pathToFile: string,
+    options?: RuntimeFileOptions
+  ): ReportOnFile;
 }
 ```
 
@@ -64,9 +73,12 @@ interface RuntimeOptions {
   finalize?: (sourceFile: SourceFile) => void;
 }
 
+type SourceFlags = "fetch";
+
 interface Report {
   dependencies: Map<string, Dependency>;
   warnings: Warning[];
+  flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
   isOneLineRequire: boolean;
@@ -75,6 +87,7 @@ interface Report {
 type ReportOnFile = {
   ok: true,
   warnings: Warning[];
+  flags: Set<SourceFlags>;
   dependencies: Map<string, Dependency>;
   isMinified: boolean;
 } | {
@@ -82,6 +95,12 @@ type ReportOnFile = {
   warnings: Warning[];
 }
 ```
+
+A given SourceFile can have multiple unique flags:
+
+| name | description |
+| --- | --- |
+| fetch | the source file include at least one [native fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) CallExpression |
 
 ### Hooks
 
@@ -170,6 +189,7 @@ Result:
   stringScore: 0,
   warnings: [ { kind: 'unsafe-danger', location: [Array], source: 'JS-X-Ray' } ],
   dependencies: Map(0) {},
+  flags: Set(0) {},
   isOneLineRequire: false
 }
 ```
