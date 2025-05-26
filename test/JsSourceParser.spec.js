@@ -29,5 +29,13 @@ describe("JsSourceParser", () => {
         isEcmaScriptModule: false
       });
     });
+
+    it("should not crash with a source code containing import attributes", () => {
+      const code = `import data from "./data.json" with { type: "json" };
+        export default data;`;
+      new JsSourceParser().parse(code, {
+        isEcmaScriptModule: false
+      });
+    });
   });
 });
