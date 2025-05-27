@@ -50,6 +50,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.shady_link",
     severity: "Warning",
     experimental: false
+  },
+  "unsafe-spawn": {
+    i18n: "sast_warnings.unsafe-spawn",
+    severity: "Warning",
+    experimental: true
   }
 });
 
