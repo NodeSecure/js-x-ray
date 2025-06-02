@@ -2,7 +2,7 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
 
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../index.js";
@@ -456,6 +456,53 @@ describe("AstAnalyser", (t) => {
 
       const parsingError = result.warnings[0];
       assert.strictEqual(parsingError.kind, "parsing-error");
+    });
+
+    it("should include flags property in response", () => {
+      const result = getAnalyser().analyseFileSync(
+        new URL("depName.js", FIXTURE_URL)
+      );
+
+      assert.ok(result.ok);
+      assert.ok(result.flags instanceof Set);
+    });
+
+    it("should add is-minified flag for minified files", () => {
+      const minifiedContent = "var a=require(\"fs\"),b=require(\"http\");" +
+        "a.readFile(\"test.txt\",function(c,d){b.createServer().listen(3000)});";
+      const tempMinFile = "temp-test.min.js";
+
+      writeFileSync(tempMinFile, minifiedContent);
+
+      try {
+        const result = getAnalyser().analyseFileSync(tempMinFile);
+
+        assert.ok(result.ok);
+        assert.ok(result.flags.has("is-minified"));
+        assert.strictEqual(result.flags.has("oneline-require"), false);
+      }
+      finally {
+        unlinkSync(tempMinFile);
+      }
+    });
+
+    it("should add oneline-require flag for one-line exports", () => {
+      const oneLineContent = "module.exports = require('foo');";
+      const tempOneLineFile = "temp-oneline.js";
+
+      writeFileSync(tempOneLineFile, oneLineContent);
+
+      try {
+        const result = getAnalyser().analyseFileSync(tempOneLineFile);
+
+        assert.ok(result.ok);
+        assert.ok(result.flags.has("oneline-require"));
+        assert.strictEqual(result.flags.has("is-minified"), false);
+        assert.deepEqual([...result.dependencies.keys()], ["foo"]);
+      }
+      finally {
+        unlinkSync(tempOneLineFile);
+      }
     });
 
     describe("hooks", () => {
