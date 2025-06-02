@@ -3,6 +3,8 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
 import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../index.js";
@@ -470,7 +472,7 @@ describe("AstAnalyser", (t) => {
     it("should add is-minified flag for minified files", () => {
       const minifiedContent = "var a=require(\"fs\"),b=require(\"http\");" +
         "a.readFile(\"test.txt\",function(c,d){b.createServer().listen(3000)});";
-      const tempMinFile = "temp-test.min.js";
+      const tempMinFile = path.join(os.tmpdir(), "temp-test.min.js");
 
       writeFileSync(tempMinFile, minifiedContent);
 
@@ -488,7 +490,7 @@ describe("AstAnalyser", (t) => {
 
     it("should add oneline-require flag for one-line exports", () => {
       const oneLineContent = "module.exports = require('foo');";
-      const tempOneLineFile = "temp-oneline.js";
+      const tempOneLineFile = path.join(os.tmpdir(), "temp-oneline.js");
 
       writeFileSync(tempOneLineFile, oneLineContent);
 
