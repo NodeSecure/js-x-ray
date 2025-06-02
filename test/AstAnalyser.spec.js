@@ -133,11 +133,11 @@ describe("AstAnalyser", (t) => {
     });
 
     it("should return isOneLineRequire true given a single line CJS export", () => {
-      const { dependencies, isOneLineRequire } = getAnalyser().analyse(
+      const { dependencies, flags } = getAnalyser().analyse(
         "module.exports = require('foo');"
       );
 
-      assert.ok(isOneLineRequire);
+      assert.ok(flags.has("oneline-require"));
       assert.deepEqual([...dependencies.keys()], ["foo"]);
     });
 

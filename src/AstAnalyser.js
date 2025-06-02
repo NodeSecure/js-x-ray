@@ -75,11 +75,15 @@ export class AstAnalyser {
       finalize(source);
     }
 
+    // Add oneline-require flag if this is a one-line require expression
+    if (isOneLineExpressionExport(body)) {
+      source.flags.add("oneline-require");
+    }
+
     return {
       ...source.getResult(isMinified),
       dependencies: source.dependencies,
-      flags: source.flags,
-      isOneLineRequire: isOneLineExpressionExport(body)
+      flags: source.flags
     };
   }
 
@@ -112,12 +116,16 @@ export class AstAnalyser {
         data.dependencies.delete(packageName);
       }
 
+      // Add is-minified flag if the file is minified and not a one-line require
+      if (!data.flags.has("oneline-require") && isMin) {
+        data.flags.add("is-minified");
+      }
+
       return {
         ok: true,
         dependencies: data.dependencies,
         warnings: data.warnings,
-        flags: data.flags,
-        isMinified: !data.isOneLineRequire && isMin
+        flags: data.flags
       };
     }
     catch (error) {
@@ -159,11 +167,16 @@ export class AstAnalyser {
         data.dependencies.delete(packageName);
       }
 
+      // Add is-minified flag if the file is minified and not a one-line require
+      if (!data.flags.has("oneline-require") && isMin) {
+        data.flags.add("is-minified");
+      }
+
       return {
         ok: true,
         dependencies: data.dependencies,
         warnings: data.warnings,
-        isMinified: !data.isOneLineRequire && isMin
+        flags: data.flags
       };
     }
     catch (error) {

@@ -37,9 +37,9 @@ const validTestCases = [
 test("it should return isOneLineRequire true given a single line CJS export with a valid assignment", () => {
   validTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, isOneLineRequire } = new AstAnalyser().analyse(source);
+    const { dependencies, flags } = new AstAnalyser().analyse(source);
 
-    assert.ok(isOneLineRequire);
+    assert.ok(flags.has("oneline-require"));
     assert.deepEqual([...dependencies.keys()], modules);
   });
 });
@@ -60,9 +60,9 @@ const invalidTestCases = [
 test("it should return isOneLineRequire false given a single line CJS export with illegal callees", () => {
   invalidTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, isOneLineRequire } = new AstAnalyser().analyse(source);
+    const { dependencies, flags } = new AstAnalyser().analyse(source);
 
-    assert.ok(isOneLineRequire === false);
+    assert.ok(flags.has("oneline-require") === false);
     assert.deepEqual([...dependencies.keys()], modules);
   });
 });
