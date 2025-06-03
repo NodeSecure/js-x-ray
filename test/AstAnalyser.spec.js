@@ -460,14 +460,13 @@ describe("AstAnalyser", (t) => {
       assert.strictEqual(parsingError.kind, "parsing-error");
     });
 
-    it("should include flags property in response", (t) => {
-      t.plan(2);
+    it("should include flags property in response", () => {
       const result = getAnalyser().analyseFileSync(
         new URL("depName.js", FIXTURE_URL)
       );
 
-      t.assert.ok(result.ok);
-      t.assert.ok(result.flags instanceof Set);
+      assert.ok(result.ok);
+      assert.ok(result.flags instanceof Set);
     });
 
     it("should add is-minified flag for minified files", (t) => {
