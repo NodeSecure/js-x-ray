@@ -460,16 +460,18 @@ describe("AstAnalyser", (t) => {
       assert.strictEqual(parsingError.kind, "parsing-error");
     });
 
-    it("should include flags property in response", () => {
+    it("should include flags property in response", (t) => {
+      t.plan(2);
       const result = getAnalyser().analyseFileSync(
         new URL("depName.js", FIXTURE_URL)
       );
 
-      assert.ok(result.ok);
-      assert.ok(result.flags instanceof Set);
+      t.assert.ok(result.ok);
+      t.assert.ok(result.flags instanceof Set);
     });
 
-    it("should add is-minified flag for minified files", () => {
+    it("should add is-minified flag for minified files", (t) => {
+      t.plan(3);
       const minifiedContent = "var a=require(\"fs\"),b=require(\"http\");" +
         "a.readFile(\"test.txt\",function(c,d){b.createServer().listen(3000)});";
       const tempMinFile = path.join(os.tmpdir(), "temp-test.min.js");
@@ -479,16 +481,17 @@ describe("AstAnalyser", (t) => {
       try {
         const result = getAnalyser().analyseFileSync(tempMinFile);
 
-        assert.ok(result.ok);
-        assert.ok(result.flags.has("is-minified"));
-        assert.strictEqual(result.flags.has("oneline-require"), false);
+        t.assert.ok(result.ok);
+        t.assert.ok(result.flags.has("is-minified"));
+        t.assert.strictEqual(result.flags.has("oneline-require"), false);
       }
       finally {
         unlinkSync(tempMinFile);
       }
     });
 
-    it("should add oneline-require flag for one-line exports", () => {
+    it("should add oneline-require flag for one-line exports", (t) => {
+      t.plan(4);
       const oneLineContent = "module.exports = require('foo');";
       const tempOneLineFile = path.join(os.tmpdir(), "temp-oneline.js");
 
@@ -497,10 +500,10 @@ describe("AstAnalyser", (t) => {
       try {
         const result = getAnalyser().analyseFileSync(tempOneLineFile);
 
-        assert.ok(result.ok);
-        assert.ok(result.flags.has("oneline-require"));
-        assert.strictEqual(result.flags.has("is-minified"), false);
-        assert.deepEqual([...result.dependencies.keys()], ["foo"]);
+        t.assert.ok(result.ok);
+        t.assert.ok(result.flags.has("oneline-require"));
+        t.assert.strictEqual(result.flags.has("is-minified"), false);
+        t.assert.deepEqual([...result.dependencies.keys()], ["foo"]);
       }
       finally {
         unlinkSync(tempOneLineFile);
