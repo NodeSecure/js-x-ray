@@ -1,18 +1,18 @@
 {
   "name": "@nodesecure/js-x-ray",
-  "version": "8.2.0",
+  "version": "9.0.0",
   "description": "JavaScript AST XRay analysis",
   "type": "module",
   "exports": {
-  ".": {
-    "import": "./index.js",
-    "types": "./index.d.ts"
-  },
-  "./warnings": {
-    "import": "./src/warnings.js",
-    "types": "./types/warnings.d.ts"
-  },
-  "./package.json": "./package.json"
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./warnings": {
+      "import": "./src/warnings.js",
+      "types": "./types/warnings.d.ts"
+    },
+    "./package.json": "./package.json"
   },
   "engines": {
     "node": ">=20.0.0"
