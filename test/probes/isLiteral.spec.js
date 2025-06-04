@@ -88,6 +88,42 @@ test("should detect shady link when an URL is bit.ly", () => {
   assert.strictEqual(warning.value, "http://bit.ly/foo");
 });
 
+test("should detect shady link when an URL is ipinfo.io when protocol is http", () => {
+  const str = "const foo = 'http://ipinfo.io/json'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://ipinfo.io/json");
+});
+
+test("should detect shady link when an URL is ipinfo.io when protocol is https", () => {
+  const str = "const foo = 'https://ipinfo.io/json'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "https://ipinfo.io/json");
+});
+
+test("should detect shady link when an URL is httpbin.org when protocol is http", () => {
+  const str = "const foo = 'http://httpbin.org/ip'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "http://httpbin.org/ip");
+});
+
+test("should detect shady link when an URL is httpbin.org when protocol is https", () => {
+  const str = "const foo = 'https://httpbin.org/ip'";
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isLiteral).execute(ast.body);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning.value, "https://httpbin.org/ip");
+});
+
 test("should detect shady link when an URL has a suspicious domain", () => {
   const str = "const foo = 'http://foobar.link'";
   const ast = parseScript(str);
