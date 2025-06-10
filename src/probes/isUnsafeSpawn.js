@@ -2,6 +2,12 @@
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import { ProbeSignals } from "../ProbeRunner.js";
 
+const kUnsafeCommands = ["csrutil"]
+
+function isUnsafeCommand(command) {
+  return kUnsafeCommands.filter(unsafeCommand => command.includes(unsafeCommand));
+}
+
 /**
  * @description Detect spawn commands containing csrutil
  * @example
@@ -47,14 +53,13 @@ function validateNode(node, { tracer }) {
 function main(node, options) {
   const { sourceFile } = options;
 
-  // Get the first argument of spawn which should be the command
   const commandArg = node.arguments[0];
   if (!commandArg || commandArg.type !== "Literal") {
     return null;
   }
 
   const command = commandArg.value;
-  if (typeof command === "string" && command.includes("csrutil")) {
+  if (typeof command === "string" && isUnsafeCommand(command)) {
     sourceFile.addWarning("unsafe-spawn", command, node.loc);
     return ProbeSignals.Skip;
   }
