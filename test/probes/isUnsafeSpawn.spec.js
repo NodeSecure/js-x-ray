@@ -38,6 +38,20 @@ test("should detect csrutil spawn command with require", () => {
   assert.equal(result.value, "csrutil");
 });
 
+test("should detect csrutil spawn command as child_process member", () => {
+  const str = `
+    child_process.spawn("csrutil", ["disable"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
+  assert.equal(result.kind, kWarningUnsafeSpawn);
+  assert.equal(result.value, "csrutil");
+});
+
 test("should not detect non-csrutil spawn command", () => {
   const str = `
     const { spawn } = require("child_process");
