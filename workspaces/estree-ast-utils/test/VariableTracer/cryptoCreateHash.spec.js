@@ -83,7 +83,7 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
   const assignments = helpers.getAssignmentArray();
 
   helpers.walkOnCode(`
-    import { createHash } from "crypto";
+    import { createHash } from "node:crypto";
 
     const createHashBis = createHash;
     createHashBis("md5");
@@ -116,7 +116,7 @@ test("it should be able to Trace crypto.createHash with CommonJS require and wit
 
   helpers.walkOnCode(`
     const fs = require("fs");
-    const crypto = require("crypto");
+    const crypto = require("node:crypto");
 
     const id = "createHash";
     const createHashBis = crypto[id];
