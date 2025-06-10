@@ -65,7 +65,7 @@ export function getSastAnalysis(
 export const customProbes = [
   {
     name: "customProbeUnsafeDanger",
-    validateNode: (node, sourceFile) => [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"]
+    validateNode: (node, _sourceFile) => [node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"]
     ,
     main: (node, options) => {
       const { sourceFile, data: calleeName } = options;

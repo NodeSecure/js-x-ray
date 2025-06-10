@@ -4,8 +4,9 @@ import FrequencySet from "frequency-set";
 // Import Internal Dependencies
 import { isNode } from "./utils/index.js";
 
-// eslint-disable-next-line func-style
-const noop = (node) => true;
+function noop() {
+  return true;
+}
 
 export class NodeCounter {
   lookup = null;

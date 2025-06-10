@@ -2,7 +2,7 @@
 import { parse } from "@typescript-eslint/typescript-estree";
 
 // CONSTANTS
-export const tsParsingOptions = {
+const kTypeScriptParsingOptions = {
   jsDocParsingMode: "none",
   jsx: true,
   loc: true,
@@ -15,7 +15,7 @@ export class TsSourceParser {
    */
   parse(source, options = {}) {
     const { body } = parse(source, {
-      ...tsParsingOptions,
+      ...kTypeScriptParsingOptions,
       ...options
     });
 

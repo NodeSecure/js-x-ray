@@ -3,7 +3,10 @@ import { Hex } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-import { VariableTracer } from "./utils/VariableTracer.js";
+
+/**
+ * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ */
 
 /**
  * Return the complete identifier of a MemberExpression
