@@ -9,20 +9,20 @@ import isUnsafeSpawn from "../../src/probes/isUnsafeSpawn.js";
 // CONSTANTS
 const kWarningUnsafeSpawn = "unsafe-spawn";
 
-// test("should detect csrutil spawn command", () => {
-//   const str = `
-//     const { spawn } = require("child_process");
-//     spawn("csrutil", ["status"]);
-//   `;
-//
-//   const ast = parseScript(str);
-//   const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
-//     .execute(ast.body);
-//
-//   const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
-//   assert.equal(result.kind, kWarningUnsafeSpawn);
-//   assert.equal(result.value, "csrutil");
-// });
+test("should detect csrutil spawn command", () => {
+  const str = `
+    const { spawn } = require("child_process");
+    spawn("csrutil", ["status"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
+  assert.equal(result.kind, kWarningUnsafeSpawn);
+  assert.equal(result.value, "csrutil");
+});
 
 test("should detect csrutil spawn command with require", () => {
   const str = `

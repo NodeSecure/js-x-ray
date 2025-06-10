@@ -5,7 +5,7 @@ import { ProbeSignals } from "../ProbeRunner.js";
 const kUnsafeCommands = ["csrutil"]
 
 function isUnsafeCommand(command) {
-  return kUnsafeCommands.filter(unsafeCommand => command.includes(unsafeCommand));
+  return !!kUnsafeCommands.find(unsafeCommand => command.includes(unsafeCommand));
 }
 
 /**
@@ -21,7 +21,15 @@ function validateNode(node, { tracer }) {
     return [false];
   }
 
-  // Direct: child_process.spawn(...) or require("child_process").spawn(...)
+  //  const { spawn } = require("child_process");
+  //  spawn("csrutil", ["status"]);
+  if (node.type === "CallExpression" &&
+      node.callee.type === "Identifier" &&
+      node.callee.name === "spawn") {
+    return [true]
+  }
+
+  // child_process.spawn(...) or require("child_process").spawn(...)
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
