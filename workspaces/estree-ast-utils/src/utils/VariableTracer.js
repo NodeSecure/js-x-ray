@@ -26,6 +26,7 @@ const kRequirePatterns = new Set([
   "process.mainModule.require",
   "process.getBuiltinModule"
 ]);
+const kNodeModulePrefix = "node:";
 const kUnsafeGlobalCallExpression = new Set(["eval", "Function"]);
 
 export class VariableTracer extends EventEmitter {
@@ -241,7 +242,7 @@ export class VariableTracer extends EventEmitter {
   }
 
   #walkImportDeclaration(node) {
-    const moduleName = node.source.value;
+    const moduleName = stripNodePrefix(node.source.value);
     if (!this.#traced.has(moduleName)) {
       return;
     }
@@ -270,18 +271,19 @@ export class VariableTracer extends EventEmitter {
 
   #walkRequireCallExpression(node, id) {
     const moduleNameLiteral = node.arguments
-      .find((argumentNode) => argumentNode.type === "Literal" && this.#traced.has(argumentNode.value));
+      .find((argumentNode) => argumentNode.type === "Literal" && this.#traced.has(stripNodePrefix(argumentNode.value)));
     if (!moduleNameLiteral) {
       return;
     }
-    this.importedModules.add(moduleNameLiteral.value);
+    const moduleName = stripNodePrefix(moduleNameLiteral.value);
+    this.importedModules.add(moduleName);
 
     switch (id.type) {
       case "Identifier":
-        this.#declareNewAssignment(moduleNameLiteral.value, id);
+        this.#declareNewAssignment(moduleName, id);
         break;
       case "ObjectPattern": {
-        this.#autoTraceId(id, moduleNameLiteral.value);
+        this.#autoTraceId(id, moduleName);
 
         break;
       }
@@ -472,4 +474,14 @@ export class VariableTracer extends EventEmitter {
       }
     }
   }
+}
+
+function stripNodePrefix(value) {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  return value.startsWith(kNodeModulePrefix) ?
+    value.slice(kNodeModulePrefix.length) :
+    value;
 }
