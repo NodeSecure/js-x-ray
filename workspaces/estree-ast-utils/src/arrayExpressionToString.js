@@ -1,5 +1,6 @@
-// Import Internal Dependencies
-import { VariableTracer } from "./utils/VariableTracer.js";
+/**
+ * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ */
 
 /**
  * @param {*} node

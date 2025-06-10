@@ -1,6 +1,9 @@
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.js";
-import { VariableTracer } from "./utils/VariableTracer.js";
+
+/**
+ * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ */
 
 /**
  * @param {any} node

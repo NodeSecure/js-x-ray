@@ -11,10 +11,10 @@ import {
 import { getWarningKind } from "./utils/index.js";
 
 // CONSTANTS
-const FIXTURE_URL = new URL("fixtures/obfuscated/", import.meta.url);
+const kFixtureURL = new URL("fixtures/obfuscated/", import.meta.url);
 
 test("should detect 'jsfuck' obfuscation", () => {
-  const trycatch = readFileSync(new URL("jsfuck.js", FIXTURE_URL), "utf-8");
+  const trycatch = readFileSync(new URL("jsfuck.js", kFixtureURL), "utf-8");
   const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
@@ -23,7 +23,7 @@ test("should detect 'jsfuck' obfuscation", () => {
 });
 
 test("should detect 'morse' obfuscation", () => {
-  const trycatch = readFileSync(new URL("morse.js", FIXTURE_URL), "utf-8");
+  const trycatch = readFileSync(new URL("morse.js", kFixtureURL), "utf-8");
   const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 1);
@@ -32,7 +32,7 @@ test("should detect 'morse' obfuscation", () => {
 });
 
 test("should not detect 'morse' obfuscation", () => {
-  const trycatch = readFileSync(new URL("notMorse.js", FIXTURE_URL), "utf-8");
+  const trycatch = readFileSync(new URL("notMorse.js", kFixtureURL), "utf-8");
   const { warnings } = new AstAnalyser().analyse(trycatch);
 
   assert.strictEqual(warnings.length, 0);
@@ -47,7 +47,7 @@ test("should not detect 'morse' obfuscation for high number of doubles morse sym
 
 test("should detect 'jjencode' obfuscation", () => {
   const trycatch = readFileSync(
-    new URL("jjencode.js", FIXTURE_URL),
+    new URL("jjencode.js", kFixtureURL),
     "utf-8"
   );
   const { warnings } = new AstAnalyser().analyse(trycatch);
@@ -59,7 +59,7 @@ test("should detect 'jjencode' obfuscation", () => {
 
 test("should detect 'freejsobfuscator' obfuscation", () => {
   const trycatch = readFileSync(
-    new URL("freejsobfuscator.js", FIXTURE_URL),
+    new URL("freejsobfuscator.js", kFixtureURL),
     "utf-8"
   );
   const { warnings } = new AstAnalyser().analyse(trycatch);
@@ -72,7 +72,7 @@ test("should detect 'freejsobfuscator' obfuscation", () => {
 
 test("should detect 'obfuscator.io' obfuscation (with hexadecimal generator)", () => {
   const trycatch = readFileSync(
-    new URL("obfuscatorio-hexa.js", FIXTURE_URL),
+    new URL("obfuscatorio-hexa.js", kFixtureURL),
     "utf-8"
   );
   const { warnings } = new AstAnalyser().analyse(trycatch);
@@ -104,7 +104,7 @@ test("should detect 'trojan-source' when there is one unsafe unicode control cha
 
 test("should detect 'trojan-source' when there is atleast one unsafe unicode control char", () => {
   const { warnings } = new AstAnalyser().analyseFileSync(
-    fileURLToPath(new URL("unsafe-unicode-chars.js", FIXTURE_URL))
+    fileURLToPath(new URL("unsafe-unicode-chars.js", kFixtureURL))
   );
 
   assert.strictEqual(warnings.length, 1);

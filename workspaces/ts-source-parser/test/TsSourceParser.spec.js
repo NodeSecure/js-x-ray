@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
-import assert from "assert/strict";
+import assert from "node:assert/strict";
 
 // Import Internal Dependencies
 import { TsSourceParser } from "../src/TsSourceParser.js";

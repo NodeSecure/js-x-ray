@@ -20,9 +20,9 @@ import {
 } from "./utils/index.js";
 
 // CONSTANTS
-const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
+const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
 
-describe("AstAnalyser", (t) => {
+describe("AstAnalyser", () => {
   describe("analyse", () => {
     it("should return all dependencies required at runtime", () => {
       const { dependencies, warnings } = getAnalyser().analyse(`
@@ -46,7 +46,7 @@ describe("AstAnalyser", (t) => {
 
     it("should throw a 'suspicious-literal' warning when given a code with a suspicious string", () => {
       const suspectString = readFileSync(
-        new URL("suspect-string.js", FIXTURE_URL),
+        new URL("suspect-string.js", kFixtureURL),
         "utf-8"
       );
       const { warnings, stringScore } = getAnalyser().analyse(suspectString);
@@ -60,7 +60,7 @@ describe("AstAnalyser", (t) => {
 
     it("should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", () => {
       const suspectString = readFileSync(
-        new URL("suspiciousFile.js", FIXTURE_URL),
+        new URL("suspiciousFile.js", kFixtureURL),
         "utf-8"
       );
       const { warnings } = getAnalyser().analyse(suspectString);
@@ -276,7 +276,7 @@ describe("AstAnalyser", (t) => {
   describe("analyseFile", () => {
     it("remove the packageName from the dependencies list", async() => {
       const result = await getAnalyser().analyseFile(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -289,7 +289,7 @@ describe("AstAnalyser", (t) => {
 
     it("should fail with a parsing error", async() => {
       const result = await getAnalyser().analyseFile(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -303,13 +303,13 @@ describe("AstAnalyser", (t) => {
     it("should call the method with the expected arguments", async(t) => {
       t.mock.method(AstAnalyser.prototype, "analyseFile");
 
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url,
         { module: false, packageName: "foobar" }
       );
 
-      const url2 = new URL("parsingError.js", FIXTURE_URL);
+      const url2 = new URL("parsingError.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url2,
         { module: true, packageName: "foobar2" }
@@ -329,7 +329,7 @@ describe("AstAnalyser", (t) => {
           customProbes,
           skipDefaultProbes: false
         }
-      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+      ).analyseFile(new URL("customProbe.js", kFixtureURL));
 
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
@@ -344,7 +344,7 @@ describe("AstAnalyser", (t) => {
           customProbes,
           skipDefaultProbes: true
         }
-      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+      ).analyseFile(new URL("customProbe.js", kFixtureURL));
 
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings.length, 1);
@@ -352,7 +352,7 @@ describe("AstAnalyser", (t) => {
 
     describe("hooks", () => {
       const analyser = new AstAnalyser();
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
 
       describe("initialize", () => {
         it("should throw if initialize is not a function", async() => {
@@ -436,7 +436,7 @@ describe("AstAnalyser", (t) => {
   describe("analyseFileSync", () => {
     it("remove the packageName from the dependencies list", () => {
       const result = getAnalyser().analyseFileSync(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -449,7 +449,7 @@ describe("AstAnalyser", (t) => {
 
     it("should fail with a parsing error", () => {
       const result = getAnalyser().analyseFileSync(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -462,7 +462,7 @@ describe("AstAnalyser", (t) => {
 
     it("should include flags property in response", () => {
       const result = getAnalyser().analyseFileSync(
-        new URL("depName.js", FIXTURE_URL)
+        new URL("depName.js", kFixtureURL)
       );
 
       assert.ok(result.ok);
@@ -510,7 +510,7 @@ describe("AstAnalyser", (t) => {
     });
 
     describe("hooks", () => {
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
 
       describe("initialize", () => {
         it("should throw if initialize is not a function", () => {
@@ -592,7 +592,7 @@ describe("AstAnalyser", (t) => {
   });
 
   describe("prepareSource", () => {
-    it("should remove shebang at the start of the file", (t) => {
+    it("should remove shebang at the start of the file", () => {
       const source = "#!/usr/bin/env node\nconst hello = \"world\";";
       const preparedSource = getAnalyser().prepareSource(source);
 
@@ -667,14 +667,14 @@ describe("AstAnalyser", (t) => {
       t.mock.method(FakeSourceParser.prototype, "parse");
 
       await new AstAnalyser().analyseFile(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
       await new AstAnalyser(
         { customParser: new FakeSourceParser() }
       ).analyseFile(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: true, packageName: "foobar2" }
       );
 

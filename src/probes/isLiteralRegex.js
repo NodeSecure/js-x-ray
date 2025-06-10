@@ -1,4 +1,4 @@
-// Require Third-party Dependencies
+// Import Third-party Dependencies
 import { isLiteralRegex } from "@nodesecure/estree-ast-utils";
 import safeRegex from "safe-regex";
 
