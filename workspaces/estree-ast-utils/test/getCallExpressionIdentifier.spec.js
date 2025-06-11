@@ -59,3 +59,14 @@ then it must return null`, () => {
 
   assert.strictEqual(nodeIdentifier, null);
 });
+
+test(`given two CallExpression with a MemberExpression coming first
+  then it must return the full identifier path`, () => {
+  const [astNode] = codeToAst("foo.bar().yo();");
+  const nodeIdentifier = getCallExpressionIdentifier(
+    getExpressionFromStatement(astNode),
+    { resolveCallExpression: true }
+  );
+
+  assert.strictEqual(nodeIdentifier, "foo.bar.yo");
+});

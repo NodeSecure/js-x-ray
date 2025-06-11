@@ -22,9 +22,14 @@ export function getCallExpressionIdentifier(node, options = {}) {
     return node.callee.name;
   }
   if (node.callee.type === "MemberExpression") {
-    return [
+    const memberObject = node.callee.object;
+    const lastId = [
       ...getMemberExpressionIdentifier(node.callee, { tracer })
     ].join(".");
+
+    return resolveCallExpression && memberObject.type === "CallExpression" ?
+      getCallExpressionIdentifier(memberObject) + `.${lastId}` :
+      lastId;
   }
 
   return resolveCallExpression ?
