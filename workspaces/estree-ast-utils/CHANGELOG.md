@@ -1,5 +1,11 @@
 # @nodesecure/estree-ast-utils
 
+## 2.0.0
+
+### Major Changes
+
+- [#342](https://github.com/NodeSecure/js-x-ray/pull/342) [`633f334`](https://github.com/NodeSecure/js-x-ray/commit/633f334e1fbceb3d7eb20a08907c56502b51d6ca) Thanks [@fraxken](https://github.com/fraxken)! - Resolve CallExpression in MemberExpression with getCallExpressionIdentifier helper
+
 ## 1.6.0
 
 ### Minor Changes
