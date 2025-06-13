@@ -1,5 +1,6 @@
 // Import Internal Dependencies
-import * as utils from "./utils/index.js";
+import { toArrayLocation } from "./utils/toArrayLocation.js";
+import { notNullOrUndefined } from "./utils/notNullOrUndefined.js";
 
 export const warnings = Object.freeze({
   "parsing-error": {
@@ -63,16 +64,16 @@ export function generateWarning(kind, options) {
 
   if (kind === "encoded-literal") {
     return Object.assign(
-      { kind, value, location: [utils.toArrayLocation(location)], source },
+      { kind, value, location: [toArrayLocation(location)], source },
       warnings[kind]
     );
   }
 
-  const result = { kind, location: utils.toArrayLocation(location), source };
-  if (utils.notNullOrUndefined(file)) {
+  const result = { kind, location: toArrayLocation(location), source };
+  if (notNullOrUndefined(file)) {
     result.file = file;
   }
-  if (utils.notNullOrUndefined(value)) {
+  if (notNullOrUndefined(value)) {
     result.value = value;
   }
 

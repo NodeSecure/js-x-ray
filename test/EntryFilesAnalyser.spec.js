@@ -7,14 +7,14 @@ import { fileURLToPath } from "node:url";
 // Import Internal Dependencies
 import { EntryFilesAnalyser, AstAnalyser } from "../index.js";
 
-const FIXTURE_URL = new URL("fixtures/entryFiles/", import.meta.url);
-const FIXTURE_URL_PATH = fileURLToPath(FIXTURE_URL);
+const kFixtureURL = new URL("fixtures/entryFiles/", import.meta.url);
+const kFixtureURLPath = fileURLToPath(kFixtureURL);
 
 describe("EntryFilesAnalyser", () => {
   it("should analyze internal dependencies recursively", async(t) => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
-    const entryUrl = new URL("entry.js", FIXTURE_URL);
-    const deepEntryUrl = new URL("deps/deepEntry.js", FIXTURE_URL);
+    const entryUrl = new URL("entry.js", kFixtureURL);
+    const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
 
     t.mock.method(AstAnalyser.prototype, "analyseFile");
 
@@ -28,11 +28,11 @@ describe("EntryFilesAnalyser", () => {
       reports.map((report) => report.file),
       [
         entryUrl,
-        new URL("deps/dep1.js", FIXTURE_URL),
-        new URL("shared.js", FIXTURE_URL),
-        new URL("deps/dep2.js", FIXTURE_URL),
+        new URL("deps/dep1.js", kFixtureURL),
+        new URL("shared.js", kFixtureURL),
+        new URL("deps/dep2.js", kFixtureURL),
         deepEntryUrl,
-        new URL("deps/dep3.js", FIXTURE_URL)
+        new URL("deps/dep3.js", kFixtureURL)
       ].map((url) => fileURLToPath(url))
     );
 
@@ -43,7 +43,7 @@ describe("EntryFilesAnalyser", () => {
 
   it("should analyze ESM export statements recursively", async(t) => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
-    const entryUrl = new URL("export.js", FIXTURE_URL);
+    const entryUrl = new URL("export.js", kFixtureURL);
 
     t.mock.method(AstAnalyser.prototype, "analyseFile");
 
@@ -56,7 +56,7 @@ describe("EntryFilesAnalyser", () => {
       reports.map((report) => report.file),
       [
         entryUrl,
-        new URL("shared.js", FIXTURE_URL)
+        new URL("shared.js", kFixtureURL)
       ].map((url) => fileURLToPath(url))
     );
 
@@ -67,7 +67,7 @@ describe("EntryFilesAnalyser", () => {
 
   it("should detect internal deps that failed to be analyzed", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
-    const entryUrl = new URL("entryWithInvalidDep.js", FIXTURE_URL);
+    const entryUrl = new URL("entryWithInvalidDep.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
     const reports = await fromAsync(generator);
@@ -76,9 +76,9 @@ describe("EntryFilesAnalyser", () => {
       reports.map((report) => report.file),
       [
         entryUrl,
-        new URL("deps/invalidDep.js", FIXTURE_URL),
-        new URL("deps/dep1.js", FIXTURE_URL),
-        new URL("shared.js", FIXTURE_URL)
+        new URL("deps/invalidDep.js", kFixtureURL),
+        new URL("deps/dep1.js", kFixtureURL),
+        new URL("shared.js", kFixtureURL)
       ].map((url) => fileURLToPath(url))
     );
 
@@ -94,7 +94,7 @@ describe("EntryFilesAnalyser", () => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
       loadExtensions: (exts) => [...exts, "jsx"]
     });
-    const entryUrl = new URL("entryWithVariousDepExtensions.js", FIXTURE_URL);
+    const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
     const reports = await fromAsync(generator);
@@ -103,15 +103,15 @@ describe("EntryFilesAnalyser", () => {
       reports.map((report) => report.file),
       [
         entryUrl,
-        new URL("deps/default.js", FIXTURE_URL),
-        new URL("deps/default.cjs", FIXTURE_URL),
-        new URL("deps/dep.cjs", FIXTURE_URL),
-        new URL("deps/default.mjs", FIXTURE_URL),
-        new URL("deps/dep.mjs", FIXTURE_URL),
-        new URL("deps/default.node", FIXTURE_URL),
-        new URL("deps/dep.node", FIXTURE_URL),
-        new URL("deps/default.jsx", FIXTURE_URL),
-        new URL("deps/dep.jsx", FIXTURE_URL)
+        new URL("deps/default.js", kFixtureURL),
+        new URL("deps/default.cjs", kFixtureURL),
+        new URL("deps/dep.cjs", kFixtureURL),
+        new URL("deps/default.mjs", kFixtureURL),
+        new URL("deps/dep.mjs", kFixtureURL),
+        new URL("deps/default.node", kFixtureURL),
+        new URL("deps/dep.node", kFixtureURL),
+        new URL("deps/default.jsx", kFixtureURL),
+        new URL("deps/dep.jsx", kFixtureURL)
       ].map((url) => fileURLToPath(url))
     );
   });
@@ -120,7 +120,7 @@ describe("EntryFilesAnalyser", () => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
       loadExtensions: () => ["jsx"]
     });
-    const entryUrl = new URL("entryWithVariousDepExtensions.js", FIXTURE_URL);
+    const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
     const reports = await fromAsync(generator);
@@ -129,17 +129,17 @@ describe("EntryFilesAnalyser", () => {
       reports.map((report) => report.file),
       [
         entryUrl,
-        new URL("deps/default.jsx", FIXTURE_URL),
-        new URL("deps/dep.jsx", FIXTURE_URL)
+        new URL("deps/default.jsx", kFixtureURL),
+        new URL("deps/dep.jsx", kFixtureURL)
       ].map((url) => fileURLToPath(url))
     );
   });
 
   it("should detect recursive dependencies using DiGraph (with rootPath)", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
-      rootPath: FIXTURE_URL
+      rootPath: kFixtureURL
     });
-    const entryUrl = new URL("recursive/A.js", FIXTURE_URL);
+    const entryUrl = new URL("recursive/A.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse(
       [entryUrl]
@@ -167,7 +167,7 @@ describe("EntryFilesAnalyser", () => {
 
   it("should detect recursive dependencies using DiGraph but without rootPath everything is absolute", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
-    const entryUrl = new URL("recursive/A.js", FIXTURE_URL);
+    const entryUrl = new URL("recursive/A.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse(
       [entryUrl]
@@ -177,8 +177,8 @@ describe("EntryFilesAnalyser", () => {
     for (const [from, to] of [...entryFilesAnalyser.dependencies.findCycles()]) {
       assert.ok(path.isAbsolute(from));
       assert.ok(path.isAbsolute(to));
-      assert.ok(from.startsWith(FIXTURE_URL_PATH));
-      assert.ok(to.startsWith(FIXTURE_URL_PATH));
+      assert.ok(from.startsWith(kFixtureURLPath));
+      assert.ok(to.startsWith(kFixtureURLPath));
     }
   });
 });
@@ -186,10 +186,10 @@ describe("EntryFilesAnalyser", () => {
 it("should ignore file that does not exist when option ignoreENOENT is provided", async() => {
   const entryFilesAnalyser = new EntryFilesAnalyser({
     ignoreENOENT: true,
-    rootPath: FIXTURE_URL
+    rootPath: kFixtureURL
   });
 
-  const entryUrl = new URL("does-not-exists.js", FIXTURE_URL);
+  const entryUrl = new URL("does-not-exists.js", kFixtureURL);
 
   const generator = entryFilesAnalyser.analyse(
     [entryUrl]

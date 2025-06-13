@@ -73,7 +73,7 @@ interface RuntimeOptions {
   finalize?: (sourceFile: SourceFile) => void;
 }
 
-type SourceFlags = "fetch";
+type SourceFlags = "fetch" | "oneline-require" | "is-minified";
 
 interface Report {
   dependencies: Map<string, Dependency>;
@@ -81,7 +81,6 @@ interface Report {
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
-  isOneLineRequire: boolean;
 }
 
 type ReportOnFile = {
@@ -89,7 +88,6 @@ type ReportOnFile = {
   warnings: Warning[];
   flags: Set<SourceFlags>;
   dependencies: Map<string, Dependency>;
-  isMinified: boolean;
 } | {
   ok: false,
   warnings: Warning[];
@@ -101,6 +99,8 @@ A given SourceFile can have multiple unique flags:
 | name | description |
 | --- | --- |
 | fetch | the source file include at least one [native fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch) CallExpression |
+| oneline-require | the source file is a one-line require expression (like `module.exports = require('foo')`) |
+| is-minified | the source file is detected as minified |
 
 ### Hooks
 

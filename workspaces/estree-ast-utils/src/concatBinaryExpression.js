@@ -1,6 +1,9 @@
 // Import Internal Dependencies
 import { arrayExpressionToString } from "./arrayExpressionToString.js";
-import { VariableTracer } from "./utils/VariableTracer.js";
+
+/**
+ * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ */
 
 // CONSTANTS
 const kBinaryExprTypes = new Set([

@@ -1,11 +1,14 @@
 /* eslint-disable consistent-return */
 
+// Import Third-party Dependencies
 import {
   concatBinaryExpression,
   arrayExpressionToString,
   getCallExpressionIdentifier,
   getCallExpressionArguments
 } from "@nodesecure/estree-ast-utils";
+
+// Import Internal Dependencies
 import { ProbeSignals } from "../../ProbeRunner.js";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.js";
 

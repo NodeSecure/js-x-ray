@@ -1,9 +1,19 @@
 {
   "name": "@nodesecure/js-x-ray",
-  "version": "8.1.1",
+  "version": "9.0.0",
   "description": "JavaScript AST XRay analysis",
   "type": "module",
-  "exports": "./index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./warnings": {
+      "import": "./src/warnings.js",
+      "types": "./types/warnings.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "engines": {
     "node": ">=20.0.0"
   },
@@ -11,7 +21,9 @@
     "lint": "eslint src workspaces test",
     "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
     "test": "c8 --all --src ./src -r html npm run test-only",
-    "check": "npm run lint && npm run test-only"
+    "check": "npm run lint && npm run test-only",
+    "ci:publish": "changeset publish",
+    "ci:version": "changeset version"
   },
   "repository": {
     "type": "git",
@@ -54,6 +66,8 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.4",
     "@openally/config.eslint": "^2.0.0",
     "@types/node": "^22.0.0",
     "c8": "^10.1.2",

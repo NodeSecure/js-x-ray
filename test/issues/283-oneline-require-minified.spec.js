@@ -7,13 +7,13 @@ import { AstAnalyser } from "../../index.js";
 
 // Regression test for https://github.com/NodeSecure/js-x-ray/issues/283
 test("Given a one line require (with no module.exports) then isOneLineRequire must equal true", () => {
-  const { isOneLineRequire } = new AstAnalyser().analyse(`require('foo.js');`);
+  const { flags } = new AstAnalyser().analyse("require('foo.js');");
 
-  assert.ok(isOneLineRequire);
+  assert.ok(flags.has("oneline-require"));
 });
 
 test("Given an empty code then isOneLineRequire must equal false", () => {
-  const { isOneLineRequire } = new AstAnalyser().analyse(``);
+  const { flags } = new AstAnalyser().analyse("");
 
-  assert.strictEqual(isOneLineRequire, false);
+  assert.strictEqual(flags.has("oneline-require"), false);
 });

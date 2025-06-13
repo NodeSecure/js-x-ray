@@ -6,7 +6,7 @@ import assert from "node:assert";
 import { AstAnalyser } from "../../index.js";
 
 test("it should detect native fetch", () => {
-  const code = `await fetch(url);`;
+  const code = "await fetch(url);";
   const { flags } = new AstAnalyser().analyse(code);
 
   assert.ok(flags.has("fetch"));

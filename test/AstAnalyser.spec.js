@@ -2,7 +2,9 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../index.js";
@@ -18,9 +20,9 @@ import {
 } from "./utils/index.js";
 
 // CONSTANTS
-const FIXTURE_URL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
+const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
 
-describe("AstAnalyser", (t) => {
+describe("AstAnalyser", () => {
   describe("analyse", () => {
     it("should return all dependencies required at runtime", () => {
       const { dependencies, warnings } = getAnalyser().analyse(`
@@ -44,7 +46,7 @@ describe("AstAnalyser", (t) => {
 
     it("should throw a 'suspicious-literal' warning when given a code with a suspicious string", () => {
       const suspectString = readFileSync(
-        new URL("suspect-string.js", FIXTURE_URL),
+        new URL("suspect-string.js", kFixtureURL),
         "utf-8"
       );
       const { warnings, stringScore } = getAnalyser().analyse(suspectString);
@@ -58,7 +60,7 @@ describe("AstAnalyser", (t) => {
 
     it("should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", () => {
       const suspectString = readFileSync(
-        new URL("suspiciousFile.js", FIXTURE_URL),
+        new URL("suspiciousFile.js", kFixtureURL),
         "utf-8"
       );
       const { warnings } = getAnalyser().analyse(suspectString);
@@ -133,11 +135,11 @@ describe("AstAnalyser", (t) => {
     });
 
     it("should return isOneLineRequire true given a single line CJS export", () => {
-      const { dependencies, isOneLineRequire } = getAnalyser().analyse(
+      const { dependencies, flags } = getAnalyser().analyse(
         "module.exports = require('foo');"
       );
 
-      assert.ok(isOneLineRequire);
+      assert.ok(flags.has("oneline-require"));
       assert.deepEqual([...dependencies.keys()], ["foo"]);
     });
 
@@ -274,7 +276,7 @@ describe("AstAnalyser", (t) => {
   describe("analyseFile", () => {
     it("remove the packageName from the dependencies list", async() => {
       const result = await getAnalyser().analyseFile(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -287,7 +289,7 @@ describe("AstAnalyser", (t) => {
 
     it("should fail with a parsing error", async() => {
       const result = await getAnalyser().analyseFile(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -301,13 +303,13 @@ describe("AstAnalyser", (t) => {
     it("should call the method with the expected arguments", async(t) => {
       t.mock.method(AstAnalyser.prototype, "analyseFile");
 
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url,
         { module: false, packageName: "foobar" }
       );
 
-      const url2 = new URL("parsingError.js", FIXTURE_URL);
+      const url2 = new URL("parsingError.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url2,
         { module: true, packageName: "foobar2" }
@@ -327,7 +329,7 @@ describe("AstAnalyser", (t) => {
           customProbes,
           skipDefaultProbes: false
         }
-      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+      ).analyseFile(new URL("customProbe.js", kFixtureURL));
 
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings[1].kind, kWarningUnsafeImport);
@@ -342,7 +344,7 @@ describe("AstAnalyser", (t) => {
           customProbes,
           skipDefaultProbes: true
         }
-      ).analyseFile(new URL("customProbe.js", FIXTURE_URL));
+      ).analyseFile(new URL("customProbe.js", kFixtureURL));
 
       assert.equal(result.warnings[0].kind, kWarningUnsafeDanger);
       assert.equal(result.warnings.length, 1);
@@ -350,7 +352,7 @@ describe("AstAnalyser", (t) => {
 
     describe("hooks", () => {
       const analyser = new AstAnalyser();
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
 
       describe("initialize", () => {
         it("should throw if initialize is not a function", async() => {
@@ -434,7 +436,7 @@ describe("AstAnalyser", (t) => {
   describe("analyseFileSync", () => {
     it("remove the packageName from the dependencies list", () => {
       const result = getAnalyser().analyseFileSync(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -447,7 +449,7 @@ describe("AstAnalyser", (t) => {
 
     it("should fail with a parsing error", () => {
       const result = getAnalyser().analyseFileSync(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
@@ -458,8 +460,57 @@ describe("AstAnalyser", (t) => {
       assert.strictEqual(parsingError.kind, "parsing-error");
     });
 
+    it("should include flags property in response", () => {
+      const result = getAnalyser().analyseFileSync(
+        new URL("depName.js", kFixtureURL)
+      );
+
+      assert.ok(result.ok);
+      assert.ok(result.flags instanceof Set);
+    });
+
+    it("should add is-minified flag for minified files", (t) => {
+      t.plan(3);
+      const minifiedContent = "var a=require(\"fs\"),b=require(\"http\");" +
+        "a.readFile(\"test.txt\",function(c,d){b.createServer().listen(3000)});";
+      const tempMinFile = path.join(os.tmpdir(), "temp-test.min.js");
+
+      writeFileSync(tempMinFile, minifiedContent);
+
+      try {
+        const result = getAnalyser().analyseFileSync(tempMinFile);
+
+        t.assert.ok(result.ok);
+        t.assert.ok(result.flags.has("is-minified"));
+        t.assert.strictEqual(result.flags.has("oneline-require"), false);
+      }
+      finally {
+        unlinkSync(tempMinFile);
+      }
+    });
+
+    it("should add oneline-require flag for one-line exports", (t) => {
+      t.plan(4);
+      const oneLineContent = "module.exports = require('foo');";
+      const tempOneLineFile = path.join(os.tmpdir(), "temp-oneline.js");
+
+      writeFileSync(tempOneLineFile, oneLineContent);
+
+      try {
+        const result = getAnalyser().analyseFileSync(tempOneLineFile);
+
+        t.assert.ok(result.ok);
+        t.assert.ok(result.flags.has("oneline-require"));
+        t.assert.strictEqual(result.flags.has("is-minified"), false);
+        t.assert.deepEqual([...result.dependencies.keys()], ["foo"]);
+      }
+      finally {
+        unlinkSync(tempOneLineFile);
+      }
+    });
+
     describe("hooks", () => {
-      const url = new URL("depName.js", FIXTURE_URL);
+      const url = new URL("depName.js", kFixtureURL);
 
       describe("initialize", () => {
         it("should throw if initialize is not a function", () => {
@@ -541,7 +592,7 @@ describe("AstAnalyser", (t) => {
   });
 
   describe("prepareSource", () => {
-    it("should remove shebang at the start of the file", (t) => {
+    it("should remove shebang at the start of the file", () => {
       const source = "#!/usr/bin/env node\nconst hello = \"world\";";
       const preparedSource = getAnalyser().prepareSource(source);
 
@@ -616,14 +667,14 @@ describe("AstAnalyser", (t) => {
       t.mock.method(FakeSourceParser.prototype, "parse");
 
       await new AstAnalyser().analyseFile(
-        new URL("depName.js", FIXTURE_URL),
+        new URL("depName.js", kFixtureURL),
         { module: false, packageName: "foobar" }
       );
 
       await new AstAnalyser(
         { customParser: new FakeSourceParser() }
       ).analyseFile(
-        new URL("parsingError.js", FIXTURE_URL),
+        new URL("parsingError.js", kFixtureURL),
         { module: true, packageName: "foobar2" }
       );
 

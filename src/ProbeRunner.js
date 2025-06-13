@@ -1,7 +1,7 @@
-// Import Native Dependencies
+// Import Node.js Dependencies
 import assert from "node:assert";
 
-// Import all the probes
+// Import Internal Dependencies
 import isUnsafeCallee from "./probes/isUnsafeCallee.js";
 import isLiteral from "./probes/isLiteral.js";
 import isLiteralRegex from "./probes/isLiteralRegex.js";
@@ -15,8 +15,9 @@ import isESMExport from "./probes/isESMExport.js";
 import isFetch from "./probes/isFetch.js";
 import isUnsafeSpawn from "./probes/isUnsafeSpawn.js"
 
-// Import Internal Dependencies
-import { SourceFile } from "./SourceFile.js";
+/**
+ * @typedef {import('./SourceFile.js').SourceFile} SourceFile
+ */
 
 /**
  * @typedef {Object} Probe

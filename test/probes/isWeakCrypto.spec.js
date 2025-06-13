@@ -7,10 +7,10 @@ import assert from "node:assert";
 import { AstAnalyser } from "../../index.js";
 
 // Constants
-const FIXTURE_URL = new URL("fixtures/weakCrypto/", import.meta.url);
+const kFixtureURL = new URL("fixtures/weakCrypto/", import.meta.url);
 
 test("it should report a warning in case of `createHash(<weak-algo>)` usage", async() => {
-  const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
+  const fixturesDir = new URL("directCallExpression/", kFixtureURL);
   const fixtureFiles = await fs.readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {
@@ -25,7 +25,7 @@ test("it should report a warning in case of `createHash(<weak-algo>)` usage", as
 });
 
 test("it should report a warning in case of `[expression]createHash(<weak-algo>)` usage", async() => {
-  const fixturesDir = new URL("memberExpression/", FIXTURE_URL);
+  const fixturesDir = new URL("memberExpression/", kFixtureURL);
   const fixtureFiles = await fs.readdir(fixturesDir);
 
   for (const fixtureFile of fixtureFiles) {

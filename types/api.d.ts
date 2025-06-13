@@ -30,7 +30,9 @@ export {
 }
 
 type SourceFlags =
-  | "fetch";
+  | "fetch"
+  | "oneline-require"
+  | "is-minified";
 
 interface SourceLocation {
   start: {
@@ -96,7 +98,6 @@ interface Report {
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
-  isOneLineRequire: boolean;
 }
 
 type ReportOnFile = {
@@ -104,7 +105,6 @@ type ReportOnFile = {
   warnings: Warning[];
   dependencies: Map<string, Dependency>;
   flags: Set<SourceFlags>;
-  isMinified: boolean;
 } | {
   ok: false,
   warnings: Warning[];

@@ -1,3 +1,4 @@
+// Import Third-party Dependencies
 import { ESLintConfig } from "@openally/config.eslint";
 
 export default [
