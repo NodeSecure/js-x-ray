@@ -1,11 +1,10 @@
 // Import Internal Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import { ProbeSignals } from "../ProbeRunner.js";
 
-const kUnsafeCommands = ["csrutil"]
+const kUnsafeCommands = ["csrutil"];
 
 function isUnsafeCommand(command) {
-  return !!kUnsafeCommands.find(unsafeCommand => command.includes(unsafeCommand));
+  return Boolean(kUnsafeCommands.find((unsafeCommand) => command.includes(unsafeCommand)));
 }
 
 /**
@@ -16,7 +15,7 @@ function isUnsafeCommand(command) {
  * const { spawn } = require("child_process");
  * spawn("csrutil", ["status"]);
  */
-function validateNode(node, { tracer }) {
+function validateNode(node) {
   if (node.type !== "CallExpression" || node.arguments.length === 0) {
     return [false];
   }
@@ -24,9 +23,9 @@ function validateNode(node, { tracer }) {
   //  const { spawn } = require("child_process");
   //  spawn("csrutil", ["status"]);
   if (node.type === "CallExpression" &&
-      node.callee.type === "Identifier" &&
-      node.callee.name === "spawn") {
-    return [true]
+    node.callee.type === "Identifier" &&
+    node.callee.name === "spawn") {
+    return [true];
   }
 
   // child_process.spawn(...) or require("child_process").spawn(...)
@@ -69,6 +68,7 @@ function main(node, options) {
   const command = commandArg.value;
   if (typeof command === "string" && isUnsafeCommand(command)) {
     sourceFile.addWarning("unsafe-spawn", command, node.loc);
+
     return ProbeSignals.Skip;
   }
 

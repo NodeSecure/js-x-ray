@@ -13,7 +13,7 @@ import isBinaryExpression from "./probes/isBinaryExpression.js";
 import isArrayExpression from "./probes/isArrayExpression.js";
 import isESMExport from "./probes/isESMExport.js";
 import isFetch from "./probes/isFetch.js";
-import isUnsafeSpawn from "./probes/isUnsafeSpawn.js"
+import isUnsafeSpawn from "./probes/isUnsafeSpawn.js";
 
 /**
  * @typedef {import('./SourceFile.js').SourceFile} SourceFile
