@@ -28,11 +28,13 @@ describe("TsSourceParser", () => {
     });
 
     it("should not crash parsing JSX by default", () => {
-      const source = `const Dropzone = forwardRef(({ children, ...params }, ref) => {
+      const source = `
+        const Dropzone = forwardRef(({ children, ...params }, ref) => {
             const { open, ...props } = useDropzone(params);
             useImperativeHandle(ref, () => ({ open }), [open]);
             return <Fragment>{children({ ...props, open })}</Fragment>;
-        });`;
+        });
+      `;
 
       assert.doesNotThrow(() => {
         parser.parse(source);
@@ -40,11 +42,13 @@ describe("TsSourceParser", () => {
     });
 
     it("should crash parsing JSX if jsx: false", () => {
-      const source = `const Dropzone = forwardRef(({ children, ...params }, ref) => {
+      const source = `
+        const Dropzone = forwardRef(({ children, ...params }, ref) => {
             const { open, ...props } = useDropzone(params);
             useImperativeHandle(ref, () => ({ open }), [open]);
             return <Fragment>{children({ ...props, open })}</Fragment>;
-        });`;
+        });
+      `;
 
       assert.throws(() => {
         parser.parse(source, { jsx: false });
