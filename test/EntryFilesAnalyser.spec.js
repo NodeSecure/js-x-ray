@@ -181,23 +181,43 @@ describe("EntryFilesAnalyser", () => {
       assert.ok(to.startsWith(kFixtureURLPath));
     }
   });
-});
 
-it("should ignore file that does not exist when option ignoreENOENT is provided", async() => {
-  const entryFilesAnalyser = new EntryFilesAnalyser({
-    ignoreENOENT: true,
-    rootPath: kFixtureURL
+  it("should automatically build absolute path for entryFiles when rootPath is provided", async() => {
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: kFixtureURL
+    });
+
+    const generator = entryFilesAnalyser.analyse(
+      ["recursive/A.js"]
+    );
+    const reports = await fromAsync(generator);
+
+    const files = reports.map((report) => path.normalize(report.file));
+    assert.deepEqual(
+      files,
+      [
+        "recursive/A.js",
+        "recursive/B.js"
+      ].map((file) => path.normalize(file))
+    );
   });
 
-  const entryUrl = new URL("does-not-exists.js", kFixtureURL);
+  it("should ignore file that does not exist when option ignoreENOENT is provided", async() => {
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      ignoreENOENT: true,
+      rootPath: kFixtureURL
+    });
 
-  const generator = entryFilesAnalyser.analyse(
-    [entryUrl]
-  );
+    const entryUrl = new URL("does-not-exists.js", kFixtureURL);
 
-  const reports = await fromAsync(generator);
-  assert.strictEqual(reports.length, 0);
-  assert.strictEqual(entryFilesAnalyser.dependencies.hasVertex("does-not-exists.js"), false);
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl]
+    );
+
+    const reports = await fromAsync(generator);
+    assert.strictEqual(reports.length, 0);
+    assert.strictEqual(entryFilesAnalyser.dependencies.hasVertex("does-not-exists.js"), false);
+  });
 });
 
 // TODO: replace with Array.fromAsync when droping Node.js 20
