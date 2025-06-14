@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { createTracer } from "../utils.js";
+import { createTracer } from "./utils.js";
 
 test("it should be able to Trace crypto.createHash when imported with an ESTree ImportNamespaceSpecifier (ESM)", () => {
   const helpers = createTracer();

@@ -148,6 +148,7 @@ Click on one of the links to access the documentation of the workspace:
 | name | package and link |
 | --- | --- |
 | estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
+| tracer | [@nodesecure/tracer](./workspaces/tracer) |
 | sec-literal | [@nodesecure/sec-literal ](./workspaces/sec-literal) |
 | ts-source-parser | [@nodesecure/ts-source-parser ](./workspaces/ts-source-parser) |
 

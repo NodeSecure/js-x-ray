@@ -32,7 +32,8 @@
   "workspaces": [
     "workspaces/estree-ast-utils",
     "workspaces/sec-literal",
-    "workspaces/ts-source-parser"
+    "workspaces/ts-source-parser",
+    "workspaces/tracer"
   ],
   "keywords": [
     "ast",
@@ -57,6 +58,7 @@
   "dependencies": {
     "@nodesecure/estree-ast-utils": "^1.5.0",
     "@nodesecure/sec-literal": "^1.2.0",
+    "@nodesecure/tracer": "^1.0.0",
     "digraph-js": "^2.2.3",
     "estree-walker": "^3.0.1",
     "frequency-set": "^1.0.2",

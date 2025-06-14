@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { createTracer } from "../utils.js";
+import { createTracer } from "./utils.js";
 
 test("getDataFromIdentifier must return primitive null is there is no kwown traced identifier", () => {
   const helpers = createTracer(true);

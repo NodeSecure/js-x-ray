@@ -3,9 +3,9 @@ import * as meriyah from "meriyah";
 import { walk } from "estree-walker";
 
 // Import Internal Dependencies
-import { VariableTracer } from "@nodesecure/tracer";
+import { VariableTracer } from "../src/index.js";
 
-export function codeToAst(code) {
+function codeToAst(code) {
   const estreeRootNode = meriyah.parseScript(code, {
     next: true,
     loc: true,
@@ -15,10 +15,6 @@ export function codeToAst(code) {
   });
 
   return estreeRootNode.body;
-}
-
-export function getExpressionFromStatement(node) {
-  return node.type === "ExpressionStatement" ? node.expression : null;
 }
 
 export function createTracer(enableDefaultTracing = false) {
