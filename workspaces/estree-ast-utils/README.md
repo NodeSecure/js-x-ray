@@ -19,17 +19,6 @@ $ npm i @nodesecure/estree-ast-utils
 $ yarn add @nodesecure/estree-ast-utils
 ```
 
-## Usage example
-
-```js
-import { VariableTracer } from "@nodesecure/estree-ast-utils";
-
-const tracer = new VariableTracer().enableDefaultTracing();
-
-const data = tracer.getDataFromIdentifier("identifier...here");
-console.log(data);
-```
-
 ## API
 
 <details><summary>arrayExpressionToString(node): IterableIterator< string ></summary>

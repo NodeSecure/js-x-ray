@@ -29,9 +29,6 @@
     "url": "https://github.com/NodeSecure/js-x-ray/issues"
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/estree-ast-utils#readme",
-  "devDependencies": {
-    "estree-walker": "^3.0.2"
-  },
   "dependencies": {
     "@nodesecure/sec-literal": "^1.1.0"
   }

@@ -1,0 +1,30 @@
+{
+  "name": "@nodesecure/tracer",
+  "version": "1.0.0",
+  "description": "JS-X-Ray variables and assignments tracer",
+  "exports": "./src/index.js",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src",
+    "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
+    "test": "npm run lint && npm run test-only"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NodeSecure/js-x-ray.git"
+  },
+  "keywords": [],
+  "files": [
+    "src"
+  ],
+  "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/NodeSecure/js-x-ray/issues"
+  },
+  "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/tracer#readme",
+  "dependencies": {
+    "@nodesecure/estree-ast-utils": "^2.0.0"
+  }
+}

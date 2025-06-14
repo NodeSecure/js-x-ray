@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ * @typedef {import('@nodesecure/tracer').VariableTracer} VariableTracer
  */
 
 /**
