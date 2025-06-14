@@ -41,11 +41,12 @@ export class EntryFilesAnalyser {
     this.dependencies = new DiGraph();
 
     for (const entryFile of new Set(entryFiles)) {
-      const normalizedEntryFile = path.normalize(
-        fileURLToPathExtended(entryFile)
-      );
+      const normalizedEntryFile = this.#normalizeAndCleanEntryFile(entryFile);
 
-      if (this.ignoreENOENT && !await this.#fileExists(normalizedEntryFile)) {
+      if (
+        this.ignoreENOENT &&
+        !await this.#fileExists(normalizedEntryFile)
+      ) {
         return;
       }
 
@@ -57,8 +58,21 @@ export class EntryFilesAnalyser {
     }
   }
 
+  #normalizeAndCleanEntryFile(file) {
+    let normalizedEntryFile = path.normalize(
+      fileURLToPathExtended(file)
+    );
+    if (this.#rootPath !== null && !path.isAbsolute(normalizedEntryFile)) {
+      normalizedEntryFile = path.join(this.#rootPath, normalizedEntryFile);
+    }
+
+    return normalizedEntryFile;
+  }
+
   #getRelativeFilePath(file) {
-    return this.#rootPath ? path.relative(this.#rootPath, file) : file;
+    return this.#rootPath ?
+      path.relative(this.#rootPath, file) :
+      file;
   }
 
   async* #analyseFile(
