@@ -4,10 +4,10 @@ import assert from "node:assert";
 
 // Import Internal Dependencies
 import { parseScript, getSastAnalysis } from "../utils/index.js";
-import isUnsafeSpawn from "../../src/probes/isUnsafeSpawn.js";
+import isUnsafeCommand from "../../src/probes/isUnsafeCommand.js";
 
 // CONSTANTS
-const kWarningUnsafeSpawn = "unsafe-spawn";
+const kWarningUnsafeCommand = "unsafe-command";
 
 test("should detect csrutil spawn command", () => {
   const str = `
@@ -16,11 +16,11 @@ test("should detect csrutil spawn command", () => {
   `;
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
     .execute(ast.body);
 
-  const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
-  assert.equal(result.kind, kWarningUnsafeSpawn);
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
   assert.equal(result.value, "csrutil");
 });
 
@@ -32,11 +32,11 @@ test.skip("should detect hidden csrutil spawn command", () => {
   `;
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
     .execute(ast.body);
 
-  const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
-  assert.equal(result.kind, kWarningUnsafeSpawn);
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
   assert.equal(result.value, "csrutil");
 });
 
@@ -46,11 +46,11 @@ test("should detect csrutil spawn command with require", () => {
   `;
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
     .execute(ast.body);
 
-  const result = sastAnalysis.getWarning(kWarningUnsafeSpawn);
-  assert.equal(result.kind, kWarningUnsafeSpawn);
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
   assert.equal(result.value, "csrutil");
 });
 
@@ -61,7 +61,7 @@ test("should not detect non-csrutil spawn command", () => {
   `;
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeSpawn)
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
     .execute(ast.body);
 
   assert.equal(sastAnalysis.warnings().length, 0);

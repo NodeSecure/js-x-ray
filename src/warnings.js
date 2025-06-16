@@ -52,8 +52,8 @@ export const warnings = Object.freeze({
     severity: "Warning",
     experimental: false
   },
-  "unsafe-spawn": {
-    i18n: "sast_warnings.unsafe-spawn",
+  "unsafe-command": {
+    i18n: "sast_warnings.unsafe-command",
     severity: "Warning",
     experimental: true
   }

@@ -8,33 +8,41 @@ function isUnsafeCommand(command) {
 }
 
 /**
- * @description Detect spawn commands containing csrutil
+ * @description Detect spawn or exec unsafe commands
  * @example
  * child_process.spawn("csrutil", ["status"]);
+ *
  * require("child_process").spawn("csrutil", ["disable"]);
- * const { spawn } = require("child_process");
- * spawn("csrutil", ["status"]);
+ *
+ * const { exec } = require("child_process");
+ * exec("csrutil status");
  */
 function validateNode(node) {
   if (node.type !== "CallExpression" || node.arguments.length === 0) {
     return [false];
   }
 
-  //  const { spawn } = require("child_process");
-  //  spawn("csrutil", ["status"]);
+  // const { spawn } = require("child_process");
+  // spawn("...", ["..."]);
+  // or
+  // const { exec } = require("child_process");
+  // exec(...);
   if (node.type === "CallExpression" &&
     node.callee.type === "Identifier" &&
-    node.callee.name === "spawn") {
+    (node.callee.name === "spawn" || node.callee.name === "exec")
+  ) {
     return [true];
   }
 
   // child_process.spawn(...) or require("child_process").spawn(...)
+  // child_process.exec(...) or require("child_process").exec(...)
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
-    node.callee.property.name === "spawn"
+    (node.callee.property.name === "spawn" || node.callee.property.name == "exec")
   ) {
     // child_process.spawn(...)
+    // child_process.exec(...)
     if (
       node.callee.object.type === "Identifier" &&
       node.callee.object.name === "child_process"
@@ -42,6 +50,7 @@ function validateNode(node) {
       return [true];
     }
     // require("child_process").spawn(...)
+    // require("child_process").exec(...)
     if (
       node.callee.object.type === "CallExpression" &&
       node.callee.object.callee.type === "Identifier" &&
@@ -67,7 +76,7 @@ function main(node, options) {
 
   const command = commandArg.value;
   if (typeof command === "string" && isUnsafeCommand(command)) {
-    sourceFile.addWarning("unsafe-spawn", command, node.loc);
+    sourceFile.addWarning("unsafe-command", command, node.loc);
 
     return ProbeSignals.Skip;
   }
@@ -76,7 +85,7 @@ function main(node, options) {
 }
 
 export default {
-  name: "isUnsafeSpwan",
+  name: "isUnsafeCommand",
   validateNode,
   main
 };
