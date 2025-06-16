@@ -1,6 +1,7 @@
 // Import Internal Dependencies
 import { ProbeSignals } from "../ProbeRunner.js";
 
+// CONSTANTS
 const kUnsafeCommands = ["csrutil"];
 
 function isUnsafeCommand(command) {
