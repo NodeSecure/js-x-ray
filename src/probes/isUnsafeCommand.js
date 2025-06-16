@@ -39,7 +39,7 @@ function validateNode(node) {
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
-    (node.callee.property.name === "spawn" || node.callee.property.name == "exec")
+    (node.callee.property.name === "spawn" || node.callee.property.name === "exec")
   ) {
     // child_process.spawn(...)
     // child_process.exec(...)
