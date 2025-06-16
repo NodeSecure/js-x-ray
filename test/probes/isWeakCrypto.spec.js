@@ -1,7 +1,7 @@
 // Import Node.js Dependencies
 import { readFileSync, promises as fs } from "node:fs";
 import { test } from "node:test";
-import assert from "node:assert";
+import assert from "node:assert/strict";
 
 // Import Internal Dependencies
 import { AstAnalyser } from "../../index.js";
