@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/estree-ast-utils",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "Utilities for AST (ESTree compliant)",
   "type": "module",
   "exports": "./src/index.js",
@@ -29,9 +29,6 @@
     "url": "https://github.com/NodeSecure/js-x-ray/issues"
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/estree-ast-utils#readme",
-  "devDependencies": {
-    "estree-walker": "^3.0.2"
-  },
   "dependencies": {
     "@nodesecure/sec-literal": "^1.1.0"
   }

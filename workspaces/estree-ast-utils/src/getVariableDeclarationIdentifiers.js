@@ -1,6 +1,3 @@
-// Import Internal Dependencies
-import { notNullOrUndefined } from "./utils/index.js";
-
 export function* getVariableDeclarationIdentifiers(node, options = {}) {
   const { prefix = null } = options;
 
@@ -107,4 +104,8 @@ export function* getVariableDeclarationIdentifiers(node, options = {}) {
 
 function autoPrefix(name, prefix = null) {
   return typeof prefix === "string" ? `${prefix}.${name}` : name;
+}
+
+function notNullOrUndefined(value) {
+  return value !== null && value !== void 0;
 }

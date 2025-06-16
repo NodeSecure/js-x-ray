@@ -1,15 +1,22 @@
 // Import Node.js Dependencies
 import { EventEmitter } from "node:events";
 
+// Import Third-party Dependencies
+import {
+  getMemberExpressionIdentifier,
+  getCallExpressionIdentifier,
+  getCallExpressionArguments,
+  getVariableDeclarationIdentifiers,
+  extractLogicalExpression
+} from "@nodesecure/estree-ast-utils";
+
 // Import Internal Dependencies
-import { notNullOrUndefined } from "./notNullOrUndefined.js";
-import { isEvilIdentifierPath, isNeutralCallable } from "./isEvilIdentifierPath.js";
-import { getSubMemberExpressionSegments } from "./getSubMemberExpressionSegments.js";
-import { getMemberExpressionIdentifier } from "../getMemberExpressionIdentifier.js";
-import { getCallExpressionIdentifier } from "../getCallExpressionIdentifier.js";
-import { getVariableDeclarationIdentifiers } from "../getVariableDeclarationIdentifiers.js";
-import { getCallExpressionArguments } from "../getCallExpressionArguments.js";
-import { extractLogicalExpression } from "../extractLogicalExpression.js";
+import {
+  notNullOrUndefined,
+  isEvilIdentifierPath,
+  isNeutralCallable,
+  getSubMemberExpressionSegments
+} from "./utils/index.js";
 
 // CONSTANTS
 const kGlobalIdentifiersToTrace = new Set([

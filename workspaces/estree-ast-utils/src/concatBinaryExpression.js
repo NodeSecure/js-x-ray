@@ -2,7 +2,7 @@
 import { arrayExpressionToString } from "./arrayExpressionToString.js";
 
 /**
- * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
+ * @typedef {import('@nodesecure/tracer').VariableTracer} VariableTracer
  */
 
 // CONSTANTS

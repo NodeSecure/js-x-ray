@@ -32,7 +32,8 @@
   "workspaces": [
     "workspaces/estree-ast-utils",
     "workspaces/sec-literal",
-    "workspaces/ts-source-parser"
+    "workspaces/ts-source-parser",
+    "workspaces/tracer"
   ],
   "keywords": [
     "ast",
@@ -57,6 +58,7 @@
   "dependencies": {
     "@nodesecure/estree-ast-utils": "^1.5.0",
     "@nodesecure/sec-literal": "^1.2.0",
+    "@nodesecure/tracer": "^1.0.0",
     "digraph-js": "^2.2.3",
     "estree-walker": "^3.0.1",
     "frequency-set": "^1.0.2",
@@ -70,7 +72,7 @@
     "@changesets/cli": "^2.29.4",
     "@openally/config.eslint": "^2.0.0",
     "@openally/config.typescript": "^1.0.3",
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.0.2",
     "c8": "^10.1.2",
     "glob": "^11.0.0",
     "iterator-matcher": "^2.1.0",

@@ -1,6 +1,6 @@
 // Import Third-party Dependencies
 import { Utils, Literal } from "@nodesecure/sec-literal";
-import { VariableTracer } from "@nodesecure/estree-ast-utils";
+import { VariableTracer } from "@nodesecure/tracer";
 
 // Import Internal Dependencies
 import { rootLocation, toArrayLocation } from "./utils/index.js";
