@@ -5,7 +5,7 @@ import { ProbeSignals } from "../ProbeRunner.js";
 const kUnsafeCommands = ["csrutil"];
 
 function isUnsafeCommand(command) {
-  return Boolean(kUnsafeCommands.find((unsafeCommand) => command.includes(unsafeCommand)));
+  return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
 }
 
 /**
