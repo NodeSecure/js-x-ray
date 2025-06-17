@@ -23,7 +23,7 @@ test("should detect csrutil spawn command", () => {
 
   const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
   assert.equal(result.kind, kWarningUnsafeCommand);
-  assert.equal(result.value, "csrutil");
+  assert.equal(result.value, "csrutil status");
 });
 
 // TODO: de-skip when the tracer would be ready
@@ -39,7 +39,7 @@ test.skip("should detect hidden csrutil spawn command", () => {
 
   const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
   assert.equal(result.kind, kWarningUnsafeCommand);
-  assert.equal(result.value, "csrutil");
+  assert.equal(result.value, "csrutil status");
 });
 
 test("should detect csrutil spawn command with require", () => {
@@ -53,7 +53,7 @@ test("should detect csrutil spawn command with require", () => {
 
   const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
   assert.equal(result.kind, kWarningUnsafeCommand);
-  assert.equal(result.value, "csrutil");
+  assert.equal(result.value, "csrutil disable");
 });
 
 test("should not detect non suspicious spawned command", () => {

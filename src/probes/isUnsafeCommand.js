@@ -32,7 +32,7 @@ function validateNode(node) {
     node.callee.type === "Identifier" &&
     (node.callee.name === "spawn" || node.callee.name === "exec")
   ) {
-    return [true];
+    return [true, node.callee.name];
   }
 
   // child_process.spawn(...) or require("child_process").spawn(...)
@@ -48,7 +48,7 @@ function validateNode(node) {
       node.callee.object.type === "Identifier" &&
       node.callee.object.name === "child_process"
     ) {
-      return [true];
+      return [true, node.callee.property.name];
     }
     // require("child_process").spawn(...)
     // require("child_process").exec(...)
@@ -60,7 +60,7 @@ function validateNode(node) {
       node.callee.object.arguments[0].type === "Literal" &&
       node.callee.object.arguments[0].value === "child_process"
     ) {
-      return [true];
+      return [true, node.callee.property.name];
     }
   }
 
@@ -75,8 +75,20 @@ function main(node, options) {
     return null;
   }
 
-  const command = commandArg.value;
+  let command = commandArg.value;
   if (typeof command === "string" && isUnsafeCommand(command)) {
+    // Spwaned command arguments are filled into an Array
+    // as second arguments. This is why we should add them
+    // manually to the command string.
+    if (options.data === "spawn") {
+      const args = node.arguments.at(1);
+      if (args && Array.isArray(args.elements)) {
+        args.elements.forEach((element) => {
+          command += ` ${element.value}`
+        })
+      }
+    }
+
     sourceFile.addWarning("unsafe-command", command, node.loc);
 
     return ProbeSignals.Skip;
