@@ -9,10 +9,10 @@ function isUnsafeCommand(command) {
 }
 
 function isSpwanOrExec(name) {
-    return name === "spawn" ||
-      name === "exec" ||
-      name === "spawnSync" ||
-      name === "execSync";
+  return name === "spawn" ||
+    name === "exec" ||
+    name === "spawnSync" ||
+    name === "execSync";
 }
 
 /**
@@ -91,8 +91,8 @@ function main(node, options) {
       const args = node.arguments.at(1);
       if (args && Array.isArray(args.elements)) {
         args.elements.forEach((element) => {
-          command += ` ${element.value}`
-        })
+          command += ` ${element.value}`;
+        });
       }
     }
 
