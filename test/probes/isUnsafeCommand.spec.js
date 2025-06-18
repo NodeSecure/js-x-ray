@@ -69,6 +69,66 @@ test("should not detect non suspicious spawned command", () => {
   assert.equal(sastAnalysis.warnings().length, 0);
 });
 
+// Spawn sync
+
+test("should detect csrutil spawnSync command", () => {
+  const str = `
+    const { spawnSync } = require("child_process");
+    spawnSync("csrutil", ["status"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil status");
+});
+
+// TODO: de-skip when the tracer would be ready
+test.skip("should detect hidden csrutil spawnSync command", () => {
+  const str = `
+    const { spawnSync: hide } = require("child_process");
+    hide("csrutil", ["status"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil status");
+});
+
+test("should detect csrutil spawnSync command with require", () => {
+  const str = `
+    require("child_process").spawnSync("csrutil", ["disable"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil disable");
+});
+
+test("should not detect non suspicious spawnSync command", () => {
+  const str = `
+    const { spawnSync } = require("child_process");
+    spawn("ls", ["-la"]);
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  assert.equal(sastAnalysis.warnings().length, 0);
+});
+
 // Exec
 
 test("should detect csrutil exec command", () => {
@@ -119,6 +179,66 @@ test("should detect csrutil spawn command with require", () => {
 test("should not detect non suspicious exec-ed command", () => {
   const str = `
     const { exec } = require("child_process");
+    exec("ls -la");
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  assert.equal(sastAnalysis.warnings().length, 0);
+});
+
+// Exec sync
+
+test("should detect csrutil execSync command", () => {
+  const str = `
+    const { execSync } = require("child_process");
+    exec("csrutil status");
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil status");
+});
+
+// TODO: de-skip when the tracer would be ready
+test.skip("should detect hidden csrutil execSync command", () => {
+  const str = `
+    const { execSync: hide } = require("child_process");
+    exec("csrutil status");
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil status");
+});
+
+test("should detect csrutil execSync command with require", () => {
+  const str = `
+    require("child_process").execSync("csrutil disable");
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "csrutil disable");
+});
+
+test("should not detect non suspicious execSync-ed command", () => {
+  const str = `
+    const { execSync } = require("child_process");
     exec("ls -la");
   `;
 

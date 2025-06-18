@@ -30,7 +30,7 @@ function validateNode(node) {
   // exec(...);
   if (node.type === "CallExpression" &&
     node.callee.type === "Identifier" &&
-    (node.callee.name === "spawn" || node.callee.name === "exec")
+    (node.callee.name === "spawn" || node.callee.name === "exec" || node.callee.name === "spawnSync" || node.callee.name === "execSync")
   ) {
     return [true, node.callee.name];
   }
@@ -40,7 +40,7 @@ function validateNode(node) {
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
-    (node.callee.property.name === "spawn" || node.callee.property.name === "exec")
+    (node.callee.property.name === "spawn" || node.callee.property.name === "exec" || node.callee.property.name === "spawnSync" || node.callee.property.name === "execSync")
   ) {
     // child_process.spawn(...)
     // child_process.exec(...)
@@ -80,7 +80,7 @@ function main(node, options) {
     // Spwaned command arguments are filled into an Array
     // as second arguments. This is why we should add them
     // manually to the command string.
-    if (options.data === "spawn") {
+    if (options.data === "spawn" || options.data === "spawnSync") {
       const args = node.arguments.at(1);
       if (args && Array.isArray(args.elements)) {
         args.elements.forEach((element) => {
