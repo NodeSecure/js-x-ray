@@ -8,6 +8,13 @@ function isUnsafeCommand(command) {
   return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
 }
 
+function isSpwanOrExec(name) {
+    return name === "spawn" ||
+      name === "exec" ||
+      name === "spawnSync" ||
+      name === "execSync";
+}
+
 /**
  * @description Detect spawn or exec unsafe commands
  * @example
@@ -30,7 +37,7 @@ function validateNode(node) {
   // exec(...);
   if (node.type === "CallExpression" &&
     node.callee.type === "Identifier" &&
-    (node.callee.name === "spawn" || node.callee.name === "exec" || node.callee.name === "spawnSync" || node.callee.name === "execSync")
+    isSpwanOrExec(node.callee.name)
   ) {
     return [true, node.callee.name];
   }
@@ -40,7 +47,7 @@ function validateNode(node) {
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
-    (node.callee.property.name === "spawn" || node.callee.property.name === "exec" || node.callee.property.name === "spawnSync" || node.callee.property.name === "execSync")
+    isSpwanOrExec(node.callee.property.name)
   ) {
     // child_process.spawn(...)
     // child_process.exec(...)
