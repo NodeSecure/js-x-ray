@@ -1,5 +1,11 @@
 # @nodesecure/estree-ast-utils
 
+## 3.0.0
+
+### Major Changes
+
+- [#346](https://github.com/NodeSecure/js-x-ray/pull/346) [`d38f809`](https://github.com/NodeSecure/js-x-ray/commit/d38f809aaf4963a0274f7f8355aebc78ccdfaa13) Thanks [@fraxken](https://github.com/fraxken)! - Remove VariableTracer
+
 ## 2.0.0
 
 ### Major Changes
