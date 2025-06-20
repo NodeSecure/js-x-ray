@@ -51,6 +51,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.shady_link",
     severity: "Warning",
     experimental: false
+  },
+  "unsafe-command": {
+    i18n: "sast_warnings.unsafe-command",
+    severity: "Warning",
+    experimental: true
   }
 });
 

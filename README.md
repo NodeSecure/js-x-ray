@@ -105,6 +105,7 @@ type WarningName = "parsing-error"
 | "obfuscated-code"
 | "weak-crypto"
 | "unsafe-import"
+| "unsafe-command"
 | "shady-link";
 
 declare const warnings: Record<WarningName, {
@@ -133,6 +134,7 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (require, require.resolve) statement/expr. |
 | [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A RegEx as been detected as unsafe and may be used for a ReDoS Attack. |
 | [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statement like `eval()` or `Function("")`. |
+| [unsafe-command](./docs/unsafe-command.md) | ❌ | Usage of suspicious commands in `spawn()` or `exec()`.|
 | [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexa value, unicode sequence or a base64 string) |
 | [short-identifiers](./docs/short-identifiers.md) | ❌ | This mean that all identifiers has an average length below 1.5. |
 | [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code. |
