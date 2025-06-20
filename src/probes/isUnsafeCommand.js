@@ -84,7 +84,7 @@ function main(node, options) {
 
   let command = commandArg.value;
   if (typeof command === "string" && isUnsafeCommand(command)) {
-    // Spwaned command arguments are filled into an Array
+    // Spawned command arguments are filled into an Array
     // as second arguments. This is why we should add them
     // manually to the command string.
     if (options.data === "spawn" || options.data === "spawnSync") {
