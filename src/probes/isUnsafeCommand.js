@@ -8,7 +8,7 @@ function isUnsafeCommand(command) {
   return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
 }
 
-function isSpwanOrExec(name) {
+function isSpawnOrExec(name) {
   return name === "spawn" ||
     name === "exec" ||
     name === "spawnSync" ||
