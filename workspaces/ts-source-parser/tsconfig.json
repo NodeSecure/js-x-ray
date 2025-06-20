@@ -1,0 +1,8 @@
+{
+  "extends": "@openally/config.typescript",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+} 
