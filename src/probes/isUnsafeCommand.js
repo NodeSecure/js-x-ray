@@ -37,7 +37,7 @@ function validateNode(node) {
   // exec(...);
   if (node.type === "CallExpression" &&
     node.callee.type === "Identifier" &&
-    isSpwanOrExec(node.callee.name)
+    isSpawnOrExec(node.callee.name)
   ) {
     return [true, node.callee.name];
   }
@@ -47,7 +47,7 @@ function validateNode(node) {
   if (
     node.callee.type === "MemberExpression" &&
     node.callee.property.type === "Identifier" &&
-    isSpwanOrExec(node.callee.property.name)
+    isSpawnOrExec(node.callee.property.name)
   ) {
     // child_process.spawn(...)
     // child_process.exec(...)
