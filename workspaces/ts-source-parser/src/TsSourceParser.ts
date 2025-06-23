@@ -4,7 +4,7 @@ import { parse, TSESTree } from "@typescript-eslint/typescript-estree";
 type ParseOptions = Parameters<typeof parse>[1];
 
 // CONSTANTS
-const TYPESCRIPT_PARSING_OPTIONS: ParseOptions = {
+const kTypeScriptParsingOptions: ParseOptions = {
   jsDocParsingMode: "none",
   jsx: true,
   loc: true,
@@ -18,7 +18,7 @@ export class TsSourceParser {
    */
   parse(source: string, options: ParseOptions = {}): TSESTree.Program['body'] {
     const { body } = parse(source, {
-      ...TYPESCRIPT_PARSING_OPTIONS,
+      ...kTypeScriptParsingOptions,
       ...options
     });
 

@@ -1,8 +1,7 @@
 {
-  "extends": "@openally/config.typescript",
+  "extends": "../../base.tsconfig.json",
   "compilerOptions": {
-    "composite": true,
     "outDir": "./dist"
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
-} 
+}
