@@ -29,7 +29,11 @@ describe("isHex()", () => {
   test("should return false for non-string/ESTree Literal values", () => {
     const hexValue = 100;
 
-    assert.strictEqual(isHex(hexValue), false, "100 is typeof number so it must always return false");
+    assert.strictEqual(
+      isHex(hexValue as any),
+      false,
+      "100 is typeof number so it must always return false"
+    );
   });
 });
 

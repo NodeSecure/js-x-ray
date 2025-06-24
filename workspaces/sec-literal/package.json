@@ -2,13 +2,14 @@
   "name": "@nodesecure/sec-literal",
   "version": "1.2.0",
   "description": "Package created to analyze JavaScript literals",
-  "exports": "./src/index.js",
+  "exports": "./dist/index.js",
   "private": false,
   "type": "module",
   "scripts": {
-    "lint": "eslint src",
-    "test-only": "node --test",
-    "test": "npm run lint && npm run test-only"
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test": "npm run test-only"
   },
   "repository": {
     "type": "git",
@@ -22,7 +23,7 @@
     "scanner"
   ],
   "files": [
-    "src"
+    "dist"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
@@ -35,5 +36,8 @@
     "is-base64": "^1.1.0",
     "is-svg": "^6.0.0",
     "string-width": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/is-base64": "^1.1.3"
   }
 }

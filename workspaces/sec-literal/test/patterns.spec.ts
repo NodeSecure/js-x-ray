@@ -47,7 +47,7 @@ describe("commonStringSuffix()", () => {
 
 describe("commonHexadecimalPrefix()", () => {
   test("should throw a TypeError if identifiersArray is not an Array", () => {
-    assert.throws(() => commonHexadecimalPrefix(10), {
+    assert.throws(() => commonHexadecimalPrefix(10 as any), {
       name: "TypeError",
       message: "identifiersArray must be an Array"
     });
