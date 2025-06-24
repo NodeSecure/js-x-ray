@@ -27,7 +27,67 @@ export class SourceFile {
       .enableDefaultTracing()
       .trace("crypto.createHash", {
         followConsecutiveAssignment: true, moduleName: "crypto"
-      });
+      }).trace("crypto.pbkdf2Sync", {
+        followConsecutiveAssignment: true 
+      }).trace("crypto.scryptSync", {
+        followConsecutiveAssignment: true, 
+      }).trace("crypto.generateKeyPairSync", {
+        followConsecutiveAssignment: true
+      }).trace("fs.readFileSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.writeFileSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.appendFileSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.readSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.writeSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.readdirSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.statSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.mkdirSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.renameSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.unlinkSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.symlinkSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.openSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.fstatSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.linkSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("fs.realpathSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "fs"
+      }).trace("child_process.execSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "child_process"
+      }).trace("child_process.spawnSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "child_process"
+      }).trace("child_process.execFileSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "child_process"
+      })
 
     let probes = ProbeRunner.Defaults;
     if (Array.isArray(probesOptions.customProbes) && probesOptions.customProbes.length > 0) {
