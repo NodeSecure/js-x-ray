@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "TypeScript parser for AST XRay analysis",
   "type": "module",
-  "exports": "./index.js",
-  "types": "./index.d.ts",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
+    "build": "tsc -p tsconfig.json",
     "lint": "eslint src test",
-    "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
+    "test-only": "glob -c \"node --test-reporter=spec --test\" \"./dist/test/**/*.spec.js\"",
     "test": "c8 --all --src ./src -r html npm run test-only",
-    "check": "npm run lint && npm run test"
+    "check": "npm run lint && npm run test",
+    "test-dev": "glob -c \"tsx --test-reporter=spec --test\" \"./test/**/*.spec.ts\""
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
     "utils"
   ],
   "files": [
-    "src"
+    "dist"
   ],
   "author": "Michelet Jean <jean.antoine.michelet@gmail.com>",
   "license": "MIT",
