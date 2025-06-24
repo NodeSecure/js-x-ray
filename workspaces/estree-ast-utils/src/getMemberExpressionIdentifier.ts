@@ -3,20 +3,15 @@ import { Hex } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-
-/**
- * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
- */
+import type { TracerOptions, NodeAst } from "./types.js";
 
 /**
  * Return the complete identifier of a MemberExpression
- *
- * @param {any} node
- * @param {object} options
- * @param {VariableTracer} [options.tracer=null]
- * @returns {IterableIterator<string>}
  */
-export function* getMemberExpressionIdentifier(node, options = {}) {
+export function* getMemberExpressionIdentifier(
+  node: NodeAst,
+  options: TracerOptions = {}
+): IterableIterator<string> {
   const { tracer = null } = options;
 
   switch (node.object.type) {

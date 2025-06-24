@@ -1,15 +1,10 @@
-/**
- * @typedef {import('@nodesecure/tracer').VariableTracer} VariableTracer
- */
+// Import Internal Dependencies
+import type { TracerOptions, NodeAst } from "./types.js";
 
-/**
- * @param {*} node
- * @param {object} options
- * @param {VariableTracer} [options.tracer=null]
- * @returns {IterableIterator<string>}
- */
-
-export function* arrayExpressionToString(node, options = {}) {
+export function* arrayExpressionToString(
+  node: NodeAst,
+  options: TracerOptions = {}
+): IterableIterator<string> {
   const { tracer = null } = options;
 
   if (!node || node.type !== "ArrayExpression") {

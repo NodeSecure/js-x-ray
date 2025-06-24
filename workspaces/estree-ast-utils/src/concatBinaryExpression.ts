@@ -1,9 +1,6 @@
 // Import Internal Dependencies
 import { arrayExpressionToString } from "./arrayExpressionToString.js";
-
-/**
- * @typedef {import('@nodesecure/tracer').VariableTracer} VariableTracer
- */
+import type { TracerOptions, NodeAst } from "./types.js";
 
 // CONSTANTS
 const kBinaryExprTypes = new Set([
@@ -13,14 +10,14 @@ const kBinaryExprTypes = new Set([
   "Identifier"
 ]);
 
-/**
- * @param {*} node
- * @param {object} options
- * @param {VariableTracer} [options.tracer=null]
- * @param {boolean} [options.stopOnUnsupportedNode=false]
- * @returns {IterableIterator<string>}
- */
-export function* concatBinaryExpression(node, options = {}) {
+export interface ConcatBinaryExpressionOptions extends TracerOptions {
+  stopOnUnsupportedNode?: boolean;
+}
+
+export function* concatBinaryExpression(
+  node: NodeAst,
+  options: ConcatBinaryExpressionOptions = {}
+): IterableIterator<string> {
   const {
     tracer = null,
     stopOnUnsupportedNode = false
