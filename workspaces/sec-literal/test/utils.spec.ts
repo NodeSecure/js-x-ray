@@ -42,7 +42,7 @@ test("isSvgPath must return true when we give a valid svg path and false when th
   assert.strictEqual(isSvgPath("M150"), false, "the length of an svg path must be always higher than four characters");
   assert.strictEqual(isSvgPath("hello world!"), false);
   assert.strictEqual(
-    isSvgPath(10),
+    isSvgPath(10 as any),
     false,
     "isSvgPath argument must always return false for anything that is not a string primitive"
   );

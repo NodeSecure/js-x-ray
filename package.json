@@ -18,7 +18,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+    "build": "tsc -b",
     "lint": "eslint src workspaces test",
+    "test-all": "npm run test --ws --if-present",
     "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
     "test": "c8 --all --src ./src -r html npm run test-only",
     "check": "npm run lint && npm run test-only",

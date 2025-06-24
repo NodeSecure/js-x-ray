@@ -6,12 +6,11 @@
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "lint": "eslint src test",
-    "test-only": "glob -c \"node --test-reporter=spec --test\" \"./dist/test/**/*.spec.js\"",
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
     "test": "c8 --all --src ./src -r html npm run test-only",
-    "check": "npm run lint && npm run test",
-    "test-dev": "glob -c \"tsx --test-reporter=spec --test\" \"./test/**/*.spec.ts\""
+    "check": "npm run lint && npm run test"
   },
   "repository": {
     "type": "git",

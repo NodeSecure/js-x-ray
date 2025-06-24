@@ -2,21 +2,20 @@
 import FrequencySet from "frequency-set";
 
 // Import Internal Dependencies
-import * as Literal from "./literal.js";
+import { toValue, type ESTreeLiteral } from "./literal.js";
 
 /**
  * @description get the common string prefix (at the start) pattern
- * @param {!string | SecLiteral} leftAnyValue
- * @param {!string | SecLiteral} rightAnyValue
- * @returns {string | null}
- *
  * @example
  * commonStringPrefix("boo", "foo"); // null
  * commonStringPrefix("bromance", "brother"); // "bro"
  */
-export function commonStringPrefix(leftAnyValue, rightAnyValue) {
-  const leftStr = Literal.toValue(leftAnyValue);
-  const rightStr = Literal.toValue(rightAnyValue);
+export function commonStringPrefix(
+  leftAnyValue: ESTreeLiteral | string,
+  rightAnyValue: ESTreeLiteral | string
+): string | null {
+  const leftStr = toValue(leftAnyValue);
+  const rightStr = toValue(rightAnyValue);
 
   // The length of leftStr cannot be greater than that rightStr
   const minLen = leftStr.length > rightStr.length ? rightStr.length : leftStr.length;
@@ -33,7 +32,9 @@ export function commonStringPrefix(leftAnyValue, rightAnyValue) {
   return commonStr === "" ? null : commonStr;
 }
 
-function reverseString(string) {
+function reverseString(
+  string: string
+): string {
   return string.split("").reverse().join("");
 }
 
@@ -47,7 +48,10 @@ function reverseString(string) {
  * commonStringSuffix("boo", "foo"); // oo
  * commonStringSuffix("bromance", "brother"); // null
  */
-export function commonStringSuffix(leftStr, rightStr) {
+export function commonStringSuffix(
+  leftStr: string,
+  rightStr: string
+): string | null {
   const commonPrefix = commonStringPrefix(
     reverseString(leftStr),
     reverseString(rightStr)
@@ -56,7 +60,9 @@ export function commonStringSuffix(leftStr, rightStr) {
   return commonPrefix === null ? null : reverseString(commonPrefix);
 }
 
-export function commonHexadecimalPrefix(identifiersArray) {
+export function commonHexadecimalPrefix(
+  identifiersArray: string[]
+): { oneTimeOccurence: number; prefix: Record<string, number>; } {
   if (!Array.isArray(identifiersArray)) {
     throw new TypeError("identifiersArray must be an Array");
   }
