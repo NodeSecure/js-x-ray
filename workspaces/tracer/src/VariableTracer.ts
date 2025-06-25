@@ -2,6 +2,7 @@
 import { EventEmitter } from "node:events";
 
 // Import Third-party Dependencies
+import type { ESTree } from "meriyah";
 import {
   getMemberExpressionIdentifier,
   getCallExpressionIdentifier,
@@ -36,22 +37,42 @@ const kRequirePatterns = new Set([
 const kNodeModulePrefix = "node:";
 const kUnsafeGlobalCallExpression = new Set(["eval", "Function"]);
 
+export interface DataIdentifierOptions {
+  /**
+   * @default false
+   */
+  removeGlobalIdentifier?: boolean;
+}
+
+
+export interface SourceTraced {
+  followConsecutiveAssignment?: boolean;
+  moduleName?: string | null;
+  name?: string;
+}
+
+export interface Traced extends Required<SourceTraced> {
+  identifierOrMemberExpr: string;
+  assignmentMemory: string[];
+}
+
+export interface TracedIdentifierReport {
+  name: string;
+  identifierOrMemberExpr: string;
+  assignmentMemory: string[];
+}
+
 export class VariableTracer extends EventEmitter {
   static AssignmentEvent = Symbol("AssignmentEvent");
 
   // PUBLIC PROPERTIES
-  /** @type {Map<string, string>} */
-  literalIdentifiers = new Map();
-
-  /** @type {Set<string>} */
-  importedModules = new Set();
+  literalIdentifiers = new Map<string, string>();
+  importedModules = new Set<string>();
 
   // PRIVATE PROPERTIES
-  #traced = new Map();
-  #variablesRefToGlobal = new Set();
-
-  /** @type {Set<string>} */
-  #neutralCallable = new Set();
+  #traced = new Map<string, Traced>();
+  #variablesRefToGlobal = new Set<string>();
+  #neutralCallable = new Set<string>();
 
   debug() {
     console.log(this.#traced);
@@ -68,19 +89,15 @@ export class VariableTracer extends EventEmitter {
   }
 
   /**
-   *
-   * @param {!string} identifierOrMemberExpr
-   * @param {object} [options]
-   * @param {string} [options.name]
-   * @param {string} [options.moduleName=null]
-   * @param {boolean} [options.followConsecutiveAssignment=false]
-   *
    * @example
    * new VariableTracer()
    *  .trace("require", { followConsecutiveAssignment: true })
    *  .trace("process.mainModule")
    */
-  trace(identifierOrMemberExpr, options = {}) {
+  trace(
+    identifierOrMemberExpr: string,
+    options: SourceTraced = {}
+  ) {
     const {
       followConsecutiveAssignment = false,
       moduleName = null,
@@ -101,7 +118,9 @@ export class VariableTracer extends EventEmitter {
 
       for (const expr of exprs) {
         this.trace(expr, {
-          followConsecutiveAssignment: true, name, moduleName
+          followConsecutiveAssignment: true,
+          name,
+          moduleName
         });
       }
     }
@@ -109,10 +128,9 @@ export class VariableTracer extends EventEmitter {
     return this;
   }
 
-  /**
-   * @param {!string} identifierOrMemberExpr An identifier like "foo" or "foo.bar"
-   */
-  removeGlobalIdentifier(identifierOrMemberExpr) {
+  removeGlobalIdentifier(
+    identifierOrMemberExpr: string
+  ): string {
     if (!identifierOrMemberExpr.includes(".")) {
       return identifierOrMemberExpr;
     }
@@ -125,14 +143,10 @@ export class VariableTracer extends EventEmitter {
       identifierOrMemberExpr;
   }
 
-  /**
-   * @param {!string} identifierOrMemberExpr An identifier like "foo" or "foo.bar"
-   * @param {object} [options={}]
-   */
   getDataFromIdentifier(
-    identifierOrMemberExpr,
-    options = {}
-  ) {
+    identifierOrMemberExpr: string,
+    options: DataIdentifierOptions = {}
+  ): null | TracedIdentifierReport {
     const { removeGlobalIdentifier = false } = options;
     if (removeGlobalIdentifier) {
       // eslint-disable-next-line no-param-reassign
@@ -146,7 +160,7 @@ export class VariableTracer extends EventEmitter {
     if (isMemberExpr && !isTracingIdentifier) {
       const [segment] = identifierOrMemberExpr.split(".");
       if (this.#traced.has(segment)) {
-        const tracedIdentifier = this.#traced.get(segment);
+        const tracedIdentifier = this.#traced.get(segment)!;
         finalIdentifier = `${tracedIdentifier.identifierOrMemberExpr}${identifierOrMemberExpr.slice(segment.length)}`;
       }
 
@@ -158,7 +172,7 @@ export class VariableTracer extends EventEmitter {
       return null;
     }
 
-    const tracedIdentifier = this.#traced.get(finalIdentifier);
+    const tracedIdentifier = this.#traced.get(finalIdentifier)!;
     if (!this.#isTracedIdentifierImportedAsModule(tracedIdentifier)) {
       return null;
     }
@@ -172,21 +186,30 @@ export class VariableTracer extends EventEmitter {
     };
   }
 
-  #getTracedName(identifierOrMemberExpr) {
-    return this.#traced.has(identifierOrMemberExpr) ?
-      this.#traced.get(identifierOrMemberExpr).name : null;
+  #getTracedName(
+    identifierOrMemberExpr: string
+  ): string | null {
+    return this.#traced.get(identifierOrMemberExpr)?.name ?? null;
   }
 
-  #isTracedIdentifierImportedAsModule(id) {
+  #isTracedIdentifierImportedAsModule(
+    id: Traced
+  ): boolean {
     return id.moduleName === null || this.importedModules.has(id.moduleName);
   }
 
-  #declareNewAssignment(identifierOrMemberExpr, id) {
+  #declareNewAssignment(
+    identifierOrMemberExpr: string,
+    id: ESTree.Identifier
+  ) {
     const tracedVariant = this.#traced.get(identifierOrMemberExpr);
 
     // We return if required module has not been imported
     // It mean the assigment has no relation with the required tracing
-    if (!this.#isTracedIdentifierImportedAsModule(tracedVariant)) {
+    if (
+      typeof tracedVariant === "undefined" ||
+      !this.#isTracedIdentifierImportedAsModule(tracedVariant)
+    ) {
       return;
     }
 
@@ -202,12 +225,14 @@ export class VariableTracer extends EventEmitter {
     this.emit(tracedVariant.identifierOrMemberExpr, assignmentEventPayload);
 
     if (tracedVariant.followConsecutiveAssignment && !this.#traced.has(newIdentiferName)) {
-      this.#traced.get(tracedVariant.name).assignmentMemory.push(newIdentiferName);
+      this.#traced.get(tracedVariant.name)!.assignmentMemory.push(newIdentiferName);
       this.#traced.set(newIdentiferName, tracedVariant);
     }
   }
 
-  #isGlobalVariableIdentifier(identifierName) {
+  #isGlobalVariableIdentifier(
+    identifierName: string
+  ): boolean {
     return kGlobalIdentifiersToTrace.has(identifierName) ||
       this.#variablesRefToGlobal.has(identifierName);
   }
@@ -219,10 +244,12 @@ export class VariableTracer extends EventEmitter {
    * const { process: aName } = globalThis;
    * const boo = aName.mainModule.require; // alternative: process.mainModule.require
    */
-  #searchForMemberExprAlternative(parts = []) {
+  #searchForMemberExprAlternative(
+    parts: string[] = []
+  ): string[] {
     return parts.flatMap((identifierName) => {
       if (this.#traced.has(identifierName)) {
-        return this.#traced.get(identifierName).identifierOrMemberExpr;
+        return this.#traced.get(identifierName)!.identifierOrMemberExpr;
       }
 
       /**
@@ -238,7 +265,10 @@ export class VariableTracer extends EventEmitter {
     });
   }
 
-  #autoTraceId(id, prefix = null) {
+  #autoTraceId(
+    id: ESTree.Identifier | ESTree.ObjectPattern,
+    prefix: string | null = null
+  ): void {
     for (const { name, assignmentId } of getVariableDeclarationIdentifiers(id)) {
       const identifierOrMemberExpr = typeof prefix === "string" ? `${prefix}.${name}` : name;
 
@@ -248,7 +278,9 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkImportDeclaration(node) {
+  #walkImportDeclaration(
+    node: ESTree.ImportDeclaration
+  ): void {
     const moduleName = stripNodePrefix(node.source.value);
     if (!this.#traced.has(moduleName)) {
       return;
@@ -268,6 +300,9 @@ export class VariableTracer extends EventEmitter {
     const importSpecifiers = node.specifiers
       .filter((specifierNode) => specifierNode.type === "ImportSpecifier");
     for (const specifier of importSpecifiers) {
+      if (specifier.imported.type !== "Identifier") {
+        continue;
+      }
       const fullImportedName = `${moduleName}.${specifier.imported.name}`;
 
       if (this.#traced.has(fullImportedName)) {
@@ -276,9 +311,13 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkRequireCallExpression(node, id) {
+  #walkRequireCallExpression(
+    node: ESTree.CallExpression,
+    id: ESTree.Identifier | ESTree.ObjectPattern
+  ): void {
     const moduleNameLiteral = node.arguments
-      .find((argumentNode) => argumentNode.type === "Literal" && this.#traced.has(stripNodePrefix(argumentNode.value)));
+      .find((argumentNode) => isLiteralNode(argumentNode)
+        && this.#traced.has(stripNodePrefix(argumentNode.value))) as ESTree.Literal | undefined;
     if (!moduleNameLiteral) {
       return;
     }
@@ -297,8 +336,13 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkVariableDeclarationWithIdentifier(variableDeclaratorNode) {
+  #walkVariableDeclarationWithIdentifier(
+    variableDeclaratorNode: ESTree.VariableDeclarator
+  ): void {
     const { init } = variableDeclaratorNode;
+    if (init === null) {
+      return;
+    }
 
     switch (init.type) {
       /**
@@ -323,16 +367,21 @@ export class VariableTracer extends EventEmitter {
   }
 
   #walkVariableDeclarationInitialization(
-    variableDeclaratorNode,
+    variableDeclaratorNode: ESTree.VariableDeclarator,
     childNode = variableDeclaratorNode.init
-  ) {
-    const { id } = variableDeclaratorNode;
+  ): void {
+    if (childNode === null) {
+      return;
+    }
+    const { id } = variableDeclaratorNode as any;
 
     switch (childNode.type) {
       // let foo = "10"; <-- "foo" is the key and "10" the value
-      case "Literal":
-        this.literalIdentifiers.set(id.name, childNode.value);
+      case "Literal": {
+
+        this.literalIdentifiers.set(id.name, String(childNode.value));
         break;
+      }
 
       /**
        * const g = eval("this");
@@ -418,8 +467,14 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkVariableDeclarationWithAnythingElse(variableDeclaratorNode) {
-    const { init, id } = variableDeclaratorNode;
+  #walkVariableDeclarationWithAnythingElse(
+    variableDeclaratorNode: ESTree.VariableDeclarator
+  ): void {
+    const { init } = variableDeclaratorNode;
+    if (init === null) {
+      return;
+    }
+    const id = variableDeclaratorNode.id as any;
 
     switch (init.type) {
       // const { process } = eval("this");
@@ -457,7 +512,7 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  walk(node) {
+  walk(node: ESTree.Node): void {
     switch (node.type) {
       case "ImportDeclaration": {
         this.#walkImportDeclaration(node);
@@ -483,7 +538,7 @@ export class VariableTracer extends EventEmitter {
   }
 }
 
-function stripNodePrefix(value) {
+function stripNodePrefix(value: any): any {
   if (typeof value !== "string") {
     return value;
   }
@@ -491,4 +546,10 @@ function stripNodePrefix(value) {
   return value.startsWith(kNodeModulePrefix) ?
     value.slice(kNodeModulePrefix.length) :
     value;
+}
+
+function isLiteralNode(
+  node: ESTree.Node
+): node is ESTree.Literal {
+  return node.type === "Literal";
 }

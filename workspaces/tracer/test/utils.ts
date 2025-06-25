@@ -5,7 +5,7 @@ import { walk } from "estree-walker";
 // Import Internal Dependencies
 import { VariableTracer } from "../src/index.js";
 
-function codeToAst(code) {
+function codeToAst(code: string) {
   const estreeRootNode = meriyah.parseScript(code, {
     next: true,
     loc: true,
@@ -17,6 +17,10 @@ function codeToAst(code) {
   return estreeRootNode.body;
 }
 
+export interface WalkOnAstOptions {
+  debugAst?: boolean;
+}
+
 export function createTracer(enableDefaultTracing = false) {
   const tracer = new VariableTracer();
   if (enableDefaultTracing) {
@@ -25,20 +29,14 @@ export function createTracer(enableDefaultTracing = false) {
 
   return {
     tracer,
-    walkOnAst(astNode) {
+    walkOnAst(astNode: any) {
       walk(astNode, {
         enter(node) {
           tracer.walk(node);
         }
       });
     },
-    /**
-     * @param {!string} codeStr
-     * @param {object} [options]
-     * @param {boolean} [options.debugAst=false]
-     * @returns {void}
-     */
-    walkOnCode(codeStr, options = {}) {
+    walkOnCode(codeStr: string, options: WalkOnAstOptions = {}): void {
       const { debugAst = false } = options;
 
       const astNode = codeToAst(codeStr);
@@ -49,7 +47,7 @@ export function createTracer(enableDefaultTracing = false) {
       this.walkOnAst(astNode);
     },
     getAssignmentArray(event = VariableTracer.AssignmentEvent) {
-      const assignmentEvents = [];
+      const assignmentEvents: any[] = [];
       tracer.on(event, (value) => assignmentEvents.push(value));
 
       return assignmentEvents;
