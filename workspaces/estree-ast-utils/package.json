@@ -3,13 +3,13 @@
   "version": "3.0.0",
   "description": "Utilities for AST (ESTree compliant)",
   "type": "module",
-  "exports": "./src/index.js",
-  "types": "./src/index.d.ts",
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "lint": "eslint src test",
-    "test": "node --test",
-    "check": "npm run lint && npm run test",
-    "coverage": "c8 -r html npm test"
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test": "c8 -r html npm run test-only"
   },
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     "utils"
   ],
   "files": [
-    "src"
+    "dist"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",

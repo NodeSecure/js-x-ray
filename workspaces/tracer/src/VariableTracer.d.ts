@@ -9,7 +9,7 @@ export interface DataIdentifierOptions {
 }
 
 declare class VariableTracer extends EventEmitter {
-  static AssignmentEvent: Symbol;
+  static AssignmentEvent: symbol;
 
   literalIdentifiers: Map<string, string>;
   importedModules: Set<string>;

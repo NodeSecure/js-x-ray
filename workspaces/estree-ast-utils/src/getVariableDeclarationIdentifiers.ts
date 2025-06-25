@@ -1,4 +1,17 @@
-export function* getVariableDeclarationIdentifiers(node, options = {}) {
+// Import Internal Dependencies
+import type { NodeAst } from "./types.js";
+
+export interface GetVariableDeclarationIdentifiersOptions {
+  prefix?: string;
+}
+
+export function* getVariableDeclarationIdentifiers(
+  node: NodeAst,
+  options: GetVariableDeclarationIdentifiersOptions = {}
+): IterableIterator<{
+  name: string;
+  assignmentId: NodeAst;
+}> {
   const { prefix = null } = options;
 
   switch (node.type) {
@@ -102,10 +115,15 @@ export function* getVariableDeclarationIdentifiers(node, options = {}) {
   }
 }
 
-function autoPrefix(name, prefix = null) {
+function autoPrefix(
+  name: string,
+  prefix: string | null = null
+) {
   return typeof prefix === "string" ? `${prefix}.${name}` : name;
 }
 
-function notNullOrUndefined(value) {
+function notNullOrUndefined(
+  value: any
+): value is NonNullable<any> {
   return value !== null && value !== void 0;
 }

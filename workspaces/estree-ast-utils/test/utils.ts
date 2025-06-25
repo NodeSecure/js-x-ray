@@ -5,7 +5,7 @@ import { walk } from "estree-walker";
 // Import Internal Dependencies
 import { VariableTracer } from "@nodesecure/tracer";
 
-export function codeToAst(code) {
+export function codeToAst(code: string) {
   const estreeRootNode = meriyah.parseScript(code, {
     next: true,
     loc: true,
@@ -17,8 +17,12 @@ export function codeToAst(code) {
   return estreeRootNode.body;
 }
 
-export function getExpressionFromStatement(node) {
+export function getExpressionFromStatement(node: any) {
   return node.type === "ExpressionStatement" ? node.expression : null;
+}
+
+export interface WalkOnAstOptions {
+  debugAst?: boolean;
 }
 
 export function createTracer(enableDefaultTracing = false) {
@@ -29,20 +33,14 @@ export function createTracer(enableDefaultTracing = false) {
 
   return {
     tracer,
-    walkOnAst(astNode) {
+    walkOnAst(astNode: any) {
       walk(astNode, {
         enter(node) {
           tracer.walk(node);
         }
       });
     },
-    /**
-     * @param {!string} codeStr
-     * @param {object} [options]
-     * @param {boolean} [options.debugAst=false]
-     * @returns {void}
-     */
-    walkOnCode(codeStr, options = {}) {
+    walkOnCode(codeStr: string, options: WalkOnAstOptions = {}) {
       const { debugAst = false } = options;
 
       const astNode = codeToAst(codeStr);
@@ -53,7 +51,7 @@ export function createTracer(enableDefaultTracing = false) {
       this.walkOnAst(astNode);
     },
     getAssignmentArray(event = VariableTracer.AssignmentEvent) {
-      const assignmentEvents = [];
+      const assignmentEvents: any[] = [];
       tracer.on(event, (value) => assignmentEvents.push(value));
 
       return assignmentEvents;

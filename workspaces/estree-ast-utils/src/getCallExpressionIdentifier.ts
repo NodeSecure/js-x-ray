@@ -1,18 +1,15 @@
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.js";
+import type { TracerOptions, NodeAst } from "./types.js";
 
-/**
- * @typedef {import('./utils/VariableTracer.js').VariableTracer} VariableTracer
- */
+export interface GetCallExpressionIdentifierOptions extends TracerOptions {
+  resolveCallExpression?: boolean;
+}
 
-/**
- * @param {any} node
- * @param {object} options
- * @param {VariableTracer} [options.tracer=null]
- * @param {boolean} [options.resolveCallExpression=true]
- * @returns {string | null}
- */
-export function getCallExpressionIdentifier(node, options = {}) {
+export function getCallExpressionIdentifier(
+  node: NodeAst,
+  options: GetCallExpressionIdentifierOptions = {}
+): string | null {
   if (node.type !== "CallExpression") {
     return null;
   }
