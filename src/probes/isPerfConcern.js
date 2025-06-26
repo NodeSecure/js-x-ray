@@ -2,7 +2,7 @@
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 // Constants
-const kModules = ['fs', 'crypto', 'child_process'];
+const kModules = ['fs', 'crypto', 'child_process', 'zlib'];
 
 function validateNode(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, { tracer });
@@ -11,7 +11,6 @@ function validateNode(node, { tracer }) {
   }
 
   const data = tracer.getDataFromIdentifier(id);
-  
 
   return [data !== null && data.identifierOrMemberExpr.endsWith("Sync")];
 }
@@ -24,5 +23,5 @@ export default {
   name: "isPerfConcern",
   validateNode,
   main,
-  breakOnMatch: true
+  breakOnMatch: false 
 };

@@ -42,6 +42,12 @@ describe("isPerfConcern", () => {
       execSync() {}
     }
     child_process.execSync('ls -la');
+  `,
+`
+    const zlib = {
+      gzipSync() {}
+    }
+    zlib.gzipSync(Buffer.from("text","utf-8"));
   `
 ];
     for (const code of codes) {

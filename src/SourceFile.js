@@ -26,13 +26,17 @@ export class SourceFile {
     this.tracer = new VariableTracer()
       .enableDefaultTracing()
       .trace("crypto.createHash", {
-        followConsecutiveAssignment: true, moduleName: "crypto"
+        followConsecutiveAssignment: true, 
+        moduleName: "crypto"
       }).trace("crypto.pbkdf2Sync", {
-        followConsecutiveAssignment: true 
+        followConsecutiveAssignment: true ,
+        moduleName: "crypto"
       }).trace("crypto.scryptSync", {
         followConsecutiveAssignment: true, 
+        moduleName: "crypto"
       }).trace("crypto.generateKeyPairSync", {
-        followConsecutiveAssignment: true
+        followConsecutiveAssignment: true,
+        moduleName: "crypto"
       }).trace("fs.readFileSync", {
         followConsecutiveAssignment: true,
         moduleName: "fs"
@@ -87,7 +91,25 @@ export class SourceFile {
       }).trace("child_process.execFileSync", {
         followConsecutiveAssignment: true,
         moduleName: "child_process"
-      })
+      }).trace("zlib.deflateSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      }).trace("zlib.inflateSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      }).trace("zlib.gzipSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      }).trace("zlib.gunzipSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      }).trace("zlib.brotliCompressSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      }).trace("zlib.brotliDecompressSync", {
+        followConsecutiveAssignment: true,
+        moduleName: "zlib"
+      });
 
     let probes = ProbeRunner.Defaults;
     if (Array.isArray(probesOptions.customProbes) && probesOptions.customProbes.length > 0) {
