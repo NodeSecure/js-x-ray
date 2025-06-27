@@ -20,26 +20,26 @@
     </a>
 </p>
 
-JavaScript AST analysis. This package has been created to export the [NodeSecure](https://github.com/NodeSecure/cli) AST Analysis to enable better code evolution and allow better access to developers and researchers.
+JavaScript AST analysis. This package has been created to export the [NodeSecure](https://github.com/NodeSecure/cli) AST analysis to enable better code evolution and allow better access to developers and researchers.
 
-The goal is to quickly identify dangerous code and patterns for developers and Security researchers. Interpreting the results of this tool will still require you to have a set of security notions.
+The goal is to quickly identify dangerous code and patterns for developers and security researchers. Interpreting the results of this tool will still require you to have basic knowledge of secure coding.
 
 ## Goals
-The objective of the project is to successfully detect all potentially suspicious JavaScript codes.. The target is obviously codes that are added or injected for malicious purposes..
+The objective of the project is to detect potentially suspicious JavaScript code. The target is code that is added or injected for malicious purposes.
 
-Most of the time these hackers will try to hide the behaviour of their codes as much as possible to avoid being spotted or easily understood... The work of the library is to understand and analyze these patterns that will allow us to detect malicious code..
+Most of the time hackers will try to hide the behaviour of their code as much as possible to avoid being spotted or easily understood. The work of the library is to understand and analyze these patterns that will allow us to detect malicious code.
 
-## Features Highlight
-- Retrieve required dependencies and files for Node.js.
-- Detect unsafe RegEx.
-- Get warnings when the AST Analysis as a problem or when not able to follow a statement.
-- Highlight common attack patterns and API usages.
-- Capable to follow the usage of dangerous Node.js globals.
-- Detect obfuscated code and when possible the tool that has been used.
+## Feature Highlight
+- Retrieve required dependencies and files for Node.js
+- Detect unsafe regular expressions
+- Get warnings when the AST analysis detects a problem or is unable to follow a statement
+- Highlight common attack patterns and API usages
+- Follow the usage of dangerous Node.js globals
+- Detect obfuscated code and, when possible, the tool that has been used
 
 ## Getting Started
 
-This package is available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
+This package is available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 
 ```bash
 $ npm i @nodesecure/js-x-ray
@@ -83,7 +83,7 @@ console.dir(warnings, { depth: null });
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > [!TIP]
-> There is also a lot of suspicious code example in the `./examples` cases directory. Feel free to try the tool on these files.
+> There are also a lot of suspicious code examples in the `./examples` directory. Feel free to try the tool on these files.
 
 ## API
 
@@ -92,7 +92,7 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 ## Warnings
 
-This section describes how use `warnings` export.
+This section describes how use the `warnings` export.
 
 ```ts
 type WarningName = "parsing-error"
@@ -126,22 +126,22 @@ console.log(i18n.getTokenSync(jsxray.warnings["parsing-error"].i18n));
 
 ### Legends
 
-This section describe all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
+This section describes all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
 
 | name | experimental | description |
 | --- | :-: | --- |
 | [parsing-error](./docs/parsing-error.md) | ❌ | The AST parser throw an error |
-| [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (require, require.resolve) statement/expr. |
-| [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A RegEx as been detected as unsafe and may be used for a ReDoS Attack. |
-| [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statement like `eval()` or `Function("")`. |
-| [unsafe-command](./docs/unsafe-command.md) | ❌ | Usage of suspicious commands in `spawn()` or `exec()`.|
-| [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexa value, unicode sequence or a base64 string) |
-| [short-identifiers](./docs/short-identifiers.md) | ❌ | This mean that all identifiers has an average length below 1.5. |
-| [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code. |
-| [suspicious-file](./docs/suspicious-file.md) | ❌ | A suspicious file with more than ten encoded-literal in it |
-| [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
-| [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (md5, sha1...) |
-| [shady-link](./docs/shady-link.md) | ❌ | The code contains shady/unsafe link |
+| [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (`require`, `require.resolve`) statement/expr. |
+| [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A regular expression has been detected as unsafe and may be used for a ReDoS attack |
+| [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statements like `eval()` or `Function("")` |
+| [unsafe-command](./docs/unsafe-command.md) | ❌ | Usage of suspicious commands in `spawn()` or `exec()` |
+| [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexadecimal value, Unicode sequence or a base64 string) |
+| [short-identifiers](./docs/short-identifiers.md) | ❌ | This means that all identifiers have an average length below 1.5 |
+| [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code |
+| [suspicious-file](./docs/suspicious-file.md) | ❌ | A suspicious file with more than ten encoded literals in it |
+| [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated |
+| [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (e.g., MD5, SHA1, …) |
+| [shady-link](./docs/shady-link.md) | ❌ | The code contains a shady/unsafe link |
 
 ## Workspaces
 
@@ -154,7 +154,7 @@ Click on one of the links to access the documentation of the workspace:
 | sec-literal | [@nodesecure/sec-literal ](./workspaces/sec-literal) |
 | ts-source-parser | [@nodesecure/ts-source-parser ](./workspaces/ts-source-parser) |
 
-These packages are available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
+These packages are available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 ```bash
 $ npm i @nodesecure/estree-ast-util
 # or
