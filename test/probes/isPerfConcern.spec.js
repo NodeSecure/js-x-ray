@@ -9,8 +9,7 @@ import { AstAnalyser } from "../../index.js";
 const FIXTURE_URL = new URL("fixtures/perfConcern/", import.meta.url);
 
 describe("isPerfConcern", () => {
-
-test("it should report a warning in case of *Sync(...params)` usage", async() => {
+  test("it should report a warning in case of *Sync(...params)` usage", async() => {
     const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
     const fixtureFiles = await fs.readdir(fixturesDir);
 
@@ -40,8 +39,6 @@ test("it should report a warning in case of *Sync(...params)` usage", async() =>
     }
   });
 
-  
-
   test("it should NOT report a warning when relevant module is not imported", () => {
     const codes = [`
     const fs = {
@@ -49,25 +46,25 @@ test("it should report a warning in case of *Sync(...params)` usage", async() =>
     }
     fs.readFileSync('foo.txt');
   `,
-  `
+    `
     const crypto = {
       generateKeyPairSync() {}
     }
     crypto.generateKeyPairSync('foo.txt');
   `,
-  `
+    `
     const child_process = {
       execSync() {}
     }
     child_process.execSync('ls -la');
   `,
-`
+    `
     const zlib = {
       gzipSync() {}
     }
     zlib.gzipSync(Buffer.from("text","utf-8"));
   `
-];
+    ];
     for (const code of codes) {
       const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
       assert.strictEqual(outputWarnings.length, 0);

@@ -2,7 +2,7 @@
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 // Constants
-const kModules = ['fs', 'crypto', 'child_process', 'zlib'];
+const kModules = ["fs", "crypto", "child_process", "zlib"];
 
 function validateNode(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, { tracer });
@@ -16,12 +16,12 @@ function validateNode(node, { tracer }) {
 }
 
 function main(node, { sourceFile }) {
-    sourceFile.addWarning("perf", node.callee.name, node.loc);
+  sourceFile.addWarning("perf", node.callee.name, node.loc);
 }
 
 export default {
   name: "isPerfConcern",
   validateNode,
   main,
-  breakOnMatch: false 
+  breakOnMatch: false
 };
