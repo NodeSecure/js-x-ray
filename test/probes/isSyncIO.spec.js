@@ -111,7 +111,6 @@ describe("isSyncIO", () => {
     }).analyse(fixture);
     assert.strictEqual(outputWarnings.length, 1);
     const [firstWarning] = outputWarnings;
-    assert.strictEqual(outputWarnings.length, 1);
     assert.deepEqual(firstWarning.kind, "synchronous-io");
     assert.strictEqual(firstWarning.value, "readFileSync");
   });
