@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| synchronous-io | `Warning` | `sast_warnings.sync-io` | ✔️ |
+| synchronous-io | `Warning` | `sast_warnings.synchronous-io` | ✔️ |
 
 ## Introduction
 
