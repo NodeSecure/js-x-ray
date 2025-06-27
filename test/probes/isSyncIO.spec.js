@@ -6,9 +6,9 @@ import assert from "node:assert";
 // Import Internal Dependencies
 import { AstAnalyser } from "../../index.js";
 
-const FIXTURE_URL = new URL("fixtures/perfConcern/", import.meta.url);
+const FIXTURE_URL = new URL("fixtures/syncIO/", import.meta.url);
 
-describe("isPerfConcern", () => {
+describe("isSyncIO", () => {
   test("it should report a warning in case of *Sync(...params)` usage", async() => {
     const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
     const fixtureFiles = await fs.readdir(fixturesDir);
@@ -19,7 +19,7 @@ describe("isPerfConcern", () => {
 
       const [firstWarning] = outputWarnings;
       assert.strictEqual(outputWarnings.length, 1);
-      assert.deepEqual(firstWarning.kind, "perf");
+      assert.deepEqual(firstWarning.kind, "synchronous-io");
       assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
     }
   });
@@ -34,7 +34,7 @@ describe("isPerfConcern", () => {
 
       const [firstWarning] = outputWarnings;
       assert.strictEqual(outputWarnings.length, 1);
-      assert.deepEqual(firstWarning.kind, "perf");
+      assert.deepEqual(firstWarning.kind, "synchronous-io");
       assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
     }
   });

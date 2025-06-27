@@ -16,11 +16,11 @@ function validateNode(node, { tracer }) {
 }
 
 function main(node, { sourceFile }) {
-  sourceFile.addWarning("perf", node.callee.name, node.loc);
+  sourceFile.addWarning("synchronous-io", node.callee.name, node.loc);
 }
 
 export default {
-  name: "isPerfConcern",
+  name: "isSyncIO",
   validateNode,
   main,
   breakOnMatch: false

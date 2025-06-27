@@ -57,8 +57,8 @@ export const warnings = Object.freeze({
     severity: "Warning",
     experimental: true
   },
-  perf: {
-    i18n: "sast_warnings.perf",
+  "sync-io": {
+    i18n: "sast_warnings.sync-io",
     severity: "Warning",
     experimental: true
   }

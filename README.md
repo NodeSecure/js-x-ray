@@ -36,7 +36,7 @@ Most of the time these hackers will try to hide the behaviour of their codes as 
 - Highlight common attack patterns and API usages.
 - Capable to follow the usage of dangerous Node.js globals.
 - Detect obfuscated code and when possible the tool that has been used.
-- Detect potential performance issues.
+- Detect potential performance issues related to usage of synchronous API from Node.js core.
 
 ## Getting Started
 
@@ -108,7 +108,7 @@ type WarningName = "parsing-error"
 | "unsafe-import"
 | "unsafe-command"
 | "shady-link"
-| "perf";
+| "synchronous-io";
 
 declare const warnings: Record<WarningName, {
   i18n: string;
@@ -144,7 +144,7 @@ This section describe all the possible warnings returned by JSXRay. Click on the
 | [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated. |
 | [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (md5, sha1...) |
 | [shady-link](./docs/shady-link.md) | ❌ | The code contains shady/unsafe link |
-| [perf](./docs/perf.md) | ✔️ | The code probably contains performance issues. |
+| [synchronous-io](./docs/synchronous-io.md) | ✔️ | The code contains a synchronous IO call. |
 
 ## Workspaces
 

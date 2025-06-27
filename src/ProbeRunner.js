@@ -14,7 +14,7 @@ import isArrayExpression from "./probes/isArrayExpression.js";
 import isESMExport from "./probes/isESMExport.js";
 import isFetch from "./probes/isFetch.js";
 import isUnsafeCommand from "./probes/isUnsafeCommand.js";
-import isPerfConcern from "./probes/isPerfConcern.js";
+import isSyncIO from "./probes/isSyncIO.js";
 
 /**
  * @typedef {import('./SourceFile.js').SourceFile} SourceFile
@@ -55,7 +55,7 @@ export class ProbeRunner {
     isBinaryExpression,
     isArrayExpression,
     isUnsafeCommand,
-    isPerfConcern
+    isSyncIO
   ];
 
   /**
