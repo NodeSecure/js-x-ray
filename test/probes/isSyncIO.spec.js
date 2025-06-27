@@ -107,7 +107,7 @@ describe("isSyncIO", () => {
     const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
     const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");
     const { warnings: outputWarnings } = new AstAnalyser({
-      optionalWarnings: ["synchronous-io"]
+      optionalWarnings: new Set(["synchronous-io"])
     }).analyse(fixture);
     assert.strictEqual(outputWarnings.length, 1);
     const [firstWarning] = outputWarnings;

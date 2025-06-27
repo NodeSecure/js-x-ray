@@ -88,7 +88,7 @@ interface AstAnalyserOptions {
   /**
    * @default false
    */
-  optionalWarnings?: boolean | string[];
+  optionalWarnings?: boolean | Iterable<string>;
 }
 
 interface Probe {

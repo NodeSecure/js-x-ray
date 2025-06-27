@@ -66,15 +66,16 @@ export class SourceFile {
       probes = probesOptions.skipDefaultProbes === true ? probesOptions.customProbes : [...probes, ...probesOptions.customProbes];
     }
 
-    if (Array.isArray(probesOptions.optionalWarnings)) {
-      const optionalProbes = probesOptions.optionalWarnings
-        .map((warning) => ProbeRunner.Optionals[warning])
-        .filter(Boolean);
+    if (typeof probesOptions.optionalWarnings === "boolean") {
+      if (probesOptions.optionalWarnings) {
+        probes = [...probes, ...Object.values(ProbeRunner.Optionals)];
+      }
+    }
+    else {
+      const optionalProbes = Array.from(probesOptions.optionalWarnings ?? [])
+        .flatMap((warning) => ProbeRunner.Optionals[warning] ?? []);
 
       probes = [...probes, ...optionalProbes];
-    }
-    else if (probesOptions.optionalWarnings) {
-      probes = [...probes, ...Object.values(ProbeRunner.Optionals)];
     }
 
     this.probesRunner = new ProbeRunner(this, probes);
