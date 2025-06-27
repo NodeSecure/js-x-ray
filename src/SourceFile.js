@@ -65,6 +65,18 @@ export class SourceFile {
     if (Array.isArray(probesOptions.customProbes) && probesOptions.customProbes.length > 0) {
       probes = probesOptions.skipDefaultProbes === true ? probesOptions.customProbes : [...probes, ...probesOptions.customProbes];
     }
+
+    if (Array.isArray(probesOptions.optionalWarnings)) {
+      const optionalProbes = probesOptions.optionalWarnings
+        .map((warning) => ProbeRunner.Optionals[warning])
+        .filter(Boolean);
+
+      probes = [...probes, ...optionalProbes];
+    }
+    else if (probesOptions.optionalWarnings) {
+      probes = [...probes, ...Object.values(ProbeRunner.Optionals)];
+    }
+
     this.probesRunner = new ProbeRunner(this, probes);
 
     if (trojan.verify(sourceCodeString)) {

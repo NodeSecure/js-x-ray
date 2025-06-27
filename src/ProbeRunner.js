@@ -54,9 +54,16 @@ export class ProbeRunner {
     isWeakCrypto,
     isBinaryExpression,
     isArrayExpression,
-    isUnsafeCommand,
-    isSyncIO
+    isUnsafeCommand
   ];
+
+  /**
+   *
+   * @type {Record<string,Probe>}
+   */
+  static Optionals = {
+    "synchronous-io": isSyncIO
+  };
 
   /**
    *

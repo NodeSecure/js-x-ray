@@ -698,6 +698,14 @@ describe("AstAnalyser", () => {
       assert.strictEqual(FakeSourceParser.prototype.parse.mock.calls.length, 1);
     });
   });
+
+  describe("optional warnings", () => {
+    it("should not crash when there is an unknown optional warning", () => {
+      new AstAnalyser({
+        optionalWarnings: ["unknown"]
+      }).analyse("");
+    });
+  });
 });
 
 let analyser = null;

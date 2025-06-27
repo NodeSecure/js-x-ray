@@ -15,7 +15,9 @@ describe("isSyncIO", () => {
 
     for (const fixtureFile of fixtureFiles) {
       const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
-      const { warnings: outputWarnings } = new AstAnalyser().analyse(fixture);
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: true
+      }).analyse(fixture);
 
       const [firstWarning] = outputWarnings;
       assert.strictEqual(outputWarnings.length, 1);
@@ -30,7 +32,11 @@ describe("isSyncIO", () => {
 
     for (const fixtureFile of fixtureFiles) {
       const fixture = readFileSync(new URL(fixtureFile, fixturesDir), "utf-8");
-      const { warnings: outputWarnings } = new AstAnalyser().analyse(fixture);
+      const { warnings: outputWarnings } = new AstAnalyser(
+        {
+          optionalWarnings: true
+        }
+      ).analyse(fixture);
 
       const [firstWarning] = outputWarnings;
       assert.strictEqual(outputWarnings.length, 1);
@@ -66,8 +72,47 @@ describe("isSyncIO", () => {
   `
     ];
     for (const code of codes) {
-      const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: true
+      }).analyse(code);
       assert.strictEqual(outputWarnings.length, 0);
     }
+  });
+
+  test("should not have any warning when no optional warning is specified", async() => {
+    const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
+    const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");
+    const { warnings: outputWarnings } = new AstAnalyser({
+    }).analyse(fixture);
+    assert.strictEqual(outputWarnings.length, 0);
+  });
+
+  test("should not have any warning when no optional warnings is specified", async() => {
+    const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
+    const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(fixture);
+    assert.strictEqual(outputWarnings.length, 0);
+  });
+
+  test("should not have any warning when synchronous-io is not in the optional warnings", async() => {
+    const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
+    const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");
+    const { warnings: outputWarnings } = new AstAnalyser({
+      optionalWarnings: []
+    }).analyse(fixture);
+    assert.strictEqual(outputWarnings.length, 0);
+  });
+
+  test("should have a warning when synchronous-io is in the optional warnings", async() => {
+    const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
+    const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");
+    const { warnings: outputWarnings } = new AstAnalyser({
+      optionalWarnings: ["synchronous-io"]
+    }).analyse(fixture);
+    assert.strictEqual(outputWarnings.length, 1);
+    const [firstWarning] = outputWarnings;
+    assert.strictEqual(outputWarnings.length, 1);
+    assert.deepEqual(firstWarning.kind, "synchronous-io");
+    assert.strictEqual(firstWarning.value, "readFileSync");
   });
 });
