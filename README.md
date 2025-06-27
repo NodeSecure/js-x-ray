@@ -83,7 +83,7 @@ console.dir(warnings, { depth: null });
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > [!TIP]
-> There are also a lot of suspicious code example sin the `./examples` directory. Feel free to try the tool on these files.
+> There are also a lot of suspicious code examples in the `./examples` directory. Feel free to try the tool on these files.
 
 ## API
 
