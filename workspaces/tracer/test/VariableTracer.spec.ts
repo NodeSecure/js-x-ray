@@ -13,6 +13,32 @@ test("getDataFromIdentifier must return primitive null is there is no kwown trac
   assert.strictEqual(result, null);
 });
 
+test("it should trace re-assignment from a module import using /promises", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("fs.readFile", {
+    followConsecutiveAssignment: true,
+    moduleName: "fs"
+  });
+  helpers.walkOnCode(`
+    import { readFile } from "fs/promises";
+
+    const foobar = readFile;
+    const buf = await foobar("test.txt");
+    console.log(buf);
+  `);
+
+  const result = helpers.tracer.getDataFromIdentifier("foobar");
+
+  assert.deepEqual(result, {
+    assignmentMemory: [
+      "readFile",
+      "foobar"
+    ],
+    identifierOrMemberExpr: "fs.readFile",
+    name: "fs.readFile"
+  });
+});
+
 test("it should be able to Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();

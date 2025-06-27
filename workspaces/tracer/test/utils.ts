@@ -31,7 +31,7 @@ export function createTracer(enableDefaultTracing = false) {
     tracer,
     walkOnAst(astNode: any) {
       walk(astNode, {
-        enter(node) {
+        enter(node: any) {
           tracer.walk(node);
         }
       });
