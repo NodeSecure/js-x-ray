@@ -199,6 +199,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "michaelmior",
+      "name": "Michael Mior",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82501?v=4",
+      "profile": "https://michael.mior.ca",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
