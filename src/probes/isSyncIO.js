@@ -2,11 +2,11 @@
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 // Constants
-const kModules = ["fs", "crypto", "child_process", "zlib"];
+const kTracedNodeCoreModules = ["fs", "crypto", "child_process", "zlib"];
 
 function validateNode(node, { tracer }) {
   const id = getCallExpressionIdentifier(node, { tracer });
-  if (id === null || !kModules.some((m) => tracer.importedModules.has(m))) {
+  if (id === null || !kTracedNodeCoreModules.some((moduleName) => tracer.importedModules.has(moduleName))) {
     return [false];
   }
 

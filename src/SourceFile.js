@@ -11,6 +11,36 @@ import * as trojan from "./obfuscators/trojan-source.js";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;
+const kIdentifierOrMemberExps = [
+  "crypto.createHash",
+  "crypto.pbkdf2Sync",
+  "crypto.scryptSync",
+  "crypto.generateKeyPairSync",
+  "fs.readFileSync",
+  "fs.writeFileSync",
+  "fs.appendFileSync",
+  "fs.readSync",
+  "fs.writeSync",
+  "fs.readdirSync",
+  "fs.statSync",
+  "fs.mkdirSync",
+  "fs.renameSync",
+  "fs.unlinkSync",
+  "fs.symlinkSync",
+  "fs.openSync",
+  "fs.fstatSync",
+  "fs.linkSync",
+  "fs.realpathSync",
+  "child_process.execSync",
+  "child_process.spawnSync",
+  "child_process.execFileSync",
+  "zlib.deflateSync",
+  "zlib.inflateSync",
+  "zlib.gzipSync",
+  "zlib.gunzipSync",
+  "zlib.brotliCompressSync",
+  "zlib.brotliDecompressSync"
+];
 
 export class SourceFile {
   inTryStatement = false;
@@ -24,118 +54,12 @@ export class SourceFile {
 
   constructor(sourceCodeString, probesOptions = {}) {
     this.tracer = new VariableTracer()
-      .enableDefaultTracing()
-      .trace("crypto.createHash", {
-        followConsecutiveAssignment: true,
-        moduleName: "crypto"
-      }).trace("crypto.pbkdf2Sync", {
-        followConsecutiveAssignment: true,
-        moduleName: "crypto"
-      })
-      .trace("crypto.scryptSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "crypto"
-      })
-      .trace("crypto.generateKeyPairSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "crypto"
-      })
-      .trace("fs.readFileSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.writeFileSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.appendFileSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.readSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.writeSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.readdirSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.statSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.mkdirSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.renameSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.unlinkSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.symlinkSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.openSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.fstatSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.linkSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("fs.realpathSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "fs"
-      })
-      .trace("child_process.execSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "child_process"
-      })
-      .trace("child_process.spawnSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "child_process"
-      })
-      .trace("child_process.execFileSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "child_process"
-      })
-      .trace("zlib.deflateSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      })
-      .trace("zlib.inflateSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      })
-      .trace("zlib.gzipSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      })
-      .trace("zlib.gunzipSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      })
-      .trace("zlib.brotliCompressSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      })
-      .trace("zlib.brotliDecompressSync", {
-        followConsecutiveAssignment: true,
-        moduleName: "zlib"
-      });
+      .enableDefaultTracing();
+
+    kIdentifierOrMemberExps.forEach((identifierOrMemberExp) => this.tracer.trace(identifierOrMemberExp, {
+      followConsecutiveAssignment: true,
+      moduleName: identifierOrMemberExp.split(".")[0]
+    }));
 
     let probes = ProbeRunner.Defaults;
     if (Array.isArray(probesOptions.customProbes) && probesOptions.customProbes.length > 0) {
