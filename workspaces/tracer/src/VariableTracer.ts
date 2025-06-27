@@ -281,7 +281,8 @@ export class VariableTracer extends EventEmitter {
   #walkImportDeclaration(
     node: ESTree.ImportDeclaration
   ): void {
-    const moduleName = stripNodePrefix(node.source.value);
+    const moduleName = stripNodePrefix(node.source.value)
+      .replace(/\/promises$/, "");
     if (!this.#traced.has(moduleName)) {
       return;
     }
