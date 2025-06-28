@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://github.com/NodeSecure/js-x-ray">
-      <img src="https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/master/package.json&query=$.version&label=Version" alt="npm version">
+      <img src="https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/refs/heads/master/workspaces/js-x-ray/package.json&query=$.version&label=Version" alt="npm version">
     </a>
     <a href="https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE">
       <img src="https://img.shields.io/github/license/NodeSecure/js-x-ray.svg?style=for-the-badge" alt="license">
@@ -14,9 +14,6 @@
     </a>
     <a href="https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22Node.js+CI%22">
       <img src="https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/node.js.yml?style=for-the-badge" alt="github ci workflow">
-    </a>
-    <a href="https://codecov.io/github/NodeSecure/js-xray">
-      <img src="https://img.shields.io/codecov/c/github/NodeSecure/js-x-ray?style=for-the-badge" alt="codecov">
     </a>
 </p>
 
@@ -84,12 +81,12 @@ console.dir(warnings, { depth: null });
 The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 > [!TIP]
-> There are also a lot of suspicious code examples in the `./examples` directory. Feel free to try the tool on these files.
+> There are also a lot of suspicious code examples in the `./workspaces/js-x-ray/examples` directory. Feel free to try the tool on these files.
 
 ## API
 
-- [AstAnalyser](./docs/api/AstAnalyser.md)
-- [EntryFilesAnalyser](./docs/api/EntryFilesAnalyser.md)
+- [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
+- [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
 
 ## Warnings
 
@@ -136,7 +133,7 @@ This section describes all the possible warnings returned by JSXRay. Click on th
 | [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (`require`, `require.resolve`) statement/expr. |
 | [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A regular expression has been detected as unsafe and may be used for a ReDoS attack |
 | [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statements like `eval()` or `Function("")` |
-| [unsafe-command](./docs/unsafe-command.md) | ❌ | Usage of suspicious commands in `spawn()` or `exec()` |
+| [unsafe-command](./docs/unsafe-command.md) | ✔️ | Usage of suspicious commands in `spawn()` or `exec()` |
 | [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexadecimal value, Unicode sequence or a base64 string) |
 | [short-identifiers](./docs/short-identifiers.md) | ❌ | This means that all identifiers have an average length below 1.5 |
 | [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code |
@@ -152,10 +149,11 @@ Click on one of the links to access the documentation of the workspace:
 
 | name | package and link |
 | --- | --- |
+| js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
 | estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
 | tracer | [@nodesecure/tracer](./workspaces/tracer) |
-| sec-literal | [@nodesecure/sec-literal ](./workspaces/sec-literal) |
-| ts-source-parser | [@nodesecure/ts-source-parser ](./workspaces/ts-source-parser) |
+| sec-literal | [@nodesecure/sec-literal](./workspaces/sec-literal) |
+| ts-source-parser | [@nodesecure/ts-source-parser](./workspaces/ts-source-parser) |
 
 These packages are available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 ```bash

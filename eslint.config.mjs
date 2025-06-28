@@ -1,5 +1,5 @@
 // Import Third-party Dependencies
-import { ESLintConfig } from "@openally/config.eslint";
+import { ESLintConfig, typescriptConfig } from "@openally/config.eslint";
 
 export default [
   {
@@ -9,6 +9,7 @@ export default [
       "**/examples/*.js"
     ]
   },
+  ...typescriptConfig(),
   ...ESLintConfig,
   {
     languageOptions: {
