@@ -1,12 +1,12 @@
-# Sec-literal
-[![version](https://img.shields.io/github/package-json/v/NodeSecure/js-x-ray?filename=workspaces%2Fsec-literal%2Fpackage.json&style=for-the-badge)](https://www.npmjs.com/package/@nodesecure/sec-literal)
-[![maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/graphs/commit-activity)
-[![OpenSSF
-Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
-[![mit](https://img.shields.io/github/license/NodeSecure/js-x-ray?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/sec-literal/LICENSE)
-[![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/sec-literal.yml?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22sec+literal+CI%22)
+<p align="center">
+  <h1 align="center">
+    @nodesecure/sec-literal
+  </h1>
+</p>
 
-This package is a security utilities library created to analyze [ESTree Literal](https://github.com/estree/estree/blob/master/es5.md#literal) and JavaScript string primitive. This project was originally created to simplify and better test the functionalities required for the SAST Scanner [JS-X-Ray](https://github.com/fraxken/js-x-ray).
+<p align="center">
+  This package is a security utilities library created to analyze <a href="https://github.com/estree/estree/blob/master/es5.md#literal">ESTree Literal</a> and JavaScript string primitive.
+</p>
 
 ## Features
 

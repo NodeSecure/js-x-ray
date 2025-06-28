@@ -9,9 +9,9 @@ export function* getVariableDeclarationIdentifiers(
   node: NodeAst,
   options: GetVariableDeclarationIdentifiersOptions = {}
 ): IterableIterator<{
-  name: string;
-  assignmentId: NodeAst;
-}> {
+    name: string;
+    assignmentId: NodeAst;
+  }> {
   const { prefix = null } = options;
 
   switch (node.type) {

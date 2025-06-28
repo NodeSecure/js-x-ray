@@ -5,7 +5,7 @@ export type LogicalExpressionOperators = "||" | "&&" | "??";
 
 export function* extractLogicalExpression(
   node: NodeAst
-): IterableIterator<{ operator: LogicalExpressionOperators, node: NodeAst }> {
+): IterableIterator<{ operator: LogicalExpressionOperators; node: NodeAst; }> {
   if (node.type !== "LogicalExpression") {
     return;
   }

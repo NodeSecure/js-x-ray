@@ -44,7 +44,6 @@ export interface DataIdentifierOptions {
   removeGlobalIdentifier?: boolean;
 }
 
-
 export interface SourceTraced {
   followConsecutiveAssignment?: boolean;
   moduleName?: string | null;
@@ -342,7 +341,7 @@ export class VariableTracer extends EventEmitter {
   ): void {
     const { init } = variableDeclaratorNode;
     if (init === null) {
-      return;
+      return void 0;
     }
 
     switch (init.type) {
@@ -379,7 +378,6 @@ export class VariableTracer extends EventEmitter {
     switch (childNode.type) {
       // let foo = "10"; <-- "foo" is the key and "10" the value
       case "Literal": {
-
         this.literalIdentifiers.set(id.name, String(childNode.value));
         break;
       }

@@ -1,12 +1,12 @@
-# ts-source-parser
-[![version](https://img.shields.io/github/package-json/v/NodeSecure/js-x-ray?filename=workspaces%2Fts-source-parser%2Fpackage.json&style=for-the-badge)](https://www.npmjs.com/package/@nodesecure/ts-source-parser)
-[![maintained](https://img.shields.io/badge/Maintained%3F-yes-green.svg?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/ts-source-parser/graphs/commit-activity)
-[![OpenSSF
-Scorecard](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray)
-[![mit](https://img.shields.io/github/license/NodeSecure/js-x-ray?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/blob/master/workspaces/ts-source-parser/LICENSE)
-[![build](https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/ts-source-parser.yml?style=for-the-badge)](https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22sec+literal+CI%22)
+<p align="center">
+  <h1 align="center">
+    @nodesecure/ts-source-parser
+  </h1>
+</p>
 
-This package provide a TypeScript source parser for the `@nodesecure/js-x-ray` project.
+<p align="center">
+  This package provide a TypeScript source parser for the `@nodesecure/js-x-ray` project.
+</p>
 
 ## Getting Started
 

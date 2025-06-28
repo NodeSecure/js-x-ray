@@ -1,6 +1,12 @@
-# tracer
+<p align="center">
+  <h1 align="center">
+    @nodesecure/tracer
+  </h1>
+</p>
 
-JS-X-Ray variables and assignments tracer
+<p align="center">
+  JS-X-Ray variables and assignments tracer
+</p>
 
 ## Getting Started
 
