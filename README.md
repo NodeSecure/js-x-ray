@@ -136,7 +136,7 @@ This section describes all the possible warnings returned by JSXRay. Click on th
 | [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (`require`, `require.resolve`) statement/expr. |
 | [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A regular expression has been detected as unsafe and may be used for a ReDoS attack |
 | [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statements like `eval()` or `Function("")` |
-| [unsafe-command](./docs/unsafe-command.md) | ✔️ | Usage of suspicious commands in `spawn()` or `exec()` |
+| [unsafe-command](./docs/unsafe-command.md) | ❌ | Usage of suspicious commands in `spawn()` or `exec()` |
 | [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexadecimal value, Unicode sequence or a base64 string) |
 | [short-identifiers](./docs/short-identifiers.md) | ❌ | This means that all identifiers have an average length below 1.5 |
 | [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code |
