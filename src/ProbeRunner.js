@@ -14,6 +14,7 @@ import isArrayExpression from "./probes/isArrayExpression.js";
 import isESMExport from "./probes/isESMExport.js";
 import isFetch from "./probes/isFetch.js";
 import isUnsafeCommand from "./probes/isUnsafeCommand.js";
+import isSyncIO from "./probes/isSyncIO.js";
 
 /**
  * @typedef {import('./SourceFile.js').SourceFile} SourceFile
@@ -55,6 +56,14 @@ export class ProbeRunner {
     isArrayExpression,
     isUnsafeCommand
   ];
+
+  /**
+   *
+   * @type {Record<string,Probe>}
+   */
+  static Optionals = {
+    "synchronous-io": isSyncIO
+  };
 
   /**
    *

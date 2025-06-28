@@ -85,6 +85,10 @@ interface AstAnalyserOptions {
    * @default false
    */
   skipDefaultProbes?: boolean;
+  /**
+   * @default false
+   */
+  optionalWarnings?: boolean | Iterable<string>;
 }
 
 interface Probe {

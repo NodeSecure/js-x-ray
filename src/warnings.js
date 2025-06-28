@@ -56,6 +56,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.unsafe-command",
     severity: "Warning",
     experimental: true
+  },
+  "synchronous-io": {
+    i18n: "sast_warnings.synchronous-io",
+    severity: "Warning",
+    experimental: true
   }
 });
 

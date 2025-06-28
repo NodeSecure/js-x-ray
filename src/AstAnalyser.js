@@ -19,12 +19,14 @@ export class AstAnalyser {
    * @param {SourceParser} [options.customParser]
    * @param {Array<object>} [options.customProbes]
    * @param {boolean} [options.skipDefaultProbes=false]
+   * @param {boolean | Iterable<string>} [options.optionalWarnings=false]
    */
   constructor(options = {}) {
     this.parser = options.customParser ?? new JsSourceParser();
     this.probesOptions = {
       customProbes: options.customProbes ?? [],
-      skipDefaultProbes: options.skipDefaultProbes ?? false
+      skipDefaultProbes: options.skipDefaultProbes ?? false,
+      optionalWarnings: options.optionalWarnings ?? false
     };
   }
 
