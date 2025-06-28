@@ -66,6 +66,20 @@ describe("ProbeRunner", () => {
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
     });
+
+    it("should fail if initialize initialize is present and not a function", () => {
+      const fakeProbe = {
+        validateNode: mock.fn(),
+        main: mock.fn(),
+        initialize: null
+      };
+
+      function instantiateProbeRunner() {
+        return new ProbeRunner(null, [fakeProbe]);
+      }
+
+      assert.throws(instantiateProbeRunner, Error, "Invalid probe");
+    });
   });
 
   describe("walk", () => {

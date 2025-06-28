@@ -134,7 +134,7 @@ scanner.analyse("const foo = 'bar';", {
 
 You can also create custom probes to detect specific pattern in the code you are analyzing.
 
-A probe is a pair of two functions (`validateNode` and `main`) that will be called on each node of the AST. It will return a warning if the pattern is detected.
+A probe is a pair of two required functions (`validateNode` and `main`) that will be called on each node of the AST and one optional function (`initialize`) that will be call before walking the AST.It will return a warning if the pattern is detected.
 
 Below a basic probe that detect a string assignation to `danger`:
 

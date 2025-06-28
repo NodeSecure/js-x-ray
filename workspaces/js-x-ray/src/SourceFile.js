@@ -11,36 +11,6 @@ import * as trojan from "./obfuscators/trojan-source.js";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;
-const kIdentifierOrMemberExps = [
-  "crypto.createHash",
-  "crypto.pbkdf2Sync",
-  "crypto.scryptSync",
-  "crypto.generateKeyPairSync",
-  "fs.readFileSync",
-  "fs.writeFileSync",
-  "fs.appendFileSync",
-  "fs.readSync",
-  "fs.writeSync",
-  "fs.readdirSync",
-  "fs.statSync",
-  "fs.mkdirSync",
-  "fs.renameSync",
-  "fs.unlinkSync",
-  "fs.symlinkSync",
-  "fs.openSync",
-  "fs.fstatSync",
-  "fs.linkSync",
-  "fs.realpathSync",
-  "child_process.execSync",
-  "child_process.spawnSync",
-  "child_process.execFileSync",
-  "zlib.deflateSync",
-  "zlib.inflateSync",
-  "zlib.gzipSync",
-  "zlib.gunzipSync",
-  "zlib.brotliCompressSync",
-  "zlib.brotliDecompressSync"
-];
 
 export class SourceFile {
   inTryStatement = false;
@@ -55,11 +25,6 @@ export class SourceFile {
   constructor(sourceCodeString, probesOptions = {}) {
     this.tracer = new VariableTracer()
       .enableDefaultTracing();
-
-    kIdentifierOrMemberExps.forEach((identifierOrMemberExp) => this.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName: identifierOrMemberExp.split(".")[0]
-    }));
 
     let probes = ProbeRunner.Defaults;
     if (Array.isArray(probesOptions.customProbes) && probesOptions.customProbes.length > 0) {
