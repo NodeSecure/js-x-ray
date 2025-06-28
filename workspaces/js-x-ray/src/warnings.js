@@ -61,6 +61,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.synchronous-io",
     severity: "Warning",
     experimental: true
+  },
+  "serialize-environment": {
+    i18n: "sast_warnings.serialize-environment",
+    severity: "Warning",
+    experimental: false
   }
 });
 

@@ -15,6 +15,7 @@ import isESMExport from "./probes/isESMExport.js";
 import isFetch from "./probes/isFetch.js";
 import isUnsafeCommand from "./probes/isUnsafeCommand.js";
 import isSyncIO from "./probes/isSyncIO.js";
+import isSerializeEnv from "./probes/isSerializeEnv.js";
 
 /**
  * @typedef {import('./SourceFile.js').SourceFile} SourceFile
@@ -54,7 +55,8 @@ export class ProbeRunner {
     isWeakCrypto,
     isBinaryExpression,
     isArrayExpression,
-    isUnsafeCommand
+    isUnsafeCommand,
+    isSerializeEnv
   ];
 
   /**
