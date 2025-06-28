@@ -107,3 +107,4 @@ temp.js
 temp/
 .vscode/
 .idea/
+workspaces/**/temp/

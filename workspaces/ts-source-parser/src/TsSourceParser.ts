@@ -16,7 +16,7 @@ export class TsSourceParser {
    * @param {string} source
    * @param {object} options
    */
-  parse(source: string, options: ParseOptions = {}): TSESTree.Program['body'] {
+  parse(source: string, options: ParseOptions = {}): TSESTree.Program["body"] {
     const { body } = parse(source, {
       ...kTypeScriptParsingOptions,
       ...options
