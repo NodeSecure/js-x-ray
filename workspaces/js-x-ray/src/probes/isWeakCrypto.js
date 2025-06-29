@@ -21,6 +21,13 @@ function validateNode(node, { tracer }) {
   return [data !== null && data.identifierOrMemberExpr === "crypto.createHash"];
 }
 
+function initialize(sourceFile) {
+  sourceFile.tracer.trace("crypto.createHash", {
+    followConsecutiveAssignment: true,
+    moduleName: "crypto"
+  });
+}
+
 function main(node, { sourceFile }) {
   const arg = node.arguments.at(0);
 
@@ -33,5 +40,6 @@ export default {
   name: "isWeakCrypto",
   validateNode,
   main,
+  initialize,
   breakOnMatch: false
 };

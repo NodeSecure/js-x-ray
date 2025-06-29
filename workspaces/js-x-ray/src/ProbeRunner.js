@@ -28,6 +28,7 @@ import isSyncIO from "./probes/isSyncIO.js";
  * @property {(options: any) => void} teardown
  * @property {boolean} [breakOnMatch=false]
  * @property {string} [breakGroup]
+ * @property {(sourceFile: SourceFile) => void} [initialize]
  */
 
 export const ProbeSignals = Object.freeze({
@@ -85,6 +86,13 @@ export class ProbeRunner {
         typeof probe.main === "function",
         `Invalid probe ${probe.name}: main must be a function`
       );
+      assert(
+        typeof probe.initialize === "function" || probe.initialize === undefined,
+        `Invalid probe ${probe.name}: initialize must be a function or undefined`
+      );
+      if (probe.initialize) {
+        probe.initialize(sourceFile);
+      }
     }
 
     this.probes = probes;

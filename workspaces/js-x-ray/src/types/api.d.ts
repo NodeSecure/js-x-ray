@@ -94,6 +94,7 @@ interface AstAnalyserOptions {
 interface Probe {
   validateNode: Function | Function[];
   main: Function;
+  initialize?: (sourceFile: SourceFile) => void;
 }
 
 interface Report {
