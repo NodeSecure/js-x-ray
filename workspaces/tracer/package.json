@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/tracer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JS-X-Ray variables and assignments tracer",
   "exports": "./dist/index.js",
   "private": false,
