@@ -30,7 +30,8 @@ describe("isHex()", () => {
     const hexValue = 100;
 
     assert.strictEqual(
-      isHex(hexValue as any),
+      // @ts-expect-error
+      isHex(hexValue),
       false,
       "100 is typeof number so it must always return false"
     );
