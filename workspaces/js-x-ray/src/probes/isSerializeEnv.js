@@ -1,3 +1,6 @@
+// Import Third-party Dependencies
+import { getCallExpressionIdentifier, getMemberExpressionIdentifier } from "@nodesecure/estree-ast-utils";
+
 // Import Internal Dependencies
 import { ProbeSignals } from "../ProbeRunner.js";
 
@@ -10,15 +13,8 @@ import { ProbeSignals } from "../ProbeRunner.js";
  * JSON.stringify(process[`env`])
  */
 function validateNode(node) {
-  if (node.type !== "CallExpression") {
-    return [false];
-  }
-
-  if (
-    node.callee.type !== "MemberExpression" ||
-    node.callee.object.name !== "JSON" ||
-    node.callee.property.name !== "stringify"
-  ) {
+  const id = getCallExpressionIdentifier(node);
+  if (id !== "JSON.stringify") {
     return [false];
   }
 
@@ -28,17 +24,11 @@ function validateNode(node) {
 
   const firstArg = node.arguments[0];
 
-  if (
-    firstArg.type === "MemberExpression" &&
-    firstArg.object.name === "process" &&
-    (
-      // Check for process.env
-      (firstArg.property.type === "Identifier" && firstArg.property.name === "env") ||
-      // Check for process["env"] or process["env"] or process[`env`]
-      (firstArg.property.type === "Literal" && firstArg.property.value === "env")
-    )
-  ) {
-    return [true, "serialize-environment"];
+  if (firstArg.type === "MemberExpression") {
+    const memberExprId = [...getMemberExpressionIdentifier(firstArg)].join(".");
+    if (memberExprId === "process.env") {
+      return [true, "serialize-environment"];
+    }
   }
 
   return [false];
