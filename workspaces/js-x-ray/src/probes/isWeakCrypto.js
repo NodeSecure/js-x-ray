@@ -22,7 +22,7 @@ function validateNode(node, { tracer }) {
 }
 
 function initialize(sourceFile) {
-  sourceFile?.tracer.trace("crypto.createHash", {
+  sourceFile.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
     moduleName: "crypto"
   });

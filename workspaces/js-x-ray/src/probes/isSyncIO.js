@@ -45,12 +45,10 @@ function validateNode(node, { tracer }) {
 }
 
 function initialize(sourceFile) {
-  if (sourceFile) {
-    kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => sourceFile.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName: identifierOrMemberExp.split(".")[0]
-    }));
-  }
+  kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => sourceFile.tracer.trace(identifierOrMemberExp, {
+    followConsecutiveAssignment: true,
+    moduleName: identifierOrMemberExp.split(".")[0]
+  }));
 }
 
 function main(node, { sourceFile }) {

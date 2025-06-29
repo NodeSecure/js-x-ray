@@ -4,13 +4,13 @@ import assert from "node:assert";
 
 // Import Internal Dependencies
 import { ProbeRunner, ProbeSignals } from "../src/ProbeRunner.js";
+import { SourceFile } from "../src/SourceFile.js";
 
 describe("ProbeRunner", () => {
   describe("constructor", () => {
     it("should instanciate class with Defaults probes when none are provide", () => {
-      const pr = new ProbeRunner(null);
+      const pr = new ProbeRunner(new SourceFile(""));
 
-      assert.strictEqual(pr.sourceFile, null);
       assert.strictEqual(pr.probes, ProbeRunner.Defaults);
     });
 
@@ -23,8 +23,7 @@ describe("ProbeRunner", () => {
         }
       ];
 
-      const pr = new ProbeRunner(null, fakeProbe);
-      assert.strictEqual(pr.sourceFile, null);
+      const pr = new ProbeRunner(new SourceFile(""), fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -36,8 +35,7 @@ describe("ProbeRunner", () => {
           teardown: mock.fn()
         }];
 
-      const pr = new ProbeRunner(null, fakeProbe);
-      assert.strictEqual(pr.sourceFile, null);
+      const pr = new ProbeRunner(new SourceFile(""), fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -48,7 +46,7 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        return new ProbeRunner(null, [fakeProbe]);
+        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -61,7 +59,7 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        return new ProbeRunner(null, [fakeProbe]);
+        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -75,7 +73,7 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        return new ProbeRunner(null, [fakeProbe]);
+        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
