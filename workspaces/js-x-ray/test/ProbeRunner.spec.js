@@ -65,7 +65,7 @@ describe("ProbeRunner", () => {
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
     });
 
-    it("should fail if initialize initialize is present and not a function", () => {
+    it("should fail if initialize is present and not a function", () => {
       const fakeProbe = {
         validateNode: mock.fn(),
         main: mock.fn(),
