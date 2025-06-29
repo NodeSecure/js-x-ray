@@ -105,7 +105,8 @@ type WarningName = "parsing-error"
 | "unsafe-import"
 | "unsafe-command"
 | "shady-link"
-| "synchronous-io";
+| "synchronous-io"
+| "serialize-environment";
 
 declare const warnings: Record<WarningName, {
   i18n: string;
@@ -142,6 +143,7 @@ This section describes all the possible warnings returned by JSXRay. Click on th
 | [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (e.g., MD5, SHA1, …) |
 | [shady-link](./docs/shady-link.md) | ❌ | The code contains a shady/unsafe link |
 | [synchronous-io](./docs/synchronous-io.md) | ✔️ | The code contains a synchronous IO call. |
+| [serialize-environment](./docs/serialize-environment.md) | ❌ | The code attempts to serialize process.env which could lead to environment variable exfiltration |
 
 ## Workspaces
 
