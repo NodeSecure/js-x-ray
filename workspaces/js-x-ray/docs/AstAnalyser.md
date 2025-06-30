@@ -31,7 +31,7 @@ interface AstAnalyserOptions {
   /**
    * @default false
    */
-  optionalWarnings?: boolean | Iterable<string>;
+  optionalWarnings?: boolean | Iterable<OptionalWarningName>;
 }
 ```
 
@@ -47,13 +47,14 @@ class AstAnalyser {
     options?: RuntimeOptions
   ) => Report;
   analyseFile(
-    pathToFile: string,
+    pathToFile: string | URL,
     options?: RuntimeFileOptions
   ): Promise<ReportOnFile>;
   analyseFileSync(
-    pathToFile: string,
+    pathToFile: string | URL,
     options?: RuntimeFileOptions
   ): ReportOnFile;
+  prepareSource(source: string, options?: PrepareSourceOptions): string
 }
 ```
 
@@ -148,7 +149,14 @@ export const customProbes = [
     main: (node, options) => {
       const { sourceFile, data: calleeName } = options;
       if (node.declarations[0].init.value === "danger") {
-        sourceFile.addWarning("unsafe-danger", calleeName, node.loc);
+        sourceFile.warnings.push({
+          kind: "unsafe-danger",
+          value: calleeName,
+          location: node.loc,
+          source: "JS-X-Ray Custom Probe",
+          i18n: "sast_warnings.unsafe-danger",
+          severity: "Warning"
+        });
 
         return ProbeSignals.Skip;
       }

@@ -30,7 +30,8 @@ test("toRaw must return a string when we give a valid EStree Literal", () => {
 });
 
 test("defaultAnalysis() of something else than a Literal must always return null", () => {
-  assert.strictEqual(defaultAnalysis(10 as any), null);
+  // @ts-expect-error
+  assert.strictEqual(defaultAnalysis(10), null);
 });
 
 test("defaultAnalysis() of an Hexadecimal value", () => {
