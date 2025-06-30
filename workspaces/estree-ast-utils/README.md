@@ -20,64 +20,142 @@ $ yarn add @nodesecure/estree-ast-utils
 
 ## API
 
-<details><summary>arrayExpressionToString(node: ESTree.Node | null): IterableIterator< string ></summary>
+Most utility options extend the `DefaultOptions` interface:
 
-Translate an ESTree ArrayExpression into an iterable of Literal value.
+```ts
+export interface DefaultOptions {
+  externalIdentifierLookup?(name: string): string | null;
+}
+```
+
+You can provide a custom `externalIdentifierLookup` function to enable the utilities to resolve identifiers from external sources—such as **VariableTracer**, for example.
+
+---
+
+<details>
+<summary>arrayExpressionToString(node: ESTree.Node | null): IterableIterator< string ></summary>
+
+Transforms an ESTree `ArrayExpression` into an iterable of literal values.
 
 ```js
 ["foo", "bar"];
 ```
 
-will return `"foo"` then `"bar"`.
+will yield `"foo"`, then `"bar"`.
 
 </details>
 
-<details><summary>concatBinaryExpression(node: ESTree.BinaryExpression, options?: ConcatBinaryExpressionOptions): IterableIterator< string ></summary>
+<details>
+<summary>concatBinaryExpression(node: ESTree.BinaryExpression, options?: ConcatBinaryExpressionOptions): IterableIterator< string ></summary>
 
-Return all Literal part of a given Binary Expression.
+Returns all `Literal` nodes from a binary expression.
 
 ```js
 "foo" + "bar";
 ```
 
-will return `"foo"` then `"bar"`.
+Will yield `"foo"`, then `"bar"`.
+
+Options are described by the following interface:
 
 ```ts
-export interface ConcatBinaryExpressionOptions extends TracerOptions {
+interface ConcatBinaryExpressionOptions extends DefaultOptions {
+  /**
+   * When set to true, the function will throw an error if it encounters
+   * a node type that is not supported (i.e., not a Literal, BinaryExpr, ArrayExpr or Identifier).
+   *
+   * @default false
+   * @example
+   * "foo" + fn() + "bar" // <- will throw an error if `stopOnUnsupportedNode` is true
+   */
   stopOnUnsupportedNode?: boolean;
 }
 ```
 
-If `stopOnUnsupportedNode` option is enabled it will throw an Error if the left or right side of the Expr is not a supported type.
+</details>
+
+<details>
+<summary>extractLogicalExpression(node: ESTree.Node): IterableIterator< { operator: string; node: ESTree.Expression; } ></summary>
+
+Recursively extracts all `LogicalExpression` components.
+
+```ts
+{ operator: "||" | "&&" | "??", node: ESTree.Expression }
+```
+
+For example:
+
+```js
+freeGlobal || freeSelf || Function('return this')();
+```
+
+Will yield three components:
+- freeGlobal
+- freeSelf
+- and finally `Function('return this')();`
 
 </details>
 
-<details><summary>getCallExpressionIdentifier(node: ESTree.Node, options?: GetCallExpressionIdentifierOptions): string | null</summary>
+<details>
+<summary>getCallExpressionArguments(node: ESTree.Node, options?: DefaultOptions): string[] | null</summary>
 
-Return the identifier name of the CallExpression (or null if there is none).
+Returns the literal arguments of a `CallExpression`.
+
+For example:
+
+```js
+eval("require");
+```
+
+Returns
+
+```js
+["require"]
+```
+
+</details>
+
+<details>
+<summary>getCallExpressionIdentifier(node: ESTree.Node, options?: GetCallExpressionIdentifierOptions): string | null</summary>
+
+Returns the identifier name of a `CallExpression`, or **null** if not resolvable.
 
 ```js
 foobar();
 ```
 
-will return `"foobar"`.
+Returns `"foobar"`.
 
-One of the options of the method is `resolveCallExpression` (which is true by default).
+By default, it resolves member expressions.
+This can be disabled with resolveCallExpression: false.
 
-Sometimes you don't want to resolve/jump early CallExpression like in the following example:
 ```js
 require('./file.js')();
 //     ^ Second     ^ First
 ```
 
-With **resolveCallExpression** equal to **false** the function return `null`.
+With `resolveCallExpression`: false, the function will return null.
 
+```ts
+interface GetCallExpressionIdentifierOptions extends DefaultOptions {
+  /**
+   * Resolve the CallExpression callee if it is a MemberExpression.
+   *
+   * @default true
+   * @example
+   * require('./file.js')();
+            ^ Second     ^ First
+   */
+  resolveCallExpression?: boolean;
+}
+```
 
 </details>
 
-<details><summary>getMemberExpressionIdentifier(node: ESTree.MemberExpression, options?: TracerOptions): IterableIterator< string ></summary>
+<details>
+<summary>getMemberExpressionIdentifier(node: ESTree.MemberExpression, options?: DefaultOptions): IterableIterator< string ></summary>
 
-Return the identifier name of the CallExpression (or null if there is none).
+Returns the identifier chain from a `MemberExpression`.
 
 ```js
 foo.bar();
@@ -87,36 +165,16 @@ will return `"foo"` then `"bar"`.
 
 </details>
 
-<details><summary>getVariableDeclarationIdentifiers(node: any, options?: GetVariableDeclarationIdentifiersOptions): IterableIterator< string ></summary>
+<details>
+<summary>getVariableDeclarationIdentifiers(node: any, options?: GetVariableDeclarationIdentifiersOptions): IterableIterator< string ></summary>
 
-Get all variables identifier name.
+Extracts all variable identifiers from a declaration.
 
 ```js
 const [foo, bar] = [1, 2];
 ```
 
 will return `"foo"` then `"bar"`.
-
-</details>
-
-<details><summary>extractLogicalExpression(node: ESTree.Node): IterableIterator< { operator: string; node: ESTree.Expression; } ></summary>
-
-Extract all LogicalExpression recursively and return an IterableIterator of 
-
-```ts
-{ operator: "||" | "&&" | "??", node: any }
-```
-
-For the following code example
-
-```js
-freeGlobal || freeSelf || Function('return this')();
-```
-
-The extract will return three parts
-- freeGlobal
-- freeSelf
-- and finally `Function('return this')();`
 
 </details>
 

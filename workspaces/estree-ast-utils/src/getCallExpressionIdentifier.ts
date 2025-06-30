@@ -3,9 +3,12 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.js";
-import type { TracerOptions } from "./types.js";
+import {
+  type DefaultOptions,
+  noop
+} from "./options.js";
 
-export interface GetCallExpressionIdentifierOptions extends TracerOptions {
+export interface GetCallExpressionIdentifierOptions extends DefaultOptions {
   /**
    * Resolve the CallExpression callee if it is a MemberExpression.
    *
@@ -24,7 +27,10 @@ export function getCallExpressionIdentifier(
   if (node.type !== "CallExpression") {
     return null;
   }
-  const { tracer = null, resolveCallExpression = true } = options;
+  const {
+    externalIdentifierLookup = noop,
+    resolveCallExpression = true
+  } = options;
 
   if (node.callee.type === "Identifier") {
     return node.callee.name;
@@ -32,7 +38,7 @@ export function getCallExpressionIdentifier(
   if (node.callee.type === "MemberExpression") {
     const memberObject = node.callee.object;
     const lastId = [
-      ...getMemberExpressionIdentifier(node.callee, { tracer })
+      ...getMemberExpressionIdentifier(node.callee, { externalIdentifierLookup })
     ].join(".");
 
     return resolveCallExpression && memberObject.type === "CallExpression" ?
@@ -41,5 +47,5 @@ export function getCallExpressionIdentifier(
   }
 
   return resolveCallExpression ?
-    getCallExpressionIdentifier(node.callee, { tracer }) : null;
+    getCallExpressionIdentifier(node.callee, { externalIdentifierLookup }) : null;
 }

@@ -2,13 +2,16 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { TracerOptions } from "./types.js";
+import {
+  type DefaultOptions,
+  noop
+} from "./options.js";
 
 export function* arrayExpressionToString(
   node: ESTree.Node | null,
-  options: TracerOptions = {}
+  options: DefaultOptions = {}
 ): IterableIterator<string> {
-  const { tracer = null } = options;
+  const { externalIdentifierLookup = noop } = options;
 
   if (!node || node.type !== "ArrayExpression") {
     return;
@@ -34,8 +37,9 @@ export function* arrayExpressionToString(
         break;
       }
       case "Identifier": {
-        if (tracer?.literalIdentifiers.has(row.name)) {
-          yield tracer.literalIdentifiers.get(row.name);
+        const identifier = externalIdentifierLookup(row.name);
+        if (identifier !== null) {
+          yield identifier;
         }
         break;
       }
