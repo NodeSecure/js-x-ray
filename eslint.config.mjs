@@ -1,16 +1,16 @@
 // Import Third-party Dependencies
-import { ESLintConfig, typescriptConfig } from "@openally/config.eslint";
+import { typescriptConfig } from "@openally/config.eslint";
 
 export default [
   {
     ignores: [
       "**/test/fixtures/**/*",
       "**/test/probes/fixtures/**/*.js",
-      "**/examples/*.js"
+      "**/examples/*.js",
+      "**/temp/**"
     ]
   },
   ...typescriptConfig(),
-  ...ESLintConfig,
   {
     languageOptions: {
       sourceType: "module",

@@ -4,13 +4,16 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-import type { TracerOptions } from "./types.js";
+import {
+  type DefaultOptions,
+  noop
+} from "./options.js";
 
 export function getCallExpressionArguments(
   node: ESTree.Node,
-  options: TracerOptions = {}
+  options: DefaultOptions = {}
 ): string[] | null {
-  const { tracer = null } = options;
+  const { externalIdentifierLookup = noop } = options;
 
   if (node.type !== "CallExpression" || node.arguments.length === 0) {
     return null;
@@ -20,8 +23,9 @@ export function getCallExpressionArguments(
   for (const arg of node.arguments) {
     switch (arg.type) {
       case "Identifier": {
-        if (tracer !== null && tracer.literalIdentifiers.has(arg.name)) {
-          literalsNode.push(tracer.literalIdentifiers.get(arg.name)!);
+        const identifierValue = externalIdentifierLookup(arg.name);
+        if (identifierValue !== null) {
+          literalsNode.push(identifierValue);
         }
 
         break;
@@ -34,7 +38,9 @@ export function getCallExpressionArguments(
         break;
       }
       case "BinaryExpression": {
-        const concatenatedBinaryExpr = [...concatBinaryExpression(arg, { tracer })].join("");
+        const concatenatedBinaryExpr = [
+          ...concatBinaryExpression(arg, { externalIdentifierLookup })
+        ].join("");
         if (concatenatedBinaryExpr !== "") {
           literalsNode.push(concatenatedBinaryExpr);
         }

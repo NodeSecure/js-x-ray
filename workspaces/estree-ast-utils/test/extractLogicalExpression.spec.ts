@@ -2,6 +2,9 @@
 import { test } from "node:test";
 import assert from "node:assert";
 
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
 import { extractLogicalExpression } from "../src/index.js";
 import { codeToAst, getExpressionFromStatement } from "./utils.js";
@@ -31,7 +34,7 @@ test("it should extract all nodes and add up all Literal values", () => {
   );
 
   const total = [...iter]
-    .reduce((previous, { node }) => previous + node.value, 0);
+    .reduce((previous, { node }) => previous + (isLiteralNumber(node) ? node.value : 0), 0);
   assert.strictEqual(total, 50);
 });
 
@@ -46,3 +49,9 @@ test("it should extract all Nodes but with different operators and a LogicalExpr
   );
   assert.deepEqual([...operators], ["||", "&&"]);
 });
+
+function isLiteralNumber(
+  node: ESTree.Node
+): node is ESTree.Literal & { value: number; } {
+  return node.type === "Literal" && typeof node.value === "number";
+}

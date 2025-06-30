@@ -4,16 +4,19 @@ import { Hex } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-import type { TracerOptions } from "./types.js";
+import {
+  type DefaultOptions,
+  noop
+} from "./options.js";
 
 /**
  * Return the complete identifier of a MemberExpression
  */
 export function* getMemberExpressionIdentifier(
   node: ESTree.MemberExpression,
-  options: TracerOptions = {}
+  options: DefaultOptions = {}
 ): IterableIterator<string> {
-  const { tracer = null } = options;
+  const { externalIdentifierLookup = noop } = options;
 
   switch (node.object.type) {
     // Chain with another MemberExpression
@@ -33,11 +36,12 @@ export function* getMemberExpressionIdentifier(
 
   switch (node.property.type) {
     case "Identifier": {
-      if (tracer !== null && tracer.literalIdentifiers.has(node.property.name)) {
-        yield tracer.literalIdentifiers.get(node.property.name);
+      const identifierValue = externalIdentifierLookup(node.property.name);
+      if (identifierValue === null) {
+        yield node.property.name;
       }
       else {
-        yield node.property.name;
+        yield identifierValue;
       }
 
       break;

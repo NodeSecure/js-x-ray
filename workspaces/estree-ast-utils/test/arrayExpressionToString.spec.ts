@@ -7,7 +7,7 @@ import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
 import { arrayExpressionToString } from "../src/index.js";
-import { codeToAst, getExpressionFromStatement, createTracer } from "./utils.js";
+import { codeToAst, getExpressionFromStatement } from "./utils.js";
 
 test("given an ArrayExpression with two Literals then the iterable must return them one by one", () => {
   const [astNode] = codeToAst("['foo', 'bar']");
@@ -23,12 +23,17 @@ test("given an ArrayExpression with two Literals then the iterable must return t
 });
 
 test("given an ArrayExpression with two Identifiers then the iterable must return value from the Tracer", () => {
-  const { tracer } = createTracer();
-  tracer.literalIdentifiers.set("foo", "1");
-  tracer.literalIdentifiers.set("bar", "2");
+  const literalIdentifiers = new Map<string, string>();
+  literalIdentifiers.set("foo", "1");
+  literalIdentifiers.set("bar", "2");
 
   const [astNode] = codeToAst("[foo, bar]");
-  const iter = arrayExpressionToString(getExpressionFromStatement(astNode), { tracer });
+  const iter = arrayExpressionToString(
+    getExpressionFromStatement(astNode),
+    {
+      externalIdentifierLookup: (name: string) => literalIdentifiers.get(name) ?? null
+    }
+  );
 
   const iterResult = new IteratorMatcher()
     .expect("1")

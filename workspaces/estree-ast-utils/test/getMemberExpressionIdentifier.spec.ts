@@ -7,7 +7,7 @@ import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier } from "../src/index.js";
-import { codeToAst, createTracer, getExpressionFromStatement } from "./utils.js";
+import { codeToAst, getExpressionFromStatement } from "./utils.js";
 
 test("it must return all literals part of the given MemberExpression", () => {
   const [astNode] = codeToAst("foo.bar.xd");
@@ -60,13 +60,16 @@ test(`given a MemberExpression with a computed property containing a deep tree o
 
 test(`given a MemberExpression with computed properties containing identifiers
   then it must return all literals values from the tracer`, () => {
-  const { tracer } = createTracer();
-  tracer.literalIdentifiers.set("foo", "hello");
-  tracer.literalIdentifiers.set("yo", "bar");
+  const literalIdentifiers = new Map<string, string>();
+  literalIdentifiers.set("foo", "hello");
+  literalIdentifiers.set("yo", "bar");
 
   const [astNode] = codeToAst("hey[foo][yo]");
   const iter = getMemberExpressionIdentifier(
-    getExpressionFromStatement(astNode), { tracer }
+    getExpressionFromStatement(astNode),
+    {
+      externalIdentifierLookup: (name: string) => literalIdentifiers.get(name) ?? null
+    }
   );
 
   const iterResult = new IteratorMatcher()

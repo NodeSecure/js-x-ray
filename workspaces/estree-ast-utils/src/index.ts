@@ -5,3 +5,4 @@ export * from "./getCallExpressionArguments.js";
 export * from "./concatBinaryExpression.js";
 export * from "./arrayExpressionToString.js";
 export * from "./extractLogicalExpression.js";
+export type { DefaultOptions } from "./options.js";

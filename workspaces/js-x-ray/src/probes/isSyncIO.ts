@@ -62,9 +62,11 @@ function initialize(
   sourceFile: SourceFile
 ) {
   kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
+    const moduleName = identifierOrMemberExp.split(".")[0];
+
     return sourceFile.tracer.trace(identifierOrMemberExp, {
       followConsecutiveAssignment: true,
-      moduleName: identifierOrMemberExp.split(".")[0]
+      moduleName
     });
   });
 }
