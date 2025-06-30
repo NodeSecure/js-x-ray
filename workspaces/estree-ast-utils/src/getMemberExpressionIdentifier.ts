@@ -1,15 +1,16 @@
 // Import Third-party Dependencies
+import type { ESTree } from "meriyah";
 import { Hex } from "@nodesecure/sec-literal";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-import type { TracerOptions, NodeAst } from "./types.js";
+import type { TracerOptions } from "./types.js";
 
 /**
  * Return the complete identifier of a MemberExpression
  */
 export function* getMemberExpressionIdentifier(
-  node: NodeAst,
+  node: ESTree.MemberExpression,
   options: TracerOptions = {}
 ): IterableIterator<string> {
   const { tracer = null } = options;
@@ -24,7 +25,9 @@ export function* getMemberExpressionIdentifier(
       break;
     // Literal is used when the property is computed
     case "Literal":
-      yield node.object.value;
+      if (typeof node.object.value === "string") {
+        yield node.object.value;
+      }
       break;
   }
 
@@ -41,13 +44,20 @@ export function* getMemberExpressionIdentifier(
     }
     // Literal is used when the property is computed
     case "Literal":
-      yield node.property.value;
+      if (typeof node.property.value === "string") {
+        yield node.property.value;
+      }
       break;
 
     // foo.bar[callexpr()]
     case "CallExpression": {
       const args = node.property.arguments;
-      if (args.length > 0 && args[0].type === "Literal" && Hex.isHex(args[0].value)) {
+      if (
+        args.length > 0 &&
+        args[0].type === "Literal" &&
+        typeof args[0].value === "string" &&
+        Hex.isHex(args[0].value)
+      ) {
         yield Buffer.from(args[0].value, "hex").toString();
       }
       break;

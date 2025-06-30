@@ -1,13 +1,24 @@
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.js";
-import type { TracerOptions, NodeAst } from "./types.js";
+import type { TracerOptions } from "./types.js";
 
 export interface GetCallExpressionIdentifierOptions extends TracerOptions {
+  /**
+   * Resolve the CallExpression callee if it is a MemberExpression.
+   *
+   * @default true
+   * @example
+   * require('./file.js')();
+            ^ Second     ^ First
+   */
   resolveCallExpression?: boolean;
 }
 
 export function getCallExpressionIdentifier(
-  node: NodeAst,
+  node: ESTree.Node,
   options: GetCallExpressionIdentifierOptions = {}
 ): string | null {
   if (node.type !== "CallExpression") {
