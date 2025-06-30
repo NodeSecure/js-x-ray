@@ -1,8 +1,11 @@
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
-import type { TracerOptions, NodeAst } from "./types.js";
+import type { TracerOptions } from "./types.js";
 
 export function* arrayExpressionToString(
-  node: NodeAst,
+  node: ESTree.Node | null,
   options: TracerOptions = {}
 ): IterableIterator<string> {
   const { tracer = null } = options;
@@ -12,18 +15,26 @@ export function* arrayExpressionToString(
   }
 
   for (const row of node.elements) {
+    if (row === null) {
+      continue;
+    }
+
     switch (row.type) {
       case "Literal": {
-        if (row.value === "") {
+        if (
+          row.value === ""
+        ) {
           continue;
         }
 
         const value = Number(row.value);
-        yield Number.isNaN(value) ? row.value : String.fromCharCode(value);
+        yield Number.isNaN(value) ?
+          String(row.value) :
+          String.fromCharCode(value);
         break;
       }
       case "Identifier": {
-        if (tracer !== null && tracer.literalIdentifiers.has(row.name)) {
+        if (tracer?.literalIdentifiers.has(row.name)) {
           yield tracer.literalIdentifiers.get(row.name);
         }
         break;

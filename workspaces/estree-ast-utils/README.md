@@ -20,7 +20,7 @@ $ yarn add @nodesecure/estree-ast-utils
 
 ## API
 
-<details><summary>arrayExpressionToString(node): IterableIterator< string ></summary>
+<details><summary>arrayExpressionToString(node: ESTree.Node | null): IterableIterator< string ></summary>
 
 Translate an ESTree ArrayExpression into an iterable of Literal value.
 
@@ -32,7 +32,7 @@ will return `"foo"` then `"bar"`.
 
 </details>
 
-<details><summary>concatBinaryExpression(node, options): IterableIterator< string ></summary>
+<details><summary>concatBinaryExpression(node: ESTree.BinaryExpression, options?: ConcatBinaryExpressionOptions): IterableIterator< string ></summary>
 
 Return all Literal part of a given Binary Expression.
 
@@ -42,11 +42,17 @@ Return all Literal part of a given Binary Expression.
 
 will return `"foo"` then `"bar"`.
 
-One of the options of the method is `stopOnUnsupportedNode`, if true it will throw an Error if the left or right side of the Expr is not a supported type.
+```ts
+export interface ConcatBinaryExpressionOptions extends TracerOptions {
+  stopOnUnsupportedNode?: boolean;
+}
+```
+
+If `stopOnUnsupportedNode` option is enabled it will throw an Error if the left or right side of the Expr is not a supported type.
 
 </details>
 
-<details><summary>getCallExpressionIdentifier(node, options): string | null</summary>
+<details><summary>getCallExpressionIdentifier(node: ESTree.Node, options?: GetCallExpressionIdentifierOptions): string | null</summary>
 
 Return the identifier name of the CallExpression (or null if there is none).
 
@@ -69,7 +75,7 @@ With **resolveCallExpression** equal to **false** the function return `null`.
 
 </details>
 
-<details><summary>getMemberExpressionIdentifier(node): IterableIterator< string ></summary>
+<details><summary>getMemberExpressionIdentifier(node: ESTree.MemberExpression, options?: TracerOptions): IterableIterator< string ></summary>
 
 Return the identifier name of the CallExpression (or null if there is none).
 
@@ -81,7 +87,7 @@ will return `"foo"` then `"bar"`.
 
 </details>
 
-<details><summary>getVariableDeclarationIdentifiers(node): IterableIterator< string ></summary>
+<details><summary>getVariableDeclarationIdentifiers(node: any, options?: GetVariableDeclarationIdentifiersOptions): IterableIterator< string ></summary>
 
 Get all variables identifier name.
 
@@ -93,17 +99,7 @@ will return `"foo"` then `"bar"`.
 
 </details>
 
-<details><summary>isLiteralRegex(node): boolean</summary>
-
-Return `true` if the given Node is a Literal Regex Node.
-
-```js
-/^hello/g;
-```
-
-</details>
-
-<details><summary>extractLogicalExpression(node)</summary>
+<details><summary>extractLogicalExpression(node: ESTree.Node): IterableIterator< { operator: string; node: ESTree.Expression; } ></summary>
 
 Extract all LogicalExpression recursively and return an IterableIterator of 
 

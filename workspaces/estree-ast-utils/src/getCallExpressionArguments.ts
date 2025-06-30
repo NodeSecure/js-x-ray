@@ -1,12 +1,13 @@
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
+import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.js";
-import type { TracerOptions, NodeAst } from "./types.js";
+import type { TracerOptions } from "./types.js";
 
 export function getCallExpressionArguments(
-  node: NodeAst,
+  node: ESTree.Node,
   options: TracerOptions = {}
 ): string[] | null {
   const { tracer = null } = options;
@@ -26,7 +27,9 @@ export function getCallExpressionArguments(
         break;
       }
       case "Literal": {
-        literalsNode.push(hexToString(arg.value));
+        if (typeof arg.value === "string") {
+          literalsNode.push(hexToString(arg.value));
+        }
 
         break;
       }

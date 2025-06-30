@@ -1,11 +1,9 @@
-// Import Internal Dependencies
-import type { NodeAst } from "./types.js";
-
-export type LogicalExpressionOperators = "||" | "&&" | "??";
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
 
 export function* extractLogicalExpression(
-  node: NodeAst
-): IterableIterator<{ operator: LogicalExpressionOperators; node: NodeAst; }> {
+  node: ESTree.Node
+): IterableIterator<{ operator: string; node: ESTree.Expression; }> {
   if (node.type !== "LogicalExpression") {
     return;
   }
