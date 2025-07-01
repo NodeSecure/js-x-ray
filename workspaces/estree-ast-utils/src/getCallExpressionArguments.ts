@@ -15,7 +15,12 @@ export function getCallExpressionArguments(
 ): string[] | null {
   const { externalIdentifierLookup = noop } = options;
 
-  if (node.type !== "CallExpression" || node.arguments.length === 0) {
+  if (
+    // eslint-disable-next-line no-eq-null
+    node == null ||
+    node.type !== "CallExpression" ||
+    node.arguments.length === 0
+  ) {
     return null;
   }
 

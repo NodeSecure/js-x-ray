@@ -21,19 +21,34 @@ export function* getVariableDeclarationIdentifiers(
   switch (node.type) {
     case "VariableDeclaration": {
       for (const variableDeclarator of node.declarations) {
-        yield* getVariableDeclarationIdentifiers(variableDeclarator.id);
+        yield* getVariableDeclarationIdentifiers(
+          variableDeclarator,
+          options
+        );
       }
 
       break;
     }
 
     case "VariableDeclarator":
-      yield* getVariableDeclarationIdentifiers(node.id);
+      yield* getVariableDeclarationIdentifiers(
+        node.id,
+        options
+      );
+      if (node.init !== null) {
+        yield* getVariableDeclarationIdentifiers(
+          node.init,
+          options
+        );
+      }
 
       break;
 
     case "Identifier":
-      yield { name: autoPrefix(node.name, prefix), assignmentId: node };
+      yield {
+        name: autoPrefix(node.name, prefix),
+        assignmentId: node
+      };
 
       break;
 
@@ -87,10 +102,30 @@ export function* getVariableDeclarationIdentifiers(
       break;
 
     /**
+     * ({ foo: 5, bar: null })
+     */
+    case "ObjectExpression": {
+      for (const property of node.properties) {
+        yield* getVariableDeclarationIdentifiers(property, options);
+      }
+      break;
+    }
+
+    /**
+     * (foo = 5, bar = null)
+     */
+    case "SequenceExpression": {
+      for (const expr of node.expressions) {
+        yield* getVariableDeclarationIdentifiers(expr, options);
+      }
+      break;
+    }
+
+    /**
      * (foo = 5)
      */
     case "AssignmentExpression":
-      yield* getVariableDeclarationIdentifiers(node.left);
+      yield* getVariableDeclarationIdentifiers(node.left, options);
 
       break;
 
@@ -104,7 +139,7 @@ export function* getVariableDeclarationIdentifiers(
         yield { name: node.left.name, assignmentId: node.left };
       }
       else {
-        yield* getVariableDeclarationIdentifiers(node.left);
+        yield* getVariableDeclarationIdentifiers(node.left, options);
       }
 
       break;
@@ -116,7 +151,7 @@ export function* getVariableDeclarationIdentifiers(
     case "ArrayPattern":
       yield* node.elements
         .filter(notNullOrUndefined)
-        .map((id) => [...getVariableDeclarationIdentifiers(id)]).flat();
+        .map((id) => [...getVariableDeclarationIdentifiers(id, options)]).flat();
 
       break;
 
@@ -127,7 +162,7 @@ export function* getVariableDeclarationIdentifiers(
     case "ObjectPattern":
       yield* node.properties
         .filter(notNullOrUndefined)
-        .map((property) => [...getVariableDeclarationIdentifiers(property)]).flat();
+        .map((property) => [...getVariableDeclarationIdentifiers(property, options)]).flat();
 
       break;
   }
