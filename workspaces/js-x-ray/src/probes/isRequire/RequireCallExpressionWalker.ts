@@ -96,8 +96,11 @@ export class RequireCallExpressionWalker {
   ): void {
     const nodeArguments = getCallExpressionArguments(
       node,
-      { tracer: this.tracer }
+      {
+        externalIdentifierLookup: (name) => this.tracer.literalIdentifiers.get(name) ?? null
+      }
     );
+
     if (nodeArguments !== null && nodeArguments.length > 0) {
       this.dependencies.add(
         Buffer.from(nodeArguments.at(0)!, "base64").toString()

@@ -113,7 +113,11 @@ function main(
 
     // require(["ht", "tp"])
     case "ArrayExpression": {
-      const value = [...arrayExpressionToString(arg, { tracer })]
+      const value = [
+        ...arrayExpressionToString(arg, {
+          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
+        })
+      ]
         .join("")
         .trim();
 
@@ -139,7 +143,8 @@ function main(
 
       try {
         const iter = concatBinaryExpression(arg, {
-          tracer, stopOnUnsupportedNode: true
+          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null,
+          stopOnUnsupportedNode: true
         });
 
         sourceFile.addDependency([...iter].join(""), node.loc);
