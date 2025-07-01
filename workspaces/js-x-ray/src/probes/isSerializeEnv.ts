@@ -19,10 +19,17 @@ import { ProbeSignals } from "../ProbeRunner.js";
  * JSON.stringify(process[`env`])
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Node,
+  { tracer }: SourceFile
 ): [boolean, any?] {
   const id = getCallExpressionIdentifier(node);
-  if (id !== "JSON.stringify") {
+
+  if (id === null) {
+    return [false];
+  }
+  const data = tracer.getDataFromIdentifier(id);
+
+  if (data === null || data.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
@@ -35,6 +42,13 @@ function validateNode(
   if (firstArg.type === "MemberExpression") {
     const memberExprId = [...getMemberExpressionIdentifier(firstArg)].join(".");
     if (memberExprId === "process.env") {
+      return [true];
+    }
+  }
+
+  if (firstArg.type === "Identifier") {
+    const data = tracer.getDataFromIdentifier("process.env");
+    if (data !== null && data.assignmentMemory.includes(firstArg.name)) {
       return [true];
     }
   }
@@ -57,9 +71,18 @@ function main(
   return ProbeSignals.Skip;
 }
 
+function initialize(sourceFile: SourceFile) {
+  sourceFile.tracer.trace("process.env", {
+    followConsecutiveAssignment: true
+  }).trace("JSON.stringify", {
+    followConsecutiveAssignment: true
+  });
+}
+
 export default {
   name: "isSerializeEnv",
   validateNode,
+  initialize,
   main,
   breakOnMatch: false
 };
