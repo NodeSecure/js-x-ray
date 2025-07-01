@@ -42,7 +42,12 @@ function validateNode(
   node: ESTree.Node,
   { tracer }: SourceFile
 ): [boolean, any?] {
-  const id = getCallExpressionIdentifier(node, { tracer });
+  const id = getCallExpressionIdentifier(
+    node,
+    {
+      externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
+    }
+  );
   if (
     id === null ||
     !kTracedNodeCoreModules.some((moduleName) => tracer.importedModules.has(moduleName))
