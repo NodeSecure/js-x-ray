@@ -1,5 +1,11 @@
 # @nodesecure/estree-ast-utils
 
+## 4.1.0
+
+### Minor Changes
+
+- [#374](https://github.com/NodeSecure/js-x-ray/pull/374) [`19f9822`](https://github.com/NodeSecure/js-x-ray/commit/19f9822fb74ea6de9d2978106a719ce93dcbb918) Thanks [@fraxken](https://github.com/fraxken)! - Add missing utilities UT
+
 ## 4.0.0
 
 ### Major Changes
