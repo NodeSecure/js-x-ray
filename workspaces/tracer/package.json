@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/tracer",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "JS-X-Ray variables and assignments tracer",
   "exports": "./dist/index.js",
   "private": false,
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/tracer#readme",
   "dependencies": {
-    "@nodesecure/estree-ast-utils": "^3.0.0",
+    "@nodesecure/estree-ast-utils": "^4.0.0",
     "meriyah": "^6.1.3"
   }
 }
