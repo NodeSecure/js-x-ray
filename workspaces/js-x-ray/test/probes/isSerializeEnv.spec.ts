@@ -53,7 +53,7 @@ test("should detect process.env reassignment", () => {
   assert.strictEqual(warning.value, "JSON.stringify(process.env)");
 });
 
-test("should not falsly detect process.env", () => {
+test("should not detect process.env", () => {
   const str = `
   const env = {};
   const env2 = process.env;
