@@ -36,10 +36,7 @@
     "security"
   ],
   "files": [
-    "src",
-    "types",
-    "index.js",
-    "index.d.ts"
+    "dist"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
