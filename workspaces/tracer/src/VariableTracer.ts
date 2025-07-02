@@ -409,7 +409,12 @@ export class VariableTracer extends EventEmitter {
           this.#walkRequireCallExpression(childNode, id);
         }
         else if (tracedFullIdentifierName === "atob") {
-          const callExprArguments = getCallExpressionArguments(childNode, { tracer: this });
+          const callExprArguments = getCallExpressionArguments(
+            childNode,
+            {
+              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
+            }
+          );
           if (callExprArguments === null) {
             break;
           }
@@ -442,7 +447,14 @@ export class VariableTracer extends EventEmitter {
       // process.mainModule and require.resolve
       case "MemberExpression": {
         // Example: ["process", "mainModule"]
-        const memberExprParts = [...getMemberExpressionIdentifier(childNode, { tracer: this })];
+        const memberExprParts = [
+          ...getMemberExpressionIdentifier(
+            childNode,
+            {
+              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
+            }
+          )
+        ];
         const memberExprFullname = memberExprParts.join(".");
 
         // Function.prototype.call

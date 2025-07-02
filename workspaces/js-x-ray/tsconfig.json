@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist"
+  },
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../estree-ast-utils"
+    },
+    {
+      "path": "../tracer"
+    },
+    {
+      "path": "../sec-literal"
+    }
+  ]
+}

@@ -1,6 +1,12 @@
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
 import { arrayExpressionToString } from "./arrayExpressionToString.js";
-import type { TracerOptions, NodeAst } from "./types.js";
+import {
+  type DefaultOptions,
+  noop
+} from "./options.js";
 
 // CONSTANTS
 const kBinaryExprTypes = new Set([
@@ -10,16 +16,24 @@ const kBinaryExprTypes = new Set([
   "Identifier"
 ]);
 
-export interface ConcatBinaryExpressionOptions extends TracerOptions {
+export interface ConcatBinaryExpressionOptions extends DefaultOptions {
+  /**
+   * When set to true, the function will throw an error if it encounters
+   * a node type that is not supported (i.e., not a Literal, BinaryExpr, ArrayExpr or Identifier).
+   *
+   * @default false
+   * @example
+   * "foo" + fn() + "bar" // <- will throw an error if `stopOnUnsupportedNode` is true
+   */
   stopOnUnsupportedNode?: boolean;
 }
 
 export function* concatBinaryExpression(
-  node: NodeAst,
+  node: ESTree.BinaryExpression,
   options: ConcatBinaryExpressionOptions = {}
 ): IterableIterator<string> {
   const {
-    tracer = null,
+    externalIdentifierLookup = noop,
     stopOnUnsupportedNode = false
   } = options;
   const { left, right } = node;
@@ -35,23 +49,30 @@ export function* concatBinaryExpression(
     switch (childNode.type) {
       case "BinaryExpression": {
         yield* concatBinaryExpression(childNode, {
-          tracer,
+          externalIdentifierLookup,
           stopOnUnsupportedNode
         });
         break;
       }
       case "ArrayExpression": {
-        yield* arrayExpressionToString(childNode, { tracer });
+        yield* arrayExpressionToString(
+          childNode,
+          { externalIdentifierLookup }
+        );
         break;
       }
       case "Literal":
-        yield childNode.value;
-        break;
-      case "Identifier":
-        if (tracer !== null && tracer.literalIdentifiers.has(childNode.name)) {
-          yield tracer.literalIdentifiers.get(childNode.name);
+        if (typeof childNode.value === "string") {
+          yield childNode.value;
         }
         break;
+      case "Identifier": {
+        const identifier = externalIdentifierLookup(childNode.name);
+        if (identifier) {
+          yield identifier;
+        }
+        break;
+      }
     }
   }
 }

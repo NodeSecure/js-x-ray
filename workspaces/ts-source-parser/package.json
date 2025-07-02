@@ -9,8 +9,7 @@
     "prepublishOnly": "npm run build",
     "build": "tsc",
     "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
-    "test": "c8 --all --src ./src -r html npm run test-only",
-    "check": "npm run lint && npm run test"
+    "test": "c8 --all --src ./src -r html npm run test-only"
   },
   "repository": {
     "type": "git",

@@ -1,16 +1,16 @@
 {
   "name": "@nodesecure/js-x-ray",
-  "version": "9.0.0",
+  "version": "9.2.0",
   "description": "JavaScript AST XRay analysis",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./src/index.js",
-      "types": "./src/index.d.ts"
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./warnings": {
-      "import": "./src/warnings.js",
-      "types": "./types/warnings.d.ts"
+      "import": "./dist/warnings.js",
+      "types": "./dist/warnings.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -18,7 +18,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "test-only": "glob -c \"node --test-reporter=spec --test\" \"./test/**/*.spec.js\"",
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
     "test": "c8 --all --src ./src -r html npm run test-only"
   },
   "repository": {
@@ -34,10 +36,7 @@
     "security"
   ],
   "files": [
-    "src",
-    "types",
-    "index.js",
-    "index.d.ts"
+    "dist"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
@@ -46,9 +45,9 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "@nodesecure/estree-ast-utils": "^1.5.0",
+    "@nodesecure/estree-ast-utils": "^4.1.0",
     "@nodesecure/sec-literal": "^1.2.0",
-    "@nodesecure/tracer": "^1.0.0",
+    "@nodesecure/tracer": "^2.0.0",
     "digraph-js": "^2.2.3",
     "estree-walker": "^3.0.1",
     "frequency-set": "^1.0.2",
