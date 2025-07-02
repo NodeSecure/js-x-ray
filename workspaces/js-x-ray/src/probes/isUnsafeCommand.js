@@ -2,7 +2,7 @@
 import { ProbeSignals } from "../ProbeRunner.js";
 
 // CONSTANTS
-const kUnsafeCommands = ["csrutil"];
+const kUnsafeCommands = ["csrutil", "uname"];
 
 function isUnsafeCommand(command) {
   return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
