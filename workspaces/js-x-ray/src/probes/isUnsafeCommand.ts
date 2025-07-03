@@ -8,7 +8,7 @@ import { ProbeSignals } from "../ProbeRunner.js";
 import { isLiteral } from "../types/estree.js";
 
 // CONSTANTS
-const kUnsafeCommands = ["csrutil"];
+const kUnsafeCommands = ["csrutil", "uname"];
 
 function isUnsafeCommand(
   command: string

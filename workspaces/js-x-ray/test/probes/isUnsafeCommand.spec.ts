@@ -89,3 +89,28 @@ test("should not detect non suspicious command", () => {
     assert.equal(sastAnalysis.warnings().length, 0);
   });
 });
+
+// Note: Until we can safely test with actual malware samples,
+// these tests uses a truncated snippet from a known malicious package.
+
+test("aog-checker detection", () => {
+  // Ref: https://socket.dev/npm/package/aog-checker/files/99.99.99/index.js
+  const maliciousCode = `
+	  const { execSync } = require("child_process");
+    // truncated ...
+    let uname = "";
+    try {
+      uname = execSync("uname -a").toString().trim();
+    } catch (e) {
+      uname = "N/A";
+    }
+  `;
+
+  const ast = parseScript(maliciousCode);
+  const sastAnalysis = getSastAnalysis(maliciousCode, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
+  assert.equal(result.kind, kWarningUnsafeCommand);
+  assert.equal(result.value, "uname -a");
+});
