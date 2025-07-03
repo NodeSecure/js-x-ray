@@ -90,17 +90,17 @@ export const warnings = Object.freeze({
     experimental: false
   },
   "unsafe-command": {
-    i18n: "sast_warnings.unsafe-command",
+    i18n: "sast_warnings.unsafe_command",
     severity: "Warning",
     experimental: true
   },
   "synchronous-io": {
-    i18n: "sast_warnings.synchronous-io",
+    i18n: "sast_warnings.synchronous_io",
     severity: "Warning",
     experimental: true
   },
   "serialize-environment": {
-    i18n: "sast_warnings.serialize-environment",
+    i18n: "sast_warnings.serialize_environment",
     severity: "Warning",
     experimental: false
   }
