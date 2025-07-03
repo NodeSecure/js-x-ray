@@ -19,6 +19,8 @@ export function getExpressionFromStatement(node: any) {
   return node.type === "ExpressionStatement" ? node.expression : null;
 }
 
-export function getExpressionFromStatementIf(node: any) {
+export function getExpressionFromStatementIf(
+  node: any
+) {
   return node.type === "ExpressionStatement" ? node.expression : node;
 }

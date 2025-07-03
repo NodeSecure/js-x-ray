@@ -33,7 +33,7 @@ You can provide a custom `externalIdentifierLookup` function to enable the utili
 ---
 
 <details>
-<summary>arrayExpressionToString(node: ESTree.Node | null): IterableIterator< string ></summary>
+<summary>arrayExpressionToString(node: ESTree.Node | null, options?: ArrayExpressionToStringOptions): IterableIterator< string ></summary>
 
 Transforms an ESTree `ArrayExpression` into an iterable of literal values.
 
@@ -42,6 +42,37 @@ Transforms an ESTree `ArrayExpression` into an iterable of literal values.
 ```
 
 will yield `"foo"`, then `"bar"`.
+
+```ts
+export interface ArrayExpressionToStringOptions extends DefaultOptions {
+  /**
+   * When enabled, resolves the char code of the literal value.
+   *
+   * @default true
+   * @example
+   * [65, 66] // => ['A', 'B']
+   */
+  resolveCharCode?: boolean;
+}
+```
+
+</details>
+
+<details>
+<summary>joinArrayExpression(node: ESTree.Node | null, options?: DefaultOptions): string | null</summary>
+
+Compute simple ArrayExpression that are using a CallExpression `join()`
+
+```js
+{
+  host: [
+    ["goo", "g", "gle"].join(""),
+    "com"
+  ].join(".")
+}
+```
+
+Will return `google.com`
 
 </details>
 

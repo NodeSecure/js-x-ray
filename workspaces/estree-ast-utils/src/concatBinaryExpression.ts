@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { arrayExpressionToString } from "./arrayExpressionToString.js";
+import { arrayExpressionToString } from "./arrayExpression.js";
 import {
   type DefaultOptions,
   noop
