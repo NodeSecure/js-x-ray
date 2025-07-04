@@ -19,6 +19,7 @@ import isFetch from "./probes/isFetch.js";
 import isUnsafeCommand from "./probes/isUnsafeCommand.js";
 import isSyncIO from "./probes/isSyncIO.js";
 import isSerializeEnv from "./probes/isSerializeEnv.js";
+import dataExfiltration from "./probes/dataExfiltration.js";
 
 import type { SourceFile } from "./SourceFile.js";
 import type { OptionalWarningName } from "./warnings.js";
@@ -70,7 +71,8 @@ export class ProbeRunner {
     isBinaryExpression,
     isArrayExpression,
     isUnsafeCommand,
-    isSerializeEnv
+    isSerializeEnv,
+    dataExfiltration
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {
