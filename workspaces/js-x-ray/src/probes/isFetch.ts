@@ -6,11 +6,22 @@ import type { ESTree } from "meriyah";
 import { SourceFile } from "../SourceFile.js";
 
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Node,
+  { tracer }: SourceFile
 ): [boolean, any?] {
   const id = getCallExpressionIdentifier(node);
 
-  return [id === "fetch"];
+  if (id === null) {
+    return [false];
+  }
+
+  const data = tracer.getDataFromIdentifier(id);
+
+  return [data !== null && data.identifierOrMemberExpr === "fetch"];
+}
+
+function initialize(sourceFile: SourceFile) {
+  sourceFile.tracer.trace("fetch", { followConsecutiveAssignment: true });
 }
 
 function main(
@@ -23,6 +34,7 @@ function main(
 export default {
   name: "isFetch",
   validateNode,
+  initialize,
   main,
   breakOnMatch: false
 };
