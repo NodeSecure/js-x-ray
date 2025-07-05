@@ -1,5 +1,20 @@
 # @nodesecure/js-x-ray
 
+## 9.3.0
+
+### Minor Changes
+
+- [#382](https://github.com/NodeSecure/js-x-ray/pull/382) [`bc62d3e`](https://github.com/NodeSecure/js-x-ray/commit/bc62d3eeac861ff75e4dcd7901a77c6ef09ef461) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(probes): add finalize callback
+
+- [#380](https://github.com/NodeSecure/js-x-ray/pull/380) [`99fd4fe`](https://github.com/NodeSecure/js-x-ray/commit/99fd4fe674ce880bf5d91d0d2589a3bba6a68097) Thanks [@clemgbld](https://github.com/clemgbld)! - refactor(probes): isFetch detect fetch re-assigment
+
+### Patch Changes
+
+- [#376](https://github.com/NodeSecure/js-x-ray/pull/376) [`d5b98de`](https://github.com/NodeSecure/js-x-ray/commit/d5b98de21ce00282c5226f663513a2236d45bbdc) Thanks [@tony-go](https://github.com/tony-go)! - Handle uname as unsafe-command
+
+- Updated dependencies [[`53b25a4`](https://github.com/NodeSecure/js-x-ray/commit/53b25a485fed51776c673b4e86de907faa25989e)]:
+  - @nodesecure/estree-ast-utils@4.2.0
+
 ## 9.2.0
 
 ### Minor Changes
