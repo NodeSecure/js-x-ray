@@ -355,7 +355,7 @@ describe("AstAnalyser", () => {
       assert.equal(result.warnings.length, 1);
     });
 
-    it("should call initialize and finialize of every probes at the end", async(t) => {
+    it("should call initialize and finalize of every probes at the end", async(t) => {
       const calls: string[] = [];
       await new AstAnalyser(
         {
