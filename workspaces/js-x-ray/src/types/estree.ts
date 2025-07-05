@@ -5,6 +5,10 @@ export type Literal<T> = ESTree.Literal & {
   value: T;
 };
 
+export type TemplateLiteral<T> = ESTree.TemplateLiteral & {
+  value: T;
+};
+
 export type RegExpLiteral<T> = ESTree.RegExpLiteral & {
   value: T;
 };
@@ -26,6 +30,15 @@ export function isLiteral(
   return isNode(node) &&
     node.type === "Literal" &&
     typeof node.value === "string";
+}
+
+export function isTemplateLiteral(
+  node: any
+): node is TemplateLiteral<string> {
+  return isNode(node) &&
+    node.type === "TemplateLiteral" &&
+    node.quasis.at(0).type === "TemplateElement" &&
+    typeof node.quasis.at(0).value.raw === "string";
 }
 
 export function isCallExpression(
