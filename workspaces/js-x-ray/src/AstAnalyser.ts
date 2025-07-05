@@ -137,6 +137,7 @@ export class AstAnalyser {
       }
       finalize(source);
     }
+    source.probesRunner.finalize();
 
     // Add oneline-require flag if this is a one-line require expression
     if (isOneLineExpressionExport(body)) {

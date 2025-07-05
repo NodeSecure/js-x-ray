@@ -355,6 +355,33 @@ describe("AstAnalyser", () => {
       assert.equal(result.warnings.length, 1);
     });
 
+    it("should call initialize and finalize of every probes at the end", async(t) => {
+      const calls: string[] = [];
+      await new AstAnalyser(
+        {
+          customParser: new JsSourceParser(),
+          customProbes: [
+            {
+              name: "name",
+              initialize: () => calls.push("initialize"),
+              validateNode: () => [true],
+              main: t.mock.fn(),
+              finalize: () => calls.push("finalize")
+            },
+            {
+              name: "classic probe",
+              validateNode: () => [true],
+              main: t.mock.fn()
+            }
+
+          ],
+          skipDefaultProbes: true
+        }
+      ).analyseFile(new URL("customProbe.js", kFixtureURL));
+
+      assert.deepEqual(calls, ["initialize", "finalize"]);
+    });
+
     describe("hooks", () => {
       const analyser = new AstAnalyser();
       const url = new URL("depName.js", kFixtureURL);

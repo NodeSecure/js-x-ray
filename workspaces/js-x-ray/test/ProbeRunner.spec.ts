@@ -145,4 +145,47 @@ describe("ProbeRunner", () => {
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
     });
   });
+
+  describe("finalize", () => {
+    it("should call the finalize methods", () => {
+      const fakeProbe = {
+        validateNode: (_: ESTree.Node) => [true],
+        main: () => ProbeSignals.Skip,
+        finalize: mock.fn()
+      };
+
+      const fakeProbeSkip = {
+        validateNode: (_: ESTree.Node) => [true],
+        main: () => ProbeSignals.Skip,
+        teardown: mock.fn(),
+        finalize: mock.fn()
+      };
+
+      const fakeProbeBreak = {
+        validateNode: (_: ESTree.Node) => [true],
+        main: () => ProbeSignals.Break,
+        teardown: mock.fn(),
+        finalize: mock.fn()
+      };
+
+      const probes = [fakeProbe, fakeProbeBreak, fakeProbeSkip];
+
+      const sourceFile = new SourceFile("");
+
+      const pr = new ProbeRunner(
+        sourceFile,
+        // @ts-expect-error
+        probes
+      );
+
+      pr.finalize();
+
+      probes.forEach((probe) => {
+        assert.strictEqual(probe.finalize.mock.calls.length, 1);
+        assert.deepEqual(probe.finalize.mock.calls.at(0)?.arguments, [
+          sourceFile
+        ]);
+      });
+    });
+  });
 });

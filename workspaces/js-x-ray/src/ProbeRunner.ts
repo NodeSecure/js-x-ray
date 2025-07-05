@@ -25,6 +25,7 @@ import type { OptionalWarningName } from "./warnings.js";
 
 export type ProbeReturn = void | null | symbol;
 export type ProbeInitializeCallback = (sourceFile: SourceFile) => void;
+export type ProbeFinalizeCallback = (sourceFile: SourceFile) => void;
 export type ProbeMainCallback = (
   node: any,
   options: { sourceFile: SourceFile; data?: any; }
@@ -35,6 +36,7 @@ export type ProbeValidationCallback = (node: ESTree.Node, sourceFile: SourceFile
 export interface Probe {
   name: string;
   initialize?: ProbeInitializeCallback;
+  finalize?: ProbeFinalizeCallback;
   validateNode: ProbeValidationCallback | ProbeValidationCallback[];
   main: ProbeMainCallback;
   teardown?: ProbeTeardownCallback;
@@ -163,5 +165,13 @@ export class ProbeRunner {
     }
 
     return null;
+  }
+
+  finalize(): void {
+    for (const probe of this.probes) {
+      if (probe.finalize) {
+        probe.finalize(this.sourceFile);
+      }
+    }
   }
 }
