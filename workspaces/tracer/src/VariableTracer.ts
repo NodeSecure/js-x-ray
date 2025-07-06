@@ -46,19 +46,25 @@ export interface DataIdentifierOptions {
 
 export interface SourceTraced {
   followConsecutiveAssignment?: boolean;
+  followReturnValueAssignement?: boolean;
   moduleName?: string | null;
   name?: string;
 }
 
+export interface AssignmentMemory {
+  type: "AliasBinding" | "ReturnValueAssignment";
+  name: string;
+}
+
 export interface Traced extends Required<SourceTraced> {
   identifierOrMemberExpr: string;
-  assignmentMemory: string[];
+  assignmentMemory: AssignmentMemory[];
 }
 
 export interface TracedIdentifierReport {
   name: string;
   identifierOrMemberExpr: string;
-  assignmentMemory: string[];
+  assignmentMemory: AssignmentMemory[];
 }
 
 export class VariableTracer extends EventEmitter {
@@ -99,6 +105,7 @@ export class VariableTracer extends EventEmitter {
   ) {
     const {
       followConsecutiveAssignment = false,
+      followReturnValueAssignement = false,
       moduleName = null,
       name = identifierOrMemberExpr
     } = options;
@@ -107,6 +114,7 @@ export class VariableTracer extends EventEmitter {
       name,
       identifierOrMemberExpr,
       followConsecutiveAssignment,
+      followReturnValueAssignement,
       assignmentMemory: [],
       moduleName
     });
@@ -224,7 +232,10 @@ export class VariableTracer extends EventEmitter {
     this.emit(tracedVariant.identifierOrMemberExpr, assignmentEventPayload);
 
     if (tracedVariant.followConsecutiveAssignment && !this.#traced.has(newIdentiferName)) {
-      this.#traced.get(tracedVariant.name)!.assignmentMemory.push(newIdentiferName);
+      this.#traced.get(tracedVariant.name)!.assignmentMemory.push({
+        type: "AliasBinding",
+        name: newIdentiferName
+      });
       this.#traced.set(newIdentiferName, tracedVariant);
     }
   }
@@ -382,6 +393,36 @@ export class VariableTracer extends EventEmitter {
         break;
       }
 
+      case "ObjectExpression": {
+        for (const prop of childNode.properties) {
+          switch (prop.type) {
+            case "Property": {
+              this.#walkVariableDeclarationInitialization(variableDeclaratorNode,
+                prop.value as ESTree.VariableDeclarator["init"]);
+              break;
+            }
+            case "SpreadElement": {
+              this.#walkVariableDeclarationInitialization(variableDeclaratorNode,
+                prop.argument as ESTree.VariableDeclarator["init"]);
+              break;
+            }
+          }
+        }
+        break;
+      }
+
+      case "ArrayExpression": {
+        for (const element of childNode.elements) {
+          this.#walkVariableDeclarationInitialization(variableDeclaratorNode, element);
+        }
+        break;
+      }
+
+      case "SpreadElement": {
+        this.#walkVariableDeclarationInitialization(variableDeclaratorNode, childNode.argument);
+        break;
+      }
+
       /**
        * const g = eval("this");
        * const g = Function("return this")();
@@ -395,6 +436,13 @@ export class VariableTracer extends EventEmitter {
         const tracedFullIdentifierName = this.#getTracedName(fullIdentifierPath) ?? fullIdentifierPath;
         const [identifierName] = fullIdentifierPath.split(".");
 
+        const tracedVariant = this.#traced.get(tracedFullIdentifierName);
+        if (tracedVariant?.followReturnValueAssignement) {
+          tracedVariant.assignmentMemory.push({
+            type: "ReturnValueAssignment",
+            name: id.name
+          });
+        }
         // const id = Function.prototype.call.call(require, require, "http");
         if (this.#neutralCallable.has(identifierName) || isEvilIdentifierPath(fullIdentifierPath)) {
           // TODO: make sure we are walking on a require CallExpr here ?
@@ -473,6 +521,9 @@ export class VariableTracer extends EventEmitter {
           }
         }
 
+        if (childNode.object.type === "CallExpression") {
+          this.#walkVariableDeclarationInitialization(variableDeclaratorNode, childNode.object);
+        }
         break;
       }
     }
@@ -495,7 +546,6 @@ export class VariableTracer extends EventEmitter {
           break;
         }
         const [identifierName] = fullIdentifierPath.split(".");
-
         // const {} = Function.prototype.call.call(require, require, "http");
         if (isEvilIdentifierPath(fullIdentifierPath)) {
           this.#walkRequireCallExpression(init, id);

@@ -31,8 +31,14 @@ test("it should trace re-assignment from a module import using /promises", () =>
 
   assert.deepEqual(result, {
     assignmentMemory: [
-      "readFile",
-      "foobar"
+      {
+        type: "AliasBinding",
+        name: "readFile"
+      },
+      {
+        type: "AliasBinding",
+        name: "foobar"
+      }
     ],
     identifierOrMemberExpr: "fs.readFile",
     name: "fs.readFile"
@@ -56,7 +62,13 @@ test("it should be able to Trace a malicious code with Global, BinaryExpr, Assig
   assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["p", "evil"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "p"
+    }, {
+      type: "AliasBinding",
+      name: "evil"
+    }]
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -84,7 +96,16 @@ test("it should be able to Trace a malicious CallExpression by recombining segme
   assert.deepEqual(evil, {
     name: "require",
     identifierOrMemberExpr: "process.mainModule.require",
-    assignmentMemory: ["g", "r", "c"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "g"
+    }, {
+      type: "AliasBinding",
+      name: "r"
+    }, {
+      type: "AliasBinding",
+      name: "c"
+    }]
   });
   assert.strictEqual(assignments.length, 3);
 
@@ -143,7 +164,13 @@ test("it should be able to Trace an unsafe crypto.createHash using Function.prot
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["crr", "createHashBis"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "crr"
+    }, {
+      type: "AliasBinding",
+      name: "createHashBis"
+    }]
   });
 
   assert.strictEqual(helpers.tracer.importedModules.has("crypto"), true);
@@ -158,4 +185,183 @@ test("it should be able to Trace an unsafe crypto.createHash using Function.prot
 
   assert.strictEqual(eventThree.identifierOrMemberExpr, "crypto.createHash");
   assert.strictEqual(eventThree.id, "createHashBis");
+});
+
+test("should be able to trace the return value of a traced function", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.hostname", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import { hostname } from "os";
+
+    const host = hostname();
+    console.log(host);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.hostname")?.assignmentMemory, [
+    { type: "AliasBinding", name: "hostname" }, {
+      type: "ReturnValueAssignment",
+      name: "host"
+    }]);
+});
+
+test("should be able to follow the return value of a traced function in an object", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.hostname", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import { hostname } from "os";
+
+    const host = {x: hostname()};
+    console.log(host);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.hostname")?.assignmentMemory, [
+    { type: "AliasBinding", name: "hostname" },
+    {
+      type: "ReturnValueAssignment",
+      name: "host"
+    }]);
+});
+
+test("it should be able to trace a the return value of a traced function in a nested object", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.hostname", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import { hostname } from "os";
+
+    const host = {x: null, y: {z: hostname()}};
+    console.log(host);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.hostname")?.assignmentMemory, [
+    { type: "AliasBinding", name: "hostname" },
+    {
+      type: "ReturnValueAssignment",
+      name: "host"
+    }]);
+});
+
+test("should be able to trace the return value of a traced function when the return value is spreaded", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = {...os.userInfo()};
+    console.log(user);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }]);
+});
+
+test("should be able to trace a property access on the return value of a traced function", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = {x: os.userInfo().name};
+
+    console.log(user);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }]);
+});
+
+test("it should be able to trace a the return value of a traced function in an array", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.hostname", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import { hostname } from "os";
+
+    const host = [hostname()];
+    console.log(host);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.hostname")?.assignmentMemory, [
+    { type: "AliasBinding", name: "hostname" },
+    {
+      type: "ReturnValueAssignment",
+      name: "host"
+    }]);
+});
+
+test("should be able to trace the return value of a traced function in a nested array", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.hostname", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import { hostname } from "os";
+
+    const host = [null,[1, hostname()]];
+    console.log(host);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.hostname")?.assignmentMemory, [
+
+    { type: "AliasBinding", name: "hostname" },
+    {
+      type: "ReturnValueAssignment",
+      name: "host"
+    }]);
+});
+
+test("should be able to trace the return value of a traced function in an array when the return value is spreaded", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = [...os.userInfo()];
+    console.log(user);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }]);
 });
