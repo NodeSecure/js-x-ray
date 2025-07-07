@@ -26,7 +26,13 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["cryptoBis", "createHashBis"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "cryptoBis"
+    }, {
+      type: "AliasBinding",
+      name: "createHashBis"
+    }]
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -62,7 +68,13 @@ test("it should be able to Trace createHash when required (CommonJS) and destruc
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["createHash", "createHashBis"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "createHash"
+    }, {
+      type: "AliasBinding",
+      name: "createHashBis"
+    }]
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -94,7 +106,13 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["createHash", "createHashBis"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "createHash"
+    }, {
+      type: "AliasBinding",
+      name: "createHashBis"
+    }]
   });
   assert.strictEqual(assignments.length, 2);
 
@@ -130,7 +148,10 @@ test("it should be able to Trace crypto.createHash with CommonJS require and wit
   assert.deepEqual(createHashBis, {
     name: "crypto.createHash",
     identifierOrMemberExpr: "crypto.createHash",
-    assignmentMemory: ["createHashBis"]
+    assignmentMemory: [{
+      type: "AliasBinding",
+      name: "createHashBis"
+    }]
   });
   assert.strictEqual(assignments.length, 2);
 
