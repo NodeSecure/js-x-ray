@@ -9,6 +9,7 @@ import path from "node:path";
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../src/index.js";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
+import { ProbeRunner } from "../src/ProbeRunner.js";
 import { SourceFile } from "../src/SourceFile.js";
 import {
   customProbes,
@@ -693,8 +694,7 @@ describe("AstAnalyser", () => {
     it("should instantiate with correct default options", () => {
       const analyser = new AstAnalyser();
       assert.ok(analyser.parser instanceof JsSourceParser);
-      assert.deepStrictEqual(analyser.probesOptions.customProbes, []);
-      assert.strictEqual(analyser.probesOptions.skipDefaultProbes, false);
+      assert.deepStrictEqual(analyser.probes, ProbeRunner.Defaults);
     });
 
     it("should properly instanciate default or custom parser (using analyseFile)", async(t) => {
