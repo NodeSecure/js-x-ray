@@ -1,4 +1,5 @@
 ---
+"@nodesecure/js-x-ray": major
 "@nodesecure/tracer": major
 ---
 

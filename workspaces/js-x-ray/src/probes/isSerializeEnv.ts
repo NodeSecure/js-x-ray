@@ -48,7 +48,7 @@ function validateNode(
 
   if (firstArg.type === "Identifier") {
     const data = tracer.getDataFromIdentifier("process.env");
-    if (data !== null && data.assignmentMemory.includes(firstArg.name)) {
+    if (data !== null && data.assignmentMemory.some(({ name }) => name === firstArg.name)) {
       return [true];
     }
   }
