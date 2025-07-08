@@ -7,11 +7,9 @@ import type { ESTree } from "meriyah";
 import { rootLocation, toArrayLocation } from "./utils/index.js";
 import {
   generateWarning,
-  type OptionalWarningName,
   type Warning
 } from "./warnings.js";
 import type { Dependency } from "./AstAnalyser.js";
-import { ProbeRunner, type Probe } from "./ProbeRunner.js";
 import { Deobfuscator } from "./Deobfuscator.js";
 import * as trojan from "./obfuscators/trojan-source.js";
 
@@ -23,24 +21,8 @@ export type SourceFlags =
   | "oneline-require"
   | "is-minified";
 
-export interface ProbesOptions {
-  /**
-   * @default []
-   */
-  customProbes?: Probe[];
-  /**
-   * @default false
-   */
-  skipDefaultProbes?: boolean;
-  /**
-   * @default false
-   */
-  optionalWarnings?: boolean | Iterable<OptionalWarningName>;
-}
-
 export class SourceFile {
-  tracer: VariableTracer;
-  probesRunner: ProbeRunner;
+  tracer = new VariableTracer().enableDefaultTracing();
   inTryStatement = false;
   dependencyAutoWarning = false;
   deobfuscator = new Deobfuscator();
@@ -50,36 +32,8 @@ export class SourceFile {
   flags = new Set<SourceFlags>();
 
   constructor(
-    sourceCodeString: string,
-    probesOptions: ProbesOptions = {}
+    sourceCodeString: string
   ) {
-    this.tracer = new VariableTracer()
-      .enableDefaultTracing();
-
-    let probes = ProbeRunner.Defaults;
-    if (
-      Array.isArray(probesOptions.customProbes) &&
-      probesOptions.customProbes.length > 0
-    ) {
-      probes = probesOptions.skipDefaultProbes === true ?
-        probesOptions.customProbes :
-        [...probes, ...probesOptions.customProbes];
-    }
-
-    if (typeof probesOptions.optionalWarnings === "boolean") {
-      if (probesOptions.optionalWarnings) {
-        probes = [...probes, ...Object.values(ProbeRunner.Optionals)];
-      }
-    }
-    else {
-      const optionalProbes = Array.from(probesOptions.optionalWarnings ?? [])
-        .flatMap((warning) => ProbeRunner.Optionals[warning] ?? []);
-
-      probes = [...probes, ...optionalProbes];
-    }
-
-    this.probesRunner = new ProbeRunner(this, probes);
-
     if (trojan.verify(sourceCodeString)) {
       this.warnings.push(
         generateWarning("obfuscated-code", { value: "trojan-source" })
@@ -203,7 +157,7 @@ export class SourceFile {
 
   walk(
     node: ESTree.Node
-  ): null | "skip" {
+  ): void {
     this.tracer.walk(node);
     this.deobfuscator.walk(node);
 
@@ -214,8 +168,6 @@ export class SourceFile {
     else if (node.type === "CatchClause") {
       this.inTryStatement = false;
     }
-
-    return this.probesRunner.walk(node);
   }
 }
 

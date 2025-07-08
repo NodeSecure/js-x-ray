@@ -9,14 +9,18 @@ import type { ESTree } from "meriyah";
 import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
-import { generateWarning, type Warning } from "./warnings.js";
+import {
+  generateWarning,
+  type Warning,
+  type OptionalWarningName
+} from "./warnings.js";
 import {
   SourceFile,
-  type ProbesOptions,
   type SourceFlags
 } from "./SourceFile.js";
 import { isOneLineExpressionExport } from "./utils/index.js";
 import { JsSourceParser, type SourceParser } from "./JsSourceParser.js";
+import { ProbeRunner, type Probe } from "./ProbeRunner.js";
 
 export interface Dependency {
   unsafe: boolean;
@@ -63,11 +67,23 @@ export type ReportOnFile = {
   warnings: Warning[];
 };
 
-export interface AstAnalyserOptions extends ProbesOptions {
+export interface AstAnalyserOptions {
   /**
    * @default JsSourceParser
    */
   customParser?: SourceParser;
+  /**
+   * @default []
+   */
+  customProbes?: Probe[];
+  /**
+   * @default false
+   */
+  skipDefaultProbes?: boolean;
+  /**
+   * @default false
+   */
+  optionalWarnings?: boolean | Iterable<OptionalWarningName>;
 }
 
 export interface PrepareSourceOptions {
@@ -76,15 +92,40 @@ export interface PrepareSourceOptions {
 
 export class AstAnalyser {
   parser: SourceParser;
-  probesOptions: ProbesOptions;
+  probes: Probe[];
 
   constructor(options: AstAnalyserOptions = {}) {
+    const {
+      customProbes = [],
+      optionalWarnings = false,
+      skipDefaultProbes = false
+    } = options;
+
     this.parser = options.customParser ?? new JsSourceParser();
-    this.probesOptions = {
-      customProbes: options.customProbes ?? [],
-      skipDefaultProbes: options.skipDefaultProbes ?? false,
-      optionalWarnings: options.optionalWarnings ?? false
-    };
+
+    let probes = ProbeRunner.Defaults;
+    if (
+      Array.isArray(customProbes) &&
+      customProbes.length > 0
+    ) {
+      probes = skipDefaultProbes === true ?
+        customProbes :
+        [...probes, ...customProbes];
+    }
+
+    if (typeof optionalWarnings === "boolean") {
+      if (optionalWarnings) {
+        probes = [...probes, ...Object.values(ProbeRunner.Optionals)];
+      }
+    }
+    else {
+      const optionalProbes = Array.from(optionalWarnings ?? [])
+        .flatMap((warning) => ProbeRunner.Optionals[warning] ?? []);
+
+      probes = [...probes, ...optionalProbes];
+    }
+
+    this.probes = probes;
   }
 
   analyse(
@@ -102,7 +143,8 @@ export class AstAnalyser {
     const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
-    const source = new SourceFile(str, this.probesOptions);
+    const source = new SourceFile(str);
+    const runner = new ProbeRunner(source, this.probes);
 
     // TODO: this check should be factorized in a way that we reuse it
     // on analyze and anlyseFile
@@ -116,13 +158,14 @@ export class AstAnalyser {
     // we walk each AST Nodes, this is a purely synchronous I/O
     // @ts-expect-error
     walk(body, {
-      enter(node) {
+      enter(node: any) {
         // Skip the root of the AST.
         if (Array.isArray(node)) {
           return;
         }
 
-        const action = source.walk(node as ESTree.Node);
+        source.walk(node);
+        const action = runner.walk(node);
         if (action === "skip") {
           this.skip();
         }
@@ -137,7 +180,7 @@ export class AstAnalyser {
       }
       finalize(source);
     }
-    source.probesRunner.finalize();
+    runner.finalize();
 
     // Add oneline-require flag if this is a one-line require expression
     if (isOneLineExpressionExport(body)) {
