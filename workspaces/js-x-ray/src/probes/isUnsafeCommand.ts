@@ -25,15 +25,18 @@ function isSpawnOrExec(
     name === "execSync";
 }
 
-function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral) {
+function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string {
+  let command = "";
   switch (commandArg.type) {
     case "Literal":
-      return commandArg.value;
+      command = commandArg.value as string;
+      break;
     case "TemplateLiteral":
-      return commandArg.quasis.at(0).value.raw;
+      command = commandArg.quasis.at(0)?.value.raw as string;
+      break;
   }
 
-  return null;
+  return command;
 }
 
 /**
