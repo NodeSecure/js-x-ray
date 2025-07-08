@@ -365,3 +365,80 @@ test("should be able to trace the return value of a traced function in an array 
     name: "user"
   }]);
 });
+
+test("should be able to follow re-assignment on traced return values", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = [...os.userInfo()];
+    const userBis = user;
+    console.log(userBis);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }, {
+    type: "ReturnValueAssignment",
+    name: "userBis"
+  }]);
+});
+
+test("should be able to follow re-assignment on multiple consecutive traced return values", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = [...os.userInfo()];
+    const userBis = {...user};
+    const userTer = userBis;
+    console.log(userTer);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }, {
+    type: "ReturnValueAssignment",
+    name: "userBis"
+  },
+  {
+    type: "ReturnValueAssignment",
+    name: "userTer"
+  }
+  ]);
+});
+
+test("should not be able to follow re-assignment of a traced return value when followConsecutiveAssignment is not on", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("os.userInfo", {
+    followReturnValueAssignement: true,
+    moduleName: "os"
+  });
+
+  helpers.walkOnCode(`
+    import os from "os";
+
+    const user = [...os.userInfo()];
+    const userBis = user;
+    console.log(userBis);
+  `);
+
+  assert.deepEqual(helpers.tracer.getDataFromIdentifier("os.userInfo")?.assignmentMemory, [{
+    type: "ReturnValueAssignment",
+    name: "user"
+  }]);
+});
