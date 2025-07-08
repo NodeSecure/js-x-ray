@@ -31,10 +31,19 @@ export function isLiteral(
 export function isTemplateLiteral(
   node: any
 ): node is ESTree.TemplateLiteral {
-  return isNode(node) &&
-    node.type === "TemplateLiteral" &&
-    node.quasis.at(0).type === "TemplateElement" &&
-    typeof node.quasis.at(0).value.raw === "string";
+  if (!isNode(node) || node.type !== "TemplateLiteral") {
+    return false;
+  }
+
+  const firstQuasi = node.quasis.at(0);
+  if (!firstQuasi) {
+    return false;
+  }
+
+  return (
+    firstQuasi.type === "TemplateElement" &&
+    typeof firstQuasi.value.raw === "string"
+  );
 }
 
 export function isCallExpression(
