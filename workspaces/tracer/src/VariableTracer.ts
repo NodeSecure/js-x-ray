@@ -78,6 +78,7 @@ export class VariableTracer extends EventEmitter {
   #traced = new Map<string, Traced>();
   #variablesRefToGlobal = new Set<string>();
   #neutralCallable = new Set<string>();
+  #assignedReturnValueToTraced = new Map<string, string>();
 
   debug() {
     console.log(this.#traced);
@@ -442,6 +443,9 @@ export class VariableTracer extends EventEmitter {
             type: "ReturnValueAssignment",
             name: id.name
           });
+          if (tracedVariant.followConsecutiveAssignment) {
+            this.#assignedReturnValueToTraced.set(id.name, tracedFullIdentifierName);
+          }
         }
         // const id = Function.prototype.call.call(require, require, "http");
         if (this.#neutralCallable.has(identifierName) || isEvilIdentifierPath(fullIdentifierPath)) {
@@ -487,6 +491,16 @@ export class VariableTracer extends EventEmitter {
         }
         else if (this.#isGlobalVariableIdentifier(identifierName)) {
           this.#variablesRefToGlobal.add(id.name);
+        }
+
+        if (this.#assignedReturnValueToTraced.has(childNode.name)) {
+          const tracedFullIdentifierName = this.#assignedReturnValueToTraced.get(childNode.name)!;
+          const tracedVariant = this.#traced.get(tracedFullIdentifierName)!;
+          tracedVariant.assignmentMemory.push({
+            type: "ReturnValueAssignment",
+            name: id.name
+          });
+          this.#assignedReturnValueToTraced.set(id.name, tracedFullIdentifierName);
         }
 
         break;
