@@ -5,10 +5,10 @@ import type { ESTree } from "meriyah";
 import { SourceFile } from "../SourceFile.js";
 import { generateWarning } from "../warnings.js";
 import { ProbeSignals } from "../ProbeRunner.js";
-import { isLiteral } from "../types/estree.js";
+import { isLiteral, isTemplateLiteral } from "../types/estree.js";
 
 // CONSTANTS
-const kUnsafeCommands = ["csrutil", "uname"];
+const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
 
 function isUnsafeCommand(
   command: string
@@ -23,6 +23,20 @@ function isSpawnOrExec(
     name === "exec" ||
     name === "spawnSync" ||
     name === "execSync";
+}
+
+function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string {
+  let command = "";
+  switch (commandArg.type) {
+    case "Literal":
+      command = commandArg.value as string;
+      break;
+    case "TemplateLiteral":
+      command = commandArg.quasis.at(0)?.value.raw as string;
+      break;
+  }
+
+  return command;
 }
 
 /**
@@ -93,11 +107,11 @@ function main(
   const { sourceFile, data: methodName } = options;
 
   const commandArg = node.arguments[0];
-  if (!isLiteral(commandArg)) {
+  if (!isLiteral(commandArg) && !isTemplateLiteral(commandArg)) {
     return null;
   }
 
-  let command = commandArg.value;
+  let command = getCommand(commandArg);
   if (isUnsafeCommand(command)) {
     // Spawned command arguments are filled into an Array
     // as second arguments. This is why we should add them

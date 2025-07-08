@@ -28,6 +28,24 @@ export function isLiteral(
     typeof node.value === "string";
 }
 
+export function isTemplateLiteral(
+  node: any
+): node is ESTree.TemplateLiteral {
+  if (!isNode(node) || node.type !== "TemplateLiteral") {
+    return false;
+  }
+
+  const firstQuasi = node.quasis.at(0);
+  if (!firstQuasi) {
+    return false;
+  }
+
+  return (
+    firstQuasi.type === "TemplateElement" &&
+    typeof firstQuasi.value.raw === "string"
+  );
+}
+
 export function isCallExpression(
   node: any
 ): node is ESTree.CallExpression {
