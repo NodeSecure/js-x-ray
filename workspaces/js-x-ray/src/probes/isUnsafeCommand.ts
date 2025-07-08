@@ -25,15 +25,15 @@ function isSpawnOrExec(
     name === "execSync";
 }
 
-function getCommand(commandArg) {
+function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral) {
   switch (commandArg.type) {
     case "Literal":
       return commandArg.value;
     case "TemplateLiteral":
       return commandArg.quasis.at(0).value.raw;
-    default:
-      throw new Error("Unhandled arguments");
   }
+
+  return null;
 }
 
 /**
