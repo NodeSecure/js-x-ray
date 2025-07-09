@@ -1,5 +1,5 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
+import { test, describe } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
@@ -78,50 +78,34 @@ test("should not throw any warnings without hexadecimal value (and should call a
   assert.strictEqual(astNode.value, "hello world!");
 });
 
-test("should detect shady link when an URL is bit.ly", () => {
-  const str = "const foo = 'http://bit.ly/foo'";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
+describe("known suspicious domain", () => {
+  // CONSTANTS
+  const kKnownSuspiciousDomains = ["bit.ly/foo",
+    "ipinfo.io/json",
+    "httpbin.org/ip",
+    "api.ipify.org/ip"];
 
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://bit.ly/foo");
-});
+  test("should detect shady link when an URL is known to be suspicious when protocol is http", () => {
+    for (const suspicousDomain of kKnownSuspiciousDomains) {
+      const str = `const foo = 'http://${suspicousDomain}'`;
+      const ast = parseScript(str);
+      const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
+      assert.strictEqual(sastAnalysis.warnings().length, 1);
+      const warning = sastAnalysis.getWarning("shady-link");
+      assert.strictEqual(warning.value, `http://${suspicousDomain}`);
+    }
+  });
 
-test("should detect shady link when an URL is ipinfo.io when protocol is http", () => {
-  const str = "const foo = 'http://ipinfo.io/json'";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://ipinfo.io/json");
-});
-
-test("should detect shady link when an URL is ipinfo.io when protocol is https", () => {
-  const str = "const foo = 'https://ipinfo.io/json'";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "https://ipinfo.io/json");
-});
-
-test("should detect shady link when an URL is httpbin.org when protocol is http", () => {
-  const str = "const foo = 'http://httpbin.org/ip'";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://httpbin.org/ip");
-});
-
-test("should detect shady link when an URL is httpbin.org when protocol is https", () => {
-  const str = "const foo = 'https://httpbin.org/ip'";
-  const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
-  assert.strictEqual(sastAnalysis.warnings().length, 1);
-  const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "https://httpbin.org/ip");
+  test("should detect shady link when an URL is known to be suspicious when protocol is https", () => {
+    for (const suspicousDomain of kKnownSuspiciousDomains) {
+      const str = `const foo = 'https://${suspicousDomain}'`;
+      const ast = parseScript(str);
+      const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
+      assert.strictEqual(sastAnalysis.warnings().length, 1);
+      const warning = sastAnalysis.getWarning("shady-link");
+      assert.strictEqual(warning.value, `https://${suspicousDomain}`);
+    }
+  });
 });
 
 test("should detect shady link when an URL has a suspicious domain", () => {
