@@ -10,7 +10,7 @@ test("it should trigger analyzeLiteral method one time", (t) => {
   const str = "['foo']";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isArrayExpression);
+  const sastAnalysis = getSastAnalysis(isArrayExpression);
 
   const analyzeLiteralMock = t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
@@ -28,7 +28,7 @@ test("it should trigger analyzeLiteral method two times (ignoring the holey betw
   const str = "[5, ,10]";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isArrayExpression);
+  const sastAnalysis = getSastAnalysis(isArrayExpression);
 
   const analyzeLiteralMock = t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);
@@ -43,7 +43,7 @@ test("it should trigger analyzeLiteral one time (ignoring non-literal Node)", (t
   const str = "[5, () => void 0]";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isArrayExpression);
+  const sastAnalysis = getSastAnalysis(isArrayExpression);
 
   const analyzeLiteralMock = t.mock.method(sastAnalysis.sourceFile, "analyzeLiteral");
   sastAnalysis.execute(ast.body);

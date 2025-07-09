@@ -9,7 +9,7 @@ import isSerializeEnv from "../../src/probes/isSerializeEnv.js";
 test("should detect JSON.stringify(process.env)", () => {
   const str = "JSON.stringify(process.env)";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("serialize-environment");
@@ -20,7 +20,7 @@ test("should detect JSON.stringify(process.env)", () => {
 test("should detect JSON.stringify(process['env'])", () => {
   const str = "JSON.stringify(process['env'])";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("serialize-environment");
@@ -31,7 +31,7 @@ test("should detect JSON.stringify(process['env'])", () => {
 test("should detect JSON.stringify(process[\"env\"])", () => {
   const str = "JSON.stringify(process[\"env\"])";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("serialize-environment");
@@ -45,7 +45,7 @@ test("should detect process.env reassignment", () => {
   JSON.stringify(env);
 `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("serialize-environment");
@@ -60,7 +60,7 @@ test("should not detect process.env", () => {
   JSON.stringify(env);
 `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 });
@@ -72,7 +72,7 @@ test("should be able to detect reassigned JSON.stringify", () => {
   stringify(env);
 `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("serialize-environment");
@@ -83,7 +83,7 @@ test("should be able to detect reassigned JSON.stringify", () => {
 test("should not detect other JSON.stringify calls", () => {
   const str = "JSON.stringify({ foo: 'bar' })";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 });
@@ -91,7 +91,7 @@ test("should not detect other JSON.stringify calls", () => {
 test("should not detect non-JSON.stringify calls", () => {
   const str = "const env = process.env";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isSerializeEnv).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
 });

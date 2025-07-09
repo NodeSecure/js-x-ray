@@ -9,7 +9,7 @@ import isImportDeclaration from "../../src/probes/isImportDeclaration.js";
 test("should detect 1 dependency for an ImportNamespaceSpecifier", () => {
   const str = "import * as foo from \"bar\"";
   const ast = parseScript(str);
-  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(isImportDeclaration)
     .execute(ast.body);
 
   const { dependencies } = sourceFile;
@@ -19,7 +19,7 @@ test("should detect 1 dependency for an ImportNamespaceSpecifier", () => {
 test("should detect 1 dependency for an ImportDefaultSpecifier", () => {
   const str = "import foo from \"bar\"";
   const ast = parseScript(str);
-  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(isImportDeclaration)
     .execute(ast.body);
 
   const { dependencies } = sourceFile;
@@ -29,7 +29,7 @@ test("should detect 1 dependency for an ImportDefaultSpecifier", () => {
 test("should detect 1 dependency for an ImportSpecifier", () => {
   const str = "import { xd } from \"bar\"";
   const ast = parseScript(str);
-  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(isImportDeclaration)
     .execute(ast.body);
 
   const { dependencies } = sourceFile;
@@ -39,7 +39,7 @@ test("should detect 1 dependency for an ImportSpecifier", () => {
 test("should detect 1 dependency with no specificiers", () => {
   const str = "import \"bar\"";
   const ast = parseScript(str);
-  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(isImportDeclaration)
     .execute(ast.body);
 
   const { dependencies } = sourceFile;
@@ -49,7 +49,7 @@ test("should detect 1 dependency with no specificiers", () => {
 test("should detect 1 dependency for an ImportExpression", () => {
   const str = "import(\"bar\")";
   const ast = parseScript(str);
-  const { sourceFile } = getSastAnalysis(str, isImportDeclaration)
+  const { sourceFile } = getSastAnalysis(isImportDeclaration)
     .execute(ast.body);
 
   const { dependencies } = sourceFile;
@@ -66,7 +66,7 @@ test("should detect an unsafe import using data:text/javascript and throw a unsa
 
   importNodes.forEach((str) => {
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(str, isImportDeclaration)
+    const sastAnalysis = getSastAnalysis(isImportDeclaration)
       .execute(ast.body);
 
     assert.strictEqual(sastAnalysis.warnings().length, 1);

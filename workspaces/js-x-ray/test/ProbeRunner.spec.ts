@@ -15,7 +15,7 @@ import { SourceFile } from "../src/SourceFile.js";
 describe("ProbeRunner", () => {
   describe("constructor", () => {
     it("should instanciate class with Defaults probes when none are provide", () => {
-      const pr = new ProbeRunner(new SourceFile(""));
+      const pr = new ProbeRunner(new SourceFile());
 
       assert.strictEqual(pr.probes, ProbeRunner.Defaults);
     });
@@ -30,7 +30,7 @@ describe("ProbeRunner", () => {
       ];
 
       // @ts-expect-error
-      const pr = new ProbeRunner(new SourceFile(""), fakeProbe);
+      const pr = new ProbeRunner(new SourceFile(), fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -44,7 +44,7 @@ describe("ProbeRunner", () => {
       ];
 
       // @ts-expect-error
-      const pr = new ProbeRunner(new SourceFile(""), fakeProbe);
+      const pr = new ProbeRunner(new SourceFile(), fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -56,7 +56,7 @@ describe("ProbeRunner", () => {
 
       function instantiateProbeRunner() {
         // @ts-expect-error
-        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
+        return new ProbeRunner(new SourceFile(), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -70,7 +70,7 @@ describe("ProbeRunner", () => {
 
       function instantiateProbeRunner() {
         // @ts-expect-error
-        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
+        return new ProbeRunner(new SourceFile(), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -85,7 +85,7 @@ describe("ProbeRunner", () => {
 
       function instantiateProbeRunner() {
         // @ts-expect-error
-        return new ProbeRunner(new SourceFile(""), [fakeProbe]);
+        return new ProbeRunner(new SourceFile(), [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -94,7 +94,7 @@ describe("ProbeRunner", () => {
 
   describe("walk", () => {
     it("should pass validateNode, enter main and then teardown", () => {
-      const sourceFile = new SourceFile("");
+      const sourceFile = new SourceFile();
       const fakeProbe = {
         validateNode: (node: ESTree.Node) => [node.type === "Literal"],
         main: mock.fn(),
@@ -130,7 +130,7 @@ describe("ProbeRunner", () => {
       };
 
       const pr = new ProbeRunner(
-        new SourceFile(""),
+        new SourceFile(),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -170,7 +170,7 @@ describe("ProbeRunner", () => {
 
       const probes = [fakeProbe, fakeProbeBreak, fakeProbeSkip];
 
-      const sourceFile = new SourceFile("");
+      const sourceFile = new SourceFile();
 
       const pr = new ProbeRunner(
         sourceFile,

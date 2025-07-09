@@ -33,11 +33,10 @@ export function parseScript(
 }
 
 export function getSastAnalysis(
-  sourceCodeString: string,
   probe: Probe
 ) {
   return {
-    sourceFile: new SourceFile(sourceCodeString),
+    sourceFile: new SourceFile(),
     getWarning(warning: string): Warning | undefined {
       return this.warnings().find(
         (item: Warning) => item.kind === warning

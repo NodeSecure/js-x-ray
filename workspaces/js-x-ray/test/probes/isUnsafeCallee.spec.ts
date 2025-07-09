@@ -13,7 +13,7 @@ test("should detect eval", () => {
   const str = "eval(\"this\");";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+  const sastAnalysis = getSastAnalysis(isUnsafeCallee)
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
@@ -25,7 +25,7 @@ test("should not detect warnings for Function with return this", () => {
   const str = "Function(\"return this\")()";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+  const sastAnalysis = getSastAnalysis(isUnsafeCallee)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings.length, 0);
@@ -35,7 +35,7 @@ test("should detect for unsafe Function statement", () => {
   const str = "Function(\"anything in here\")()";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+  const sastAnalysis = getSastAnalysis(isUnsafeCallee)
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
@@ -47,7 +47,7 @@ test("should not detect Function", () => {
   const str = "Function('foo');";
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isUnsafeCallee)
+  const sastAnalysis = getSastAnalysis(isUnsafeCallee)
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
