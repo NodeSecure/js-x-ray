@@ -79,14 +79,15 @@ test("should not throw any warnings without hexadecimal value (and should call a
 });
 
 describe("known suspicious domain", () => {
-  // CONSTANTS
-  const kKnownSuspiciousDomains = ["bit.ly/foo",
+  const suspiciousDomains = [
+    "bit.ly/foo",
     "ipinfo.io/json",
     "httpbin.org/ip",
-    "api.ipify.org/ip"];
+    "api.ipify.org/ip"
+  ];
 
   test("should detect shady link when an URL is known to be suspicious when protocol is http", () => {
-    for (const suspicousDomain of kKnownSuspiciousDomains) {
+    for (const suspicousDomain of suspiciousDomains) {
       const str = `const foo = 'http://${suspicousDomain}'`;
       const ast = parseScript(str);
       const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
@@ -97,7 +98,7 @@ describe("known suspicious domain", () => {
   });
 
   test("should detect shady link when an URL is known to be suspicious when protocol is https", () => {
-    for (const suspicousDomain of kKnownSuspiciousDomains) {
+    for (const suspicousDomain of suspiciousDomains) {
       const str = `const foo = 'https://${suspicousDomain}'`;
       const ast = parseScript(str);
       const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
