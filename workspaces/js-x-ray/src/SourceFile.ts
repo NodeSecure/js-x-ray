@@ -11,7 +11,6 @@ import {
 } from "./warnings.js";
 import type { Dependency } from "./AstAnalyser.js";
 import { Deobfuscator } from "./Deobfuscator.js";
-import * as trojan from "./obfuscators/trojan-source.js";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;
@@ -30,17 +29,6 @@ export class SourceFile {
   encodedLiterals = new Map<string, string>();
   warnings: Warning[] = [];
   flags = new Set<SourceFlags>();
-
-  constructor(
-    sourceCodeString: string
-  ) {
-    if (trojan.verify(sourceCodeString)) {
-      this.warnings.push(
-        generateWarning("obfuscated-code", { value: "trojan-source" })
-      );
-    }
-  }
-
   addDependency(
     name: string,
     location?: ESTree.SourceLocation | null,

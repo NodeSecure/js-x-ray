@@ -21,6 +21,7 @@ import {
 import { isOneLineExpressionExport } from "./utils/index.js";
 import { JsSourceParser, type SourceParser } from "./JsSourceParser.js";
 import { ProbeRunner, type Probe } from "./ProbeRunner.js";
+import * as trojan from "./obfuscators/trojan-source.js";
 
 export interface Dependency {
   unsafe: boolean;
@@ -143,7 +144,13 @@ export class AstAnalyser {
     const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
-    const source = new SourceFile(str);
+    const source = new SourceFile();
+    if (trojan.verify(str)) {
+      source.warnings.push(
+        generateWarning("obfuscated-code", { value: "trojan-source" })
+      );
+    }
+
     const runner = new ProbeRunner(source, this.probes);
 
     if (initialize) {

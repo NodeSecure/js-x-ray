@@ -23,7 +23,7 @@ test("should detect csrutil command", () => {
     `;
 
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    const sastAnalysis = getSastAnalysis(isUnsafeCommand)
       .execute(ast.body);
 
     const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
@@ -44,7 +44,7 @@ test.skip("should detect hidden csrutil command", () => {
     `;
 
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    const sastAnalysis = getSastAnalysis(isUnsafeCommand)
       .execute(ast.body);
 
     const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
@@ -63,7 +63,7 @@ test("should detect csrutil command with require", () => {
     `;
 
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    const sastAnalysis = getSastAnalysis(isUnsafeCommand)
       .execute(ast.body);
 
     const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
@@ -83,7 +83,7 @@ test("should not detect non suspicious command", () => {
     `;
 
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(str, isUnsafeCommand)
+    const sastAnalysis = getSastAnalysis(isUnsafeCommand)
       .execute(ast.body);
 
     assert.equal(sastAnalysis.warnings().length, 0);
@@ -107,7 +107,7 @@ test("aog-checker detection", () => {
   `;
 
   const ast = parseScript(maliciousCode);
-  const sastAnalysis = getSastAnalysis(maliciousCode, isUnsafeCommand)
+  const sastAnalysis = getSastAnalysis(isUnsafeCommand)
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeCommand);
@@ -124,7 +124,7 @@ test("mydummyproject-zyp detection", () => {
   `;
 
   const ast = parseScript(maliciousCode);
-  const sastAnalysis = getSastAnalysis(maliciousCode, isUnsafeCommand)
+  const sastAnalysis = getSastAnalysis(isUnsafeCommand)
     .execute(ast.body);
 
   const result = sastAnalysis.warnings();

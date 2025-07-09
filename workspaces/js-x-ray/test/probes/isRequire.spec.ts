@@ -11,7 +11,7 @@ test("it should ignore require CallExpression with no (zero) arguments", () => {
     require()
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -25,7 +25,7 @@ test("it should execute probe using require.resolve (detected by the VariableTra
     require.resolve("http");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -38,7 +38,7 @@ test("it should execute probe using process.mainModule.require (detected by the 
     process.mainModule.require("http");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -56,7 +56,7 @@ test("it should execute probe using process.getBuiltinModule (detected by the Va
     }
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -74,7 +74,7 @@ test("it should execute probe on a variable reassignments of require (detected b
     b("http");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -93,7 +93,7 @@ test("it should execute probe on a variable reassignments of require extended (d
     r.require("fs");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -110,7 +110,7 @@ test("it should catch require with an Identifier argument pointing to the Node.j
     require(foo);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -124,7 +124,7 @@ test("it should throw an 'unsafe-import' warning for a require with an unknown I
     require(foo);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -137,7 +137,7 @@ test("it should throw an 'unsafe-import' warning for a require with an unknown M
     require(foo.bar);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -150,7 +150,7 @@ test("it should catch require with a Literal argument having for value the Node.
     require("http");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -165,7 +165,7 @@ are equal to the Node.js core http module`, () => {
     require(["h", "t", "t", "p"]);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -181,7 +181,7 @@ are equal to the Node.js core http module (with charCodes as values)`, () => {
     require([104, 101, 108, 108, 111]);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -199,7 +199,7 @@ are equal to the Node.js core http module (with VariableTracer usage)`, () => {
     require([a, b, b, "p"]);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -214,7 +214,7 @@ where all Literals values concatened is equal to an empty string`, () => {
     require(["", ""]);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -228,7 +228,7 @@ are equal to the Node.js core http module`, () => {
     require("ht" + "tp");
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -246,7 +246,7 @@ are equal to the Node.js core http module (with VariableTracer usage)`, () => {
     require(left + right);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
@@ -261,7 +261,7 @@ with an operator not equal to '+' as require argument`, () => {
     require(5 - 5);
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -274,7 +274,7 @@ test("it should throw an 'unsafe-import' warning for using a BinaryExpression wi
     require("foo" + evil());
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -290,7 +290,7 @@ test("(require CallExpression): it should always throw an 'unsafe-import' warnin
     require(evil());
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -311,7 +311,7 @@ and then add the unobfuscated value in the dependency list`, () => {
     require(unhex("68747470"));
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -328,7 +328,7 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from", 
     require(Buffer.from("68747470", "hex").toString());
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -345,7 +345,7 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from (w
     require(Buffer.from([104, 101, 108, 108, 111]).toString());
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
@@ -362,7 +362,7 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
     require(require.resolve("foo"));
   `;
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(
@@ -385,7 +385,7 @@ test("(require CallExpression): it should detect obfuscated atob value", () => {
   `;
 
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isRequire)
+  const sastAnalysis = getSastAnalysis(isRequire)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);

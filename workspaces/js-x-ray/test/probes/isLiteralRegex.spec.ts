@@ -9,7 +9,7 @@ import isLiteralRegex from "../../src/probes/isLiteralRegex.js";
 test("should throw a 'unsafe-regex' warning because the given RegExp Literal is unsafe", () => {
   const str = "const foo = /(a+){10}/g;";
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(str, isLiteralRegex)
+  const sastAnalysis = getSastAnalysis(isLiteralRegex)
     .execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
