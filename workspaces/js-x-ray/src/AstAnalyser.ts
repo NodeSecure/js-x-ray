@@ -146,8 +146,6 @@ export class AstAnalyser {
     const source = new SourceFile(str);
     const runner = new ProbeRunner(source, this.probes);
 
-    // TODO: this check should be factorized in a way that we reuse it
-    // on analyze and anlyseFile
     if (initialize) {
       if (typeof initialize !== "function") {
         throw new TypeError("options.initialize must be a function");
@@ -172,8 +170,6 @@ export class AstAnalyser {
       }
     });
 
-    // TODO: this check should be factorized in a way that we reuse it
-    // on analyze and anlyseFile
     if (finalize) {
       if (typeof finalize !== "function") {
         throw new TypeError("options.finalize must be a function");
