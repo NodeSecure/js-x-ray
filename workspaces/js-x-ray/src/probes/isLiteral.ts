@@ -21,7 +21,7 @@ const kNodeDeps = new Set(builtinModules);
 const kShadyLinkRegExps = [
   kMapRegexIps.regexIPv4,
   kMapRegexIps.regexIPv6,
-  /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org).*)$/,
+  /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org|api\.ipify\.org).*)$/,
   /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
 ];
 
