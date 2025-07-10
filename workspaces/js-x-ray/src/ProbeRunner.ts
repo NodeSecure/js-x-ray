@@ -46,7 +46,8 @@ export interface Probe {
 
 export const ProbeSignals = Object.freeze({
   Break: Symbol.for("breakWalk"),
-  Skip: Symbol.for("skipWalk")
+  Skip: Symbol.for("skipWalk"),
+  Continue: null
 });
 
 export class ProbeRunner {
@@ -96,18 +97,16 @@ export class ProbeRunner {
         typeof probe.initialize === "function" || probe.initialize === undefined,
         `Invalid probe ${probe.name}: initialize must be a function or undefined`
       );
-      if (probe.initialize) {
-        probe.initialize(sourceFile);
-      }
+      probe.initialize?.(sourceFile);
     }
 
     this.probes = probes;
   }
 
-  #runProbe(
+  #executeProbeWithNode(
     probe: Probe,
     node: ESTree.Node
-  ): ProbeReturn {
+  ): { signal: ProbeReturn; [Symbol.dispose]: () => void; } {
     const validationFns = Array.isArray(probe.validateNode) ?
       probe.validateNode : [probe.validateNode];
     for (const validateNode of validationFns) {
@@ -117,14 +116,22 @@ export class ProbeRunner {
       );
 
       if (isMatching) {
-        return probe.main(node, {
-          sourceFile: this.sourceFile,
-          data
-        });
+        return {
+          signal: probe.main(node, {
+            sourceFile: this.sourceFile,
+            data
+          }),
+          [Symbol.dispose]: () => {
+            probe.teardown?.({ sourceFile: this.sourceFile });
+          }
+        };
       }
     }
 
-    return null;
+    return {
+      signal: null,
+      [Symbol.dispose]: () => void 0
+    };
   }
 
   walk(
@@ -137,29 +144,25 @@ export class ProbeRunner {
         continue;
       }
 
-      try {
-        const result = this.#runProbe(probe, node);
-        if (result === null) {
-          continue;
-        }
+      using probeResult = this.#executeProbeWithNode(probe, node);
+      const { signal } = probeResult;
 
-        if (result === ProbeSignals.Skip) {
-          return "skip";
-        }
-        if (result === ProbeSignals.Break || probe.breakOnMatch) {
-          const breakGroup = probe.breakGroup || null;
-
-          if (breakGroup === null) {
-            break;
-          }
-          else {
-            breakGroups.add(breakGroup);
-          }
-        }
+      if (signal === ProbeSignals.Continue) {
+        continue;
       }
-      finally {
-        if (probe.teardown) {
-          probe.teardown({ sourceFile: this.sourceFile });
+
+      if (signal === ProbeSignals.Skip) {
+        return "skip";
+      }
+
+      if (signal === ProbeSignals.Break || probe.breakOnMatch) {
+        const breakGroup = probe.breakGroup || null;
+
+        if (breakGroup === null) {
+          break;
+        }
+        else {
+          breakGroups.add(breakGroup);
         }
       }
     }
@@ -169,9 +172,7 @@ export class ProbeRunner {
 
   finalize(): void {
     for (const probe of this.probes) {
-      if (probe.finalize) {
-        probe.finalize(this.sourceFile);
-      }
+      probe.finalize?.(this.sourceFile);
     }
   }
 }
