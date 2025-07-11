@@ -16,7 +16,8 @@ import {
   notNullOrUndefined,
   isEvilIdentifierPath,
   isNeutralCallable,
-  getSubMemberExpressionSegments
+  getSubMemberExpressionSegments,
+  makePrefixRemover
 } from "./utils/index.js";
 
 // CONSTANTS
@@ -27,6 +28,7 @@ const kGlobalIdentifiersToTrace = new Set([
   "GLOBAL",
   "window"
 ]);
+const kGlobalIdentifiersRemover = makePrefixRemover(kGlobalIdentifiersToTrace);
 const kRequirePatterns = new Set([
   "require",
   "require.resolve",
@@ -136,21 +138,6 @@ export class VariableTracer extends EventEmitter {
     return this;
   }
 
-  removeGlobalIdentifier(
-    identifierOrMemberExpr: string
-  ): string {
-    if (!identifierOrMemberExpr.includes(".")) {
-      return identifierOrMemberExpr;
-    }
-
-    const globalIdentifier = [...kGlobalIdentifiersToTrace]
-      .find((globalId) => identifierOrMemberExpr.startsWith(globalId));
-
-    return globalIdentifier ?
-      identifierOrMemberExpr.slice(globalIdentifier.length + 1) :
-      identifierOrMemberExpr;
-  }
-
   getDataFromIdentifier(
     identifierOrMemberExpr: string,
     options: DataIdentifierOptions = {}
@@ -158,7 +145,7 @@ export class VariableTracer extends EventEmitter {
     const { removeGlobalIdentifier = false } = options;
     if (removeGlobalIdentifier) {
       // eslint-disable-next-line no-param-reassign
-      identifierOrMemberExpr = this.removeGlobalIdentifier(identifierOrMemberExpr);
+      identifierOrMemberExpr = kGlobalIdentifiersRemover(identifierOrMemberExpr);
     }
 
     const isMemberExpr = identifierOrMemberExpr.includes(".");
