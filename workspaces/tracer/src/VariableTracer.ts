@@ -8,8 +8,10 @@ import {
   getCallExpressionIdentifier,
   getCallExpressionArguments,
   getVariableDeclarationIdentifiers,
-  extractLogicalExpression
+  extractLogicalExpression,
+  isLiteral
 } from "@nodesecure/estree-ast-utils";
+import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import {
@@ -17,7 +19,8 @@ import {
   isEvilIdentifierPath,
   isNeutralCallable,
   getSubMemberExpressionSegments,
-  makePrefixRemover
+  makePrefixRemover,
+  stripNodePrefix
 } from "./utils/index.js";
 
 // CONSTANTS
@@ -36,7 +39,6 @@ const kRequirePatterns = new Set([
   "process.mainModule.require",
   "process.getBuiltinModule"
 ]);
-const kNodeModulePrefix = "node:";
 const kUnsafeGlobalCallExpression = new Set(["eval", "Function"]);
 
 export interface DataIdentifierOptions {
@@ -276,6 +278,29 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
+  #reverseAtob(
+    node: ESTree.CallExpression,
+    id: ESTree.Identifier
+  ) {
+    const callExprArguments = getCallExpressionArguments(
+      node,
+      {
+        externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
+      }
+    );
+    if (callExprArguments === null) {
+      return;
+    }
+
+    const callExprArgumentNode = callExprArguments.at(0);
+    if (typeof callExprArgumentNode === "string") {
+      this.literalIdentifiers.set(
+        id.name,
+        Buffer.from(callExprArgumentNode, "base64").toString()
+      );
+    }
+  }
+
   #walkImportDeclaration(
     node: ESTree.ImportDeclaration
   ): void {
@@ -315,7 +340,7 @@ export class VariableTracer extends EventEmitter {
     id: ESTree.Identifier | ESTree.ObjectPattern
   ): void {
     const moduleNameLiteral = node.arguments
-      .find((argumentNode) => isLiteralNode(argumentNode)
+      .find((argumentNode) => isLiteral(argumentNode)
         && this.#traced.has(stripNodePrefix(argumentNode.value))) as ESTree.Literal | undefined;
     if (!moduleNameLiteral) {
       return;
@@ -335,44 +360,17 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  #walkVariableDeclarationWithIdentifier(
-    variableDeclaratorNode: ESTree.VariableDeclarator
-  ): void {
-    const { init } = variableDeclaratorNode;
-    if (init === null) {
-      return void 0;
-    }
-
-    switch (init.type) {
-      /**
-       * var root = freeGlobal || freeSelf || Function('return this')();
-       */
-      case "LogicalExpression": {
-        for (const { node } of extractLogicalExpression(init)) {
-          this.#walkVariableDeclarationInitialization(
-            variableDeclaratorNode,
-            node
-          );
-        }
-
-        return void 0;
-      }
-
-      default:
-        return this.#walkVariableDeclarationInitialization(
-          variableDeclaratorNode
-        );
-    }
-  }
-
-  #walkVariableDeclarationInitialization(
+  #walkVariableDeclaratorInitialization(
     variableDeclaratorNode: ESTree.VariableDeclarator,
-    childNode = variableDeclaratorNode.init
+    childNode: ESTree.Node | null = variableDeclaratorNode.init
   ): void {
     if (childNode === null) {
       return;
     }
-    const { id } = variableDeclaratorNode as any;
+    const { id } = variableDeclaratorNode;
+    if (id.type !== "Identifier") {
+      return;
+    }
 
     switch (childNode.type) {
       // let foo = "10"; <-- "foo" is the key and "10" the value
@@ -381,33 +379,45 @@ export class VariableTracer extends EventEmitter {
         break;
       }
 
+      /**
+       * import os from "node:os";
+       *
+       * const foo = {
+       *    host: os.hostname(), <-- Property
+       *    ...{ bar: "hello world"} <-- SpreadElement
+       * };
+       * ^ ObjectExpression
+       */
       case "ObjectExpression": {
-        for (const prop of childNode.properties) {
-          switch (prop.type) {
-            case "Property": {
-              this.#walkVariableDeclarationInitialization(variableDeclaratorNode,
-                prop.value as ESTree.VariableDeclarator["init"]);
-              break;
-            }
-            case "SpreadElement": {
-              this.#walkVariableDeclarationInitialization(variableDeclaratorNode,
-                prop.argument as ESTree.VariableDeclarator["init"]);
-              break;
-            }
-          }
+        for (const property of childNode.properties) {
+          const node = match(property)
+            .with({ type: "Property" }, (prop) => prop.value)
+            .with({ type: "SpreadElement" }, (prop) => prop.argument)
+            .otherwise(() => null);
+
+          node && this.#walkVariableDeclaratorInitialization(
+            variableDeclaratorNode,
+            node
+          );
         }
         break;
       }
 
       case "ArrayExpression": {
         for (const element of childNode.elements) {
-          this.#walkVariableDeclarationInitialization(variableDeclaratorNode, element);
+          this.#walkVariableDeclaratorInitialization(
+            variableDeclaratorNode,
+            element
+          );
         }
         break;
       }
 
       case "SpreadElement": {
-        this.#walkVariableDeclarationInitialization(variableDeclaratorNode, childNode.argument);
+        this.#walkVariableDeclaratorInitialization(
+          variableDeclaratorNode,
+          childNode.argument
+        );
         break;
       }
 
@@ -448,23 +458,7 @@ export class VariableTracer extends EventEmitter {
           this.#walkRequireCallExpression(childNode, id);
         }
         else if (tracedFullIdentifierName === "atob") {
-          const callExprArguments = getCallExpressionArguments(
-            childNode,
-            {
-              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
-            }
-          );
-          if (callExprArguments === null) {
-            break;
-          }
-
-          const callExprArgumentNode = callExprArguments.at(0);
-          if (typeof callExprArgumentNode === "string") {
-            this.literalIdentifiers.set(
-              id.name,
-              Buffer.from(callExprArgumentNode, "base64").toString()
-            );
-          }
+          this.#reverseAtob(childNode, id);
         }
 
         break;
@@ -523,7 +517,7 @@ export class VariableTracer extends EventEmitter {
         }
 
         if (childNode.object.type === "CallExpression") {
-          this.#walkVariableDeclarationInitialization(variableDeclaratorNode, childNode.object);
+          this.#walkVariableDeclaratorInitialization(variableDeclaratorNode, childNode.object);
         }
         break;
       }
@@ -537,7 +531,7 @@ export class VariableTracer extends EventEmitter {
     if (init === null) {
       return;
     }
-    const id = variableDeclaratorNode.id as any;
+    const { id } = variableDeclaratorNode as any;
 
     switch (init.type) {
       // const { process } = eval("this");
@@ -574,44 +568,53 @@ export class VariableTracer extends EventEmitter {
     }
   }
 
-  walk(node: ESTree.Node): void {
+  #walkVariableDeclarator(
+    node: ESTree.VariableDeclarator
+  ): void {
+    // var foo; <-- no initialization here.
+    if (!notNullOrUndefined(node.init)) {
+      return;
+    }
+
+    /**
+     * const { foo } = {};
+     *       ^     ^ ObjectPattern (example)
+     */
+    if (node.id.type !== "Identifier") {
+      this.#walkVariableDeclarationWithAnythingElse(node);
+
+      return;
+    }
+
+    // var root = freeGlobal || freeSelf || Function('return this')();
+    if (node.init.type === "LogicalExpression") {
+      for (const extractedNode of extractLogicalExpression(node.init)) {
+        this.#walkVariableDeclaratorInitialization(
+          node,
+          extractedNode.node
+        );
+      }
+    }
+    // const foo = "bar";
+    else {
+      this.#walkVariableDeclaratorInitialization(node);
+    }
+  }
+
+  walk(
+    node: ESTree.Node
+  ): void {
     switch (node.type) {
       case "ImportDeclaration": {
         this.#walkImportDeclaration(node);
         break;
       }
       case "VariableDeclaration": {
-        for (const variableDeclaratorNode of node.declarations) {
-          // var foo; <-- no initialization here.
-          if (!notNullOrUndefined(variableDeclaratorNode.init)) {
-            continue;
-          }
-
-          if (variableDeclaratorNode.id.type === "Identifier") {
-            this.#walkVariableDeclarationWithIdentifier(variableDeclaratorNode);
-          }
-          else {
-            this.#walkVariableDeclarationWithAnythingElse(variableDeclaratorNode);
-          }
-        }
+        node.declarations.forEach(
+          (node) => this.#walkVariableDeclarator(node)
+        );
         break;
       }
     }
   }
-}
-
-function stripNodePrefix(value: any): any {
-  if (typeof value !== "string") {
-    return value;
-  }
-
-  return value.startsWith(kNodeModulePrefix) ?
-    value.slice(kNodeModulePrefix.length) :
-    value;
-}
-
-function isLiteralNode(
-  node: ESTree.Node
-): node is ESTree.Literal {
-  return node.type === "Literal";
 }
