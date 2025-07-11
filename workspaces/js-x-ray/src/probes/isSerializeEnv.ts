@@ -47,8 +47,8 @@ function validateNode(
   }
 
   if (firstArg.type === "Identifier") {
-    const data = tracer.getDataFromIdentifier("process.env");
-    if (data !== null && data.assignmentMemory.some(({ name }) => name === firstArg.name)) {
+    const data = tracer.getDataFromIdentifier(firstArg.name);
+    if (data !== null) {
       return [true];
     }
   }
@@ -71,12 +71,16 @@ function main(
   return ProbeSignals.Skip;
 }
 
-function initialize(sourceFile: SourceFile) {
-  sourceFile.tracer.trace("process.env", {
-    followConsecutiveAssignment: true
-  }).trace("JSON.stringify", {
-    followConsecutiveAssignment: true
-  });
+function initialize(
+  { tracer }: SourceFile
+) {
+  tracer
+    .trace("process.env", {
+      followConsecutiveAssignment: true
+    })
+    .trace("JSON.stringify", {
+      followConsecutiveAssignment: true
+    });
 }
 
 export default {
