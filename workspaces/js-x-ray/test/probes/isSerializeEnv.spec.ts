@@ -80,6 +80,20 @@ test("should be able to detect reassigned JSON.stringify", () => {
   assert.strictEqual(warning.value, "JSON.stringify(process.env)");
 });
 
+test("should be able to detect serialization of process.env using a SpreadElement", () => {
+  const str = `
+  const env = {...process.env};
+  JSON.stringify(env);
+`;
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(isSerializeEnv).execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("serialize-environment");
+  assert.strictEqual(warning.kind, "serialize-environment");
+  assert.strictEqual(warning.value, "JSON.stringify(process.env)");
+});
+
 test("should not detect other JSON.stringify calls", () => {
   const str = "JSON.stringify({ foo: 'bar' })";
   const ast = parseScript(str);
