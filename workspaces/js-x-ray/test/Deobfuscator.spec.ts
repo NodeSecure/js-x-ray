@@ -4,11 +4,11 @@ import assert from "node:assert/strict";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import { Deobfuscator } from "../src/Deobfuscator.js";
 import { JsSourceParser } from "../src/index.js";
+import { walkEnter } from "../src/walker/index.js";
 
 describe("Deobfuscator", () => {
   describe("identifiers and counters", () => {
@@ -341,14 +341,11 @@ describe("Deobfuscator", () => {
 
 function walkAst(
   body: ESTree.Program["body"],
-  callback: (node: any) => void = (_node) => undefined
+  callback: (node: ESTree.Node) => void = (_node) => undefined
 ) {
-  // @ts-expect-error
-  walk(body, {
-    enter(node) {
-      if (!Array.isArray(node)) {
-        callback(node);
-      }
+  walkEnter(body, function enter(node) {
+    if (!Array.isArray(node)) {
+      callback(node);
     }
   });
 }

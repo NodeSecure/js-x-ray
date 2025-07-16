@@ -49,7 +49,6 @@
     "@nodesecure/sec-literal": "^1.2.0",
     "@nodesecure/tracer": "^2.0.0",
     "digraph-js": "^2.2.3",
-    "estree-walker": "^3.0.1",
     "frequency-set": "^1.0.2",
     "is-minified-code": "^2.0.0",
     "meriyah": "^6.0.0",

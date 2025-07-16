@@ -10,7 +10,7 @@ export type RegExpLiteral<T> = ESTree.RegExpLiteral & {
 };
 
 export function isNode(
-  value: any
+  value: unknown
 ): value is ESTree.Node {
   return (
     value !== null &&
@@ -21,7 +21,7 @@ export function isNode(
 }
 
 export function isLiteral(
-  node: any
+  node: unknown
 ): node is Literal<string> {
   return isNode(node) &&
     node.type === "Literal" &&
@@ -29,7 +29,7 @@ export function isLiteral(
 }
 
 export function isTemplateLiteral(
-  node: any
+  node: unknown
 ): node is ESTree.TemplateLiteral {
   if (!isNode(node) || node.type !== "TemplateLiteral") {
     return false;
@@ -47,7 +47,7 @@ export function isTemplateLiteral(
 }
 
 export function isCallExpression(
-  node: any
+  node: unknown
 ): node is ESTree.CallExpression {
   return isNode(node) && node.type === "CallExpression";
 }
