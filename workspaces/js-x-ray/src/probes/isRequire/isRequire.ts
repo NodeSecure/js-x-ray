@@ -10,16 +10,16 @@ import {
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { ProbeSignals } from "../../ProbeRunner.js";
-import { SourceFile } from "../../SourceFile.js";
+import { ProbeSignals, type ProbeContext } from "../../ProbeRunner.js";
 import { isLiteral } from "../../types/estree.js";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.js";
 import { generateWarning } from "../../warnings.js";
 
 function validateNodeRequire(
   node: ESTree.Node,
-  { tracer }: SourceFile
+  ctx: ProbeContext
 ): [boolean, any?] {
+  const { tracer } = ctx.sourceFile;
   const id = getCallExpressionIdentifier(node, {
     resolveCallExpression: false
   });
@@ -63,14 +63,14 @@ function validateNodeEvalRequire(
 }
 
 function teardown(
-  { sourceFile }: { sourceFile: SourceFile; }
+  ctx: ProbeContext
 ) {
-  sourceFile.dependencyAutoWarning = false;
+  ctx.sourceFile.dependencyAutoWarning = false;
 }
 
 function main(
   node: ESTree.CallExpression,
-  options: { sourceFile: SourceFile; data?: string; }
+  options: ProbeContext & { data?: string; }
 ) {
   const { sourceFile, data: calleeName } = options;
   const { tracer } = sourceFile;

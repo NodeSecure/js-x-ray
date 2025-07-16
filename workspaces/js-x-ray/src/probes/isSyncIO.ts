@@ -3,7 +3,7 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
+import type { ProbeContext } from "../ProbeRunner.js";
 import { generateWarning } from "../warnings.js";
 
 // CONSTANTS
@@ -40,8 +40,9 @@ const kSyncIOIdentifierOrMemberExps = [
 
 function validateNode(
   node: ESTree.Node,
-  { tracer }: SourceFile
+  ctx: ProbeContext
 ): [boolean, any?] {
+  const { tracer } = ctx.sourceFile;
   const id = getCallExpressionIdentifier(
     node,
     {
@@ -64,12 +65,12 @@ function validateNode(
 }
 
 function initialize(
-  sourceFile: SourceFile
+  ctx: ProbeContext
 ) {
   kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
     const moduleName = identifierOrMemberExp.split(".")[0];
 
-    return sourceFile.tracer.trace(identifierOrMemberExp, {
+    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
       followConsecutiveAssignment: true,
       moduleName
     });
@@ -78,13 +79,13 @@ function initialize(
 
 function main(
   node: ESTree.CallExpression,
-  { sourceFile }: { sourceFile: SourceFile; }
+  ctx: ProbeContext
 ) {
   const warning = generateWarning("synchronous-io", {
     value: node.callee.name,
     location: node.loc
   });
-  sourceFile.warnings.push(warning);
+  ctx.sourceFile.warnings.push(warning);
 }
 
 export default {

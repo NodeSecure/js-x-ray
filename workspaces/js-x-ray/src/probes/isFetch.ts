@@ -3,12 +3,13 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
+import type { ProbeContext } from "../ProbeRunner.js";
 
 function validateNode(
   node: ESTree.Node,
-  { tracer }: SourceFile
+  ctx: ProbeContext
 ): [boolean, any?] {
+  const { tracer } = ctx.sourceFile;
   const id = getCallExpressionIdentifier(node);
 
   if (id === null) {
@@ -20,13 +21,17 @@ function validateNode(
   return [data !== null && data.identifierOrMemberExpr === "fetch"];
 }
 
-function initialize(sourceFile: SourceFile) {
+function initialize(
+  ctx: ProbeContext
+) {
+  const { sourceFile } = ctx;
+
   sourceFile.tracer.trace("fetch", { followConsecutiveAssignment: true });
 }
 
 function main(
   _node: ESTree.Node,
-  { sourceFile }: { sourceFile: SourceFile; }
+  { sourceFile }: ProbeContext
 ) {
   sourceFile.flags.add("fetch");
 }
