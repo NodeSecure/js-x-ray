@@ -3,7 +3,7 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
+import type { ProbeContext } from "../ProbeRunner.js";
 import { generateWarning } from "../warnings.js";
 import {
   isLiteral
@@ -20,9 +20,9 @@ const kWeakAlgorithms = new Set([
 
 function validateNode(
   node: ESTree.Node,
-  sourceFile: SourceFile
+  ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = sourceFile;
+  const { tracer } = ctx.sourceFile;
 
   const id = getCallExpressionIdentifier(node);
   if (id === null || !tracer.importedModules.has("crypto")) {
@@ -37,9 +37,11 @@ function validateNode(
 }
 
 function initialize(
-  sourceFile: SourceFile
+  ctx: ProbeContext
 ) {
-  sourceFile.tracer.trace("crypto.createHash", {
+  const { tracer } = ctx.sourceFile;
+
+  tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
     moduleName: "crypto"
   });
@@ -47,8 +49,9 @@ function initialize(
 
 function main(
   node: ESTree.CallExpression,
-  { sourceFile }: { sourceFile: SourceFile; }
+  ctx: ProbeContext
 ) {
+  const { sourceFile } = ctx;
   const arg = node.arguments.at(0);
 
   if (isLiteral(arg) && kWeakAlgorithms.has(arg.value)) {

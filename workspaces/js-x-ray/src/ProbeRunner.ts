@@ -24,24 +24,29 @@ import type { SourceFile } from "./SourceFile.js";
 import type { OptionalWarningName } from "./warnings.js";
 
 export type ProbeReturn = void | null | symbol;
-export type ProbeInitializeCallback = (sourceFile: SourceFile) => void;
-export type ProbeFinalizeCallback = (sourceFile: SourceFile) => void;
-export type ProbeMainCallback = (
-  node: any,
-  options: { sourceFile: SourceFile; data?: any; }
-) => ProbeReturn;
-export type ProbeTeardownCallback = (options: { sourceFile: SourceFile; }) => void;
-export type ProbeValidationCallback = (node: ESTree.Node, sourceFile: SourceFile) => [boolean, any?];
+export type ProbeContextDef = Record<string, any>;
+export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
+  sourceFile: SourceFile;
+  context?: T;
+};
 
-export interface Probe {
+export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef> = (
+  node: ESTree.Node, ctx: ProbeContext<T>
+) => [boolean, any?];
+
+export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   name: string;
-  initialize?: ProbeInitializeCallback;
-  finalize?: ProbeFinalizeCallback;
-  validateNode: ProbeValidationCallback | ProbeValidationCallback[];
-  main: ProbeMainCallback;
-  teardown?: ProbeTeardownCallback;
+  initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
+  finalize?: (ctx: ProbeContext<T>) => void;
+  validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
+  main: (
+    node: any,
+    ctx: ProbeContext<T> & { data?: any; }
+  ) => ProbeReturn;
+  teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
   breakGroup?: string;
+  context?: ProbeContext<T>;
 }
 
 export const ProbeSignals = Object.freeze({
@@ -97,11 +102,23 @@ export class ProbeRunner {
         `Invalid probe ${probe.name}: initialize must be a function or undefined`
       );
       if (probe.initialize) {
-        probe.initialize(sourceFile);
+        const context = probe.initialize(this.#getProbeContext(probe));
+        if (context) {
+          probe.context = context;
+        }
       }
     }
 
     this.probes = probes;
+  }
+
+  #getProbeContext(
+    probe: Probe
+  ): ProbeContext {
+    return {
+      sourceFile: this.sourceFile,
+      context: probe.context
+    };
   }
 
   #runProbe(
@@ -110,15 +127,17 @@ export class ProbeRunner {
   ): ProbeReturn {
     const validationFns = Array.isArray(probe.validateNode) ?
       probe.validateNode : [probe.validateNode];
+    const ctx = this.#getProbeContext(probe);
+
     for (const validateNode of validationFns) {
       const [isMatching, data = null] = validateNode(
         node,
-        this.sourceFile
+        ctx
       );
 
       if (isMatching) {
         return probe.main(node, {
-          sourceFile: this.sourceFile,
+          ...ctx,
           data
         });
       }
@@ -158,9 +177,7 @@ export class ProbeRunner {
         }
       }
       finally {
-        if (probe.teardown) {
-          probe.teardown({ sourceFile: this.sourceFile });
-        }
+        probe.teardown?.(this.#getProbeContext(probe));
       }
     }
 
@@ -169,9 +186,7 @@ export class ProbeRunner {
 
   finalize(): void {
     for (const probe of this.probes) {
-      if (probe.finalize) {
-        probe.finalize(this.sourceFile);
-      }
+      probe.finalize?.(this.#getProbeContext(probe));
     }
   }
 }

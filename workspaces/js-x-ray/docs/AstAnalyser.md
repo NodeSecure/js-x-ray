@@ -143,11 +143,11 @@ Below a basic probe that detect a string assignation to `danger`:
 export const customProbes = [
   {
     name: "customProbeUnsafeDanger",
-    validateNode: (node, sourceFile) => [
+    validateNode: (node) => [
       node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
     ],
-    main: (node, options) => {
-      const { sourceFile, data: calleeName } = options;
+    main: (node, ctx) => {
+      const { sourceFile, data: calleeName } = ctx;
       if (node.declarations[0].init.value === "danger") {
         sourceFile.warnings.push({
           kind: "unsafe-danger",

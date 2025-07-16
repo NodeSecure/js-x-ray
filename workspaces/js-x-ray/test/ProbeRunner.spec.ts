@@ -113,12 +113,43 @@ describe("ProbeRunner", () => {
 
       assert.strictEqual(fakeProbe.main.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { sourceFile, data: null }
+        astNode, { sourceFile, data: null, context: undefined }
       ]);
 
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.teardown.mock.calls.at(0)?.arguments, [
-        { sourceFile }
+        { sourceFile, context: undefined }
+      ]);
+    });
+
+    it("should forward validateNode data to main", () => {
+      const data = { test: "data" };
+      const fakeProbe = {
+        validateNode: mock.fn((_: ESTree.Node) => [true, data]),
+        main: mock.fn(() => ProbeSignals.Skip)
+      };
+
+      const sourceFile = new SourceFile();
+
+      const pr = new ProbeRunner(
+        sourceFile,
+        // @ts-expect-error
+        [fakeProbe]
+      );
+
+      const astNode: ESTree.Literal = {
+        type: "Literal",
+        value: "test"
+      };
+      pr.walk(astNode);
+      pr.finalize();
+
+      const expectedContext = { sourceFile, context: undefined };
+      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
+        astNode, expectedContext
+      ]);
+      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
+        astNode, { ...expectedContext, data }
       ]);
     });
 
@@ -183,9 +214,91 @@ describe("ProbeRunner", () => {
       probes.forEach((probe) => {
         assert.strictEqual(probe.finalize.mock.calls.length, 1);
         assert.deepEqual(probe.finalize.mock.calls.at(0)?.arguments, [
-          sourceFile
+          { sourceFile, context: undefined }
         ]);
       });
+    });
+  });
+
+  describe("context", () => {
+    it("should define context with initialize and dispatch it to all methods", () => {
+      const fakeCtx = {};
+
+      const fakeProbe = {
+        initialize: mock.fn(() => fakeCtx),
+        validateNode: mock.fn((_: ESTree.Node) => [true]),
+        main: mock.fn(() => ProbeSignals.Skip),
+        finalize: mock.fn()
+      };
+
+      const sourceFile = new SourceFile();
+
+      const pr = new ProbeRunner(
+        sourceFile,
+        // @ts-expect-error
+        [fakeProbe]
+      );
+
+      const astNode: ESTree.Literal = {
+        type: "Literal",
+        value: "test"
+      };
+      pr.walk(astNode);
+      pr.finalize();
+
+      const expectedContext = { sourceFile, context: fakeCtx };
+      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
+        astNode, expectedContext
+      ]);
+      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
+        astNode, { ...expectedContext, data: null }
+      ]);
+      assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
+        { sourceFile, context: undefined }
+      ]);
+      assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
+        expectedContext
+      ]);
+    });
+
+    it("should define context within the probe and dispatch it to all methods", () => {
+      const fakeCtx = {};
+      const fakeProbe = {
+        initialize: mock.fn(),
+        validateNode: mock.fn((_: ESTree.Node) => [true]),
+        main: mock.fn(() => ProbeSignals.Skip),
+        finalize: mock.fn(),
+        context: fakeCtx
+      };
+
+      const sourceFile = new SourceFile();
+
+      const pr = new ProbeRunner(
+        sourceFile,
+        // @ts-expect-error
+        [fakeProbe]
+      );
+
+      const astNode: ESTree.Literal = {
+        type: "Literal",
+        value: "test"
+      };
+      pr.walk(astNode);
+      pr.finalize();
+
+      const expectedContext = { sourceFile, context: fakeCtx };
+      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
+        astNode, expectedContext
+      ]);
+      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
+        astNode, { ...expectedContext, data: null }
+      ]);
+      assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
+        expectedContext
+      ]);
+      assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
+        expectedContext
+      ]);
     });
   });
 });

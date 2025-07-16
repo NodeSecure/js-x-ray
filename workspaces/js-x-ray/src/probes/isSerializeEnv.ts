@@ -6,9 +6,8 @@ import {
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
 import { generateWarning } from "../warnings.js";
-import { ProbeSignals } from "../ProbeRunner.js";
+import { ProbeSignals, type ProbeContext } from "../ProbeRunner.js";
 
 /**
  * @description Detect serialization of process.env which could indicate environment variable exfiltration
@@ -20,8 +19,10 @@ import { ProbeSignals } from "../ProbeRunner.js";
  */
 function validateNode(
   node: ESTree.Node,
-  { tracer }: SourceFile
+  ctx: ProbeContext
 ): [boolean, any?] {
+  const { tracer } = ctx.sourceFile;
+
   const id = getCallExpressionIdentifier(node);
 
   if (id === null) {
@@ -58,9 +59,9 @@ function validateNode(
 
 function main(
   node: ESTree.Node,
-  options: { sourceFile: SourceFile; }
+  ctx: ProbeContext
 ) {
-  const { sourceFile } = options;
+  const { sourceFile } = ctx;
 
   const warning = generateWarning("serialize-environment", {
     value: "JSON.stringify(process.env)",
@@ -72,8 +73,10 @@ function main(
 }
 
 function initialize(
-  { tracer }: SourceFile
+  ctx: ProbeContext
 ) {
+  const { tracer } = ctx.sourceFile;
+
   tracer
     .trace("process.env", {
       followConsecutiveAssignment: true
