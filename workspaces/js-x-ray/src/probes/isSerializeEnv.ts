@@ -7,7 +7,10 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { generateWarning } from "../warnings.js";
-import { ProbeSignals, type ProbeContext } from "../ProbeRunner.js";
+import type {
+  ProbeContext,
+  ProbeMainContext
+} from "../ProbeRunner.js";
 
 /**
  * @description Detect serialization of process.env which could indicate environment variable exfiltration
@@ -59,9 +62,9 @@ function validateNode(
 
 function main(
   node: ESTree.Node,
-  ctx: ProbeContext
+  ctx: ProbeMainContext
 ) {
-  const { sourceFile } = ctx;
+  const { sourceFile, signals } = ctx;
 
   const warning = generateWarning("serialize-environment", {
     value: "JSON.stringify(process.env)",
@@ -69,7 +72,7 @@ function main(
   });
   sourceFile.warnings.push(warning);
 
-  return ProbeSignals.Skip;
+  return signals.Skip;
 }
 
 function initialize(

@@ -10,7 +10,6 @@ import {
 } from "../../src/index.js";
 import {
   ProbeRunner,
-  ProbeSignals,
   type Probe
 } from "../../src/ProbeRunner.js";
 
@@ -82,8 +81,8 @@ export const customProbes: Probe[] = [
         node.declarations[0].init.value === "danger"
       ];
     },
-    main(node, options) {
-      const { sourceFile, data: calleeName } = options;
+    main(node, ctx) {
+      const { sourceFile, data: calleeName, signals } = ctx;
       if (node.declarations[0].init.value === "danger") {
         sourceFile.warnings.push({
           kind: "unsafe-danger",
@@ -94,7 +93,7 @@ export const customProbes: Probe[] = [
           severity: "Warning"
         });
 
-        return ProbeSignals.Skip;
+        return signals.Skip;
       }
 
       return null;
