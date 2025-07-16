@@ -32,6 +32,7 @@ interface AstAnalyserOptions {
    * @default false
    */
   optionalWarnings?: boolean | Iterable<OptionalWarningName>;
+  pipelines?: Pipeline[];
 }
 ```
 

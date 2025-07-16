@@ -4,7 +4,8 @@ import type { ESTree } from "meriyah";
 export interface WalkerContext {
   skip: () => void;
   remove: () => void;
-  replace: (node: ESTree.Node) => void;
+  replace: (node: ESTree.Node | void) => void;
+  replaceAndSkip: (node: ESTree.Node | void) => void;
 }
 
 export class WalkerBase {
@@ -17,7 +18,17 @@ export class WalkerBase {
     this.context = {
       skip: () => (this.should_skip = true),
       remove: () => (this.should_remove = true),
-      replace: (node) => (this.replacement = node)
+      replace: (node) => {
+        if (node !== undefined) {
+          this.replacement = node;
+        }
+      },
+      replaceAndSkip: (node) => {
+        this.should_skip = true;
+        if (node !== undefined) {
+          this.replacement = node;
+        }
+      }
     };
   }
 
