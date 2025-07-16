@@ -147,7 +147,7 @@ export const customProbes = [
       node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
     ],
     main: (node, ctx) => {
-      const { sourceFile, data: calleeName } = ctx;
+      const { sourceFile, data: calleeName, signals } = ctx;
       if (node.declarations[0].init.value === "danger") {
         sourceFile.warnings.push({
           kind: "unsafe-danger",
@@ -158,7 +158,7 @@ export const customProbes = [
           severity: "Warning"
         });
 
-        return ProbeSignals.Skip;
+        return signals.Skip;
       }
 
       return null;

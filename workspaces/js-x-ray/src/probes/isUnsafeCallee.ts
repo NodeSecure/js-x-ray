@@ -3,9 +3,8 @@ import type { ESTree } from "meriyah";
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
 import { generateWarning } from "../warnings.js";
-import { ProbeSignals } from "../ProbeRunner.js";
+import type { ProbeMainContext } from "../ProbeRunner.js";
 
 /**
  * @description Detect unsafe statement
@@ -21,19 +20,19 @@ function validateNode(
 
 function main(
   node: ESTree.CallExpression,
-  options: { sourceFile: SourceFile; data?: string; }
+  ctx: ProbeMainContext
 ) {
-  const { sourceFile, data: calleeName } = options;
+  const { sourceFile, data: calleeName, signals } = ctx;
 
   if (!calleeName) {
-    return ProbeSignals.Skip;
+    return signals.Skip;
   }
   if (
     calleeName === "Function" &&
     node.callee.arguments.length > 0 &&
     node.callee.arguments[0].value === "return this"
   ) {
-    return ProbeSignals.Skip;
+    return signals.Skip;
   }
 
   const warning = generateWarning("unsafe-stmt", {
@@ -42,7 +41,7 @@ function main(
   });
   sourceFile.warnings.push(warning);
 
-  return ProbeSignals.Skip;
+  return signals.Skip;
 }
 
 function isEvalCallee(

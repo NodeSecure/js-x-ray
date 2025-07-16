@@ -7,8 +7,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  ProbeRunner,
-  ProbeSignals
+  ProbeRunner
 } from "../src/ProbeRunner.js";
 import { SourceFile } from "../src/SourceFile.js";
 
@@ -113,7 +112,7 @@ describe("ProbeRunner", () => {
 
       assert.strictEqual(fakeProbe.main.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { sourceFile, data: null, context: undefined }
+        astNode, { sourceFile, data: null, context: undefined, signals: ProbeRunner.Signals }
       ]);
 
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
@@ -126,7 +125,7 @@ describe("ProbeRunner", () => {
       const data = { test: "data" };
       const fakeProbe = {
         validateNode: mock.fn((_: ESTree.Node) => [true, data]),
-        main: mock.fn(() => ProbeSignals.Skip)
+        main: mock.fn(() => ProbeRunner.Signals.Skip)
       };
 
       const sourceFile = new SourceFile();
@@ -149,14 +148,14 @@ describe("ProbeRunner", () => {
         astNode, expectedContext
       ]);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data }
+        astNode, { ...expectedContext, data, signals: ProbeRunner.Signals }
       ]);
     });
 
     it("should trigger and return a skip signal", () => {
       const fakeProbe = {
         validateNode: (node: ESTree.Node) => [node.type === "Literal"],
-        main: () => ProbeSignals.Skip,
+        main: () => ProbeRunner.Signals.Skip,
         teardown: mock.fn()
       };
 
@@ -181,20 +180,20 @@ describe("ProbeRunner", () => {
     it("should call the finalize methods", () => {
       const fakeProbe = {
         validateNode: (_: ESTree.Node) => [true],
-        main: () => ProbeSignals.Skip,
+        main: () => ProbeRunner.Signals.Skip,
         finalize: mock.fn()
       };
 
       const fakeProbeSkip = {
         validateNode: (_: ESTree.Node) => [true],
-        main: () => ProbeSignals.Skip,
+        main: () => ProbeRunner.Signals.Skip,
         teardown: mock.fn(),
         finalize: mock.fn()
       };
 
       const fakeProbeBreak = {
         validateNode: (_: ESTree.Node) => [true],
-        main: () => ProbeSignals.Break,
+        main: () => ProbeRunner.Signals.Break,
         teardown: mock.fn(),
         finalize: mock.fn()
       };
@@ -227,7 +226,7 @@ describe("ProbeRunner", () => {
       const fakeProbe = {
         initialize: mock.fn(() => fakeCtx),
         validateNode: mock.fn((_: ESTree.Node) => [true]),
-        main: mock.fn(() => ProbeSignals.Skip),
+        main: mock.fn(() => ProbeRunner.Signals.Skip),
         finalize: mock.fn()
       };
 
@@ -251,7 +250,7 @@ describe("ProbeRunner", () => {
         astNode, expectedContext
       ]);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data: null }
+        astNode, { ...expectedContext, data: null, signals: ProbeRunner.Signals }
       ]);
       assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
         { sourceFile, context: undefined }
@@ -266,7 +265,7 @@ describe("ProbeRunner", () => {
       const fakeProbe = {
         initialize: mock.fn(),
         validateNode: mock.fn((_: ESTree.Node) => [true]),
-        main: mock.fn(() => ProbeSignals.Skip),
+        main: mock.fn(() => ProbeRunner.Signals.Skip),
         finalize: mock.fn(),
         context: fakeCtx
       };
@@ -291,7 +290,7 @@ describe("ProbeRunner", () => {
         astNode, expectedContext
       ]);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data: null }
+        astNode, { ...expectedContext, data: null, signals: ProbeRunner.Signals }
       ]);
       assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
         expectedContext

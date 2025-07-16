@@ -29,6 +29,10 @@ export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
   sourceFile: SourceFile;
   context?: T;
 };
+export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef> = ProbeContext<T> & {
+  data?: any;
+  signals: typeof ProbeRunner.Signals;
+};
 
 export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef> = (
   node: ESTree.Node, ctx: ProbeContext<T>
@@ -41,7 +45,7 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
   main: (
     node: any,
-    ctx: ProbeContext<T> & { data?: any; }
+    ctx: ProbeMainContext<T>
   ) => ProbeReturn;
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
@@ -49,14 +53,15 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   context?: ProbeContext<T>;
 }
 
-export const ProbeSignals = Object.freeze({
-  Break: Symbol.for("breakWalk"),
-  Skip: Symbol.for("skipWalk")
-});
-
 export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
+
+  static Signals = Object.freeze({
+    Break: Symbol.for("breakWalk"),
+    Skip: Symbol.for("skipWalk"),
+    Continue: null
+  });
 
   /**
    * Note:
@@ -138,6 +143,7 @@ export class ProbeRunner {
       if (isMatching) {
         return probe.main(node, {
           ...ctx,
+          signals: ProbeRunner.Signals,
           data
         });
       }
@@ -157,15 +163,15 @@ export class ProbeRunner {
       }
 
       try {
-        const result = this.#runProbe(probe, node);
-        if (result === null) {
+        const signal = this.#runProbe(probe, node);
+        if (signal === ProbeRunner.Signals.Continue) {
           continue;
         }
 
-        if (result === ProbeSignals.Skip) {
+        if (signal === ProbeRunner.Signals.Skip) {
           return "skip";
         }
-        if (result === ProbeSignals.Break || probe.breakOnMatch) {
+        if (signal === ProbeRunner.Signals.Break || probe.breakOnMatch) {
           const breakGroup = probe.breakGroup || null;
 
           if (breakGroup === null) {

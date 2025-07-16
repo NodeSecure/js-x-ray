@@ -2,10 +2,12 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
 import { generateWarning } from "../warnings.js";
-import { ProbeSignals } from "../ProbeRunner.js";
-import { isLiteral, isTemplateLiteral } from "../types/estree.js";
+import {
+  isLiteral,
+  isTemplateLiteral
+} from "../types/estree.js";
+import type { ProbeMainContext } from "../ProbeRunner.js";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
@@ -102,9 +104,9 @@ function validateNode(
 
 function main(
   node: ESTree.CallExpression,
-  options: { sourceFile: SourceFile; data?: string; }
+  ctx: ProbeMainContext
 ) {
-  const { sourceFile, data: methodName } = options;
+  const { sourceFile, data: methodName, signals } = ctx;
 
   const commandArg = node.arguments[0];
   if (!isLiteral(commandArg) && !isTemplateLiteral(commandArg)) {
@@ -134,7 +136,7 @@ function main(
     });
     sourceFile.warnings.push(warning);
 
-    return ProbeSignals.Skip;
+    return signals.Skip;
   }
 
   return null;

@@ -10,7 +10,7 @@ import {
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { ProbeSignals, type ProbeContext } from "../../ProbeRunner.js";
+import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.js";
 import { isLiteral } from "../../types/estree.js";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.js";
 import { generateWarning } from "../../warnings.js";
@@ -70,9 +70,9 @@ function teardown(
 
 function main(
   node: ESTree.CallExpression,
-  options: ProbeContext & { data?: string; }
+  ctx: ProbeMainContext
 ) {
-  const { sourceFile, data: calleeName } = options;
+  const { sourceFile, data: calleeName, signals } = ctx;
   const { tracer } = sourceFile;
 
   if (node.arguments.length === 0) {
@@ -170,7 +170,7 @@ function main(
       }
 
       // We skip walking the tree to avoid anymore warnings...
-      return ProbeSignals.Skip;
+      return signals.Skip;
     }
 
     default:
