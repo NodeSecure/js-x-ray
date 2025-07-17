@@ -4,12 +4,12 @@ import assert from "node:assert/strict";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import { NodeCounter } from "../src/NodeCounter.js";
 import { JsSourceParser } from "../src/index.js";
 import { isNode } from "../src/types/estree.js";
+import { walkEnter } from "../src/walker/index.js";
 
 describe("NodeCounter", () => {
   describe("constructor", () => {
@@ -130,14 +130,12 @@ describe("NodeCounter", () => {
 });
 
 function walkAst(
-  body: any,
-  callback: (node: any) => void = () => void 0
+  body: ESTree.Program["body"],
+  callback: (node: ESTree.Node) => void = () => void 0
 ) {
-  walk(body, {
-    enter(node) {
-      if (!Array.isArray(node)) {
-        callback(node);
-      }
+  walkEnter(body, function enter(node) {
+    if (!Array.isArray(node)) {
+      callback(node);
     }
   });
 }

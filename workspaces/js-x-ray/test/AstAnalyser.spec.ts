@@ -364,7 +364,9 @@ describe("AstAnalyser", () => {
           customProbes: [
             {
               name: "name",
-              initialize: () => calls.push("initialize"),
+              initialize: () => {
+                calls.push("initialize");
+              },
               validateNode: () => [true],
               main: t.mock.fn(),
               finalize: () => calls.push("finalize")

@@ -3,7 +3,6 @@ import path from "node:path";
 
 // Import Third-party Dependencies
 import { Hex } from "@nodesecure/sec-literal";
-import { walk as doWalk } from "estree-walker";
 import {
   arrayExpressionToString,
   getMemberExpressionIdentifier,
@@ -17,6 +16,7 @@ import {
   isLiteral,
   isCallExpression
 } from "../../types/estree.js";
+import { walkEnter } from "../../walker/index.js";
 
 export class RequireCallExpressionWalker {
   tracer: VariableTracer;
@@ -41,47 +41,44 @@ export class RequireCallExpressionWalker {
 
     // we need the `this` context of doWalk.enter
     const self = this;
-    // @ts-expect-error
-    doWalk(callExprNode, {
-      enter(node: any) {
-        if (
-          !isCallExpression(node) ||
-          node.arguments.length === 0
-        ) {
-          return;
-        }
+    walkEnter(callExprNode, function enter(node) {
+      if (
+        !isCallExpression(node) ||
+        node.arguments.length === 0
+      ) {
+        return;
+      }
 
-        const castedNode = node as ESTree.CallExpression;
-        const rootArgument = castedNode.arguments.at(0)!;
-        if (
-          rootArgument.type === "Literal" &&
-          typeof rootArgument.value === "string" &&
-          Hex.isHex(rootArgument.value)
-        ) {
-          self.dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
-          this.skip();
+      const castedNode = node as ESTree.CallExpression;
+      const rootArgument = castedNode.arguments.at(0)!;
+      if (
+        rootArgument.type === "Literal" &&
+        typeof rootArgument.value === "string" &&
+        Hex.isHex(rootArgument.value)
+      ) {
+        self.dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
+        this.skip();
 
-          return;
-        }
+        return;
+      }
 
-        const fullName = castedNode.callee.type === "MemberExpression" ?
-          [...getMemberExpressionIdentifier(castedNode.callee)].join(".") :
-          castedNode.callee.name;
-        const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
-        switch (tracedFullName) {
-          case "atob":
-            self.#handleAtob(castedNode);
-            break;
-          case "Buffer.from":
-            self.#handleBufferFrom(castedNode);
-            break;
-          case "require.resolve":
-            self.#handleRequireResolve(rootArgument);
-            break;
-          case "path.join":
-            self.#handlePathJoin(castedNode);
-            break;
-        }
+      const fullName = castedNode.callee.type === "MemberExpression" ?
+        [...getMemberExpressionIdentifier(castedNode.callee)].join(".") :
+        castedNode.callee.name;
+      const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
+      switch (tracedFullName) {
+        case "atob":
+          self.#handleAtob(castedNode);
+          break;
+        case "Buffer.from":
+          self.#handleBufferFrom(castedNode);
+          break;
+        case "require.resolve":
+          self.#handleRequireResolve(rootArgument);
+          break;
+        case "path.join":
+          self.#handlePathJoin(castedNode);
+          break;
       }
     });
 

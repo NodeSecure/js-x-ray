@@ -4,7 +4,6 @@ import fsSync from "node:fs";
 import path from "node:path";
 
 // Import Third-party Dependencies
-import { walk } from "estree-walker";
 import type { ESTree } from "meriyah";
 import isMinified from "is-minified-code";
 
@@ -21,6 +20,7 @@ import {
 import { isOneLineExpressionExport } from "./utils/index.js";
 import { JsSourceParser, type SourceParser } from "./JsSourceParser.js";
 import { ProbeRunner, type Probe } from "./ProbeRunner.js";
+import { walkEnter } from "./walker/index.js";
 import * as trojan from "./obfuscators/trojan-source.js";
 
 export interface Dependency {
@@ -161,19 +161,16 @@ export class AstAnalyser {
     }
 
     // we walk each AST Nodes, this is a purely synchronous I/O
-    // @ts-expect-error
-    walk(body, {
-      enter(node: any) {
-        // Skip the root of the AST.
-        if (Array.isArray(node)) {
-          return;
-        }
+    walkEnter(body, function walk(node) {
+      // Skip the root of the AST.
+      if (Array.isArray(node)) {
+        return;
+      }
 
-        source.walk(node);
-        const action = runner.walk(node);
-        if (action === "skip") {
-          this.skip();
-        }
+      source.walk(node);
+      const action = runner.walk(node);
+      if (action === "skip") {
+        this.skip();
       }
     });
 

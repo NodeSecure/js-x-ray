@@ -1,6 +1,5 @@
 // Import Third-party Dependencies
 import * as meriyah from "meriyah";
-import { walk } from "estree-walker";
 
 // Import Internal Dependencies
 import {
@@ -12,6 +11,7 @@ import {
   ProbeRunner,
   type Probe
 } from "../../src/ProbeRunner.js";
+import { walk } from "../../src/walker/index.js";
 
 export function getWarningKind(
   warnings: Warning[]
@@ -52,7 +52,7 @@ export function getSastAnalysis(
       const self = this;
 
       walk(body, {
-        enter(node: any) {
+        enter(node: meriyah.ESTree.Node) {
           // Skip the root of the AST.
           if (Array.isArray(node)) {
             return;
