@@ -23,6 +23,9 @@ import isSerializeEnv from "./probes/isSerializeEnv.js";
 import type { SourceFile } from "./SourceFile.js";
 import type { OptionalWarningName } from "./warnings.js";
 
+// CONSTANTS
+const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
+
 export type ProbeReturn = void | null | symbol;
 export type ProbeContextDef = Record<string, any>;
 export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
@@ -50,7 +53,7 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
   breakGroup?: string;
-  context?: ProbeContext<T>;
+  context?: T;
 }
 
 export class ProbeRunner {
@@ -107,9 +110,18 @@ export class ProbeRunner {
         `Invalid probe ${probe.name}: initialize must be a function or undefined`
       );
       if (probe.initialize) {
+        const isDefined = Reflect.defineProperty(probe, kProbeOriginalContext, {
+          enumerable: false,
+          value: structuredClone(probe.context),
+          writable: false
+        });
+        if (!isDefined) {
+          throw new Error(`Failed to define original context for probe '${probe.name}'`);
+        }
+
         const context = probe.initialize(this.#getProbeContext(probe));
         if (context) {
-          probe.context = context;
+          probe.context = structuredClone(context);
         }
       }
     }
@@ -193,6 +205,7 @@ export class ProbeRunner {
   finalize(): void {
     for (const probe of this.probes) {
       probe.finalize?.(this.#getProbeContext(probe));
+      probe.context = probe[kProbeOriginalContext];
     }
   }
 }
