@@ -7,6 +7,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
+  ProbeContext,
   ProbeRunner
 } from "../src/ProbeRunner.js";
 import { SourceFile } from "../src/SourceFile.js";
@@ -88,6 +89,29 @@ describe("ProbeRunner", () => {
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
+    });
+
+    it("should throw if one the provided probe is sealed or frozen", () => {
+      const methods = ["seal", "freeze"];
+      for (const method of methods) {
+        const fakeProbe = Object[method]({
+          name: "frozen-probe",
+          initialize() {
+            return {};
+          },
+          validateNode: mock.fn((_: ESTree.Node) => [true]),
+          main: () => ProbeRunner.Signals.Skip
+        });
+
+        assert.throws(() => {
+          new ProbeRunner(
+            new SourceFile(),
+            [fakeProbe]
+          );
+        }, {
+          message: "Failed to define original context for probe 'frozen-probe'"
+        });
+      }
     });
   });
 
@@ -298,6 +322,46 @@ describe("ProbeRunner", () => {
       assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
         expectedContext
       ]);
+    });
+
+    it("should deep clone initialization context and clear context when the probe is fully executed", () => {
+      const fakeCtx = {};
+      const fakeProbe: any = {
+        initialize() {
+          return fakeCtx;
+        },
+        validateNode: mock.fn((_: ESTree.Node) => [true]),
+        main(_node: ESTree.Node, ctx: Required<ProbeContext>) {
+          ctx.context.hello = "world";
+
+          return ProbeRunner.Signals.Skip;
+        }
+      };
+
+      const sourceFile = new SourceFile();
+
+      const pr = new ProbeRunner(
+        sourceFile,
+        [fakeProbe]
+      );
+
+      const astNode: ESTree.Literal = {
+        type: "Literal",
+        value: "test"
+      };
+      pr.walk(astNode);
+      assert.deepEqual(fakeProbe.context, {
+        hello: "world"
+      });
+
+      pr.finalize();
+
+      assert.strictEqual(fakeProbe.context, undefined);
+      const { context = null } = fakeProbe.validateNode.mock.calls.at(0)?.arguments[1] ?? {};
+      assert.deepEqual(context, {
+        hello: "world"
+      });
+      assert.notStrictEqual(context, fakeCtx);
     });
   });
 });
