@@ -17,11 +17,17 @@ import {
   SourceFile,
   type SourceFlags
 } from "./SourceFile.js";
-import { isOneLineExpressionExport } from "./utils/index.js";
 import { JsSourceParser, type SourceParser } from "./JsSourceParser.js";
 import { ProbeRunner, type Probe } from "./ProbeRunner.js";
 import { walkEnter } from "./walker/index.js";
 import * as trojan from "./obfuscators/trojan-source.js";
+import {
+  isOneLineExpressionExport
+} from "./utils/index.js";
+import {
+  PipelineRunner,
+  type Pipeline
+} from "./pipelines/index.js";
 
 export interface Dependency {
   unsafe: boolean;
@@ -85,6 +91,7 @@ export interface AstAnalyserOptions {
    * @default false
    */
   optionalWarnings?: boolean | Iterable<OptionalWarningName>;
+  pipelines?: Pipeline[];
 }
 
 export interface PrepareSourceOptions {
@@ -92,6 +99,7 @@ export interface PrepareSourceOptions {
 }
 
 export class AstAnalyser {
+  #pipelineRunner: PipelineRunner;
   parser: SourceParser;
   probes: Probe[];
 
@@ -99,9 +107,11 @@ export class AstAnalyser {
     const {
       customProbes = [],
       optionalWarnings = false,
-      skipDefaultProbes = false
+      skipDefaultProbes = false,
+      pipelines = []
     } = options;
 
+    this.#pipelineRunner = new PipelineRunner(pipelines);
     this.parser = options.customParser ?? new JsSourceParser();
 
     let probes = ProbeRunner.Defaults;
@@ -144,6 +154,7 @@ export class AstAnalyser {
     const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
+
     const source = new SourceFile();
     if (trojan.verify(str)) {
       source.warnings.push(
@@ -151,8 +162,7 @@ export class AstAnalyser {
       );
     }
 
-    const runner = new ProbeRunner(source, this.probes);
-
+    const probeRunner = new ProbeRunner(source, this.probes);
     if (initialize) {
       if (typeof initialize !== "function") {
         throw new TypeError("options.initialize must be a function");
@@ -161,14 +171,15 @@ export class AstAnalyser {
     }
 
     // we walk each AST Nodes, this is a purely synchronous I/O
-    walkEnter(body, function walk(node) {
+    const reducedBody = this.#pipelineRunner.reduce(body);
+    walkEnter(reducedBody, function walk(node) {
       // Skip the root of the AST.
       if (Array.isArray(node)) {
         return;
       }
 
       source.walk(node);
-      const action = runner.walk(node);
+      const action = probeRunner.walk(node);
       if (action === "skip") {
         this.skip();
       }
@@ -180,7 +191,7 @@ export class AstAnalyser {
       }
       finalize(source);
     }
-    runner.finalize();
+    probeRunner.finalize();
 
     // Add oneline-require flag if this is a one-line require expression
     if (isOneLineExpressionExport(body)) {
