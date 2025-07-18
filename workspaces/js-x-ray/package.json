@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/js-x-ray",
-  "version": "9.2.0",
+  "version": "10.0.0",
   "description": "JavaScript AST XRay analysis",
   "type": "module",
   "exports": {
@@ -45,9 +45,9 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "@nodesecure/estree-ast-utils": "^4.1.0",
+    "@nodesecure/estree-ast-utils": "^4.2.0",
     "@nodesecure/sec-literal": "^1.2.0",
-    "@nodesecure/tracer": "^2.0.0",
+    "@nodesecure/tracer": "^3.0.0",
     "digraph-js": "^2.2.3",
     "frequency-set": "^1.0.2",
     "is-minified-code": "^2.0.0",
