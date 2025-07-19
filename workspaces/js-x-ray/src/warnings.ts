@@ -26,6 +26,7 @@ export type WarningName =
   | "unsafe-command"
   | "unsafe-import"
   | "serialize-environment"
+  | "data-exfiltration"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -101,6 +102,11 @@ export const warnings = Object.freeze({
   },
   "serialize-environment": {
     i18n: "sast_warnings.serialize_environment",
+    severity: "Warning",
+    experimental: false
+  },
+  "data-exfiltration": {
+    i18n: "sast_warnings.data_exfiltration",
     severity: "Warning",
     experimental: false
   }
