@@ -19,6 +19,7 @@ import isFetch from "./probes/isFetch.js";
 import isUnsafeCommand from "./probes/isUnsafeCommand.js";
 import isSyncIO from "./probes/isSyncIO.js";
 import isSerializeEnv from "./probes/isSerializeEnv.js";
+import dataExfiltration from "./probes/data-exfiltration.js";
 
 import type { SourceFile } from "./SourceFile.js";
 import type { OptionalWarningName } from "./warnings.js";
@@ -83,7 +84,8 @@ export class ProbeRunner {
     isBinaryExpression,
     isArrayExpression,
     isUnsafeCommand,
-    isSerializeEnv
+    isSerializeEnv,
+    dataExfiltration
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {
@@ -113,8 +115,9 @@ export class ProbeRunner {
         const isDefined = Reflect.defineProperty(probe, kProbeOriginalContext, {
           enumerable: false,
           value: structuredClone(probe.context),
-          writable: false
+          configurable: true
         });
+
         if (!isDefined) {
           throw new Error(`Failed to define original context for probe '${probe.name}'`);
         }
