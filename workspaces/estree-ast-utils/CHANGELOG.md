@@ -1,5 +1,11 @@
 # @nodesecure/estree-ast-utils
 
+## 4.2.0
+
+### Minor Changes
+
+- [#377](https://github.com/NodeSecure/js-x-ray/pull/377) [`53b25a4`](https://github.com/NodeSecure/js-x-ray/commit/53b25a485fed51776c673b4e86de907faa25989e) Thanks [@fraxken](https://github.com/fraxken)! - Implement a new joinArrayExpression utility
+
 ## 4.1.0
 
 ### Minor Changes
