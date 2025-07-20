@@ -1,5 +1,24 @@
 # @nodesecure/tracer
 
+## 3.0.0
+
+### Major Changes
+
+- [#383](https://github.com/NodeSecure/js-x-ray/pull/383) [`09c3575`](https://github.com/NodeSecure/js-x-ray/commit/09c357550ba0bcf6642c73fde8ea9d8a039caf45) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(tracer): support tracking function return values
+
+### Minor Changes
+
+- [#385](https://github.com/NodeSecure/js-x-ray/pull/385) [`91031f8`](https://github.com/NodeSecure/js-x-ray/commit/91031f84c7962474822640017d227d5bb31282dc) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(tracer): add follow consecutive assignment of return values
+
+- [#390](https://github.com/NodeSecure/js-x-ray/pull/390) [`7927535`](https://github.com/NodeSecure/js-x-ray/commit/7927535396dc6bc50f100d153188fc16c5367237) Thanks [@fraxken](https://github.com/fraxken)! - Refactor global id prefix removal by implementing a new generic Util function
+
+- [#391](https://github.com/NodeSecure/js-x-ray/pull/391) [`facb858`](https://github.com/NodeSecure/js-x-ray/commit/facb8581e8ebfe9082a8566647e1858bf40a8958) Thanks [@fraxken](https://github.com/fraxken)! - Enhance docs, types and syntax
+
+### Patch Changes
+
+- Updated dependencies [[`53b25a4`](https://github.com/NodeSecure/js-x-ray/commit/53b25a485fed51776c673b4e86de907faa25989e)]:
+  - @nodesecure/estree-ast-utils@4.2.0
+
 ## 2.0.0
 
 ### Major Changes
