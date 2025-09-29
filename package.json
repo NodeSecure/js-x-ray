@@ -14,7 +14,8 @@
     "workspaces/sec-literal",
     "workspaces/ts-source-parser",
     "workspaces/tracer",
-    "workspaces/js-x-ray"
+    "workspaces/js-x-ray",
+    "workspaces/js-x-ray-ai"
   ],
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
