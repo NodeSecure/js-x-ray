@@ -1,0 +1,30 @@
+{
+  "name": "@nodesecure/js-x-ray-ai",
+  "version": "1.0.0",
+  "description": "",
+  "private": false,
+  "exports": "./dist/index.js",
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "tsc",
+    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test": "c8 -r html npm run test-only"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NodeSecure/js-x-ray.git"
+  },
+  "keywords": [],
+  "author": "GOMBAULD Clément <clementgombauld@hotmail.fr>",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/NodeSecure/js-x-ray/issues"
+  },
+  "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/tracer#readme",
+  "dependencies": {
+    "@google/genai": "^1.21.0",
+    "@nodesecure/js-x-ray": "^10.0.0",
+    "openai": "^5.23.1"
+  }
+}
