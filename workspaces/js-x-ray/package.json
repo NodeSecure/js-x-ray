@@ -49,7 +49,7 @@
     "@nodesecure/sec-literal": "^1.2.0",
     "@nodesecure/tracer": "^3.0.0",
     "digraph-js": "^2.2.3",
-    "frequency-set": "^1.0.2",
+    "frequency-set": "^2.0.0",
     "is-minified-code": "^2.0.0",
     "meriyah": "^6.0.0",
     "safe-regex": "^2.1.1",
