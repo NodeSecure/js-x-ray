@@ -1,5 +1,5 @@
-// Import Third-party Dependencies
-import isStringBase64 from "is-base64";
+// Import Internal Dependencies
+import { isStringBase64 } from "./utils.js";
 
 export type ESTreeLiteral = {
   type: "Literal";
