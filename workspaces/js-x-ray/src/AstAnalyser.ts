@@ -5,7 +5,6 @@ import path from "node:path";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import isMinified from "is-minified-code";
 
 // Import Internal Dependencies
 import {
@@ -22,7 +21,8 @@ import { ProbeRunner, type Probe } from "./ProbeRunner.js";
 import { walkEnter } from "./walker/index.js";
 import * as trojan from "./obfuscators/trojan-source.js";
 import {
-  isOneLineExpressionExport
+  isOneLineExpressionExport,
+  isMinifiedCode
 } from "./utils/index.js";
 import {
   PipelineRunner,
@@ -221,7 +221,7 @@ export class AstAnalyser {
       const str = await fs.readFile(pathToFile, "utf-8");
       const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
 
-      const isMin = filePathString.includes(".min") || isMinified(str);
+      const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
         isMinified: isMin,
         module: path.extname(filePathString) === ".mjs" ? true : module,
@@ -274,7 +274,7 @@ export class AstAnalyser {
       const str = fsSync.readFileSync(pathToFile, "utf-8");
       const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
 
-      const isMin = filePathString.includes(".min") || isMinified(str);
+      const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
         isMinified: isMin,
         module: path.extname(filePathString) === ".mjs" ? true : module,
