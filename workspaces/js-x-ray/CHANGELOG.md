@@ -1,5 +1,18 @@
 # @nodesecure/js-x-ray
 
+## 10.2.0
+
+### Minor Changes
+
+- [#415](https://github.com/NodeSecure/js-x-ray/pull/415) [`d17c784`](https://github.com/NodeSecure/js-x-ray/commit/d17c784b0a584e20301b630a4fec01df59a2c9e5) Thanks [@fraxken](https://github.com/fraxken)! - Remove is-minified-code from dependencies and re-implement function in utils
+
+### Patch Changes
+
+- [#412](https://github.com/NodeSecure/js-x-ray/pull/412) [`a5c8473`](https://github.com/NodeSecure/js-x-ray/commit/a5c8473ed1c6c5f995be698c1fbeec8f744ca63b) Thanks [@fraxken](https://github.com/fraxken)! - Update digraph-js to v2.2.4 to remove deprecated lodash.isequal
+
+- Updated dependencies [[`a98fe96`](https://github.com/NodeSecure/js-x-ray/commit/a98fe96418e7da1ca90a735f6811bf78ae486f51)]:
+  - @nodesecure/sec-literal@1.4.0
+
 ## 10.1.0
 
 ### Minor Changes
