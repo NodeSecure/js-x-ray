@@ -13,6 +13,7 @@ test("Given an encoded-literal kind it should generate a warning with deep locat
   });
 
   assert.deepEqual(result, {
+    experimental: false,
     kind: "encoded-literal",
     value: null,
     source: "JS-X-Ray",
