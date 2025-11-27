@@ -8,23 +8,11 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { SourceFile } from "../SourceFile.js";
 import { generateWarning } from "../warnings.js";
+import { ShadyURL } from "../ShadyURL.js";
 import type { Literal } from "../types/estree.js";
-
-const kMapRegexIps = Object.freeze({
-  // eslint-disable-next-line @stylistic/max-len
-  regexIPv4: /^(https?:\/\/)(?!127\.)(?!.*:(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9])\.)(?!.*:(?:25[6-9])\.(?:25[6-9])\.(?:25[6-9])\.(?:0{1,3}|25[6-9]))((?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(?:\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])(?::\d{1,5})?(\/[^\s]*)?$/,
-  regexIPv6: /^(https?:\/\/)(\[[0-9A-Fa-f:]+\])(?::\d{1,5})?(\/[^\s]*)?$/
-});
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
-const kShadyLinkRegExps = [
-  kMapRegexIps.regexIPv4,
-  kMapRegexIps.regexIPv6,
-  /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org|api\.ipify\.org).*)$/,
-  /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
-];
-
 /**
  * @description Search for Literal AST Node
  * @see https://github.com/estree/estree/blob/master/es5.md#literal
@@ -67,16 +55,14 @@ function main(
   }
   // Else we are checking all other string with our suspect method
   else {
-    for (const regex of kShadyLinkRegExps) {
-      if (regex.test(node.value)) {
-        sourceFile.warnings.push(
-          generateWarning(
-            "shady-link", { value: node.value, location }
-          )
-        );
+    if (!ShadyURL.isSafe(node.value)) {
+      sourceFile.warnings.push(
+        generateWarning(
+          "shady-link", { value: node.value, location }
+        )
+      );
 
-        return;
-      }
+      return;
     }
 
     sourceFile.analyzeLiteral(node);
