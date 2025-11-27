@@ -43,32 +43,38 @@ export interface Warning<T = WarningName> {
 export const warnings = Object.freeze({
   "parsing-error": {
     i18n: "sast_warnings.parsing_error",
-    severity: "Information"
+    severity: "Information",
+    experimental: false
   },
   "unsafe-import": {
     i18n: "sast_warnings.unsafe_import",
-    severity: "Warning"
+    severity: "Warning",
+    experimental: false
   },
   "unsafe-regex": {
     i18n: "sast_warnings.unsafe_regex",
-    severity: "Warning"
+    severity: "Warning",
+    experimental: false
   },
   "unsafe-stmt": {
-    code: "unsafe-stmt",
     i18n: "sast_warnings.unsafe_stmt",
-    severity: "Warning"
+    severity: "Warning",
+    experimental: false
   },
   "encoded-literal": {
     i18n: "sast_warnings.encoded_literal",
-    severity: "Information"
+    severity: "Information",
+    experimental: false
   },
   "short-identifiers": {
     i18n: "sast_warnings.short_identifiers",
-    severity: "Warning"
+    severity: "Warning",
+    experimental: false
   },
   "suspicious-literal": {
     i18n: "sast_warnings.suspicious_literal",
-    severity: "Warning"
+    severity: "Warning",
+    experimental: false
   },
   "suspicious-file": {
     i18n: "sast_warnings.suspicious_file",
