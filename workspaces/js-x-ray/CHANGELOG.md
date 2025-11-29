@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 10.2.1
+
+### Patch Changes
+
+- [#417](https://github.com/NodeSecure/js-x-ray/pull/417) [`8125cfb`](https://github.com/NodeSecure/js-x-ray/commit/8125cfb12a4f99136246562e35e5d55947674426) Thanks [@fraxken](https://github.com/fraxken)! - Normalize experimental property in warnings
+
 ## 10.2.0
 
 ### Minor Changes
