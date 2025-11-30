@@ -4,7 +4,7 @@ import ipaddress from "ipaddr.js";
 // CONSTANTS
 const kShadyLinkRegExps = [
   /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org|api\.ipify\.org).*)$/,
-  /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|cd|ws|icu|cam|uno|email|stream))$/
+  /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|ws|icu|cam|uno|email|stream))$/
 ];
 
 export class ShadyURL {
