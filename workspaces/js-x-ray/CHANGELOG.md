@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 10.3.0
+
+### Minor Changes
+
+- [#421](https://github.com/NodeSecure/js-x-ray/pull/421) [`76a7425`](https://github.com/NodeSecure/js-x-ray/commit/76a7425ab5210ec35e25ea5a783b3ab53ff25a54) Thanks [@fraxken](https://github.com/fraxken)! - Improve trojan-source detection
+
 ## 10.2.1
 
 ### Patch Changes
