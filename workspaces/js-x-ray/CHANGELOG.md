@@ -1,5 +1,13 @@
 # @nodesecure/js-x-ray
 
+## 10.3.0
+
+### Minor Changes
+
+- [#421](https://github.com/NodeSecure/js-x-ray/pull/421) [`76a7425`](https://github.com/NodeSecure/js-x-ray/commit/76a7425ab5210ec35e25ea5a783b3ab53ff25a54) Thanks [@fraxken](https://github.com/fraxken)! - Improve trojan-source detection
+
+- [#423](https://github.com/NodeSecure/js-x-ray/pull/423) [`9a9a88a`](https://github.com/NodeSecure/js-x-ray/commit/9a9a88a4b0e96c3253e9eeec80cce0e31a966735) Thanks [@fraxken](https://github.com/fraxken)! - Implement a new ShadyURL class with ipaddr.js to detect malicious URL/ips
+
 ## 10.2.1
 
 ### Patch Changes
