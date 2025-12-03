@@ -59,7 +59,7 @@ test("should throw an encoded-literal warning because hexadecimal value is not s
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("encoded-literal");
-  assert.strictEqual(warning.value, "68656c6c6f20776f726c64");
+  assert.strictEqual(warning?.value, "68656c6c6f20776f726c64");
 });
 
 test("should not throw any warnings without hexadecimal value (and should call analyzeLiteral of Analysis class)", (t) => {
@@ -93,7 +93,7 @@ describe("known suspicious domain", () => {
       const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
       assert.strictEqual(sastAnalysis.warnings().length, 1);
       const warning = sastAnalysis.getWarning("shady-link");
-      assert.strictEqual(warning.value, `http://${suspicousDomain}`);
+      assert.strictEqual(warning?.value, `http://${suspicousDomain}`);
     }
   });
 
@@ -104,7 +104,7 @@ describe("known suspicious domain", () => {
       const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
       assert.strictEqual(sastAnalysis.warnings().length, 1);
       const warning = sastAnalysis.getWarning("shady-link");
-      assert.strictEqual(warning.value, `https://${suspicousDomain}`);
+      assert.strictEqual(warning?.value, `https://${suspicousDomain}`);
     }
   });
 });
@@ -116,7 +116,7 @@ test("should detect shady link when an URL has a suspicious domain", () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://foobar.link");
+  assert.strictEqual(warning?.value, "http://foobar.link");
 });
 
 test("should not mark suspicious links the IPv4 address range 127.0.0.0/8 (localhost 127.0.0.1)", () => {
@@ -142,7 +142,7 @@ test("should detect the link as suspicious when a URL contains a raw IPv4 addres
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://77.244.210.247/burpcollaborator.txt");
+  assert.strictEqual(warning?.value, "http://77.244.210.247/burpcollaborator.txt");
 });
 
 test("should detect suspicious links when a URL contains a raw IPv4 address with port", () => {
@@ -152,7 +152,7 @@ test("should detect suspicious links when a URL contains a raw IPv4 address with
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://77.244.210.247:8080/script");
+  assert.strictEqual(warning?.value, "http://77.244.210.247:8080/script");
 });
 
 test("should detect suspicious links when a URL contains a raw IPv6 address", () => {
@@ -162,7 +162,7 @@ test("should detect suspicious links when a URL contains a raw IPv6 address", ()
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/index.html");
+  assert.strictEqual(warning?.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]/index.html");
 });
 
 test("should detect suspicious links when a URL contains a raw IPv6 address with port", () => {
@@ -172,5 +172,5 @@ test("should detect suspicious links when a URL contains a raw IPv6 address with
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("shady-link");
-  assert.strictEqual(warning.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:100/script");
+  assert.strictEqual(warning?.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:100/script");
 });
