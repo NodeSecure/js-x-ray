@@ -50,8 +50,8 @@
     "@nodesecure/tracer": "^3.0.0",
     "digraph-js": "2.2.4",
     "frequency-set": "^2.1.0",
-    "ipaddr.js": "2.2.0",
-    "meriyah": "^6.0.0",
+    "ipaddr.js": "2.3.0",
+    "meriyah": "^7.0.0",
     "safe-regex": "^2.1.1",
     "ts-pattern": "^5.0.6"
   }
