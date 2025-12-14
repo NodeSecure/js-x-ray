@@ -1,3 +1,6 @@
+// Import Node.js Dependencies
+import path from "node:path";
+
 // Import Third-party Dependencies
 import { Utils, Literal } from "@nodesecure/sec-literal";
 import { VariableTracer } from "@nodesecure/tracer";
@@ -29,6 +32,12 @@ export class SourceFile {
   encodedLiterals = new Map<string, string>();
   warnings: Warning[] = [];
   flags = new Set<SourceFlags>();
+  path = new SourceFilePath();
+
+  constructor(sourceLocation?: string) {
+    this.path.use(sourceLocation);
+  }
+
   addDependency(
     name: string,
     location?: ESTree.SourceLocation | null,
@@ -156,6 +165,26 @@ export class SourceFile {
     else if (node.type === "CatchClause") {
       this.inTryStatement = false;
     }
+  }
+}
+
+export class SourceFilePath {
+  location: string | null = null;
+
+  use(
+    location?: string
+  ) {
+    this.location = location ?? null;
+  }
+
+  resolve(
+    ...parts: string[]
+  ) {
+    if (this.location === null) {
+      return path.posix.join(...parts);
+    }
+
+    return path.posix.join(this.location, ...parts);
   }
 }
 

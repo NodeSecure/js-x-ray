@@ -64,6 +64,10 @@ The `analyseFile` and `analyseFileSync` methods is a superset of `analyse` with 
 ```ts
 interface RuntimeOptions {
   /**
+   * A filesystem location for the given source code.
+   */
+  location?: string;
+  /**
    * @default true
    */
   module?: boolean;
