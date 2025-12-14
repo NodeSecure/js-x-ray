@@ -37,6 +37,10 @@ export interface Dependency {
 
 export interface RuntimeOptions {
   /**
+   * A filesystem location for the given source code.
+   */
+  location?: string;
+  /**
    * @default true
    */
   module?: boolean;
@@ -144,6 +148,7 @@ export class AstAnalyser {
     options: RuntimeOptions = {}
   ): Report {
     const {
+      location,
       isMinified = false,
       module = true,
       removeHTMLComments = false,
@@ -155,7 +160,7 @@ export class AstAnalyser {
       isEcmaScriptModule: Boolean(module)
     });
 
-    const source = new SourceFile();
+    const source = new SourceFile(location);
     if (trojan.verify(str)) {
       source.warnings.push(
         generateWarning("obfuscated-code", { value: "trojan-source" })
@@ -223,6 +228,7 @@ export class AstAnalyser {
 
       const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
+        location: path.dirname(filePathString),
         isMinified: isMin,
         module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
@@ -276,6 +282,7 @@ export class AstAnalyser {
 
       const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
+        location: path.dirname(filePathString),
         isMinified: isMin,
         module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
