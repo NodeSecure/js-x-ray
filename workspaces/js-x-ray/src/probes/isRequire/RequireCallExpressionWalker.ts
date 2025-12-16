@@ -77,6 +77,7 @@ export class RequireCallExpressionWalker {
           self.#handleRequireResolve(rootArgument);
           break;
         case "path.join":
+        case "path.resolve":
           self.#handlePathJoin(castedNode);
           break;
       }

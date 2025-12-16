@@ -396,3 +396,19 @@ test("(require CallExpression): it should detect obfuscated atob value", () => {
   assert.strictEqual(dependencies.size, 1);
   assert.ok(dependencies.has("os"));
 });
+
+test("(require CallExpression): it should not have an unsafe-import for a correct path.resolve", () => {
+  const str = `
+    const pkg = require(path.resolve('package.json'));
+  `;
+
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(isRequire)
+    .execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings().length, 0);
+
+  const dependencies = sastAnalysis.dependencies();
+  assert.strictEqual(dependencies.size, 1);
+  assert.ok(dependencies.has("package.json"));
+});
