@@ -4,11 +4,13 @@
 import { AstAnalyser } from "@nodesecure/js-x-ray";
 import { TsSourceParser } from "@nodesecure/ts-source-parser";
 
-const scanner = new AstAnalyser({
+// You can define the default parser to TS if required
+// AstAnalyser.DefaultParser = new TsSourceParser();
+const scanner = new AstAnalyser();
+
+const result = scanner.analyse("const x: number = 5;", {
   customParser: new TsSourceParser()
 });
-
-const result = scanner.analyse("const x: number = 5;");
 console.log(result);
 ```
 

@@ -5,7 +5,6 @@ import assert from "node:assert";
 // Import Internal Dependencies
 import {
   AstAnalyser,
-  JsSourceParser,
   Pipelines
 } from "../src/index.js";
 import {
@@ -20,7 +19,6 @@ describe("AstAnalyser pipelines", () => {
     };
 
     const analyser = new AstAnalyser({
-      customParser: new JsSourceParser(),
       pipelines: [
         pipeline,
         pipeline
@@ -69,7 +67,6 @@ describe("AstAnalyser pipelines", () => {
 describe("Pipelines.deobfuscate", () => {
   test("should find a shady-url by deobfuscating a joined ArrayExpression", () => {
     const analyser = new AstAnalyser({
-      customParser: new JsSourceParser(),
       pipelines: [
         new Pipelines.deobfuscate()
       ]
