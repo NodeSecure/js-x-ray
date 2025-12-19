@@ -10,9 +10,15 @@
     "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
     "test": "c8 -r html npm run test-only"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public",
+    "provenance": true
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NodeSecure/js-x-ray.git"
+    "url": "https://github.com/NodeSecure/js-x-ray",
+    "directory": "workspaces/js-x-ray-ai"
   },
   "keywords": [],
   "author": "GOMBAULD Clément <clementgombauld@hotmail.fr>",
