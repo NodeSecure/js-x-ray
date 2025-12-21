@@ -41,7 +41,7 @@ describe("AstAnalyser", () => {
 
     const myVar = "path";
     require(myVar);
-  `, { module: false });
+  `);
 
       assert.strictEqual(warnings.length, 0);
       assert.deepEqual([...dependencies.keys()],
@@ -153,7 +153,7 @@ describe("AstAnalyser", () => {
     import * as http from "http";
     import fs from "fs";
     import { foo } from "xd";
-  `, { module: true });
+  `);
 
       assert.strictEqual(warnings.length, 0);
       assert.deepEqual(
@@ -189,16 +189,16 @@ describe("AstAnalyser", () => {
       const astAnalyserMock = t.mock.method(AstAnalyser.prototype, "analyse");
 
       const source = "const http = require(\"http\");";
-      new AstAnalyser().analyse(source, { module: true, removeHTMLComments: true });
+      new AstAnalyser().analyse(source, { removeHTMLComments: true });
 
       const source2 = "const fs = require(\"fs\");";
-      new AstAnalyser().analyse(source2, { module: false, removeHTMLComments: false });
+      new AstAnalyser().analyse(source2, { removeHTMLComments: false });
 
       const calls = astAnalyserMock.mock.calls;
       assert.strictEqual(calls.length, 2);
 
-      assert.deepEqual(calls[0].arguments, [source, { module: true, removeHTMLComments: true }]);
-      assert.deepEqual(calls[1].arguments, [source2, { module: false, removeHTMLComments: false }]);
+      assert.deepEqual(calls[0].arguments, [source, { removeHTMLComments: true }]);
+      assert.deepEqual(calls[1].arguments, [source2, { removeHTMLComments: false }]);
     });
 
     describe("hooks", () => {
@@ -285,7 +285,7 @@ describe("AstAnalyser", () => {
     it("remove the packageName from the dependencies list", async() => {
       const result = await getAnalyser().analyseFile(
         new URL("depName.js", kFixtureURL),
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       assert.ok(result.ok);
@@ -298,7 +298,7 @@ describe("AstAnalyser", () => {
     it("should fail with a parsing error", async() => {
       const result = await getAnalyser().analyseFile(
         new URL("parsingError.js", kFixtureURL),
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       assert.strictEqual(result.ok, false);
@@ -314,20 +314,20 @@ describe("AstAnalyser", () => {
       const url = new URL("depName.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url,
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       const url2 = new URL("parsingError.js", kFixtureURL);
       await new AstAnalyser().analyseFile(
         url2,
-        { module: true, packageName: "foobar2" }
+        { packageName: "foobar2" }
       );
 
       const calls = astAnalyserMock.mock.calls;
       assert.strictEqual(calls.length, 2);
 
-      assert.deepEqual(calls[0].arguments, [url, { module: false, packageName: "foobar" }]);
-      assert.deepEqual(calls[1].arguments, [url2, { module: true, packageName: "foobar2" }]);
+      assert.deepEqual(calls[0].arguments, [url, { packageName: "foobar" }]);
+      assert.deepEqual(calls[1].arguments, [url2, { packageName: "foobar2" }]);
     });
 
     it("should implement new customProbes while keeping default probes", async() => {
@@ -471,7 +471,7 @@ describe("AstAnalyser", () => {
     it("remove the packageName from the dependencies list", () => {
       const result = getAnalyser().analyseFileSync(
         new URL("depName.js", kFixtureURL),
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       assert.ok(result.ok);
@@ -484,7 +484,7 @@ describe("AstAnalyser", () => {
     it("should fail with a parsing error", () => {
       const result = getAnalyser().analyseFileSync(
         new URL("parsingError.js", kFixtureURL),
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       assert.strictEqual(result.ok, false);
@@ -703,13 +703,12 @@ describe("AstAnalyser", () => {
 
       await new AstAnalyser().analyseFile(
         new URL("depName.js", kFixtureURL),
-        { module: false, packageName: "foobar" }
+        { packageName: "foobar" }
       );
 
       await new AstAnalyser().analyseFile(
         new URL("parsingError.js", kFixtureURL),
         {
-          module: true,
           packageName: "foobar2",
           customParser: new FakeSourceParser()
         }
@@ -729,11 +728,10 @@ describe("AstAnalyser", () => {
       const jsSourceParserMock = t.mock.method(JsSourceParser.prototype, "parse");
       const fakeSourceParserMock = t.mock.method(FakeSourceParser.prototype, "parse");
 
-      new AstAnalyser().analyse("const http = require(\"http\");", { module: true, removeHTMLComments: true });
+      new AstAnalyser().analyse("const http = require(\"http\");", { removeHTMLComments: true });
 
       new AstAnalyser().analyse("const fs = require(\"fs\");",
         {
-          module: false,
           removeHTMLComments: false,
           customParser: new FakeSourceParser()
         }

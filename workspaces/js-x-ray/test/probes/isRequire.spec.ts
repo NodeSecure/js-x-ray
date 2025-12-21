@@ -129,7 +129,7 @@ test("it should throw an 'unsafe-import' warning for a require with an unknown I
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 });
 
 test("it should throw an 'unsafe-import' warning for a require with an unknown MemberExpression", () => {
@@ -142,7 +142,7 @@ test("it should throw an 'unsafe-import' warning for a require with an unknown M
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 });
 
 test("it should catch require with a Literal argument having for value the Node.js core http module", () => {
@@ -219,7 +219,7 @@ where all Literals values concatened is equal to an empty string`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 });
 
 test(`it should catch require with a BinaryExpression where all level of operands flattened
@@ -266,7 +266,7 @@ with an operator not equal to '+' as require argument`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 });
 
 test("it should throw an 'unsafe-import' warning for using a BinaryExpression with one or many unresolvable Operands", () => {
@@ -279,7 +279,7 @@ test("it should throw an 'unsafe-import' warning for using a BinaryExpression wi
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 });
 
 test("(require CallExpression): it should always throw an 'unsafe-import' warning when using a CallExpression", () => {
@@ -295,7 +295,7 @@ test("(require CallExpression): it should always throw an 'unsafe-import' warnin
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 0);
@@ -316,7 +316,7 @@ and then add the unobfuscated value in the dependency list`, () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
@@ -333,7 +333,7 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from", 
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
@@ -350,7 +350,7 @@ test("(require CallExpression): it should detect MemberExpression Buffer.from (w
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
@@ -371,7 +371,7 @@ test("(require CallExpression): it should detect MemberExpression require.resolv
     "must have one unsafe-import warning"
   );
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);
@@ -390,7 +390,7 @@ test("(require CallExpression): it should detect obfuscated atob value", () => {
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-import");
-  assert.strictEqual(warning.kind, "unsafe-import");
+  assert.strictEqual(warning!.kind, "unsafe-import");
 
   const dependencies = sastAnalysis.dependencies();
   assert.strictEqual(dependencies.size, 1);

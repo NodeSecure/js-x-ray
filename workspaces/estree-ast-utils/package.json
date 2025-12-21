@@ -37,6 +37,6 @@
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/estree-ast-utils#readme",
   "dependencies": {
     "@nodesecure/sec-literal": "^1.1.0",
-    "meriyah": "^6.1.3"
+    "meriyah": "7.0.0"
   }
 }

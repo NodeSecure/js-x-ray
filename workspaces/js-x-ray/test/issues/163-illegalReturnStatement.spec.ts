@@ -21,11 +21,8 @@ if (!argv.length) {
 }
 `;
 
-test("it should not throw error whatever module is true or false", () => {
+test("it should not throw error for a global return statement", () => {
   assert.doesNotThrow(() => {
-    new AstAnalyser().analyse(kIncriminedCodeSample, { module: false });
-  });
-  assert.doesNotThrow(() => {
-    new AstAnalyser().analyse(kIncriminedCodeSample, { module: true });
+    new AstAnalyser().analyse(kIncriminedCodeSample);
   });
 });

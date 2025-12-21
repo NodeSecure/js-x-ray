@@ -7,9 +7,7 @@ export function codeToAst(
   const estreeRootNode = meriyah.parseScript(code, {
     next: true,
     loc: true,
-    raw: true,
-    module: true,
-    globalReturn: false
+    raw: true
   });
 
   return estreeRootNode.body;

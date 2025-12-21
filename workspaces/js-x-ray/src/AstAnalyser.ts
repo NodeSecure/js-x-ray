@@ -41,10 +41,6 @@ export interface RuntimeOptions {
    */
   location?: string;
   /**
-   * @default true
-   */
-  module?: boolean;
-  /**
    * @default false
    */
   removeHTMLComments?: boolean;
@@ -150,7 +146,6 @@ export class AstAnalyser {
     const {
       location,
       isMinified = false,
-      module = true,
       removeHTMLComments = false,
       initialize,
       finalize
@@ -158,9 +153,10 @@ export class AstAnalyser {
 
     const parser = options.customParser ?? AstAnalyser.DefaultParser;
 
-    const body = parser.parse(this.prepareSource(str, { removeHTMLComments }), {
-      isEcmaScriptModule: Boolean(module)
-    });
+    const body = parser.parse(
+      this.prepareSource(str, { removeHTMLComments }),
+      void 0
+    );
 
     const source = new SourceFile(location);
     if (trojan.verify(str)) {
@@ -219,7 +215,6 @@ export class AstAnalyser {
     try {
       const {
         packageName = null,
-        module = true,
         removeHTMLComments = false,
         initialize,
         finalize,
@@ -233,7 +228,6 @@ export class AstAnalyser {
       const data = this.analyse(str, {
         location: path.dirname(filePathString),
         isMinified: isMin,
-        module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
         initialize,
         finalize,
@@ -275,7 +269,6 @@ export class AstAnalyser {
     try {
       const {
         packageName = null,
-        module = true,
         removeHTMLComments = false,
         initialize,
         finalize,
@@ -289,7 +282,6 @@ export class AstAnalyser {
       const data = this.analyse(str, {
         location: path.dirname(filePathString),
         isMinified: isMin,
-        module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
         initialize,
         finalize,
