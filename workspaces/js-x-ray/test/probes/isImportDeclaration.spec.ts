@@ -72,6 +72,6 @@ test("should detect an unsafe import using data:text/javascript and throw a unsa
     assert.strictEqual(sastAnalysis.warnings().length, 1);
 
     const unsafeImport = sastAnalysis.getWarning("unsafe-import");
-    assert.strictEqual(unsafeImport.value, expectedValue);
+    assert.strictEqual(unsafeImport!.value, expectedValue);
   });
 });

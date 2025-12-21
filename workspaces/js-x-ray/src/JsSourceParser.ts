@@ -1,6 +1,7 @@
 // Import Third-party Dependencies
 import {
-  parseScript,
+  parseModule,
+  parse,
   type ESTree,
   type Options
 } from "meriyah";
@@ -25,27 +26,14 @@ export interface SourceParser {
   parse(source: string, options: unknown): ESTree.Statement[];
 }
 
-export interface JsSourceParserOptions {
-  isEcmaScriptModule?: boolean;
-}
-
 export class JsSourceParser implements SourceParser {
   parse(
-    source: string,
-    options: JsSourceParserOptions = {}
+    source: string
   ): ESTree.Program["body"] {
-    const {
-      isEcmaScriptModule
-    } = options;
-
     try {
-      const { body } = parseScript(
+      const { body } = parseModule(
         source,
-        {
-          ...kParsingOptions,
-          module: isEcmaScriptModule,
-          globalReturn: !isEcmaScriptModule
-        }
+        structuredClone(kParsingOptions)
       );
 
       return body;
@@ -54,17 +42,12 @@ export class JsSourceParser implements SourceParser {
       const syntaxError = error as SourceParserSyntaxError;
       const isIllegalReturn = syntaxError.description.includes("Illegal return statement");
 
-      if (syntaxError.name === "SyntaxError" && (
-        syntaxError.description.includes("The import keyword") ||
-        syntaxError.description.includes("The export keyword") ||
-        isIllegalReturn
-      )) {
-        const { body } = parseScript(
+      if (isIllegalReturn) {
+        const { body } = parse(
           source,
           {
-            ...kParsingOptions,
-            module: true,
-            globalReturn: isIllegalReturn
+            ...structuredClone(kParsingOptions),
+            sourceType: "commonjs"
           }
         );
 

@@ -22,13 +22,18 @@ export function getWarningKind(
 export function parseScript(
   str: string
 ) {
-  return meriyah.parseScript(str, {
+  const options = {
     next: true,
     loc: true,
-    raw: true,
-    module: true,
-    globalReturn: false
-  });
+    raw: true
+  };
+
+  try {
+    return meriyah.parseModule(str, options);
+  }
+  catch {
+    return meriyah.parseScript(str, options);
+  }
 }
 
 export function getSastAnalysis(

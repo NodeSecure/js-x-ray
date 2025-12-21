@@ -6,12 +6,11 @@ import { walk } from "estree-walker";
 import { VariableTracer } from "../src/index.js";
 
 function codeToAst(code: string) {
-  const estreeRootNode = meriyah.parseScript(code, {
+  const estreeRootNode = meriyah.parse(code, {
     next: true,
     loc: true,
     raw: true,
-    module: true,
-    globalReturn: false
+    sourceType: "module"
   });
 
   return estreeRootNode.body;

@@ -61,7 +61,7 @@ class AstAnalyser {
 }
 ```
 
-The `analyseFile` and `analyseFileSync` methods is a superset of `analyse` with the ability to read the file on the local filesystem with additional features like detecting if the file is ESM/CJS (using the extension).
+The `analyseFile` and `analyseFileSync` methods is a superset of `analyse` with the ability to read the file on the local filesystem.
 
 ```ts
 interface RuntimeOptions {
@@ -69,10 +69,6 @@ interface RuntimeOptions {
    * A filesystem location for the given source code.
    */
   location?: string;
-  /**
-   * @default true
-   */
-  module?: boolean;
   /**
    * @default false
    */
