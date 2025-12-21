@@ -1,5 +1,23 @@
 # @nodesecure/js-x-ray
 
+## 11.0.0
+
+### Major Changes
+
+- [#432](https://github.com/NodeSecure/js-x-ray/pull/432) [`0e1b5f5`](https://github.com/NodeSecure/js-x-ray/commit/0e1b5f54586956aeb6627f132d7ef7ee121786ed) Thanks [@fraxken](https://github.com/fraxken)! - Migrate to meriyah v7
+
+- [#431](https://github.com/NodeSecure/js-x-ray/pull/431) [`eb6c0c3`](https://github.com/NodeSecure/js-x-ray/commit/eb6c0c3cc40ed3282fa0c1aa6b52cc0d368ae527) Thanks [@fraxken](https://github.com/fraxken)! - move customParser from constructor to analyse and runtime options
+
+### Minor Changes
+
+- [#421](https://github.com/NodeSecure/js-x-ray/pull/421) [`76a7425`](https://github.com/NodeSecure/js-x-ray/commit/76a7425ab5210ec35e25ea5a783b3ab53ff25a54) Thanks [@fraxken](https://github.com/fraxken)! - Improve trojan-source detection
+
+- [#429](https://github.com/NodeSecure/js-x-ray/pull/429) [`b1d67a4`](https://github.com/NodeSecure/js-x-ray/commit/b1d67a4be64d8c0b8ba5043a0792d8d4028cdf3f) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(isRequire): Unsafe-import for prebuilt-install binary file
+
+- [#423](https://github.com/NodeSecure/js-x-ray/pull/423) [`9a9a88a`](https://github.com/NodeSecure/js-x-ray/commit/9a9a88a4b0e96c3253e9eeec80cce0e31a966735) Thanks [@fraxken](https://github.com/fraxken)! - Implement a new ShadyURL class with ipaddr.js to detect malicious URL/ips
+
+- [#428](https://github.com/NodeSecure/js-x-ray/pull/428) [`d83087f`](https://github.com/NodeSecure/js-x-ray/commit/d83087f3a261fde295d9461b18e3278d21a9da7b) Thanks [@fraxken](https://github.com/fraxken)! - Implement new SourceFilePath to locate source code
+
 ## 10.2.1
 
 ### Patch Changes
