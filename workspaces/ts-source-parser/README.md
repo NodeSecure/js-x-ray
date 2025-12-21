@@ -19,6 +19,7 @@ $ yarn add @nodesecure/ts-source-parser
 ```
 
 ## Usage example
+
 ```js
 import { TsSourceParser } from "@nodesecure/ts-source-parser";
 
@@ -29,15 +30,15 @@ console.log(body);
 ```
 
 ## Usage with `js-x-ray` 
+
 ```js
 import { AstAnalyser } from "@nodesecure/js-x-ray";
-import { readFileSync } from "node:fs";
+import { TsSourceParser } from "@nodesecure/ts-source-parser";
 
-const { warnings, dependencies } = runASTAnalysis(
-    readFileSync("./file.ts", "utf-8"),
-    { customParser: new TsSourceParser() }
-);
+const scanner = new AstAnalyser();
 
-console.log(dependencies);
-console.dir(warnings, { depth: null });
+const result = scanner.analyse("const x: number = 5;", {
+  customParser: new TsSourceParser()
+});
+console.log(result);
 ```

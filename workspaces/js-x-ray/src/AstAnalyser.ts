@@ -54,6 +54,10 @@ export interface RuntimeOptions {
   isMinified?: boolean;
   initialize?: (sourceFile: SourceFile) => void;
   finalize?: (sourceFile: SourceFile) => void;
+  /**
+   * @default JsSourceParser
+   */
+  customParser?: SourceParser;
 }
 
 export interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
@@ -80,10 +84,6 @@ export type ReportOnFile = {
 
 export interface AstAnalyserOptions {
   /**
-   * @default JsSourceParser
-   */
-  customParser?: SourceParser;
-  /**
    * @default []
    */
   customProbes?: Probe[];
@@ -103,8 +103,9 @@ export interface PrepareSourceOptions {
 }
 
 export class AstAnalyser {
+  static DefaultParser: SourceParser = new JsSourceParser();
+
   #pipelineRunner: PipelineRunner;
-  parser: SourceParser;
   probes: Probe[];
 
   constructor(options: AstAnalyserOptions = {}) {
@@ -116,7 +117,6 @@ export class AstAnalyser {
     } = options;
 
     this.#pipelineRunner = new PipelineRunner(pipelines);
-    this.parser = options.customParser ?? new JsSourceParser();
 
     let probes = ProbeRunner.Defaults;
     if (
@@ -156,7 +156,9 @@ export class AstAnalyser {
       finalize
     } = options;
 
-    const body = this.parser.parse(this.prepareSource(str, { removeHTMLComments }), {
+    const parser = options.customParser ?? AstAnalyser.DefaultParser;
+
+    const body = parser.parse(this.prepareSource(str, { removeHTMLComments }), {
       isEcmaScriptModule: Boolean(module)
     });
 
@@ -220,7 +222,8 @@ export class AstAnalyser {
         module = true,
         removeHTMLComments = false,
         initialize,
-        finalize
+        finalize,
+        customParser
       } = options;
 
       const str = await fs.readFile(pathToFile, "utf-8");
@@ -233,7 +236,8 @@ export class AstAnalyser {
         module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
         initialize,
-        finalize
+        finalize,
+        customParser
       });
 
       if (packageName !== null) {
@@ -274,7 +278,8 @@ export class AstAnalyser {
         module = true,
         removeHTMLComments = false,
         initialize,
-        finalize
+        finalize,
+        customParser
       } = options;
 
       const str = fsSync.readFileSync(pathToFile, "utf-8");
@@ -287,7 +292,8 @@ export class AstAnalyser {
         module: path.extname(filePathString) === ".mjs" ? true : module,
         removeHTMLComments,
         initialize,
-        finalize
+        finalize,
+        customParser
       });
 
       if (packageName !== null) {

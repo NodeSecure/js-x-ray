@@ -24,6 +24,10 @@ import {
 const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
 
 describe("AstAnalyser", () => {
+  it("should have a default parser instance of JsSourceParser", () => {
+    assert.ok(AstAnalyser.DefaultParser instanceof JsSourceParser);
+  });
+
   describe("analyse", () => {
     it("should return all dependencies required at runtime", () => {
       const { dependencies, warnings } = getAnalyser().analyse(`
@@ -160,7 +164,6 @@ describe("AstAnalyser", () => {
 
     it("should append to list of probes (default)", () => {
       const analyser = new AstAnalyser({
-        customParser: new JsSourceParser(),
         customProbes
       });
       const result = analyser.analyse(kIncriminedCodeSampleCustomProbe);
@@ -173,7 +176,6 @@ describe("AstAnalyser", () => {
 
     it("should replace list of probes", () => {
       const analyser = new AstAnalyser({
-        customParser: new JsSourceParser(),
         customProbes,
         skipDefaultProbes: true
       });
@@ -331,7 +333,6 @@ describe("AstAnalyser", () => {
     it("should implement new customProbes while keeping default probes", async() => {
       const result = await new AstAnalyser(
         {
-          customParser: new JsSourceParser(),
           customProbes,
           skipDefaultProbes: false
         }
@@ -346,7 +347,6 @@ describe("AstAnalyser", () => {
     it("should implement new customProbes while skipping/removing default probes", async() => {
       const result = await new AstAnalyser(
         {
-          customParser: new JsSourceParser(),
           customProbes,
           skipDefaultProbes: true
         }
@@ -360,7 +360,6 @@ describe("AstAnalyser", () => {
       const calls: string[] = [];
       await new AstAnalyser(
         {
-          customParser: new JsSourceParser(),
           customProbes: [
             {
               name: "name",
@@ -695,7 +694,6 @@ describe("AstAnalyser", () => {
 
     it("should instantiate with correct default options", () => {
       const analyser = new AstAnalyser();
-      assert.ok(analyser.parser instanceof JsSourceParser);
       assert.deepStrictEqual(analyser.probes, ProbeRunner.Defaults);
     });
 
@@ -708,11 +706,13 @@ describe("AstAnalyser", () => {
         { module: false, packageName: "foobar" }
       );
 
-      await new AstAnalyser(
-        { customParser: new FakeSourceParser() }
-      ).analyseFile(
+      await new AstAnalyser().analyseFile(
         new URL("parsingError.js", kFixtureURL),
-        { module: true, packageName: "foobar2" }
+        {
+          module: true,
+          packageName: "foobar2",
+          customParser: new FakeSourceParser()
+        }
       );
 
       assert.strictEqual(
@@ -731,10 +731,12 @@ describe("AstAnalyser", () => {
 
       new AstAnalyser().analyse("const http = require(\"http\");", { module: true, removeHTMLComments: true });
 
-      new AstAnalyser({
-        customParser: new FakeSourceParser()
-      }).analyse("const fs = require(\"fs\");",
-        { module: false, removeHTMLComments: false }
+      new AstAnalyser().analyse("const fs = require(\"fs\");",
+        {
+          module: false,
+          removeHTMLComments: false,
+          customParser: new FakeSourceParser()
+        }
       );
 
       assert.strictEqual(
@@ -761,9 +763,7 @@ describe("AstAnalyser", () => {
 let analyser: AstAnalyser | null = null;
 function getAnalyser(): NonNullable<AstAnalyser> {
   if (!analyser) {
-    analyser = new AstAnalyser({
-      customParser: new JsSourceParser()
-    });
+    analyser = new AstAnalyser();
   }
 
   return analyser;
