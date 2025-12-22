@@ -15,6 +15,10 @@ describe("ShadyURL.isSafe()", () => {
       assert.equal(ShadyURL.isSafe(""), true);
     });
 
+    it("should return true for a valid URL but with unknown protocol", () => {
+      assert.equal(ShadyURL.isSafe("unknown://example.com"), true);
+    });
+
     it("should return true for a malformed URL", () => {
       assert.equal(ShadyURL.isSafe("http://"), true);
     });
