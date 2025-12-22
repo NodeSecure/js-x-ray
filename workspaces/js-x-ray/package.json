@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/js-x-ray",
-  "version": "11.0.0",
+  "version": "11.0.1",
   "description": "JavaScript AST XRay analysis",
   "type": "module",
   "exports": {
