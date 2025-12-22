@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 11.0.1
+
+### Patch Changes
+
+- [#436](https://github.com/NodeSecure/js-x-ray/pull/436) [`f4d8a68`](https://github.com/NodeSecure/js-x-ray/commit/f4d8a6867b3c87f58960ce4bab83bedc76bf8c1e) Thanks [@fraxken](https://github.com/fraxken)! - Ignore valid URL with unknown protocol
+
 ## 11.0.0
 
 ### Major Changes
