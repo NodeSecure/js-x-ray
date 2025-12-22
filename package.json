@@ -24,7 +24,7 @@
     "@changesets/cli": "^2.29.4",
     "@openally/config.eslint": "^2.0.0",
     "@openally/config.typescript": "^1.1.0",
-    "@types/node": "^24.0.2",
+    "@types/node": "^25.0.3",
     "c8": "^10.1.2",
     "iterator-matcher": "^2.1.0",
     "tsx": "^4.20.3",
