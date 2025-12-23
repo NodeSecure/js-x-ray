@@ -14,6 +14,9 @@
     },
     {
       "path": "../sec-literal"
+    },
+    {
+      "path": "../ts-source-parser"
     }
   ]
 }
