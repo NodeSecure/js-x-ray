@@ -7,8 +7,11 @@ import { fileURLToPath } from "node:url";
 // Import Internal Dependencies
 import { EntryFilesAnalyser, AstAnalyser } from "../src/index.js";
 
+// CONSTANTS
 const kFixtureURL = new URL("fixtures/entryFiles/", import.meta.url);
 const kFixtureURLPath = fileURLToPath(kFixtureURL);
+
+const kFixtureTypeScriptURL = new URL("fixtures/entryFilesTs/", import.meta.url);
 
 describe("EntryFilesAnalyser", () => {
   it("should analyze internal dependencies recursively", async(t) => {
@@ -217,6 +220,30 @@ describe("EntryFilesAnalyser", () => {
     const reports = await fromAsync(generator);
     assert.strictEqual(reports.length, 0);
     assert.strictEqual(entryFilesAnalyser.dependencies.hasVertex("does-not-exists.js"), false);
+  });
+
+  it("should parse, analyze and follow dependencies in TypeScript", async(t) => {
+    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryUrl = new URL("entry.ts", kFixtureTypeScriptURL);
+
+    const analyseFileMock = t.mock.method(AstAnalyser.prototype, "analyseFile");
+
+    const generator = entryFilesAnalyser.analyse([
+      entryUrl
+    ]);
+    const reports = await fromAsync(generator);
+
+    assert.deepEqual(
+      reports.map((report) => report.file),
+      [
+        entryUrl,
+        new URL("entryExport.ts", kFixtureTypeScriptURL)
+      ].map((url) => fileURLToPath(url))
+    );
+
+    // Check that shared dependencies are not analyzed several times
+    const calls = analyseFileMock.mock.calls;
+    assert.strictEqual(calls.length, 2);
   });
 });
 

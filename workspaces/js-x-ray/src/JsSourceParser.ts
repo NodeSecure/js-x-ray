@@ -27,6 +27,13 @@ export interface SourceParser {
 }
 
 export class JsSourceParser implements SourceParser {
+  static FileExtensions = new Set([
+    ".js",
+    ".cjs",
+    ".mjs",
+    ".jsx"
+  ]);
+
   parse(
     source: string
   ): ESTree.Program["body"] {

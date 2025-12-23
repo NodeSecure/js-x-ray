@@ -12,11 +12,17 @@ const kTypeScriptParsingOptions: ParseOptions = {
 };
 
 export class TsSourceParser {
-  /**
-   * @param {string} source
-   * @param {object} options
-   */
-  parse(source: string, options: ParseOptions = {}): TSESTree.Program["body"] {
+  static FileExtensions = new Set([
+    ".ts",
+    ".mts",
+    ".cts",
+    ".tsx"
+  ]);
+
+  parse(
+    source: string,
+    options: ParseOptions = {}
+  ): TSESTree.Program["body"] {
     const { body } = parse(source, {
       ...kTypeScriptParsingOptions,
       ...options

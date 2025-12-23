@@ -9,6 +9,7 @@ import {
   type VertexBody,
   type VertexDefinition
 } from "digraph-js";
+import { TsSourceParser } from "@nodesecure/ts-source-parser";
 
 // Import Internal Dependencies
 import {
@@ -16,9 +17,17 @@ import {
   type ReportOnFile,
   type RuntimeFileOptions
 } from "./AstAnalyser.js";
+import {
+  JsSourceParser,
+  type SourceParser
+} from "./JsSourceParser.js";
 
 // CONSTANTS
-const kDefaultExtensions = ["js", "cjs", "mjs", "node"];
+const kDefaultExtensions = [
+  ...Array.from(JsSourceParser.FileExtensions).map((ext) => ext.slice(1)),
+  ...Array.from(TsSourceParser.FileExtensions).map((ext) => ext.slice(1)),
+  "node"
+];
 
 export interface EntryFilesAnalyserOptions {
   astAnalyzer?: AstAnalyser;
@@ -28,6 +37,11 @@ export interface EntryFilesAnalyserOptions {
 }
 
 export class EntryFilesAnalyser {
+  static Parsers = {
+    js: new JsSourceParser(),
+    ts: new TsSourceParser() as unknown as SourceParser
+  } as const satisfies Record<string, SourceParser>;
+
   #rootPath: string | null = null;
   astAnalyzer: AstAnalyser;
   allowedExtensions: Set<string>;
@@ -100,6 +114,21 @@ export class EntryFilesAnalyser {
       file;
   }
 
+  #getParserFromFileExtension(
+    file: string
+  ): SourceParser | undefined {
+    const fileExtension = path.extname(file);
+
+    if (JsSourceParser.FileExtensions.has(fileExtension)) {
+      return EntryFilesAnalyser.Parsers.js;
+    }
+    else if (TsSourceParser.FileExtensions.has(fileExtension)) {
+      return EntryFilesAnalyser.Parsers.ts;
+    }
+
+    return void 0;
+  }
+
   async* #analyseFile(
     file: string,
     relativeFile: string,
@@ -113,7 +142,10 @@ export class EntryFilesAnalyser {
 
     const report = await this.astAnalyzer.analyseFile(
       file,
-      options
+      {
+        ...options,
+        customParser: this.#getParserFromFileExtension(file)
+      }
     );
     yield { file: relativeFile, ...report };
 
