@@ -1,9 +1,9 @@
 // Import Internal Dependencies
-import { Deobfuscate } from "./deobfuscate.js";
+import { Deobfuscate } from "./deobfuscate.ts";
 import {
   PipelineRunner,
   type Pipeline
-} from "./Runner.class.js";
+} from "./Runner.class.ts";
 
 export const Pipelines = Object.freeze({
   deobfuscate: Deobfuscate
@@ -11,3 +11,4 @@ export const Pipelines = Object.freeze({
 
 export { PipelineRunner };
 export type { Pipeline };
+

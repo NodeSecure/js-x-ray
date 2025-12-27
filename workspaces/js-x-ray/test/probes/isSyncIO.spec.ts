@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { readFileSync, promises as fs } from "node:fs";
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { promises as fs, readFileSync } from "node:fs";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 const FIXTURE_URL = new URL("fixtures/syncIO/", import.meta.url);
 

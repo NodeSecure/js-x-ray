@@ -4,23 +4,23 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Import Third-party Dependencies
+import { TsSourceParser } from "@nodesecure/ts-source-parser";
 import {
   DiGraph,
   type VertexBody,
   type VertexDefinition
 } from "digraph-js";
-import { TsSourceParser } from "@nodesecure/ts-source-parser";
 
 // Import Internal Dependencies
 import {
   AstAnalyser,
   type ReportOnFile,
   type RuntimeFileOptions
-} from "./AstAnalyser.js";
+} from "./AstAnalyser.ts";
 import {
   JsSourceParser,
   type SourceParser
-} from "./JsSourceParser.js";
+} from "./JsSourceParser.ts";
 
 // CONSTANTS
 const kDefaultExtensions = [

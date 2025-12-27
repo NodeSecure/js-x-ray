@@ -1,12 +1,12 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert";
+import { describe, it } from "node:test";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { walk } from "../src/walker/index.js";
+import { walk } from "../src/walker/index.ts";
 
 describe("walk", () => {
   it("walks a malformed node", () => {

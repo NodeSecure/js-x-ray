@@ -39,7 +39,8 @@
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/sec-literal#readme",
   "dependencies": {
     "frequency-set": "^2.1.0",
+    "get-east-asian-width": "1.4.0",
     "is-svg": "^6.0.0",
-    "string-width": "^8.0.0"
+    "string-width": "^8.1.0"
   }
 }

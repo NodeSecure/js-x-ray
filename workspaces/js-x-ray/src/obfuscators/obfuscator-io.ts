@@ -2,7 +2,7 @@
 import {
   Deobfuscator,
   type ObfuscatedCounters
-} from "../Deobfuscator.js";
+} from "../Deobfuscator.ts";
 
 export function verify(
   deobfuscator: Deobfuscator,

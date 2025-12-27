@@ -1,11 +1,11 @@
 // Import Node.js Dependencies
-import { test, describe } from "node:test";
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import fs from "node:fs/promises";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 const FIXTURE_URL = new URL("fixtures/dataExfiltration/", import.meta.url);
 

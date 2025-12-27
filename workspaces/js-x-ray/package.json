@@ -15,12 +15,12 @@
     "./package.json": "./package.json"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc",
-    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test-only": "node --test-reporter=spec --test ./test/**/*.spec.ts",
     "test": "c8 --all --src ./src -r html npm run test-only"
   },
   "publishConfig": {

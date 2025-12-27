@@ -3,7 +3,7 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.js";
+import type { ProbeContext } from "../ProbeRunner.ts";
 
 function validateNode(
   node: ESTree.Node,
