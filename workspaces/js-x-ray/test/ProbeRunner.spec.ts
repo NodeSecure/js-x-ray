@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
-import { describe, it, mock } from "node:test";
 import assert from "node:assert";
+import { describe, it, mock } from "node:test";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
@@ -9,8 +9,8 @@ import type { ESTree } from "meriyah";
 import {
   ProbeContext,
   ProbeRunner
-} from "../src/ProbeRunner.js";
-import { SourceFile } from "../src/SourceFile.js";
+} from "../src/ProbeRunner.ts";
+import { SourceFile } from "../src/SourceFile.ts";
 
 describe("ProbeRunner", () => {
   describe("constructor", () => {

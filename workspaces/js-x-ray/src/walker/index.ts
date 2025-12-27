@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SyncWalker, type SyncHandler } from "./walker.sync.js";
+import { SyncWalker, type SyncHandler } from "./walker.sync.ts";
 
 export type WalkRootNode = ESTree.Program | ESTree.Program["body"] | ESTree.Node;
 

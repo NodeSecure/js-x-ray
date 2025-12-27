@@ -2,8 +2,8 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
-import type { Literal } from "../types/estree.js";
+import { SourceFile } from "../SourceFile.ts";
+import type { Literal } from "../types/estree.ts";
 
 /**
  * @description Search for ESM Export

@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { ShadyURL } from "../src/ShadyURL.js";
+import { ShadyURL } from "../src/ShadyURL.ts";
 
 describe("ShadyURL.isSafe()", () => {
   describe("when input is not a valid URL", () => {

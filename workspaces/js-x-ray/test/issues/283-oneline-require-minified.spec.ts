@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 // Regression test for https://github.com/NodeSecure/js-x-ray/issues/283
 test("Given a one line require (with no module.exports) then isOneLineRequire must equal true", () => {

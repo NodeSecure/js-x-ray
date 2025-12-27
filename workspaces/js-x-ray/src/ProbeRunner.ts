@@ -5,24 +5,24 @@ import assert from "node:assert";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import isUnsafeCallee from "./probes/isUnsafeCallee.js";
-import isLiteral from "./probes/isLiteral.js";
-import isLiteralRegex from "./probes/isLiteralRegex.js";
-import isRegexObject from "./probes/isRegexObject.js";
-import isRequire from "./probes/isRequire/isRequire.js";
-import isImportDeclaration from "./probes/isImportDeclaration.js";
-import isWeakCrypto from "./probes/isWeakCrypto.js";
-import isBinaryExpression from "./probes/isBinaryExpression.js";
-import isArrayExpression from "./probes/isArrayExpression.js";
-import isESMExport from "./probes/isESMExport.js";
-import isFetch from "./probes/isFetch.js";
-import isUnsafeCommand from "./probes/isUnsafeCommand.js";
-import isSyncIO from "./probes/isSyncIO.js";
-import isSerializeEnv from "./probes/isSerializeEnv.js";
-import dataExfiltration from "./probes/data-exfiltration.js";
+import dataExfiltration from "./probes/data-exfiltration.ts";
+import isArrayExpression from "./probes/isArrayExpression.ts";
+import isBinaryExpression from "./probes/isBinaryExpression.ts";
+import isESMExport from "./probes/isESMExport.ts";
+import isFetch from "./probes/isFetch.ts";
+import isImportDeclaration from "./probes/isImportDeclaration.ts";
+import isLiteral from "./probes/isLiteral.ts";
+import isLiteralRegex from "./probes/isLiteralRegex.ts";
+import isRegexObject from "./probes/isRegexObject.ts";
+import isRequire from "./probes/isRequire/isRequire.ts";
+import isSerializeEnv from "./probes/isSerializeEnv.ts";
+import isSyncIO from "./probes/isSyncIO.ts";
+import isUnsafeCallee from "./probes/isUnsafeCallee.ts";
+import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
+import isWeakCrypto from "./probes/isWeakCrypto.ts";
 
-import type { SourceFile } from "./SourceFile.js";
-import type { OptionalWarningName } from "./warnings.js";
+import type { SourceFile } from "./SourceFile.ts";
+import type { OptionalWarningName } from "./warnings.ts";
 
 // CONSTANTS
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");

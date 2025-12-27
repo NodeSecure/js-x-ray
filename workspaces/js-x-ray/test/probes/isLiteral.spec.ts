@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test, describe } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { getSastAnalysis, parseScript } from "../utils/index.js";
-import isLiteral from "../../src/probes/isLiteral.js";
+import isLiteral from "../../src/probes/isLiteral.ts";
+import { getSastAnalysis, parseScript } from "../utils/index.ts";
 
 test("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", (t) => {
   const str = "const foo = '68747470'";

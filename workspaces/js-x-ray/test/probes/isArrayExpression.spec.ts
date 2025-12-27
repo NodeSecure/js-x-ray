@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { getSastAnalysis, parseScript } from "../utils/index.js";
-import isArrayExpression from "../../src/probes/isArrayExpression.js";
+import isArrayExpression from "../../src/probes/isArrayExpression.ts";
+import { getSastAnalysis, parseScript } from "../utils/index.ts";
 
 test("it should trigger analyzeLiteral method one time", (t) => {
   const str = "['foo']";

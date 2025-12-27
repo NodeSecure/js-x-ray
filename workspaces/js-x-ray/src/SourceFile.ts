@@ -2,18 +2,18 @@
 import path from "node:path";
 
 // Import Third-party Dependencies
-import { Utils, Literal } from "@nodesecure/sec-literal";
+import { Literal, Utils } from "@nodesecure/sec-literal";
 import { VariableTracer } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { rootLocation, toArrayLocation } from "./utils/index.js";
+import type { Dependency } from "./AstAnalyser.ts";
+import { Deobfuscator } from "./Deobfuscator.ts";
+import { rootLocation, toArrayLocation } from "./utils/index.ts";
 import {
   generateWarning,
   type Warning
-} from "./warnings.js";
-import type { Dependency } from "./AstAnalyser.js";
-import { Deobfuscator } from "./Deobfuscator.js";
+} from "./warnings.ts";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;

@@ -2,7 +2,7 @@
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { JsSourceParser } from "../src/index.js";
+import { JsSourceParser } from "../src/index.ts";
 
 describe("JsSourceParser", () => {
   describe("parse", () => {

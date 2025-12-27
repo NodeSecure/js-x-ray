@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 test("it should detect native fetch", () => {
   const code = "await fetch(url);";

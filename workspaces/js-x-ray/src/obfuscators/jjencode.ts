@@ -1,9 +1,9 @@
 // Import Internal Dependencies
-import { notNullOrUndefined } from "../utils/index.js";
 import {
-  type ObfuscatedIdentifier,
-  type ObfuscatedCounters
-} from "../Deobfuscator.js";
+  type ObfuscatedCounters,
+  type ObfuscatedIdentifier
+} from "../Deobfuscator.ts";
+import { notNullOrUndefined } from "../utils/index.ts";
 
 // CONSTANTS
 const kJJRegularSymbols = new Set(["$", "_"]);

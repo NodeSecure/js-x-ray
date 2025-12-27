@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert";
+import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { SourceFile, SourceFilePath } from "../src/SourceFile.js";
+import { SourceFile, SourceFilePath } from "../src/SourceFile.ts";
 
 describe("SourceFile", () => {
   describe("constructor() with sourceLocation", () => {
