@@ -1,15 +1,15 @@
 // Import Node.js Dependencies
-import { describe, mock, test } from "node:test";
 import assert from "node:assert";
+import { describe, mock, test } from "node:test";
 
 // Import Internal Dependencies
 import {
   AstAnalyser,
   Pipelines
-} from "../src/index.js";
+} from "../src/index.ts";
 import {
   getWarningKind
-} from "./utils/index.js";
+} from "./utils/index.ts";
 
 describe("AstAnalyser pipelines", () => {
   test("should iterate once on the pipeline", () => {

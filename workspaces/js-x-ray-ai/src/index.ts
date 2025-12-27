@@ -1,2 +1,3 @@
-export * from "./AiAstAnalyzer.js";
-export * from "./types.js";
+export * from "./AiAstAnalyzer.ts";
+export * from "./types.ts";
+

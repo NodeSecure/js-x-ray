@@ -1,11 +1,11 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert";
 import path from "node:path";
+import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 // Import Internal Dependencies
-import { EntryFilesAnalyser, AstAnalyser } from "../src/index.js";
+import { AstAnalyser, EntryFilesAnalyser } from "../src/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/entryFiles/", import.meta.url);

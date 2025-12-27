@@ -1,6 +1,6 @@
 // Import Internal Dependencies
-import { toRaw, toValue, type ESTreeLiteral } from "./literal.js";
-import * as Utils from "./utils.js";
+import { toRaw, toValue, type ESTreeLiteral } from "./literal.ts";
+import * as Utils from "./utils.ts";
 
 // CONSTANTS
 const kUnsafeHexValues = new Set([

@@ -2,8 +2,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
 // Import Internal Dependencies
-import type { LlmProvider, LlmProviderParams, LlmReport } from "../types.js";
-import { prompt } from "./prompt.js";
+import type { LlmProvider, LlmProviderParams, LlmReport } from "../types.ts";
+import { prompt } from "./prompt.ts";
 
 export class GoogleProvider implements LlmProvider {
   private genai: GoogleGenAI;

@@ -1,16 +1,16 @@
 /* eslint-disable max-nested-callbacks */
 // Import Node.js Dependencies
-import { describe, it, TestContext } from "node:test";
 import assert from "node:assert";
-import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { describe, it, TestContext } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser, JsSourceParser } from "../src/index.js";
-import { FakeSourceParser } from "./fixtures/FakeSourceParser.js";
-import { ProbeRunner } from "../src/ProbeRunner.js";
-import { SourceFile } from "../src/SourceFile.js";
+import { AstAnalyser, JsSourceParser } from "../src/index.ts";
+import { ProbeRunner } from "../src/ProbeRunner.ts";
+import { SourceFile } from "../src/SourceFile.ts";
+import { FakeSourceParser } from "./fixtures/FakeSourceParser.ts";
 import {
   customProbes,
   getWarningKind,
@@ -18,7 +18,7 @@ import {
   kWarningUnsafeDanger,
   kWarningUnsafeImport,
   kWarningUnsafeStmt
-} from "./utils/index.js";
+} from "./utils/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);

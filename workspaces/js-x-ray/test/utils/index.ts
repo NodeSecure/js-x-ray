@@ -6,12 +6,12 @@ import {
   SourceFile,
   type Dependency,
   type Warning
-} from "../../src/index.js";
+} from "../../src/index.ts";
 import {
   ProbeRunner,
   type Probe
-} from "../../src/ProbeRunner.js";
-import { walk } from "../../src/walker/index.js";
+} from "../../src/ProbeRunner.ts";
+import { walk } from "../../src/walker/index.ts";
 
 export function getWarningKind(
   warnings: Warning[]

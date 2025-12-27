@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
+import { SourceFile } from "../SourceFile.ts";
 
 /**
  * @description Search for BinaryExpression AST Node.

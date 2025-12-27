@@ -1,11 +1,11 @@
 // Import Node.js Dependencies
+import assert from "node:assert";
 import { randomBytes } from "node:crypto";
 import { test } from "node:test";
-import assert from "node:assert";
 
 // Import Internal Dependencies
-import { isLiteral, toValue, toRaw, defaultAnalysis } from "../src/literal.js";
-import { createLiteral } from "./utils/index.js";
+import { defaultAnalysis, isLiteral, toRaw, toValue } from "../src/literal.ts";
+import { createLiteral } from "./utils/index.ts";
 
 test("isLiteral must return true for a valid ESTree Literal Node", () => {
   const literalSample = createLiteral("boo");

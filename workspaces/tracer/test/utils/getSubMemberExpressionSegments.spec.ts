@@ -1,12 +1,12 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Third-party Dependencies
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
-import { getSubMemberExpressionSegments } from "../../src/utils/index.js";
+import { getSubMemberExpressionSegments } from "../../src/utils/index.ts";
 
 describe("getSubMemberExpressionSegments", () => {
   test("given a MemberExpression then it should return each segments (except the last one)", () => {

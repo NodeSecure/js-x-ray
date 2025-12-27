@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { notNullOrUndefined } from "../../src/utils/index.js";
+import { notNullOrUndefined } from "../../src/utils/index.ts";
 
 describe("notNullOrUndefined", () => {
   test("given a null or undefined primitive value then it must always return false", () => {

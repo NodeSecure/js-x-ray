@@ -1,14 +1,14 @@
 // Import Node.js Dependencies
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { test } from "node:test";
 import assert from "node:assert";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 // Import Internal Dependencies
 import {
   AstAnalyser
-} from "../src/index.js";
-import { getWarningKind } from "./utils/index.js";
+} from "../src/index.ts";
+import { getWarningKind } from "./utils/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/obfuscated/", import.meta.url);

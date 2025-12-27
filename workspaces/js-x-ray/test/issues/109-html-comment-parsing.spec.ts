@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
+import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import assert from "node:assert";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("../fixtures/issues/", import.meta.url);

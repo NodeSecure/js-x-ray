@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { getSastAnalysis, parseScript } from "../utils/index.js";
-import isRegexObject from "../../src/probes/isRegexObject.js";
+import isRegexObject from "../../src/probes/isRegexObject.ts";
+import { getSastAnalysis, parseScript } from "../utils/index.ts";
 
 test("should not throw a warning because the given Literal RegExp is considered 'safe'", () => {
   const str = "const foo = new RegExp('^hello');";

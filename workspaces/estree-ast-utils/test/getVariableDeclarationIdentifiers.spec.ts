@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { getVariableDeclarationIdentifiers } from "../src/index.js";
+import { getVariableDeclarationIdentifiers } from "../src/index.ts";
 import {
   codeToAst,
   getExpressionFromStatementIf
-} from "./utils.js";
+} from "./utils.ts";
 
 describe("getVariableDeclarationIdentifiers", () => {
   test("return empty array when the node is not a VariableDeclaration", () => {

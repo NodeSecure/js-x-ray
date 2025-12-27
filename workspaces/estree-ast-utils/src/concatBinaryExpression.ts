@@ -2,11 +2,11 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { arrayExpressionToString } from "./arrayExpression.js";
+import { arrayExpressionToString } from "./arrayExpression.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.js";
+} from "./options.ts";
 
 // CONSTANTS
 const kBinaryExprTypes = new Set([

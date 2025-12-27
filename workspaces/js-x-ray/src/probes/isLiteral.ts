@@ -6,10 +6,10 @@ import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
-import { generateWarning } from "../warnings.js";
-import { ShadyURL } from "../ShadyURL.js";
-import type { Literal } from "../types/estree.js";
+import { ShadyURL } from "../ShadyURL.ts";
+import { SourceFile } from "../SourceFile.ts";
+import type { Literal } from "../types/estree.ts";
+import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);

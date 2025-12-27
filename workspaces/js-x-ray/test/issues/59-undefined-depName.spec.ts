@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("../fixtures/issues/", import.meta.url);

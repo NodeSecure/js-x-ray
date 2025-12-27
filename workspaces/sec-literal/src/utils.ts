@@ -3,7 +3,7 @@ import isStringSvg from "is-svg";
 import stringWidth from "string-width";
 
 // Import Internal Dependencies
-import { toValue, type ESTreeLiteral } from "./literal.js";
+import { toValue, type ESTreeLiteral } from "./literal.ts";
 
 export interface IsBase64Options {
   allowMime?: boolean;

@@ -2,8 +2,8 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
-import { extractNode } from "../utils/index.js";
+import { SourceFile } from "../SourceFile.ts";
+import { extractNode } from "../utils/index.ts";
 
 // CONSTANTS
 const kLiteralExtractor = extractNode<ESTree.Literal>("Literal");

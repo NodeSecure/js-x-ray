@@ -3,11 +3,11 @@ import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { concatBinaryExpression } from "./concatBinaryExpression.js";
+import { concatBinaryExpression } from "./concatBinaryExpression.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.js";
+} from "./options.ts";
 
 export function getCallExpressionArguments(
   node: ESTree.Node,

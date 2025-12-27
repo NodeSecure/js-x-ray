@@ -2,11 +2,11 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.js";
+import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.js";
+} from "./options.ts";
 
 export interface GetCallExpressionIdentifierOptions extends DefaultOptions {
   /**

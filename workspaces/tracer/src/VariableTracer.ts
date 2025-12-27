@@ -2,26 +2,26 @@
 import { EventEmitter } from "node:events";
 
 // Import Third-party Dependencies
-import type { ESTree } from "meriyah";
 import {
-  getMemberExpressionIdentifier,
-  getCallExpressionIdentifier,
-  getCallExpressionArguments,
-  getVariableDeclarationIdentifiers,
   extractLogicalExpression,
+  getCallExpressionArguments,
+  getCallExpressionIdentifier,
+  getMemberExpressionIdentifier,
+  getVariableDeclarationIdentifiers,
   isLiteral
 } from "@nodesecure/estree-ast-utils";
+import type { ESTree } from "meriyah";
 import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import {
-  notNullOrUndefined,
+  getSubMemberExpressionSegments,
   isEvilIdentifierPath,
   isNeutralCallable,
-  getSubMemberExpressionSegments,
   makePrefixRemover,
+  notNullOrUndefined,
   stripNodePrefix
-} from "./utils/index.js";
+} from "./utils/index.ts";
 
 // CONSTANTS
 const kGlobalIdentifiersToTrace = new Set([

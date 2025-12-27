@@ -1,10 +1,10 @@
 // Import Third-party Dependencies
-import type { ESTree } from "meriyah";
 import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
+import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { generateWarning } from "../warnings.js";
-import type { ProbeMainContext } from "../ProbeRunner.js";
+import type { ProbeMainContext } from "../ProbeRunner.ts";
+import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Detect unsafe statement

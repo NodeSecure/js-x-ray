@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { getCallExpressionIdentifier } from "../src/index.js";
-import { codeToAst, getExpressionFromStatement } from "./utils.js";
+import { getCallExpressionIdentifier } from "../src/index.ts";
+import { codeToAst, getExpressionFromStatement } from "./utils.ts";
 
 test("given a JavaScript eval CallExpression then it must return eval", () => {
   const [astNode] = codeToAst("eval(\"this\");");

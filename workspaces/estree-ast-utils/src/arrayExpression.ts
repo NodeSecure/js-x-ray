@@ -3,17 +3,17 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
+  getMemberExpressionIdentifier
+} from "./getMemberExpressionIdentifier.ts";
+import {
   type DefaultOptions,
   noop
-} from "./options.js";
+} from "./options.ts";
 import {
-  isNode,
   isCallExpression,
-  isLiteral
-} from "./utils/is.js";
-import {
-  getMemberExpressionIdentifier
-} from "./getMemberExpressionIdentifier.js";
+  isLiteral,
+  isNode
+} from "./utils/is.ts";
 
 export interface ArrayExpressionToStringOptions extends DefaultOptions {
   /**

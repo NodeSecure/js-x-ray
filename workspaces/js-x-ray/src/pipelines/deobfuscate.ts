@@ -1,11 +1,11 @@
 // Import Third-party Dependencies
+import { joinArrayExpression } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 import { match } from "ts-pattern";
-import { joinArrayExpression } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
-import { walkEnter } from "../walker/index.js";
-import type { Pipeline } from "./Runner.class.js";
+import { walkEnter } from "../walker/index.ts";
+import type { Pipeline } from "./Runner.class.ts";
 
 export class Deobfuscate implements Pipeline {
   name = "deobfuscate";

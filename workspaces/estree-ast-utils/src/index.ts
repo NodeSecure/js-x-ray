@@ -1,9 +1,10 @@
-export * from "./getMemberExpressionIdentifier.js";
-export * from "./getCallExpressionIdentifier.js";
-export * from "./getVariableDeclarationIdentifiers.js";
-export * from "./getCallExpressionArguments.js";
-export * from "./concatBinaryExpression.js";
-export * from "./arrayExpression.js";
-export * from "./extractLogicalExpression.js";
-export * from "./utils/is.js";
-export type { DefaultOptions } from "./options.js";
+export * from "./arrayExpression.ts";
+export * from "./concatBinaryExpression.ts";
+export * from "./extractLogicalExpression.ts";
+export * from "./getCallExpressionArguments.ts";
+export * from "./getCallExpressionIdentifier.ts";
+export * from "./getMemberExpressionIdentifier.ts";
+export * from "./getVariableDeclarationIdentifiers.ts";
+export type { DefaultOptions } from "./options.ts";
+export * from "./utils/is.ts";
+

@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { extractLogicalExpression } from "../src/index.js";
-import { codeToAst, getExpressionFromStatement } from "./utils.js";
+import { extractLogicalExpression } from "../src/index.ts";
+import { codeToAst, getExpressionFromStatement } from "./utils.ts";
 
 test("it should extract two Nodes from a LogicalExpression with two operands", () => {
   const [astNode] = codeToAst("5 || 10");

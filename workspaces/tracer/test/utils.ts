@@ -1,9 +1,9 @@
 // Import Third-party Dependencies
-import * as meriyah from "meriyah";
 import { walk } from "estree-walker";
+import * as meriyah from "meriyah";
 
 // Import Internal Dependencies
-import { VariableTracer } from "../src/index.js";
+import { VariableTracer } from "../src/index.ts";
 
 function codeToAst(code: string) {
   const estreeRootNode = meriyah.parse(code, {

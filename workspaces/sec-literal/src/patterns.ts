@@ -2,7 +2,7 @@
 import FrequencySet from "frequency-set";
 
 // Import Internal Dependencies
-import { toValue, type ESTreeLiteral } from "./literal.js";
+import { toValue, type ESTreeLiteral } from "./literal.ts";
 
 /**
  * @description get the common string prefix (at the start) pattern

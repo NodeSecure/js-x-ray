@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
+import assert from "node:assert";
 import { randomBytes } from "node:crypto";
 import { test } from "node:test";
-import assert from "node:assert";
 
 // Import Internal Dependencies
-import { stringCharDiversity, isSvg, isSvgPath, stringSuspicionScore } from "../src/utils.js";
+import { isSvg, isSvgPath, stringCharDiversity, stringSuspicionScore } from "../src/utils.ts";
 
 test("stringCharDiversity must return the number of unique chars in a given string", () => {
   assert.strictEqual(

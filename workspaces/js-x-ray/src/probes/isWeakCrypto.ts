@@ -3,11 +3,11 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.js";
-import { generateWarning } from "../warnings.js";
+import type { ProbeContext } from "../ProbeRunner.ts";
 import {
   isLiteral
-} from "../types/estree.js";
+} from "../types/estree.ts";
+import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kWeakAlgorithms = new Set([

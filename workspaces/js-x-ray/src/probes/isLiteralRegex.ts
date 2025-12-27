@@ -1,10 +1,10 @@
 // Import Third-party Dependencies
-import safeRegex from "safe-regex";
 import type { ESTree } from "meriyah";
+import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
-import { generateWarning } from "../warnings.js";
+import { SourceFile } from "../SourceFile.ts";
+import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Search for RegExpLiteral AST Node

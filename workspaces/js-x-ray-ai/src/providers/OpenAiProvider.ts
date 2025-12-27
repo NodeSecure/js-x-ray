@@ -2,8 +2,8 @@
 import OpenAI from "openai";
 
 // Import Internal Dependencies
-import type { LlmProvider, LlmProviderParams, LlmReport } from "../types.js";
-import { prompt } from "./prompt.js";
+import type { LlmProvider, LlmProviderParams, LlmReport } from "../types.ts";
+import { prompt } from "./prompt.ts";
 
 const schema = `
 Your response must strictly follow this schema:

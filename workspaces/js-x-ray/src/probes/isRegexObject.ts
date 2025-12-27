@@ -1,11 +1,11 @@
 // Import Third-party Dependencies
-import safeRegex from "safe-regex";
 import type { ESTree } from "meriyah";
+import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.js";
-import { generateWarning } from "../warnings.js";
-import type { Literal, RegExpLiteral } from "../types/estree.js";
+import { SourceFile } from "../SourceFile.ts";
+import type { Literal, RegExpLiteral } from "../types/estree.ts";
+import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Search for Regex Object constructor.

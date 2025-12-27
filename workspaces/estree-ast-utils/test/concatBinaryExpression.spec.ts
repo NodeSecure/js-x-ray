@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Third-party Dependencies
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
-import { concatBinaryExpression } from "../src/index.js";
-import { codeToAst, getExpressionFromStatement } from "./utils.js";
+import { concatBinaryExpression } from "../src/index.ts";
+import { codeToAst, getExpressionFromStatement } from "./utils.ts";
 
 test("given a BinaryExpression of two literals then the iterable must return Literal values", () => {
   const [astNode] = codeToAst("'foo' + 'bar' + 'xd'");
@@ -70,7 +70,7 @@ test("given a one level BinaryExpression with an unsupported node it should thro
     iter.next();
   }
   catch (error) {
-    assert.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
+    assert.strictEqual((error as Error).message, "concatBinaryExpression:: Unsupported node detected");
   }
 });
 
@@ -86,6 +86,6 @@ test("given a Deep BinaryExpression with an unsupported node it should throw an 
     iter.next();
   }
   catch (error) {
-    assert.strictEqual(error.message, "concatBinaryExpression:: Unsupported node detected");
+    assert.strictEqual((error as Error).message, "concatBinaryExpression:: Unsupported node detected");
   }
 });

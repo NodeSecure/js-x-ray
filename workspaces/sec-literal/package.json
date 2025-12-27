@@ -8,7 +8,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc",
-    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test-only": "node --test-reporter=spec --test ./test/**/*.spec.ts",
     "test": "npm run test-only"
   },
   "publishConfig": {
@@ -40,6 +40,6 @@
   "dependencies": {
     "frequency-set": "^2.1.0",
     "is-svg": "^6.0.0",
-    "string-width": "^8.0.0"
+    "string-width": "^8.1.0"
   }
 }
