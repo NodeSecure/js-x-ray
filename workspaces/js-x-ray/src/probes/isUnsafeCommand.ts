@@ -2,12 +2,12 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { generateWarning } from "../warnings.js";
+import type { ProbeMainContext } from "../ProbeRunner.ts";
 import {
   isLiteral,
   isTemplateLiteral
-} from "../types/estree.js";
-import type { ProbeMainContext } from "../ProbeRunner.js";
+} from "../types/estree.ts";
+import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];

@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { isEvilIdentifierPath } from "../../src/utils/index.js";
+import { isEvilIdentifierPath } from "../../src/utils/index.ts";
 
 describe("isEvilIdentifierPath", () => {
   test("given a random prototype method name then it should return false", () => {

@@ -6,11 +6,11 @@ import {
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { generateWarning } from "../warnings.js";
 import type {
   ProbeContext,
   ProbeMainContext
-} from "../ProbeRunner.js";
+} from "../ProbeRunner.ts";
+import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Detect serialization of process.env which could indicate environment variable exfiltration

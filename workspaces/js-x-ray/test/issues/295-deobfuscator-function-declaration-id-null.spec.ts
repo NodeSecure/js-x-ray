@@ -2,7 +2,7 @@
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/295

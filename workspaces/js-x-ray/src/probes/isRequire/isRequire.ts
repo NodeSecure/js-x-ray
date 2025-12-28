@@ -2,18 +2,18 @@
 
 // Import Third-party Dependencies
 import {
-  concatBinaryExpression,
   arrayExpressionToString,
-  getCallExpressionIdentifier,
-  getCallExpressionArguments
+  concatBinaryExpression,
+  getCallExpressionArguments,
+  getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.js";
-import { isLiteral } from "../../types/estree.js";
-import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.js";
-import { generateWarning } from "../../warnings.js";
+import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { isLiteral } from "../../types/estree.ts";
+import { generateWarning } from "../../warnings.ts";
+import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.ts";
 
 function validateNodeRequire(
   node: ESTree.Node,

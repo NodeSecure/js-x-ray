@@ -1,10 +1,10 @@
 // Import Third-party Dependencies
-import { AstAnalyser, type Report, type RuntimeOptions, type AstAnalyserOptions } from "@nodesecure/js-x-ray";
+import { AstAnalyser, type AstAnalyserOptions, type Report, type RuntimeOptions } from "@nodesecure/js-x-ray";
 
 // Import Internal Dependencies
-import { GoogleProvider } from "./providers/GoogleProvider.js";
-import { OpenAiProvider } from "./providers/OpenAiProvider.js";
-import type { LlmProvider, LlmReport } from "./types.js";
+import { GoogleProvider } from "./providers/GoogleProvider.ts";
+import { OpenAiProvider } from "./providers/OpenAiProvider.ts";
+import type { LlmProvider, LlmReport } from "./types.ts";
 
 export type Analyses = {
   llm: LlmReport;

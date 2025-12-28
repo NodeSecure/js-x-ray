@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { TsSourceParser } from "../src/TsSourceParser.js";
+import { TsSourceParser } from "../src/TsSourceParser.ts";
 
 describe("TsSourceParser", () => {
   describe("parse", () => {

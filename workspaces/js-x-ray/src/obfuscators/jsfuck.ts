@@ -1,7 +1,7 @@
 // Import Internal Dependencies
 import {
   type ObfuscatedCounters
-} from "../Deobfuscator.js";
+} from "../Deobfuscator.ts";
 
 // CONSTANTS
 const kJSFuckMinimumDoubleUnaryExpr = 5;

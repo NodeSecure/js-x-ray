@@ -1,15 +1,15 @@
 // Import Node.js Dependencies
-import { describe, it, mock } from "node:test";
 import assert from "node:assert/strict";
+import { describe, it, mock } from "node:test";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { NodeCounter } from "../src/NodeCounter.js";
-import { JsSourceParser } from "../src/index.js";
-import { isNode } from "../src/types/estree.js";
-import { walkEnter } from "../src/walker/index.js";
+import { NodeCounter } from "../src/NodeCounter.ts";
+import { JsSourceParser } from "../src/index.ts";
+import { isNode } from "../src/types/estree.ts";
+import { walkEnter } from "../src/walker/index.ts";
 
 describe("NodeCounter", () => {
   describe("constructor", () => {

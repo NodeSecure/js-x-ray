@@ -1,11 +1,11 @@
 // Import Node.js Dependencies
+import assert from "node:assert";
 import { randomBytes } from "node:crypto";
 import { describe, test } from "node:test";
-import assert from "node:assert";
 
 // Import Internal Dependencies
-import { isHex, isSafe, CONSTANTS } from "../src/hex.js";
-import { createLiteral } from "./utils/index.js";
+import { CONSTANTS, isHex, isSafe } from "../src/hex.ts";
+import { createLiteral } from "./utils/index.ts";
 
 describe("isHex()", () => {
   test("must return true for random 4 character hexadecimal values", () => {

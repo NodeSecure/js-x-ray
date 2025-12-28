@@ -5,9 +5,9 @@ import {
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { generateWarning } from "../warnings.js";
-import type { ProbeContext } from "../ProbeRunner.js";
-import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.js";
+import type { ProbeContext } from "../ProbeRunner.ts";
+import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
+import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kSensitiveMethods = [
@@ -83,7 +83,8 @@ function initialize(
     }).trace("os.cpus", {
       moduleName: "os",
       followConsecutiveAssignment: true
-    }).trace("dns.getServers", {
+    })
+    .trace("dns.getServers", {
       moduleName: "dns",
       followConsecutiveAssignment: true
     });

@@ -7,7 +7,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc",
-    "test-only": "tsx --test-reporter=spec --test \"./test/**/*.spec.ts\"",
+    "test-only": "node --test-reporter=spec --test ./test/**/*.spec.ts",
     "test": "c8 -r html npm run test-only"
   },
   "publishConfig": {

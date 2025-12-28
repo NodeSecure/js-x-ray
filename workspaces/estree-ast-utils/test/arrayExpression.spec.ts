@@ -1,6 +1,6 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Third-party Dependencies
 import { IteratorMatcher } from "iterator-matcher";
@@ -9,12 +9,12 @@ import { IteratorMatcher } from "iterator-matcher";
 import {
   arrayExpressionToString,
   joinArrayExpression
-} from "../src/index.js";
+} from "../src/index.ts";
 import {
   codeToAst,
   getExpressionFromStatement,
   getExpressionFromStatementIf
-} from "./utils.js";
+} from "./utils.ts";
 
 describe("arrayExpressionToString", () => {
   test("given an ArrayExpression with two Literals then the iterable must return them one by one", () => {

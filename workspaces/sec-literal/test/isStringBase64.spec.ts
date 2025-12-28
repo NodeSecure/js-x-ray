@@ -1,10 +1,10 @@
 /* eslint-disable @stylistic/max-len */
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert/strict";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { isStringBase64 } from "../src/utils.js";
+import { isStringBase64 } from "../src/utils.ts";
 
 test("isBase64", function isBase64() {
   const pngString = "iVBORw0KGgoAAAANSUhEUgAABQAAAALQAQMAAAD1s08VAAAAA1BMVEX/AAAZ4gk3AAAAh0lEQVR42u3BMQEAAADCoPVPbQlPoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB4GsTfAAGc95RKAAAAAElFTkSuQmCC";

@@ -2,12 +2,12 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { notNullOrUndefined } from "./utils/notNullOrUndefined.ts";
 import {
-  toArrayLocation,
   rootLocation,
+  toArrayLocation,
   type SourceArrayLocation
-} from "./utils/toArrayLocation.js";
-import { notNullOrUndefined } from "./utils/notNullOrUndefined.js";
+} from "./utils/toArrayLocation.ts";
 
 export type OptionalWarningName =
   | "synchronous-io";

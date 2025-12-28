@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import type { ESTreeLiteral } from "../../src/literal.js";
+import type { ESTreeLiteral } from "../../src/literal.ts";
 
 // @see https://github.com/estree/estree/blob/master/es5.md#literal
 export function createLiteral(

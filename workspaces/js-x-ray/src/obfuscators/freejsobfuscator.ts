@@ -4,7 +4,7 @@ import { Utils } from "@nodesecure/sec-literal";
 // Import Internal Dependencies
 import {
   type ObfuscatedIdentifier
-} from "../Deobfuscator.js";
+} from "../Deobfuscator.ts";
 
 export function verify(
   identifiers: ObfuscatedIdentifier[],

@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { rootLocation } from "../src/utils/index.js";
-import { generateWarning } from "../src/warnings.js";
+import { rootLocation } from "../src/utils/index.ts";
+import { generateWarning } from "../src/warnings.ts";
 
 test("Given an encoded-literal kind it should generate a warning with deep location array", () => {
   const result = generateWarning("encoded-literal", {

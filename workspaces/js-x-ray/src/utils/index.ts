@@ -1,5 +1,6 @@
-export * from "./extractNode.js";
-export * from "./isOneLineExpressionExport.js";
-export * from "./notNullOrUndefined.js";
-export * from "./toArrayLocation.js";
-export * from "./isMinifiedCode.js";
+export * from "./extractNode.ts";
+export * from "./isMinifiedCode.ts";
+export * from "./isOneLineExpressionExport.ts";
+export * from "./notNullOrUndefined.ts";
+export * from "./toArrayLocation.ts";
+

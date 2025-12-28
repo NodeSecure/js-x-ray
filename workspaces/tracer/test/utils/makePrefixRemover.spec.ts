@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { makePrefixRemover } from "../../src/utils/index.js";
+import { makePrefixRemover } from "../../src/utils/index.ts";
 
 describe("makePrefixRemover", () => {
   it("returns the original string when no dot is present", () => {

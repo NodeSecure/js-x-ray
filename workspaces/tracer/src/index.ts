@@ -1,1 +1,1 @@
-export * from "./VariableTracer.js";
+export * from "./VariableTracer.ts";

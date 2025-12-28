@@ -1,14 +1,14 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { Deobfuscator } from "../src/Deobfuscator.js";
-import { JsSourceParser } from "../src/index.js";
-import { walkEnter } from "../src/walker/index.js";
+import { Deobfuscator } from "../src/Deobfuscator.ts";
+import { JsSourceParser } from "../src/index.ts";
+import { walkEnter } from "../src/walker/index.ts";
 
 describe("Deobfuscator", () => {
   describe("identifiers and counters", () => {

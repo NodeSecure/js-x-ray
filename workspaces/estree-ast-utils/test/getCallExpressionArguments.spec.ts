@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { getCallExpressionArguments } from "../src/index.js";
+import { getCallExpressionArguments } from "../src/index.ts";
 import {
   codeToAst,
   getExpressionFromStatement
-} from "./utils.js";
+} from "./utils.ts";
 
 describe("getCallExpressionArguments", () => {
   test("return null when the node is not a CallExpression", () => {

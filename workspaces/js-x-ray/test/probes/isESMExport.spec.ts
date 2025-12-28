@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { describe, it } from "node:test";
 import assert from "node:assert";
+import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.js";
+import { AstAnalyser } from "../../src/index.ts";
 
 describe("probe: isESMExport", () => {
   it("should detect ExportNamedDeclaration statement with a Literal source as dependency", () => {

@@ -1,13 +1,13 @@
 // Import Third-party Dependencies
-import type { ESTree } from "meriyah";
 import { Hex } from "@nodesecure/sec-literal";
+import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { concatBinaryExpression } from "./concatBinaryExpression.js";
+import { concatBinaryExpression } from "./concatBinaryExpression.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.js";
+} from "./options.ts";
 
 /**
  * Return the complete identifier of a MemberExpression

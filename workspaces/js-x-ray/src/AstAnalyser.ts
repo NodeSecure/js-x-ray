@@ -1,33 +1,33 @@
 // Import Node.js Dependencies
-import fs from "node:fs/promises";
 import fsSync from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import {
-  generateWarning,
-  type Warning,
-  type OptionalWarningName
-} from "./warnings.js";
-import {
-  SourceFile,
-  type SourceFlags
-} from "./SourceFile.js";
-import { JsSourceParser, type SourceParser } from "./JsSourceParser.js";
-import { ProbeRunner, type Probe } from "./ProbeRunner.js";
-import { walkEnter } from "./walker/index.js";
-import * as trojan from "./obfuscators/trojan-source.js";
-import {
-  isOneLineExpressionExport,
-  isMinifiedCode
-} from "./utils/index.js";
+import { JsSourceParser, type SourceParser } from "./JsSourceParser.ts";
+import * as trojan from "./obfuscators/trojan-source.ts";
 import {
   PipelineRunner,
   type Pipeline
-} from "./pipelines/index.js";
+} from "./pipelines/index.ts";
+import { ProbeRunner, type Probe } from "./ProbeRunner.ts";
+import {
+  SourceFile,
+  type SourceFlags
+} from "./SourceFile.ts";
+import {
+  isMinifiedCode,
+  isOneLineExpressionExport
+} from "./utils/index.ts";
+import { walkEnter } from "./walker/index.ts";
+import {
+  generateWarning,
+  type OptionalWarningName,
+  type Warning
+} from "./warnings.ts";
 
 export interface Dependency {
   unsafe: boolean;

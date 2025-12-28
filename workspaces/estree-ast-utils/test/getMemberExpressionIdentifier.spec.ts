@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Third-party Dependencies
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
-import { getMemberExpressionIdentifier } from "../src/index.js";
-import { codeToAst, getExpressionFromStatement } from "./utils.js";
+import { getMemberExpressionIdentifier } from "../src/index.ts";
+import { codeToAst, getExpressionFromStatement } from "./utils.ts";
 
 test("it must return all literals part of the given MemberExpression", () => {
   const [astNode] = codeToAst("foo.bar.xd");

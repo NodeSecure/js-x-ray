@@ -1,10 +1,10 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { parseScript, getSastAnalysis } from "../utils/index.js";
-import isUnsafeCallee from "../../src/probes/isUnsafeCallee.js";
+import isUnsafeCallee from "../../src/probes/isUnsafeCallee.ts";
+import { getSastAnalysis, parseScript } from "../utils/index.ts";
 
 // CONSTANTS
 const kWarningUnsafeStmt = "unsafe-stmt";

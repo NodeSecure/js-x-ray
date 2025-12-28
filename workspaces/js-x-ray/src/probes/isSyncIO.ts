@@ -3,8 +3,8 @@ import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.js";
-import { generateWarning } from "../warnings.js";
+import type { ProbeContext } from "../ProbeRunner.ts";
+import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kTracedNodeCoreModules = ["fs", "crypto", "child_process", "zlib"];

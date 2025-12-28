@@ -1,9 +1,9 @@
 // Import Node.js Dependencies
-import { test } from "node:test";
 import assert from "node:assert";
+import { test } from "node:test";
 
 // Import Internal Dependencies
-import { createTracer } from "./utils.js";
+import { createTracer } from "./utils.ts";
 
 test("it should be able to Trace a require Assignment (using a global variable)", () => {
   const helpers = createTracer(true);

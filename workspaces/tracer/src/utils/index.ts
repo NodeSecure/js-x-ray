@@ -1,5 +1,6 @@
-export * from "./isEvilIdentifierPath.js";
-export * from "./getSubMemberExpressionSegments.js";
-export * from "./notNullOrUndefined.js";
-export * from "./makePrefixRemover.js";
-export * from "./stripNodePrefix.js";
+export * from "./getSubMemberExpressionSegments.ts";
+export * from "./isEvilIdentifierPath.ts";
+export * from "./makePrefixRemover.ts";
+export * from "./notNullOrUndefined.ts";
+export * from "./stripNodePrefix.ts";
+

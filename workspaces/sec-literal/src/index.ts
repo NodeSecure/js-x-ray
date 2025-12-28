@@ -1,4 +1,5 @@
-export * as Hex from "./hex.js";
-export * as Literal from "./literal.js";
-export * as Utils from "./utils.js";
-export * as Patterns from "./patterns.js";
+export * as Hex from "./hex.ts";
+export * as Literal from "./literal.ts";
+export * as Patterns from "./patterns.ts";
+export * as Utils from "./utils.ts";
+

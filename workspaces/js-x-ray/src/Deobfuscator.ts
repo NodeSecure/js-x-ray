@@ -1,17 +1,17 @@
 // Import Third-party Dependencies
 import { getVariableDeclarationIdentifiers } from "@nodesecure/estree-ast-utils";
-import { Utils, Patterns } from "@nodesecure/sec-literal";
-import { match } from "ts-pattern";
+import { Patterns, Utils } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
+import { match } from "ts-pattern";
 
 // Import Internal Dependencies
-import { NodeCounter } from "./NodeCounter.js";
-import { extractNode } from "./utils/index.js";
+import { NodeCounter } from "./NodeCounter.ts";
+import { extractNode } from "./utils/index.ts";
 
-import * as jjencode from "./obfuscators/jjencode.js";
-import * as jsfuck from "./obfuscators/jsfuck.js";
-import * as freejsobfuscator from "./obfuscators/freejsobfuscator.js";
-import * as obfuscatorio from "./obfuscators/obfuscator-io.js";
+import * as freejsobfuscator from "./obfuscators/freejsobfuscator.ts";
+import * as jjencode from "./obfuscators/jjencode.ts";
+import * as jsfuck from "./obfuscators/jsfuck.ts";
+import * as obfuscatorio from "./obfuscators/obfuscator-io.ts";
 
 // CONSTANTS
 const kIdentifierNodeExtractor = extractNode<ESTree.Identifier>("Identifier");

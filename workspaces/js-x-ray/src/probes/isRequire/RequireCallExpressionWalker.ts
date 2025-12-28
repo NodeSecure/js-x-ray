@@ -2,21 +2,21 @@
 import path from "node:path";
 
 // Import Third-party Dependencies
-import { Hex } from "@nodesecure/sec-literal";
 import {
   arrayExpressionToString,
-  getMemberExpressionIdentifier,
-  getCallExpressionArguments
+  getCallExpressionArguments,
+  getMemberExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
-import type { ESTree } from "meriyah";
+import { Hex } from "@nodesecure/sec-literal";
 import { VariableTracer } from "@nodesecure/tracer";
+import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  isLiteral,
-  isCallExpression
-} from "../../types/estree.js";
-import { walkEnter } from "../../walker/index.js";
+  isCallExpression,
+  isLiteral
+} from "../../types/estree.ts";
+import { walkEnter } from "../../walker/index.ts";
 
 export class RequireCallExpressionWalker {
   tracer: VariableTracer;

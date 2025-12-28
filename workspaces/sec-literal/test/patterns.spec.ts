@@ -1,13 +1,13 @@
 // Import Node.js Dependencies
-import { describe, test } from "node:test";
 import assert from "node:assert";
+import { describe, test } from "node:test";
 
 // Import Internal Dependencies
 import {
+  commonHexadecimalPrefix,
   commonStringPrefix,
-  commonStringSuffix,
-  commonHexadecimalPrefix
-} from "../src/patterns.js";
+  commonStringSuffix
+} from "../src/patterns.ts";
 
 describe("commonStringPrefix()", () => {
   test("must return null for two strings that have no common prefix", () => {
