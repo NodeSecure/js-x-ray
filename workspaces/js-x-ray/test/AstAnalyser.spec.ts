@@ -4,7 +4,7 @@ import assert from "node:assert";
 import { readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { describe, it, TestContext } from "node:test";
+import { describe, it, type TestContext } from "node:test";
 
 // Import Internal Dependencies
 import { AstAnalyser, JsSourceParser } from "../src/index.ts";
@@ -19,6 +19,7 @@ import {
   kWarningUnsafeImport,
   kWarningUnsafeStmt
 } from "./utils/index.ts";
+import { CollectableSet } from "../src/CollectableSet.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
@@ -418,6 +419,27 @@ describe("AstAnalyser", () => {
           });
 
           assert.strictEqual(initialize.mock.calls[0].arguments[0] instanceof SourceFile, true);
+        });
+
+        it("should collect the full url and the ip address", () => {
+          const urlSet = new CollectableSet("url");
+          const ipSet = new CollectableSet("ip");
+          const hostnameSet = new CollectableSet("hostname");
+          const collectables = [urlSet, ipSet, hostnameSet];
+          const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
+          new AstAnalyser({
+            collectables
+          }).analyse(str);
+
+          assert.deepEqual(Array.from(urlSet), [{
+            value: "http://127.0.0.1/script",
+            locations: [{ file: null, location: [[[1, 16], [1, 44]]] }]
+          }]);
+          assert.deepEqual(Array.from(hostnameSet), []);
+          assert.deepEqual(Array.from(ipSet), [{
+            value: "127.0.0.1",
+            locations: [{ file: null, location: [[[1, 16], [1, 44]]] }]
+          }]);
         });
       });
 
