@@ -53,7 +53,11 @@ function main(
   if (firstArg.type !== "CallExpression") {
     return;
   }
-  const id = getCallExpressionIdentifier(firstArg)!;
+  const id = getCallExpressionIdentifier(firstArg);
+
+  if (!id) {
+    return;
+  }
   const data = sourceFile.tracer.getDataFromIdentifier(id);
   if (kSensitiveMethods.some((method) => data?.identifierOrMemberExpr === method
     && sourceFile.tracer.importedModules.has(method.split(".")[0]))) {
