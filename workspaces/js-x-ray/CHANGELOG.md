@@ -1,5 +1,13 @@
 # @nodesecure/js-x-ray
 
+## 11.2.0
+
+### Minor Changes
+
+- [#445](https://github.com/NodeSecure/js-x-ray/pull/445) [`20a03d2`](https://github.com/NodeSecure/js-x-ray/commit/20a03d254ba94f83977037786908114fe00146e2) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): add collectable api
+
+- [#443](https://github.com/NodeSecure/js-x-ray/pull/443) [`297c072`](https://github.com/NodeSecure/js-x-ray/commit/297c072c143a53888517486dd071e7fd4397374b) Thanks [@clemgbld](https://github.com/clemgbld)! - fix(js-x-ray): parsing error in data exfiltration probe
+
 ## 11.1.0
 
 ### Minor Changes
