@@ -12,6 +12,8 @@ import {
   type Probe
 } from "../../src/ProbeRunner.ts";
 import { walk } from "../../src/walker/index.ts";
+import { CollectableSet } from "../../src/CollectableSet.ts";
+import { CollectableSetRegistry } from "../../src/CollectableSetRegistry.ts";
 
 export function getWarningKind(
   warnings: Warning[]
@@ -36,11 +38,19 @@ export function parseScript(
   }
 }
 
+type Options = {
+  location?: string;
+  collectables?: CollectableSet[];
+};
+
 export function getSastAnalysis(
-  probe: Probe
+  probe: Probe,
+  options: Options = {}
 ) {
+  const { location, collectables = [] } = options;
+
   return {
-    sourceFile: new SourceFile(),
+    sourceFile: new SourceFile(location),
     getWarning(warning: string): Warning | undefined {
       return this.warnings().find(
         (item: Warning) => item.kind === warning
@@ -53,7 +63,7 @@ export function getSastAnalysis(
       return this.sourceFile.dependencies;
     },
     execute(body: any) {
-      const probeRunner = new ProbeRunner(this.sourceFile, [probe]);
+      const probeRunner = new ProbeRunner(this.sourceFile, new CollectableSetRegistry(collectables), [probe]);
       const self = this;
 
       walk(body, {

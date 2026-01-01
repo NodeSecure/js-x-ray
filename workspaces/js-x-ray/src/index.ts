@@ -7,4 +7,5 @@ export {
 } from "./pipelines/index.ts";
 export * from "./SourceFile.ts";
 export * from "./warnings.ts";
+export * from "./CollectableSet.ts";
 

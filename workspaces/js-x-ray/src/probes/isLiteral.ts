@@ -10,6 +10,7 @@ import { ShadyURL } from "../ShadyURL.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal } from "../types/estree.ts";
 import { generateWarning } from "../warnings.ts";
+import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
@@ -29,9 +30,12 @@ function validateNode(
 
 function main(
   node: Literal<string>,
-  options: { sourceFile: SourceFile; }
+  options: {
+    sourceFile: SourceFile;
+    collectableSetRegistry: CollectableSetRegistry;
+  }
 ) {
-  const { sourceFile } = options;
+  const { sourceFile, collectableSetRegistry } = options;
   const location = node.loc ?? void 0;
 
   // We are searching for value obfuscated as hex of a minimum length of 4.
@@ -55,7 +59,11 @@ function main(
   }
   // Else we are checking all other string with our suspect method
   else {
-    if (!ShadyURL.isSafe(node.value)) {
+    if (!ShadyURL.isSafe(node.value, {
+      file: sourceFile.path.location,
+      collectableSetRegistry,
+      location
+    })) {
       sourceFile.warnings.push(
         generateWarning(
           "shady-link", { value: node.value, location }

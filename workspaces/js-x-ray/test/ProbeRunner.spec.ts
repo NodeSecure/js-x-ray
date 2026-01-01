@@ -11,11 +11,12 @@ import {
   ProbeRunner
 } from "../src/ProbeRunner.ts";
 import { SourceFile } from "../src/SourceFile.ts";
+import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
 describe("ProbeRunner", () => {
   describe("constructor", () => {
     it("should instanciate class with Defaults probes when none are provide", () => {
-      const pr = new ProbeRunner(new SourceFile());
+      const pr = new ProbeRunner(new SourceFile(), new CollectableSetRegistry([]));
 
       assert.strictEqual(pr.probes, ProbeRunner.Defaults);
     });
@@ -29,8 +30,10 @@ describe("ProbeRunner", () => {
         }
       ];
 
-      // @ts-expect-error
-      const pr = new ProbeRunner(new SourceFile(), fakeProbe);
+      const pr = new ProbeRunner(new SourceFile(),
+        new CollectableSetRegistry([]),
+        // @ts-expect-error
+        fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -43,8 +46,10 @@ describe("ProbeRunner", () => {
         }
       ];
 
-      // @ts-expect-error
-      const pr = new ProbeRunner(new SourceFile(), fakeProbe);
+      const pr = new ProbeRunner(new SourceFile(),
+        new CollectableSetRegistry([]),
+        // @ts-expect-error
+        fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
     });
 
@@ -55,8 +60,10 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        // @ts-expect-error
-        return new ProbeRunner(new SourceFile(), [fakeProbe]);
+        return new ProbeRunner(new SourceFile(),
+          new CollectableSetRegistry([]),
+          // @ts-expect-error
+          [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -69,8 +76,10 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        // @ts-expect-error
-        return new ProbeRunner(new SourceFile(), [fakeProbe]);
+        return new ProbeRunner(new SourceFile(),
+          new CollectableSetRegistry([]),
+          // @ts-expect-error
+          [fakeProbe]);
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -106,6 +115,7 @@ describe("ProbeRunner", () => {
         assert.throws(() => {
           new ProbeRunner(
             new SourceFile(),
+            new CollectableSetRegistry([]),
             [fakeProbe]
           );
         }, {
@@ -125,7 +135,7 @@ describe("ProbeRunner", () => {
       };
 
       // @ts-expect-error
-      const pr = new ProbeRunner(sourceFile, [fakeProbe]);
+      const pr = new ProbeRunner(sourceFile, new CollectableSetRegistry([]), [fakeProbe]);
 
       const astNode: ESTree.Literal = {
         type: "Literal",
@@ -156,6 +166,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
+        new CollectableSetRegistry([]),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -185,6 +196,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         new SourceFile(),
+        new CollectableSetRegistry([]),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -228,6 +240,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
+        new CollectableSetRegistry([]),
         // @ts-expect-error
         probes
       );
@@ -258,6 +271,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
+        new CollectableSetRegistry([]),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -298,6 +312,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
+        new CollectableSetRegistry([]),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -342,6 +357,7 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
+        new CollectableSetRegistry([]),
         [fakeProbe]
       );
 

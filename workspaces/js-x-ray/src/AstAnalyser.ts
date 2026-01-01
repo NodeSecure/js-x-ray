@@ -28,6 +28,8 @@ import {
   type OptionalWarningName,
   type Warning
 } from "./warnings.ts";
+import { CollectableSet } from "./CollectableSet.ts";
+import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 export interface Dependency {
   unsafe: boolean;
@@ -92,6 +94,10 @@ export interface AstAnalyserOptions {
    */
   optionalWarnings?: boolean | Iterable<OptionalWarningName>;
   pipelines?: Pipeline[];
+  /**
+   * @default []
+   */
+  collectables?: CollectableSet[];
 }
 
 export interface PrepareSourceOptions {
@@ -103,16 +109,19 @@ export class AstAnalyser {
 
   #pipelineRunner: PipelineRunner;
   probes: Probe[];
+  #collectables: CollectableSet[];
 
   constructor(options: AstAnalyserOptions = {}) {
     const {
       customProbes = [],
       optionalWarnings = false,
       skipDefaultProbes = false,
-      pipelines = []
+      pipelines = [],
+      collectables = []
     } = options;
 
     this.#pipelineRunner = new PipelineRunner(pipelines);
+    this.#collectables = collectables;
 
     let probes = ProbeRunner.Defaults;
     if (
@@ -165,7 +174,7 @@ export class AstAnalyser {
       );
     }
 
-    const probeRunner = new ProbeRunner(source, this.probes);
+    const probeRunner = new ProbeRunner(source, new CollectableSetRegistry(this.#collectables), this.probes);
     if (initialize) {
       if (typeof initialize !== "function") {
         throw new TypeError("options.initialize must be a function");

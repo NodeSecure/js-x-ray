@@ -1,5 +1,10 @@
 // Import Third-party Dependencies
 import ipaddress from "ipaddr.js";
+import type { ESTree } from "meriyah";
+
+// Import Internal Dependencies
+import { toArrayLocation } from "./utils/toArrayLocation.ts";
+import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kShadyLinkRegExps = [
@@ -40,9 +45,16 @@ const kKnownProtocols = new Set([
   "acap:", "cap:", "cid:", "mid:", "urn:", "tag:", "dns:", "geo:", "ni:", "nih:"
 ]);
 
+type Options = {
+  collectableSetRegistry: CollectableSetRegistry;
+  file?: string | null;
+  location?: ESTree.SourceLocation;
+};
+
 export class ShadyURL {
   static isSafe(
-    input: string
+    input: string,
+    options: Options
   ): boolean {
     if (!URL.canParse(input)) {
       return true;
@@ -54,11 +66,22 @@ export class ShadyURL {
       return true;
     }
 
+    const { collectableSetRegistry, file, location } = options;
+
+    const sourceArrayLocation = toArrayLocation(location);
+
+    collectableSetRegistry.add("url", { value: parsedUrl.href, file, location: sourceArrayLocation });
+
     const hostname = parsedUrl.hostname;
+
     if (ipaddress.isValid(hostname)) {
+      collectableSetRegistry.add("ip", { value: hostname, file, location: sourceArrayLocation });
       if (this.#isPrivateIPAddress(hostname)) {
         return true;
       }
+    }
+    else {
+      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
     }
 
     const scheme = parsedUrl.protocol.replace(":", "");

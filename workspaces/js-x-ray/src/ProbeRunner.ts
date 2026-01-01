@@ -23,6 +23,7 @@ import isWeakCrypto from "./probes/isWeakCrypto.ts";
 
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
+import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
@@ -31,6 +32,7 @@ export type ProbeReturn = void | null | symbol;
 export type ProbeContextDef = Record<string, any>;
 export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
   sourceFile: SourceFile;
+  collectableSetRegistry: CollectableSetRegistry;
   context?: T;
 };
 export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef> = ProbeContext<T> & {
@@ -60,6 +62,7 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
 export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
+  #collectableSetRegistry: CollectableSetRegistry;
 
   static Signals = Object.freeze({
     Break: Symbol.for("breakWalk"),
@@ -94,9 +97,11 @@ export class ProbeRunner {
 
   constructor(
     sourceFile: SourceFile,
+    collectableSetRegistry: CollectableSetRegistry,
     probes: Probe[] = ProbeRunner.Defaults
   ) {
     this.sourceFile = sourceFile;
+    this.#collectableSetRegistry = collectableSetRegistry;
 
     for (const probe of probes) {
       assert(
@@ -137,6 +142,7 @@ export class ProbeRunner {
   ): ProbeContext {
     return {
       sourceFile: this.sourceFile,
+      collectableSetRegistry: this.#collectableSetRegistry,
       context: probe.context
     };
   }
