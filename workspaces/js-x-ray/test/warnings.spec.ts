@@ -45,3 +45,17 @@ test("Given a weak-crypto kind it should generate a warning with value, simple l
     experimental: false
   });
 });
+
+test("Given a known warning kind with a custom severity option, it should override the default severity", () => {
+  const warningA = generateWarning("parsing-error", {
+    value: "test"
+  });
+
+  const warningB = generateWarning("parsing-error", {
+    value: "test",
+    severity: "Critical"
+  });
+
+  assert.strictEqual(warningA.severity, "Information");
+  assert.notStrictEqual(warningA.severity, warningB.severity);
+});
