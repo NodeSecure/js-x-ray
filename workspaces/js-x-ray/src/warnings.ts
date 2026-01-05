@@ -123,6 +123,10 @@ export interface GenerateWarningOptions {
   file?: string | null;
   value: string | null;
   source?: string;
+  /**
+   * Override the default severity level for this warning
+   */
+  severity?: "Information" | "Warning" | "Critical";
 }
 
 export function generateWarning<T extends WarningName>(
@@ -132,7 +136,8 @@ export function generateWarning<T extends WarningName>(
   const {
     file = null,
     value,
-    source = "JS-X-Ray"
+    source = "JS-X-Ray",
+    severity = warnings[kind].severity
   } = options;
   const location = options.location ?? rootLocation();
 
@@ -151,6 +156,7 @@ export function generateWarning<T extends WarningName>(
     location: toArrayLocation(location),
     source,
     ...warnings[kind],
+    severity,
     ...(notNullOrUndefined(file) ? { file } : {}),
     ...(notNullOrUndefined(value) ? { value } : { value: null })
   };
