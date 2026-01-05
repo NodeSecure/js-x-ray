@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 11.3.0
+
+### Minor Changes
+
+- [#450](https://github.com/NodeSecure/js-x-ray/pull/450) [`3185318`](https://github.com/NodeSecure/js-x-ray/commit/3185318c55f77e992a107966f3e491716192f2fc) Thanks [@fraxken](https://github.com/fraxken)! - Allow to customize warnings severity
+
 ## 11.2.0
 
 ### Minor Changes
