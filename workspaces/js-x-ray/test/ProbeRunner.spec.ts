@@ -7,7 +7,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  ProbeContext,
+  type ProbeContext,
   ProbeRunner
 } from "../src/ProbeRunner.ts";
 import { SourceFile } from "../src/SourceFile.ts";
@@ -93,8 +93,12 @@ describe("ProbeRunner", () => {
       };
 
       function instantiateProbeRunner() {
-        // @ts-expect-error
-        return new ProbeRunner(new SourceFile(), [fakeProbe]);
+        return new ProbeRunner(
+          new SourceFile(),
+          new CollectableSetRegistry([]),
+          // @ts-expect-error
+          [fakeProbe]
+        );
       }
 
       assert.throws(instantiateProbeRunner, Error, "Invalid probe");
@@ -103,6 +107,7 @@ describe("ProbeRunner", () => {
     it("should throw if one the provided probe is sealed or frozen", () => {
       const methods = ["seal", "freeze"];
       for (const method of methods) {
+        // @ts-expect-error
         const fakeProbe = Object[method]({
           name: "frozen-probe",
           initialize() {
@@ -134,8 +139,9 @@ describe("ProbeRunner", () => {
         teardown: mock.fn()
       };
 
+      const registry = new CollectableSetRegistry([]);
       // @ts-expect-error
-      const pr = new ProbeRunner(sourceFile, new CollectableSetRegistry([]), [fakeProbe]);
+      const pr = new ProbeRunner(sourceFile, registry, [fakeProbe]);
 
       const astNode: ESTree.Literal = {
         type: "Literal",
@@ -146,12 +152,12 @@ describe("ProbeRunner", () => {
 
       assert.strictEqual(fakeProbe.main.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { sourceFile, data: null, context: undefined, signals: ProbeRunner.Signals }
+        astNode, { collectableSetRegistry: registry, sourceFile, data: null, context: undefined, signals: ProbeRunner.Signals }
       ]);
 
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
       assert.deepEqual(fakeProbe.teardown.mock.calls.at(0)?.arguments, [
-        { sourceFile, context: undefined }
+        { collectableSetRegistry: registry, sourceFile, context: undefined }
       ]);
     });
 
@@ -164,9 +170,10 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
+      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        new CollectableSetRegistry([]),
+        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -178,7 +185,11 @@ describe("ProbeRunner", () => {
       pr.walk(astNode);
       pr.finalize();
 
-      const expectedContext = { sourceFile, context: undefined };
+      const expectedContext = {
+        collectableSetRegistry: registry,
+        sourceFile,
+        context: undefined
+      };
       assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
         astNode, expectedContext
       ]);
@@ -238,9 +249,10 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
+      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        new CollectableSetRegistry([]),
+        registry,
         // @ts-expect-error
         probes
       );
@@ -250,7 +262,7 @@ describe("ProbeRunner", () => {
       probes.forEach((probe) => {
         assert.strictEqual(probe.finalize.mock.calls.length, 1);
         assert.deepEqual(probe.finalize.mock.calls.at(0)?.arguments, [
-          { sourceFile, context: undefined }
+          { collectableSetRegistry: registry, sourceFile, context: undefined }
         ]);
       });
     });
@@ -269,9 +281,10 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
+      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        new CollectableSetRegistry([]),
+        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -283,7 +296,11 @@ describe("ProbeRunner", () => {
       pr.walk(astNode);
       pr.finalize();
 
-      const expectedContext = { sourceFile, context: fakeCtx };
+      const expectedContext = {
+        collectableSetRegistry: registry,
+        sourceFile,
+        context: fakeCtx
+      };
       assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
         astNode, expectedContext
       ]);
@@ -291,7 +308,7 @@ describe("ProbeRunner", () => {
         astNode, { ...expectedContext, data: null, signals: ProbeRunner.Signals }
       ]);
       assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
-        { sourceFile, context: undefined }
+        { collectableSetRegistry: registry, sourceFile, context: undefined }
       ]);
       assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
         expectedContext
@@ -310,9 +327,10 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
+      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        new CollectableSetRegistry([]),
+        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -324,7 +342,11 @@ describe("ProbeRunner", () => {
       pr.walk(astNode);
       pr.finalize();
 
-      const expectedContext = { sourceFile, context: fakeCtx };
+      const expectedContext = {
+        collectableSetRegistry: registry,
+        sourceFile,
+        context: fakeCtx
+      };
       assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
         astNode, expectedContext
       ]);
