@@ -120,20 +120,26 @@ test("should detect shady link when an URL has a suspicious domain", () => {
   assert.strictEqual(warning?.value, "http://foobar.link");
 });
 
-test("should not mark suspicious links the IPv4 address range 127.0.0.0/8 (localhost 127.0.0.1)", () => {
+test("should mark suspicious links the IPv4 address range 127.0.0.0/8 (localhost 127.0.0.1)", () => {
   const str = "const IPv4URL = ['http://127.0.0.1/script', 'http://127.7.7.7/script']";
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
 
-  assert.ok(!sastAnalysis.warnings().length);
+  assert.strictEqual(sastAnalysis.warnings().length, 2);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning?.kind, "shady-link");
+  assert.strictEqual(warning?.severity, "Information");
 });
 
-test("should not be considered suspicious a link with a raw IPv4 address 127.0.0.1 and a port", () => {
+test("should be considered suspicious a link with a raw IPv4 address 127.0.0.1 and a port", () => {
   const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(isLiteral).execute(ast.body);
 
-  assert.ok(!sastAnalysis.warnings().length);
+  assert.strictEqual(sastAnalysis.warnings().length, 1);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning?.kind, "shady-link");
+  assert.strictEqual(warning?.severity, "Information");
 });
 
 test("should detect the link as suspicious when a URL contains a raw IPv4 address", () => {
