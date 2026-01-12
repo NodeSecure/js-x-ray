@@ -3,7 +3,7 @@ import ipaddress from "ipaddr.js";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { toArrayLocation } from "./utils/toArrayLocation.ts";
+import { toArrayLocation, type SourceArrayLocation } from "./utils/toArrayLocation.ts";
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 // CONSTANTS
@@ -51,16 +51,16 @@ type Options = {
   location?: ESTree.SourceLocation;
 };
 
-export type ShadyURLResult = {
+export type ShadyLinkResult = {
   safe: boolean;
   isLocalAddress?: boolean;
 };
 
-export class ShadyURL {
-  static isSafe(
+export class ShadyLink {
+  static isURLSafe(
     input: string,
     options: Options
-  ): ShadyURLResult {
+  ): ShadyLinkResult {
     if (!URL.canParse(input)) {
       return { safe: true };
     }
@@ -90,10 +90,14 @@ export class ShadyURL {
       ? hostname.slice(1, -1)
       : hostname;
 
-    if (ipaddress.isValid(cleanHostname)) {
-      collectableSetRegistry.add("ip", { value: cleanHostname, file, location: sourceArrayLocation });
-      if (this.#isPrivateIPAddress(cleanHostname)) {
-        return { safe: false, isLocalAddress: true };
+    if (this.isValidIPAddress(cleanHostname)) {
+      const result = this.isIpAddressSafe(cleanHostname, {
+        collectableSetRegistry,
+        file,
+        location: sourceArrayLocation
+      });
+      if (!result.safe) {
+        return result;
       }
     }
     else {
@@ -108,6 +112,28 @@ export class ShadyURL {
     const isShadyLink = kShadyLinkRegExps.some((regex) => regex.test(input));
 
     return { safe: !isShadyLink };
+  }
+
+  static isValidIPAddress(input: string) {
+    return ipaddress.isValid(input);
+  }
+
+  static isIpAddressSafe(
+    input: string,
+    options: Omit<Options, "location"> & {
+      location?: SourceArrayLocation | ESTree.SourceLocation;
+    }
+  ): ShadyLinkResult {
+    const { collectableSetRegistry, file, location } = options;
+    collectableSetRegistry.add("ip", {
+      value: input, file,
+      location: Array.isArray(location) ? location : toArrayLocation(location)
+    });
+    if (this.#isPrivateIPAddress(input)) {
+      return { safe: false, isLocalAddress: true };
+    }
+
+    return { safe: true };
   }
 
   static #isPrivateIPAddress(
