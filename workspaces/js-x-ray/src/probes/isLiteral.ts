@@ -6,7 +6,7 @@ import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { ShadyURL } from "../ShadyURL.ts";
+import { ShadyLink } from "../ShadyLink.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal } from "../types/estree.ts";
 import { generateWarning } from "../warnings.ts";
@@ -38,6 +38,12 @@ function main(
   const { sourceFile, collectableSetRegistry } = options;
   const location = node.loc ?? void 0;
 
+  const shadyLinkOptions = {
+    file: sourceFile.path.location,
+    collectableSetRegistry,
+    location
+  };
+
   // We are searching for value obfuscated as hex of a minimum length of 4.
   if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
     const value = Buffer.from(node.value, "hex").toString();
@@ -57,13 +63,23 @@ function main(
       sourceFile.addEncodedLiteral(node.value, location);
     }
   }
+  else if (ShadyLink.isValidIPAddress(node.value)) {
+    const result = ShadyLink.isIpAddressSafe(node.value, shadyLinkOptions);
+    if (!result.safe) {
+      sourceFile.warnings.push(
+        generateWarning("shady-link", {
+          value: node.value,
+          location,
+          severity: "Information"
+        })
+      );
+
+      return;
+    }
+  }
   // Else we are checking all other string with our suspect method
   else {
-    const result = ShadyURL.isSafe(node.value, {
-      file: sourceFile.path.location,
-      collectableSetRegistry,
-      location
-    });
+    const result = ShadyLink.isURLSafe(node.value, shadyLinkOptions);
 
     if (!result.safe) {
       sourceFile.warnings.push(

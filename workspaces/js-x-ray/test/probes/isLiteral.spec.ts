@@ -182,6 +182,37 @@ test("should detect suspicious links when a URL contains a raw IPv6 address with
   assert.strictEqual(warning?.value, "http://[2001:0db8:85a3:0000:0000:8a2e:0370:7334]:100/script");
 });
 
+test("should collect public ip address", () => {
+  const str = "const IPV6 = '8.8.8.8';";
+  const ipSet = new CollectableSet("ip");
+  const collectables = [ipSet];
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.getWarning("shady-link"), undefined);
+  assert.deepEqual(Array.from(ipSet), [{
+    value: "8.8.8.8",
+    locations: [{ file: "file.js", location: [[[1, 13], [1, 22]]] }]
+  }]);
+});
+
+test("should collect and detect private address with an Information severity", () => {
+  const str = "const IPV6 = '127.0.0.1';";
+  const ipSet = new CollectableSet("ip");
+  const collectables = [ipSet];
+  const ast = parseScript(str);
+  const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+  const warning = sastAnalysis.getWarning("shady-link");
+  assert.strictEqual(warning?.value, "127.0.0.1");
+  assert.strictEqual(warning?.severity, "Information");
+  assert.deepEqual(warning?.location, [[1, 13], [1, 24]]);
+
+  assert.deepEqual(Array.from(ipSet), [{
+    value: "127.0.0.1",
+    locations: [{ file: "file.js", location: [[[1, 13], [1, 24]]] }]
+  }]);
+});
+
 test("should collect the full url and the ip address", () => {
   const urlSet = new CollectableSet("url");
   const ipSet = new CollectableSet("ip");
