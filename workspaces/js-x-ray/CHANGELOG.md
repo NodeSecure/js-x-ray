@@ -1,5 +1,15 @@
 # @nodesecure/js-x-ray
 
+## 11.3.0
+
+### Minor Changes
+
+- [#453](https://github.com/NodeSecure/js-x-ray/pull/453) [`0b0751a`](https://github.com/NodeSecure/js-x-ray/commit/0b0751acc749f240aca0b7699718c1c990432e43) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): scan and collect ip address that are not urls
+
+- [#452](https://github.com/NodeSecure/js-x-ray/pull/452) [`a01b8e7`](https://github.com/NodeSecure/js-x-ray/commit/a01b8e7f60c47674011adc13342c5768ec25ad2f) Thanks [@7amed3li](https://github.com/7amed3li)! - Added detection for local IP addresses and `localhost` in URLs. These are now flagged with the existing `shady-link` warning but with `Information` severity level instead of `Warning`.
+
+- [#450](https://github.com/NodeSecure/js-x-ray/pull/450) [`3185318`](https://github.com/NodeSecure/js-x-ray/commit/3185318c55f77e992a107966f3e491716192f2fc) Thanks [@fraxken](https://github.com/fraxken)! - Allow to customize warnings severity
+
 ## 11.2.0
 
 ### Minor Changes
