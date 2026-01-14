@@ -8,6 +8,7 @@ import {
   isTemplateLiteral
 } from "../types/estree.ts";
 import { generateWarning } from "../warnings.ts";
+import { toLiteral } from "../utils/toLiteral.ts";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
@@ -34,7 +35,7 @@ function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string
       command = commandArg.value as string;
       break;
     case "TemplateLiteral":
-      command = commandArg.quasis.at(0)?.value.raw as string;
+      command = toLiteral(commandArg);
       break;
   }
 

