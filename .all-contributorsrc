@@ -208,6 +208,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "7amed3li",
+      "name": "Hamed Mohamed",
+      "avatar_url": "https://avatars.githubusercontent.com/u/190534558?v=4",
+      "profile": "https://github.com/7amed3li",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
