@@ -183,7 +183,7 @@ You can pass an array of probes to the `AstAnalyser` constructor.
 | **customParser** | `SourceParser \| undefined` | An optional custom parser to be used for parsing the source code. | `JsSourceParser` |
 | **customProbes** | `Probe[] \| undefined` | An array of custom probes to be used during AST analysis. | `[]` |
 | **skipDefaultProbes** | `boolean \| undefined` | If **true**, default probes will be skipped and only custom probes will be used. | `false` |
-| **sensitivity** | `"conservative" \| "aggressive"` | Configures the detection strictness. "aggressive" surfaces more warnings for local audits. | `"conservative"` |
+| **sensitivity** | `Sensitivity` | Configures the detection strictness. "aggressive" surfaces more warnings for local audits. | `"conservative"` |
 
 Here using the example probe upper:
 
