@@ -42,8 +42,6 @@ interface AstAnalyserOptions {
 }
 ```
 
-> **Note:** `sensitivity` uses the `Sensitivity` type (`"conservative" | "aggressive"`).
-
 By default the AstAnalyser class is capable of parsing JavaScript source code using Meriyah.
 
 ## API
