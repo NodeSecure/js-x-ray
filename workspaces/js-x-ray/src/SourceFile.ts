@@ -7,7 +7,10 @@ import { VariableTracer } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { Dependency } from "./AstAnalyser.ts";
+import type {
+  Dependency,
+  Sensitivity
+} from "./AstAnalyser.ts";
 import { Deobfuscator } from "./Deobfuscator.ts";
 import { rootLocation, toArrayLocation } from "./utils/index.ts";
 import {
@@ -33,6 +36,7 @@ export class SourceFile {
   warnings: Warning[] = [];
   flags = new Set<SourceFlags>();
   path = new SourceFilePath();
+  sensitivity?: Sensitivity;
 
   constructor(sourceLocation?: string) {
     this.path.use(sourceLocation);

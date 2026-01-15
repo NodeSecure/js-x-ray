@@ -41,6 +41,7 @@ export function parseScript(
 type Options = {
   location?: string;
   collectables?: CollectableSet[];
+  sensitivity?: "conservative" | "aggressive";
 };
 
 export function getSastAnalysis(
@@ -63,6 +64,10 @@ export function getSastAnalysis(
       return this.sourceFile.dependencies;
     },
     execute(body: any) {
+      if (options.sensitivity) {
+        this.sourceFile.sensitivity = options.sensitivity;
+      }
+
       const probeRunner = new ProbeRunner(this.sourceFile, new CollectableSetRegistry(collectables), [probe]);
       const self = this;
 

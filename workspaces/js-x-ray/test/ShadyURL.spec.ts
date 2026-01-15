@@ -26,351 +26,351 @@ beforeEach(() => {
 describe("ShadyURL.isSafe()", () => {
   describe("when input is not a valid URL", () => {
     it("should return true for an invalid URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("not-a-url", {
+      assert.equal(ShadyURL.isSafe("not-a-url", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for an empty string", () => {
-      assert.deepEqual(ShadyURL.isSafe("",
+      assert.equal(ShadyURL.isSafe("",
         {
           collectableSetRegistry
         }
-      ), { safe: true });
+      ), true);
     });
 
     it("should return true for a valid URL but with unknown protocol", () => {
-      assert.deepEqual(ShadyURL.isSafe("unknown://example.com",
+      assert.equal(ShadyURL.isSafe("unknown://example.com",
         {
           collectableSetRegistry
         }
-      ), { safe: true });
+      ), true);
     });
 
     it("should return true for a malformed URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("http://",
+      assert.equal(ShadyURL.isSafe("http://",
         {
           collectableSetRegistry
         }
-      ), { safe: true });
+      ), true);
     });
   });
 
   describe("when URL contains an IP address", () => {
     describe("private IP addresses", () => {
-      it("should return false for localhost IPv4", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://127.0.0.1/path",
+      it("should return true for localhost IPv4", () => {
+        assert.equal(ShadyURL.isSafe("https://127.0.0.1/path",
           {
             collectableSetRegistry
           }
-        ), { safe: false, isLocalAddress: true });
+        ), true);
       });
 
-      it("should return false for private IPv4 (10.x.x.x)", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://10.0.0.1/path", {
+      it("should return true for private IPv4 (10.x.x.x)", () => {
+        assert.equal(ShadyURL.isSafe("https://10.0.0.1/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
 
-      it("should return false for private IPv4 (192.168.x.x)", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://192.168.1.1/path", {
+      it("should return true for private IPv4 (192.168.x.x)", () => {
+        assert.equal(ShadyURL.isSafe("https://192.168.1.1/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
 
-      it("should return false for private IPv4 (172.16.x.x)", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://172.16.0.1/path", {
+      it("should return true for private IPv4 (172.16.x.x)", () => {
+        assert.equal(ShadyURL.isSafe("https://172.16.0.1/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
 
-      it("should return false for IPv6 loopback address", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://[::1]/path", {
+      it("should return true for IPv6 loopback address", () => {
+        assert.equal(ShadyURL.isSafe("https://[::1]/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
 
-      it("should return false for IPv4-mapped IPv6 private address", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://[::ffff:127.0.0.1]/path", {
+      it("should return true for IPv4-mapped IPv6 private address", () => {
+        assert.equal(ShadyURL.isSafe("https://[::ffff:127.0.0.1]/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
 
-      it("should return false for IPv4-mapped IPv6 private address (192.168.x.x)", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://[::ffff:192.168.1.1]/path", {
+      it("should return true for IPv4-mapped IPv6 private address (192.168.x.x)", () => {
+        assert.equal(ShadyURL.isSafe("https://[::ffff:192.168.1.1]/path", {
           collectableSetRegistry
-        }), { safe: false, isLocalAddress: true });
+        }), true);
       });
     });
 
     describe("public IP addresses", () => {
       it("should return false for public IPv4 with HTTP", () => {
-        assert.deepEqual(ShadyURL.isSafe("http://8.8.8.8/path", {
+        assert.equal(ShadyURL.isSafe("http://8.8.8.8/path", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return true for public IPv4 with HTTPS", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://8.8.8.8/path", {
+        assert.equal(ShadyURL.isSafe("https://8.8.8.8/path", {
           collectableSetRegistry
-        }), { safe: true });
+        }), true);
       });
 
       it("should return false for public IPv6 with HTTP", () => {
-        assert.deepEqual(ShadyURL.isSafe("http://[2001:4860:4860::8888]/path", {
+        assert.equal(ShadyURL.isSafe("http://[2001:4860:4860::8888]/path", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return true for public IPv6 with HTTPS", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://[2001:4860:4860::8888]/path", {
+        assert.equal(ShadyURL.isSafe("https://[2001:4860:4860::8888]/path", {
           collectableSetRegistry
-        }), { safe: true });
+        }), true);
       });
     });
   });
 
   describe("when URL scheme is not HTTPS", () => {
     it("should return false for HTTP URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("http://example.com", {
+      assert.equal(ShadyURL.isSafe("http://example.com", {
         collectableSetRegistry
-      }), { safe: false });
+      }), false);
     });
 
     it("should return false for FTP URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("ftp://example.com", {
+      assert.equal(ShadyURL.isSafe("ftp://example.com", {
         collectableSetRegistry
-      }), { safe: false });
+      }), false);
     });
   });
 
   describe("when URL matches shady link patterns", () => {
     describe("known shady domains", () => {
       it("should return false for bit.ly", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://bit.ly/abc123", {
+        assert.equal(ShadyURL.isSafe("https://bit.ly/abc123", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for ipinfo.io", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://ipinfo.io/json", {
+        assert.equal(ShadyURL.isSafe("https://ipinfo.io/json", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for httpbin.org", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://httpbin.org/get", {
+        assert.equal(ShadyURL.isSafe("https://httpbin.org/get", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for api.ipify.org", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://api.ipify.org", {
+        assert.equal(ShadyURL.isSafe("https://api.ipify.org", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
     });
 
     describe("suspicious TLDs", () => {
       it("should return false for .link TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.link", {
+        assert.equal(ShadyURL.isSafe("https://malicious.link", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .xyz TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.xyz", {
+        assert.equal(ShadyURL.isSafe("https://malicious.xyz", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .tk TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.tk", {
+        assert.equal(ShadyURL.isSafe("https://malicious.tk", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .ml TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.ml", {
+        assert.equal(ShadyURL.isSafe("https://malicious.ml", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .ga TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.ga", {
+        assert.equal(ShadyURL.isSafe("https://malicious.ga", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .cf TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.cf", {
+        assert.equal(ShadyURL.isSafe("https://malicious.cf", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .gq TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.gq", {
+        assert.equal(ShadyURL.isSafe("https://malicious.gq", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .pw TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.pw", {
+        assert.equal(ShadyURL.isSafe("https://malicious.pw", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .top TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.top", {
+        assert.equal(ShadyURL.isSafe("https://malicious.top", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .club TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.club", {
+        assert.equal(ShadyURL.isSafe("https://malicious.club", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .mw TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.mw", {
+        assert.equal(ShadyURL.isSafe("https://malicious.mw", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .bd TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.bd", {
+        assert.equal(ShadyURL.isSafe("https://malicious.bd", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .ke TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.ke", {
+        assert.equal(ShadyURL.isSafe("https://malicious.ke", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .am TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.am", {
+        assert.equal(ShadyURL.isSafe("https://malicious.am", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .sbs TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.sbs", {
+        assert.equal(ShadyURL.isSafe("https://malicious.sbs", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .date TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.date", {
+        assert.equal(ShadyURL.isSafe("https://malicious.date", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .quest TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.quest", {
+        assert.equal(ShadyURL.isSafe("https://malicious.quest", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .cd TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.cd", {
+        assert.equal(ShadyURL.isSafe("https://malicious.cd", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .bid TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.bid", {
+        assert.equal(ShadyURL.isSafe("https://malicious.bid", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .ws TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.ws", {
+        assert.equal(ShadyURL.isSafe("https://malicious.ws", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .icu TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.icu", {
+        assert.equal(ShadyURL.isSafe("https://malicious.icu", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .cam TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.cam", {
+        assert.equal(ShadyURL.isSafe("https://malicious.cam", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .uno TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.uno", {
+        assert.equal(ShadyURL.isSafe("https://malicious.uno", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .email TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.email", {
+        assert.equal(ShadyURL.isSafe("https://malicious.email", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
 
       it("should return false for .stream TLD", () => {
-        assert.deepEqual(ShadyURL.isSafe("https://malicious.stream", {
+        assert.equal(ShadyURL.isSafe("https://malicious.stream", {
           collectableSetRegistry
-        }), { safe: false });
+        }), false);
       });
     });
   });
 
   describe("when URL is safe", () => {
     it("should return true for a standard HTTPS URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://example.com", {
+      assert.equal(ShadyURL.isSafe("https://example.com", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for a HTTPS URL with path", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://example.com/path/to/resource", {
+      assert.equal(ShadyURL.isSafe("https://example.com/path/to/resource", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for a HTTPS URL with query params", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://example.com?foo=bar", {
+      assert.equal(ShadyURL.isSafe("https://example.com?foo=bar", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for npm registry URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://registry.npmjs.org/package", {
+      assert.equal(ShadyURL.isSafe("https://registry.npmjs.org/package", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for GitHub URL", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://github.com/NodeSecure/js-x-ray", {
+      assert.equal(ShadyURL.isSafe("https://github.com/NodeSecure/js-x-ray", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for .com TLD", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://safe-website.com", {
+      assert.equal(ShadyURL.isSafe("https://safe-website.com", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for .org TLD", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://safe-website.org", {
+      assert.equal(ShadyURL.isSafe("https://safe-website.org", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
 
     it("should return true for .io TLD (not in shady list)", () => {
-      assert.deepEqual(ShadyURL.isSafe("https://safe-website.io", {
+      assert.equal(ShadyURL.isSafe("https://safe-website.io", {
         collectableSetRegistry
-      }), { safe: true });
+      }), true);
     });
   });
 

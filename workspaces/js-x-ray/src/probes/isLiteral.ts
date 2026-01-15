@@ -59,19 +59,15 @@ function main(
   }
   // Else we are checking all other string with our suspect method
   else {
-    const result = ShadyURL.isSafe(node.value, {
+    if (!ShadyURL.isSafe(node.value, {
       file: sourceFile.path.location,
       collectableSetRegistry,
       location
-    });
-
-    if (!result.safe) {
+    })) {
       sourceFile.warnings.push(
-        generateWarning("shady-link", {
-          value: node.value,
-          location,
-          severity: result.isLocalAddress ? "Information" : "Warning"
-        })
+        generateWarning(
+          "shady-link", { value: node.value, location }
+        )
       );
 
       return;

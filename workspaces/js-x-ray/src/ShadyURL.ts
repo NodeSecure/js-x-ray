@@ -51,49 +51,33 @@ type Options = {
   location?: ESTree.SourceLocation;
 };
 
-export type ShadyURLResult = {
-  safe: boolean;
-  isLocalAddress?: boolean;
-};
-
 export class ShadyURL {
   static isSafe(
     input: string,
     options: Options
-  ): ShadyURLResult {
+  ): boolean {
     if (!URL.canParse(input)) {
-      return { safe: true };
+      return true;
     }
 
     const parsedUrl = new URL(input);
     // Unknown protocol, not a real URL
     if (!kKnownProtocols.has(parsedUrl.protocol)) {
-      return { safe: true };
+      return true;
     }
 
     const { collectableSetRegistry, file, location } = options;
+
     const sourceArrayLocation = toArrayLocation(location);
 
     collectableSetRegistry.add("url", { value: parsedUrl.href, file, location: sourceArrayLocation });
 
     const hostname = parsedUrl.hostname;
 
-    // Early check for localhost
-    if (hostname === "localhost") {
-      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
-
-      return { safe: false, isLocalAddress: true };
-    }
-
-    // Remove brackets from IPv6 addresses (e.g., "[::1]" -> "::1")
-    const cleanHostname = hostname.startsWith("[") && hostname.endsWith("]")
-      ? hostname.slice(1, -1)
-      : hostname;
-
-    if (ipaddress.isValid(cleanHostname)) {
-      collectableSetRegistry.add("ip", { value: cleanHostname, file, location: sourceArrayLocation });
-      if (this.#isPrivateIPAddress(cleanHostname)) {
-        return { safe: false, isLocalAddress: true };
+    if (ipaddress.isValid(hostname)) {
+      collectableSetRegistry.add("ip", { value: hostname, file, location: sourceArrayLocation });
+      if (this.#isPrivateIPAddress(hostname)) {
+        return true;
       }
     }
     else {
@@ -102,12 +86,10 @@ export class ShadyURL {
 
     const scheme = parsedUrl.protocol.replace(":", "");
     if (scheme !== "https") {
-      return { safe: false };
+      return false;
     }
 
-    const isShadyLink = kShadyLinkRegExps.some((regex) => regex.test(input));
-
-    return { safe: !isShadyLink };
+    return kShadyLinkRegExps.every((regex) => !regex.test(input));
   }
 
   static #isPrivateIPAddress(
