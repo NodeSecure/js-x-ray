@@ -80,6 +80,8 @@ export type ReportOnFile = {
   warnings: Warning[];
 };
 
+export type Sensitivity = "conservative" | "aggressive";
+
 export interface AstAnalyserOptions {
   /**
    * @default []
@@ -98,6 +100,17 @@ export interface AstAnalyserOptions {
    * @default []
    */
   collectables?: CollectableSet[];
+  /**
+   * Configures the sensitivity level for warning detection.
+   * 
+   * - `conservative` (default): Strict detection to minimize false positives.
+   *   Suitable for scanning ecosystem libraries.
+   * - `aggressive`: Relaxed constraints to surface more warnings.
+   *   Provides maximum visibility for local project security auditing.
+   * 
+   * @default "conservative"
+   */
+  sensitivity?: Sensitivity;
 }
 
 export interface PrepareSourceOptions {
@@ -110,6 +123,7 @@ export class AstAnalyser {
   #pipelineRunner: PipelineRunner;
   probes: Probe[];
   #collectables: CollectableSet[];
+  #sensitivity: Sensitivity;
 
   constructor(options: AstAnalyserOptions = {}) {
     const {
@@ -117,11 +131,13 @@ export class AstAnalyser {
       optionalWarnings = false,
       skipDefaultProbes = false,
       pipelines = [],
-      collectables = []
+      collectables = [],
+      sensitivity = "conservative"
     } = options;
 
     this.#pipelineRunner = new PipelineRunner(pipelines);
     this.#collectables = collectables;
+    this.#sensitivity = sensitivity;
 
     let probes = ProbeRunner.Defaults;
     if (
@@ -168,6 +184,7 @@ export class AstAnalyser {
     );
 
     const source = new SourceFile(location);
+    source.sensitivity = this.#sensitivity;
     if (trojan.verify(str)) {
       source.warnings.push(
         generateWarning("obfuscated-code", { value: "trojan-source" })

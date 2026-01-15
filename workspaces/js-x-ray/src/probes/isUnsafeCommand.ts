@@ -42,6 +42,23 @@ function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string
   return command;
 }
 
+function concatArrayArgs(
+  command: string,
+  node: ESTree.CallExpression
+): string {
+  const arrExpr = node.arguments.at(1);
+
+  if (arrExpr && arrExpr.type === "ArrayExpression") {
+    arrExpr.elements
+      .filter((element) => isLiteral(element))
+      .forEach((element) => {
+        command += ` ${element.value}`;
+      });
+  }
+
+  return command;
+}
+
 /**
  * @description Detect spawn or exec unsafe commands
  * @example
@@ -115,20 +132,30 @@ function main(
   }
 
   let command = getCommand(commandArg);
+  
+  // Aggressive mode: warn on any child_process usage
+  if (sourceFile.sensitivity === "aggressive") {
+    // Handle spawn/spawnSync array arguments
+    if (methodName === "spawn" || methodName === "spawnSync") {
+      command = concatArrayArgs(command, node);
+    }
+
+    const warning = generateWarning("unsafe-command", {
+      value: command,
+      location: node.loc
+    });
+    sourceFile.warnings.push(warning);
+
+    return signals.Skip;
+  }
+
+  // Conservative mode: existing strict validation
   if (isUnsafeCommand(command)) {
     // Spawned command arguments are filled into an Array
     // as second arguments. This is why we should add them
     // manually to the command string.
     if (methodName === "spawn" || methodName === "spawnSync") {
-      const arrExpr = node.arguments.at(1);
-
-      if (arrExpr && arrExpr.type === "ArrayExpression") {
-        arrExpr.elements
-          .filter((element) => isLiteral(element))
-          .forEach((element) => {
-            command += ` ${element.value}`;
-          });
-      }
+      command = concatArrayArgs(command, node);
     }
 
     const warning = generateWarning("unsafe-command", {
