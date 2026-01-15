@@ -38,7 +38,7 @@ interface AstAnalyserOptions {
   /**
    * @default "conservative"
    */
-  sensitivity?: "conservative" | "aggressive";
+  sensitivity?: Sensitivity;
 }
 ```
 
