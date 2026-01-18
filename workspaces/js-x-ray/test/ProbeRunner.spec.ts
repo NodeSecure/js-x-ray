@@ -265,6 +265,39 @@ describe("ProbeRunner", () => {
       assert.strictEqual(result, "skip");
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
     });
+    it("should trigger setEntryPoint and be cleared after execution", () => {
+      const fakeProbe = {
+        validateNode: mock.fn((node: ESTree.Node, { setEntryPoint }) => {
+          if (node.type === "Literal") {
+            setEntryPoint("custom");
+          }
+
+          return [true];
+        }),
+        main: {
+          default: mock.fn(),
+          custom: mock.fn()
+        }
+      };
+
+      const sourceFile = new SourceFile();
+      const registry = new CollectableSetRegistry([]);
+      // @ts-expect-error
+      const pr = new ProbeRunner(sourceFile, registry, [fakeProbe]);
+
+      const literalNode: ESTree.Literal = { type: "Literal", value: "test" };
+      const nonLiteralNode: ESTree.Identifier = { type: "Identifier", name: "foo" };
+
+      // 1. First node should trigger setEntryPoint("custom")
+      pr.walk(literalNode);
+      assert.strictEqual((fakeProbe.main.custom as any).mock.calls.length, 1);
+      assert.strictEqual((fakeProbe.main.default as any).mock.calls.length, 0);
+
+      // 2. Second node should fallback to default (entry point cleared)
+      pr.walk(nonLiteralNode);
+      assert.strictEqual((fakeProbe.main.custom as any).mock.calls.length, 1);
+      assert.strictEqual((fakeProbe.main.default as any).mock.calls.length, 1);
+    });
   });
 
   describe("finalize", () => {
