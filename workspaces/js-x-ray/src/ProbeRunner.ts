@@ -158,7 +158,6 @@ export class ProbeRunner {
     probe: Probe
   ): ProbeContext {
     const setEntryPoint = (handlerName: string) => {
-      // Only set entry point if probe has named handlers
       if (typeof probe.main === "object") {
         this.#selectedEntryPoints.set(probe, handlerName);
       }
