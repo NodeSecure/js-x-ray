@@ -215,3 +215,41 @@ Result:
 ```
 
 Congrats, you have created your first custom probe! 🎉
+
+### Advanced Probes: Named Handlers
+
+For more complex use cases, a probe can define multiple execution paths using **Named Handlers**. Instead of a single `main` function, you can provide an object containing a `default` handler and any number of named handlers.
+
+You can then control which handler is executed for a given node by calling `setEntryPoint` within your `validateNode` function.
+
+```ts
+export const advancedProbe = {
+  name: "advancedProbeExample",
+  validateNode: (node, { setEntryPoint }) => {
+    // If we detect a specific pattern, we can switch to a specific handler
+    if (isSpecificPattern(node)) {
+      setEntryPoint("specialCase");
+    }
+    
+    // Always return true to trigger execution
+    return [true];
+  },
+  main: {
+    // The default handler is called if no specific entry point is set
+    default: (node, ctx) => {
+      console.log("Normal execution");
+      return null;
+    },
+    // This handler is only called if setEntryPoint("specialCase") was called
+    specialCase: (node, ctx) => {
+      console.log("Special case execution");
+      // The entry point is automatically reset to 'default' after this execution
+      return null;
+    }
+  }
+};
+```
+
+> [!IMPORTANT]
+> The `setEntryPoint` setting is **ephemeral**. It applies only to the current node being processed and is automatically cleared (reset to default) immediately after the handler is executed. This prevents state leakage between different nodes.
+
