@@ -192,7 +192,6 @@ export class ProbeRunner {
         let mainHandler: (node: any, ctx: ProbeMainContext) => ProbeReturn;
 
         if (typeof probe.main === "function") {
-          // Legacy single function
           mainHandler = probe.main;
         } else {
           // Named handlers: use selected or fallback to default
