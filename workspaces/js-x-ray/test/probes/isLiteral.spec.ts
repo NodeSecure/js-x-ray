@@ -231,3 +231,46 @@ test("should collect the full url and the ip address", () => {
     locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]] }]
   }]);
 });
+
+test("should not collect a hostname when there is none", () => {
+  const str = "const protocol = 'blob://'";
+
+  const hostnameSet = new CollectableSet("hostname");
+
+  const collectables = [hostnameSet];
+  const ast = parseScript(str);
+  getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+  assert.deepEqual(Array.from(hostnameSet), []);
+});
+
+test("should not detect file:// link ", () => {
+  const str = `worker = realRequire(decodeURIComponent(filename.replace(process.platform === 'win32' ?
+      'file:///server' : 'file://server/share/file.txt', '')));`;
+
+  const urlSet = new CollectableSet("url");
+  const ipSet = new CollectableSet("ip");
+  const hostnameSet = new CollectableSet("hostname");
+  const collectables = [urlSet, ipSet, hostnameSet];
+
+  const ast = parseScript(str);
+  const sastAnalysis =
+    getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+
+  assert.strictEqual(sastAnalysis.warnings().length, 0);
+  assert.deepEqual(Array.from(urlSet), [{
+    value: "file:///server",
+    locations: [{ file: "file.js", location: [[[2, 6], [2, 22]]] }]
+  }, {
+    value: "file://server/share/file.txt",
+    locations: [{ file: "file.js", location: [[[2, 25], [2, 55]]] }]
+  }]);
+  assert.deepEqual(Array.from(hostnameSet), [{
+    value: "server",
+    locations: [
+      {
+        file: "file.js", location: [[[2, 25], [2, 55]]]
+      }
+    ]
+  }]);
+  assert.deepEqual(Array.from(ipSet), []);
+});

@@ -75,3 +75,23 @@ test("should detect an unsafe import using data:text/javascript and throw a unsa
     assert.strictEqual(unsafeImport!.value, expectedValue);
   });
 });
+
+test("should detect an unsafe import using file: and throw a unsafe-import warning", () => {
+  const expectedValue = "file:///etc/passwd";
+
+  const importNodes = [
+    `import '${expectedValue}';`,
+    `import('${expectedValue}');`
+  ];
+
+  importNodes.forEach((str) => {
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isImportDeclaration)
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.warnings().length, 1);
+
+    const unsafeImport = sastAnalysis.getWarning("unsafe-import");
+    assert.strictEqual(unsafeImport!.value, expectedValue);
+  });
+});

@@ -85,6 +85,14 @@ export class ShadyLink {
       return { safe: false, isLocalAddress: true };
     }
 
+    if (parsedUrl.protocol === "file:") {
+      if (hostname) {
+        collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
+      }
+
+      return { safe: true };
+    }
+
     // Remove brackets from IPv6 addresses (e.g., "[::1]" -> "::1")
     const cleanHostname = hostname.startsWith("[") && hostname.endsWith("]")
       ? hostname.slice(1, -1)
@@ -100,7 +108,7 @@ export class ShadyLink {
         return result;
       }
     }
-    else {
+    else if (hostname) {
       collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
     }
 

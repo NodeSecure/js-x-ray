@@ -37,9 +37,14 @@ function main(
 ) {
   const { sourceFile } = options;
 
-  // Searching for dangerous import "data:text/javascript;..." statement.
-  // see: https://2ality.com/2019/10/eval-via-import.html
-  if (node.source.value.startsWith("data:text/javascript")) {
+  if ([
+    // Searching for dangerous import "data:text/javascript;..." statement.
+    // see: https://2ality.com/2019/10/eval-via-import.html
+    "data:text/javascript",
+    // Searching for dangerous import "file:..." statement
+    // see: https://en.wikipedia.org/wiki/File_inclusion_vulnerability
+    "file:"
+  ].some((suspiciousPath) => node.source.value.startsWith(suspiciousPath))) {
     sourceFile.warnings.push(
       generateWarning(
         "unsafe-import", { value: node.source.value, location: node.loc }
