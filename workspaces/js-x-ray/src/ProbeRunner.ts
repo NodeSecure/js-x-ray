@@ -31,7 +31,6 @@ const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 export type ProbeReturn = void | null | symbol;
 export type ProbeContextDef = Record<string, any>;
 
-// Named main handlers type for probes with multiple entry points
 export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef> = {
   default: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
   [handlerName: string]: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
