@@ -56,7 +56,6 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
   finalize?: (ctx: ProbeContext<T>) => void;
   validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
-  // Support both single function and named handlers
   main: ((node: any, ctx: ProbeMainContext<T>) => ProbeReturn) | NamedMainHandlers<T>;
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
