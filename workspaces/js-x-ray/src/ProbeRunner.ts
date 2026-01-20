@@ -67,8 +67,6 @@ export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
   #collectableSetRegistry: CollectableSetRegistry;
-  // Store selected entry point per probe
-  // CRITICAL: Cleared after each invocation to avoid bleed between nodes
   #selectedEntryPoints: Map<Probe, string> = new Map();
 
   static Signals = Object.freeze({
@@ -115,12 +113,10 @@ export class ProbeRunner {
         typeof probe.validateNode === "function" || Array.isArray(probe.validateNode),
         `Invalid probe ${probe.name}: validateNode must be a function or an array of functions`
       );
-      // Validate main: either function or object with named handlers
       assert(
         typeof probe.main === "function" || typeof probe.main === "object",
         `Invalid probe ${probe.name}: main must be a function or an object with named handlers`
       );
-      // If named handlers, ensure 'default' handler exists
       if (typeof probe.main === "object") {
         assert(
           "default" in probe.main && typeof probe.main.default === "function",
@@ -185,13 +181,11 @@ export class ProbeRunner {
       );
 
       if (isMatching) {
-        // Resolve which main handler to invoke
         let mainHandler: (node: any, ctx: ProbeMainContext) => ProbeReturn;
 
         if (typeof probe.main === "function") {
           mainHandler = probe.main;
         } else {
-          // Named handlers: use selected or fallback to default
           const selectedName = this.#selectedEntryPoints.get(probe);
           const handlerName = (selectedName && selectedName in probe.main)
             ? selectedName
@@ -199,11 +193,8 @@ export class ProbeRunner {
           mainHandler = probe.main[handlerName];
         }
 
-        // CRITICAL: Clear entry point immediately after resolution
-        // This prevents bleed between different nodes in the same file
         this.#selectedEntryPoints.delete(probe);
 
-        // Invoke handler with same context/data as legacy main
         return mainHandler(node, {
           ...ctx,
           signals: ProbeRunner.Signals,
