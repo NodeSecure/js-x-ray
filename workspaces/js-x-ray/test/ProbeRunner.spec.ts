@@ -265,6 +265,7 @@ describe("ProbeRunner", () => {
       assert.strictEqual(result, "skip");
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
     });
+    
     it("should trigger setEntryPoint and be cleared after execution", () => {
       const fakeProbe = {
         validateNode: mock.fn((node: ESTree.Node, { setEntryPoint }) => {
