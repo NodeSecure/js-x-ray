@@ -155,7 +155,6 @@ export class ProbeRunner {
       if (typeof probe.main === "object") {
         this.#selectedEntryPoints.set(probe, handlerName);
       }
-      // If probe.main is a function, this call has no effect
     };
 
     return {
