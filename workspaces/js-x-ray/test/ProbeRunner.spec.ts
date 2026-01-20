@@ -13,6 +13,31 @@ import {
 import { SourceFile } from "../src/SourceFile.ts";
 import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
+function assertProbeCtx(ctx: unknown, expected: {
+  sourceFile: SourceFile;
+  collectableSetRegistry: CollectableSetRegistry;
+  context?: any;
+}) {
+  const c = ctx as any;
+  assert.strictEqual(c.sourceFile, expected.sourceFile);
+  assert.strictEqual(c.collectableSetRegistry, expected.collectableSetRegistry);
+  assert.deepStrictEqual(c.context, expected.context);
+  assert.strictEqual(typeof c.setEntryPoint, "function");
+}
+
+function assertProbeMainContext(ctx: unknown, expected: {
+  sourceFile: SourceFile;
+  collectableSetRegistry: CollectableSetRegistry;
+  context?: any;
+  data?: any;
+  signals: any;
+}) {
+  const c = ctx as any;
+  assertProbeCtx(c, expected);
+  assert.deepStrictEqual(c.data, expected.data);
+  assert.strictEqual(c.signals, expected.signals);
+}
+
 describe("ProbeRunner", () => {
   describe("constructor", () => {
     it("should instanciate class with Defaults probes when none are provide", () => {
@@ -150,15 +175,26 @@ describe("ProbeRunner", () => {
       const result = pr.walk(astNode);
       assert.strictEqual(result, null);
 
-      assert.strictEqual(fakeProbe.main.mock.calls.length, 1);
-      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { collectableSetRegistry: registry, sourceFile, data: null, context: undefined, signals: ProbeRunner.Signals }
-      ]);
+      const mainCallArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
+      assert.ok(mainCallArgs, "mainCallArgs should be defined");
+      assert.strictEqual(mainCallArgs[0], astNode);
+      
+      assertProbeMainContext(mainCallArgs[1], {
+        sourceFile,
+        collectableSetRegistry: registry,
+        context: undefined,
+        data: null,
+        signals: ProbeRunner.Signals
+      });
 
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
-      assert.deepEqual(fakeProbe.teardown.mock.calls.at(0)?.arguments, [
-        { collectableSetRegistry: registry, sourceFile, context: undefined }
-      ]);
+      const teardownCallArgs = fakeProbe.teardown.mock.calls.at(0)?.arguments;
+      assert.ok(teardownCallArgs);
+      assertProbeCtx(teardownCallArgs[0], {
+        sourceFile,
+        collectableSetRegistry: registry,
+        context: undefined
+      });
     });
 
     it("should forward validateNode data to main", () => {
@@ -190,12 +226,20 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: undefined
       };
-      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
-        astNode, expectedContext
-      ]);
-      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data, signals: ProbeRunner.Signals }
-      ]);
+      
+      const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
+      assert.ok(validateNodeArgs);
+      assert.strictEqual(validateNodeArgs[0], astNode);
+      assertProbeCtx((validateNodeArgs as any)[1], expectedContext);
+
+      const mainArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
+      assert.ok(mainArgs);
+      assert.strictEqual((mainArgs as any)[0], astNode);
+      assertProbeMainContext((mainArgs as any)[1], {
+        ...expectedContext,
+        data,
+        signals: ProbeRunner.Signals
+      });
     });
 
     it("should trigger and return a skip signal", () => {
@@ -220,6 +264,40 @@ describe("ProbeRunner", () => {
 
       assert.strictEqual(result, "skip");
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
+    });
+    
+    it("should trigger setEntryPoint and be cleared after execution", () => {
+      const fakeProbe = {
+        validateNode: mock.fn((node: ESTree.Node, { setEntryPoint }) => {
+          if (node.type === "Literal") {
+            setEntryPoint("custom");
+          }
+
+          return [true];
+        }),
+        main: {
+          default: mock.fn(),
+          custom: mock.fn()
+        }
+      };
+
+      const sourceFile = new SourceFile();
+      const registry = new CollectableSetRegistry([]);
+      // @ts-expect-error
+      const pr = new ProbeRunner(sourceFile, registry, [fakeProbe]);
+
+      const literalNode: ESTree.Literal = { type: "Literal", value: "test" };
+      const nonLiteralNode: ESTree.Identifier = { type: "Identifier", name: "foo" };
+
+      // 1. First node should trigger setEntryPoint("custom")
+      pr.walk(literalNode);
+      assert.strictEqual((fakeProbe.main.custom as any).mock.calls.length, 1);
+      assert.strictEqual((fakeProbe.main.default as any).mock.calls.length, 0);
+
+      // 2. Second node should fallback to default (entry point cleared)
+      pr.walk(nonLiteralNode);
+      assert.strictEqual((fakeProbe.main.custom as any).mock.calls.length, 1);
+      assert.strictEqual((fakeProbe.main.default as any).mock.calls.length, 1);
     });
   });
 
@@ -261,9 +339,13 @@ describe("ProbeRunner", () => {
 
       probes.forEach((probe) => {
         assert.strictEqual(probe.finalize.mock.calls.length, 1);
-        assert.deepEqual(probe.finalize.mock.calls.at(0)?.arguments, [
-          { collectableSetRegistry: registry, sourceFile, context: undefined }
-        ]);
+        const finalizeArgs = probe.finalize.mock.calls.at(0)?.arguments;
+        assert.ok(finalizeArgs);
+        assertProbeCtx(finalizeArgs[0], {
+          collectableSetRegistry: registry,
+          sourceFile,
+          context: undefined
+        });
       });
     });
   });
@@ -301,18 +383,31 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: fakeCtx
       };
-      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
-        astNode, expectedContext
-      ]);
-      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data: null, signals: ProbeRunner.Signals }
-      ]);
-      assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
-        { collectableSetRegistry: registry, sourceFile, context: undefined }
-      ]);
-      assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
-        expectedContext
-      ]);
+      
+      const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
+      assert.ok(validateNodeArgs, "validateNodeArgs should be defined");
+      assert.strictEqual(validateNodeArgs[0], astNode);
+      assertProbeCtx((validateNodeArgs as any)[1], expectedContext);
+      
+      const mainArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
+      assert.ok(mainArgs, "mainArgs should be defined");
+      assert.strictEqual((mainArgs as any)[0], astNode);
+      assertProbeMainContext((mainArgs as any)[1], {
+        ...expectedContext,
+        data: null,
+        signals: ProbeRunner.Signals
+      });
+      
+      const initializeArgs = fakeProbe.initialize.mock.calls.at(0)?.arguments;
+      assert.ok(initializeArgs);
+      assertProbeCtx((initializeArgs as any)[0], {
+        ...expectedContext,
+        context: undefined
+      });
+      
+      const finalizeArgs = fakeProbe.finalize.mock.calls.at(0)?.arguments;
+      assert.ok(finalizeArgs, "finalizeArgs should be defined");
+      assertProbeCtx(finalizeArgs[0], expectedContext);
     });
 
     it("should define context within the probe and dispatch it to all methods", () => {
@@ -347,18 +442,28 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: fakeCtx
       };
-      assert.deepEqual(fakeProbe.validateNode.mock.calls.at(0)?.arguments, [
-        astNode, expectedContext
-      ]);
-      assert.deepEqual(fakeProbe.main.mock.calls.at(0)?.arguments, [
-        astNode, { ...expectedContext, data: null, signals: ProbeRunner.Signals }
-      ]);
-      assert.deepEqual(fakeProbe.finalize.mock.calls.at(0)?.arguments, [
-        expectedContext
-      ]);
-      assert.deepEqual(fakeProbe.initialize.mock.calls.at(0)?.arguments, [
-        expectedContext
-      ]);
+      
+      const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
+      assert.ok(validateNodeArgs);
+      assert.strictEqual(validateNodeArgs[0], astNode);
+      assertProbeCtx((validateNodeArgs as any)[1], expectedContext);
+
+      const mainArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
+      assert.ok(mainArgs);
+      assert.strictEqual((mainArgs as any)[0], astNode);
+      assertProbeMainContext((mainArgs as any)[1], {
+        ...expectedContext,
+        data: null,
+        signals: ProbeRunner.Signals
+      });
+
+      const finalizeArgs = fakeProbe.finalize.mock.calls.at(0)?.arguments;
+      assert.ok(finalizeArgs);
+      assertProbeCtx(finalizeArgs[0], expectedContext);
+
+      const initializeArgs = fakeProbe.initialize.mock.calls.at(0)?.arguments;
+      assert.ok(initializeArgs);
+      assertProbeCtx(initializeArgs[0], expectedContext);
     });
 
     it("should deep clone initialization context and clear context when the probe is fully executed", () => {

@@ -30,10 +30,17 @@ const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 
 export type ProbeReturn = void | null | symbol;
 export type ProbeContextDef = Record<string, any>;
+
+export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef> = {
+  default: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
+  [handlerName: string]: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
+};
+
 export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
   sourceFile: SourceFile;
   collectableSetRegistry: CollectableSetRegistry;
   context?: T;
+  setEntryPoint: (handlerName: string) => void;
 };
 export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef> = ProbeContext<T> & {
   data?: any;
@@ -49,10 +56,7 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
   finalize?: (ctx: ProbeContext<T>) => void;
   validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
-  main: (
-    node: any,
-    ctx: ProbeMainContext<T>
-  ) => ProbeReturn;
+  main: ((node: any, ctx: ProbeMainContext<T>) => ProbeReturn) | NamedMainHandlers<T>;
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
   breakGroup?: string;
@@ -63,6 +67,7 @@ export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
   #collectableSetRegistry: CollectableSetRegistry;
+  #selectedEntryPoints: Map<Probe, string> = new Map();
 
   static Signals = Object.freeze({
     Break: Symbol.for("breakWalk"),
@@ -109,9 +114,15 @@ export class ProbeRunner {
         `Invalid probe ${probe.name}: validateNode must be a function or an array of functions`
       );
       assert(
-        typeof probe.main === "function",
-        `Invalid probe ${probe.name}: main must be a function`
+        typeof probe.main === "function" || typeof probe.main === "object",
+        `Invalid probe ${probe.name}: main must be a function or an object with named handlers`
       );
+      if (typeof probe.main === "object") {
+        assert(
+          "default" in probe.main && typeof probe.main.default === "function",
+          `Invalid probe ${probe.name}: named main handlers must provide a 'default' handler`
+        );
+      }
       assert(
         typeof probe.initialize === "function" || probe.initialize === undefined,
         `Invalid probe ${probe.name}: initialize must be a function or undefined`
@@ -140,10 +151,17 @@ export class ProbeRunner {
   #getProbeContext(
     probe: Probe
   ): ProbeContext {
+    const setEntryPoint = (handlerName: string) => {
+      if (typeof probe.main === "object") {
+        this.#selectedEntryPoints.set(probe, handlerName);
+      }
+    };
+
     return {
       sourceFile: this.sourceFile,
       collectableSetRegistry: this.#collectableSetRegistry,
-      context: probe.context
+      context: probe.context,
+      setEntryPoint
     };
   }
 
@@ -162,7 +180,21 @@ export class ProbeRunner {
       );
 
       if (isMatching) {
-        return probe.main(node, {
+        let mainHandler: (node: any, ctx: ProbeMainContext) => ProbeReturn;
+
+        if (typeof probe.main === "function") {
+          mainHandler = probe.main;
+        } else {
+          const selectedName = this.#selectedEntryPoints.get(probe);
+          const handlerName = (selectedName && selectedName in probe.main)
+            ? selectedName
+            : "default";
+          mainHandler = probe.main[handlerName];
+        }
+
+        this.#selectedEntryPoints.delete(probe);
+
+        return mainHandler(node, {
           ...ctx,
           signals: ProbeRunner.Signals,
           data
