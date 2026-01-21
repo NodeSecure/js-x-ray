@@ -9,11 +9,13 @@ import type { ESTree } from "meriyah";
 import { ShadyLink } from "../ShadyLink.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal } from "../types/estree.ts";
+import { toArrayLocation } from "../utils/toArrayLocation.ts";
 import { generateWarning } from "../warnings.ts";
 import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
+const kEmailRegex = /^[^\.\s@:](?:[^\s@:]*[^\s@:.])?@[^\.\s@]+(?:\.[^.\s@]+)*$/;
 /**
  * @description Search for Literal AST Node
  * @see https://github.com/estree/estree/blob/master/es5.md#literal
@@ -63,6 +65,17 @@ function main(
     else if (value === "require" || !Hex.isSafe(node.value)) {
       sourceFile.addEncodedLiteral(node.value, location);
     }
+  }
+  else if (kEmailRegex.test(node.value)) {
+    if (location) {
+      collectableSetRegistry.add("email", {
+        value: node.value,
+        file: sourceFile.path.location,
+        location: toArrayLocation(location)
+      });
+    }
+
+    return;
   }
   else if (ShadyLink.isValidIPAddress(node.value)) {
     const result = ShadyLink.isIpAddressSafe(node.value, shadyLinkOptions);
