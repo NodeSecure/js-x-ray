@@ -10,12 +10,13 @@ export class CollectableSetRegistry {
     });
   }
 
-  add(type: string, { value, file, location }: {
+  add(type: string, { value, file, location, metadata }: {
     value: string;
     file?: string | null;
     location: SourceArrayLocation;
+    metadata?: Record<string, unknown>;
   }) {
     const collectableSet = this.#collectableSets.get(type);
-    collectableSet?.add(value, { file, location });
+    collectableSet?.add(value, { file, location, metadata });
   }
 }

@@ -41,7 +41,8 @@ function main(
   const shadyLinkOptions = {
     file: sourceFile.path.location,
     collectableSetRegistry,
-    location
+    location,
+    metadata: sourceFile.metadata
   };
 
   // We are searching for value obfuscated as hex of a minimum length of 4.

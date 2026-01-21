@@ -429,16 +429,16 @@ describe("AstAnalyser", () => {
           const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
           new AstAnalyser({
             collectables
-          }).analyse(str);
+          }).analyse(str, { metadata: { spec: "react@19.0.1" } });
 
           assert.deepEqual(Array.from(urlSet), [{
             value: "http://127.0.0.1/script",
-            locations: [{ file: null, location: [[[1, 16], [1, 44]]] }]
+            locations: [{ file: null, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
           }]);
           assert.deepEqual(Array.from(hostnameSet), []);
           assert.deepEqual(Array.from(ipSet), [{
             value: "127.0.0.1",
-            locations: [{ file: null, location: [[[1, 16], [1, 44]]] }]
+            locations: [{ file: null, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
           }]);
         });
       });

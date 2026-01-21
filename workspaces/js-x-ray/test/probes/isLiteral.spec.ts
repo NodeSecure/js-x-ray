@@ -187,12 +187,16 @@ test("should collect public ip address", () => {
   const ipSet = new CollectableSet("ip");
   const collectables = [ipSet];
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isLiteral, {
+    location: "file.js",
+    collectables,
+    metadata: { spec: "react@19.0.1" }
+  }).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.getWarning("shady-link"), undefined);
   assert.deepEqual(Array.from(ipSet), [{
     value: "8.8.8.8",
-    locations: [{ file: "file.js", location: [[[1, 13], [1, 22]]] }]
+    locations: [{ file: "file.js", location: [[[1, 13], [1, 22]]], metadata: { spec: "react@19.0.1" } }]
   }]);
 });
 
@@ -201,7 +205,8 @@ test("should collect and detect private address with an Information severity", (
   const ipSet = new CollectableSet("ip");
   const collectables = [ipSet];
   const ast = parseScript(str);
-  const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+  const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } })
+    .execute(ast.body);
   const warning = sastAnalysis.getWarning("shady-link");
   assert.strictEqual(warning?.value, "127.0.0.1");
   assert.strictEqual(warning?.severity, "Information");
@@ -209,7 +214,7 @@ test("should collect and detect private address with an Information severity", (
 
   assert.deepEqual(Array.from(ipSet), [{
     value: "127.0.0.1",
-    locations: [{ file: "file.js", location: [[[1, 13], [1, 24]]] }]
+    locations: [{ file: "file.js", location: [[[1, 13], [1, 24]]], metadata: { spec: "react@19.0.1" } }]
   }]);
 });
 
@@ -220,15 +225,15 @@ test("should collect the full url and the ip address", () => {
   const collectables = [urlSet, ipSet, hostnameSet];
   const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
   const ast = parseScript(str);
-  getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+  getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } }).execute(ast.body);
   assert.deepEqual(Array.from(urlSet), [{
     value: "http://127.0.0.1/script",
-    locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]] }]
+    locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
   }]);
   assert.deepEqual(Array.from(hostnameSet), []);
   assert.deepEqual(Array.from(ipSet), [{
     value: "127.0.0.1",
-    locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]] }]
+    locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
   }]);
 });
 
@@ -254,21 +259,21 @@ test("should not detect file:// link ", () => {
 
   const ast = parseScript(str);
   const sastAnalysis =
-    getSastAnalysis(isLiteral, { location: "file.js", collectables }).execute(ast.body);
+    getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } }).execute(ast.body);
 
   assert.strictEqual(sastAnalysis.warnings().length, 0);
   assert.deepEqual(Array.from(urlSet), [{
     value: "file:///server",
-    locations: [{ file: "file.js", location: [[[2, 6], [2, 22]]] }]
+    locations: [{ file: "file.js", location: [[[2, 6], [2, 22]]], metadata: { spec: "react@19.0.1" } }]
   }, {
     value: "file://server/share/file.txt",
-    locations: [{ file: "file.js", location: [[[2, 25], [2, 55]]] }]
+    locations: [{ file: "file.js", location: [[[2, 25], [2, 55]]], metadata: { spec: "react@19.0.1" } }]
   }]);
   assert.deepEqual(Array.from(hostnameSet), [{
     value: "server",
     locations: [
       {
-        file: "file.js", location: [[[2, 25], [2, 55]]]
+        file: "file.js", location: [[[2, 25], [2, 55]]], metadata: { spec: "react@19.0.1" }
       }
     ]
   }]);

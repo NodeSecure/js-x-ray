@@ -42,16 +42,17 @@ type Options = {
   location?: string;
   collectables?: CollectableSet[];
   sensitivity?: "conservative" | "aggressive";
+  metadata?: Record<string, unknown>;
 };
 
 export function getSastAnalysis(
   probe: Probe,
   options: Options = {}
 ) {
-  const { location, collectables = [] } = options;
+  const { location, collectables = [], metadata } = options;
 
   return {
-    sourceFile: new SourceFile(location),
+    sourceFile: new SourceFile(location, metadata),
     getWarning(warning: string): Warning | undefined {
       return this.warnings().find(
         (item: Warning) => item.kind === warning
