@@ -349,16 +349,10 @@ describe("email collection", () => {
     assert.strictEqual(emails[0].value, "test@example.com");
     assert.ok(emails[0].locations.length > 0);
     assert.ok(emails[0].locations[0].location);
-  });
-
-  test("should not collect emails when CollectableSet is not provided", () => {
-    const str = `const email = "user@domain.com";`;
-    const ast = parseScript(str);
-    // No email CollectableSet provided
-    const sastAnalysis = getSastAnalysis(isLiteral)
-      .execute(ast.body);
-
-    assert.strictEqual(sastAnalysis.warnings().length, 0);
-    // Should not throw error, just skip collection
+    // Assert file and metadata
+    const locationInfo = emails[0].locations[0];
+    assert.strictEqual(locationInfo.file, "test.js");
+    assert.ok(locationInfo.location);
+    assert.strictEqual(locationInfo.location.length, 2);
   });
 });

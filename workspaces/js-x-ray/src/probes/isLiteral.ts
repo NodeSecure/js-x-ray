@@ -66,7 +66,7 @@ function main(
       sourceFile.addEncodedLiteral(node.value, location);
     }
   }
-  else if (kEmailRegex.test(node.value)) {
+  else if (collectableSetRegistry.has("email") && kEmailRegex.test(node.value)) {
     collectableSetRegistry.add("email", {
       value: node.value,
       file: sourceFile.path.location,

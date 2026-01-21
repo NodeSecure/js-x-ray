@@ -19,4 +19,8 @@ export class CollectableSetRegistry {
     const collectableSet = this.#collectableSets.get(type);
     collectableSet?.add(value, { file, location, metadata });
   }
+
+  has(type: string): boolean {
+    return this.#collectableSets.has(type);
+  }
 }
