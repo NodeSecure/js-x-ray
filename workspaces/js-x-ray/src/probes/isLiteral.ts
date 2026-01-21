@@ -67,13 +67,12 @@ function main(
     }
   }
   else if (kEmailRegex.test(node.value)) {
-    if (location) {
-      collectableSetRegistry.add("email", {
-        value: node.value,
-        file: sourceFile.path.location,
-        location: toArrayLocation(location)
-      });
-    }
+    collectableSetRegistry.add("email", {
+      value: node.value,
+      file: sourceFile.path.location,
+      location: toArrayLocation(location),
+      metadata: sourceFile.metadata
+    });
 
     return;
   }
