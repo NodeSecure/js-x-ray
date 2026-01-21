@@ -279,3 +279,79 @@ test("should not detect file:// link ", () => {
   }]);
   assert.deepEqual(Array.from(ipSet), []);
 });
+
+describe("email collection", () => {
+  test("should collect valid email addresses", () => {
+    const str = `
+      const email1 = "user@example.com";
+      const email2 = "name.surname@domain.co.uk";
+      const email3 = "test123@test-domain.org";
+    `;
+    const ast = parseScript(str);
+    const emailSet = new CollectableSet("email");
+    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.warnings().length, 0);
+
+    const emails = Array.from(emailSet);
+    assert.strictEqual(emails.length, 3);
+    assert.ok(emails.some(e => e.value === "user@example.com"));
+    assert.ok(emails.some(e => e.value === "name.surname@domain.co.uk"));
+    assert.ok(emails.some(e => e.value === "test123@test-domain.org"));
+  });
+
+  test("should not collect invalid email formats", () => {
+    const str = `
+      const invalid1 = "@example.com";
+      const invalid2 = "user@";
+      const invalid3 = "user@@example.com";
+      const invalid4 = ".user@example.com";
+      const invalid5 = "user.@example.com";
+    `;
+    const ast = parseScript(str);
+    const emailSet = new CollectableSet("email");
+    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
+      .execute(ast.body);
+
+    const emails = Array.from(emailSet);
+    assert.strictEqual(emails.length, 0);
+  });
+
+  test("should collect emails from various code contexts", () => {
+    const str = `
+      const emails = ["admin@site.com", "support@help.io"];
+      const config = {
+        contact: "info@company.net"
+      };
+    `;
+    const ast = parseScript(str);
+    const emailSet = new CollectableSet("email");
+    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
+      .execute(ast.body);
+
+    const emails = Array.from(emailSet);
+    assert.strictEqual(emails.length, 3);
+    assert.ok(emails.some(e => e.value === "admin@site.com"));
+    assert.ok(emails.some(e => e.value === "support@help.io"));
+    assert.ok(emails.some(e => e.value === "info@company.net"));
+  });
+
+  test("should track email locations correctly", () => {
+    const str = `const email = "test@example.com";`;
+    const ast = parseScript(str);
+    const emailSet = new CollectableSet("email");
+    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet], location: "test.js" })
+      .execute(ast.body);
+
+    const emails = Array.from(emailSet);
+    assert.strictEqual(emails.length, 1);
+    assert.strictEqual(emails[0].value, "test@example.com");
+    assert.ok(emails[0].locations.length > 0);
+    assert.ok(emails[0].locations[0].location);
+    const locationInfo = emails[0].locations[0];
+    assert.strictEqual(locationInfo.file, "test.js");
+    assert.strictEqual(locationInfo.metadata, undefined);
+    assert.deepStrictEqual(locationInfo.location, [[[1, 14], [1, 32]]]);
+  });
+});
