@@ -49,6 +49,7 @@ type Options = {
   collectableSetRegistry: CollectableSetRegistry;
   file?: string | null;
   location?: ESTree.SourceLocation;
+  metadata?: Record<string, unknown>;
 };
 
 export type ShadyLinkResult = {
@@ -71,23 +72,23 @@ export class ShadyLink {
       return { safe: true };
     }
 
-    const { collectableSetRegistry, file, location } = options;
+    const { collectableSetRegistry, file, location, metadata } = options;
     const sourceArrayLocation = toArrayLocation(location);
 
-    collectableSetRegistry.add("url", { value: parsedUrl.href, file, location: sourceArrayLocation });
+    collectableSetRegistry.add("url", { value: parsedUrl.href, file, location: sourceArrayLocation, metadata });
 
     const hostname = parsedUrl.hostname;
 
     // Early check for localhost
     if (hostname === "localhost") {
-      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
+      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
 
       return { safe: false, isLocalAddress: true };
     }
 
     if (parsedUrl.protocol === "file:") {
       if (hostname) {
-        collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
+        collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
       }
 
       return { safe: true };
@@ -102,14 +103,15 @@ export class ShadyLink {
       const result = this.isIpAddressSafe(cleanHostname, {
         collectableSetRegistry,
         file,
-        location: sourceArrayLocation
+        location: sourceArrayLocation,
+        metadata
       });
       if (!result.safe) {
         return result;
       }
     }
     else if (hostname) {
-      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation });
+      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
     }
 
     const scheme = parsedUrl.protocol.replace(":", "");
@@ -132,10 +134,11 @@ export class ShadyLink {
       location?: SourceArrayLocation | ESTree.SourceLocation;
     }
   ): ShadyLinkResult {
-    const { collectableSetRegistry, file, location } = options;
+    const { collectableSetRegistry, file, location, metadata } = options;
     collectableSetRegistry.add("ip", {
       value: input, file,
-      location: Array.isArray(location) ? location : toArrayLocation(location)
+      location: Array.isArray(location) ? location : toArrayLocation(location),
+      metadata
     });
     if (this.#isPrivateIPAddress(input)) {
       return { safe: false, isLocalAddress: true };

@@ -386,16 +386,17 @@ describe("ShadyLink.isURLSafe()", () => {
 
     it("should collect the url and the hostname", () => {
       ShadyLink.isURLSafe("https://example.com", {
-        collectableSetRegistry
+        collectableSetRegistry,
+        metadata: { spec: "react@19.0.1" }
       });
       assert.deepEqual(Array.from(urlSet), [{
         value: "https://example.com/",
-        locations: [{ file: null, location: [[[0, 0], [0, 0]]] }]
+        locations: [{ file: null, location: [[[0, 0], [0, 0]]], metadata: { spec: "react@19.0.1" } }]
       }]);
       assert.deepEqual(Array.from(hostnameSet), [
         {
           value: "example.com",
-          locations: [{ file: null, location: [[[0, 0], [0, 0]]] }]
+          locations: [{ file: null, location: [[[0, 0], [0, 0]]], metadata: { spec: "react@19.0.1" } }]
         }
       ]);
       assert.deepEqual(Array.from(ipSet), []);
@@ -405,16 +406,17 @@ describe("ShadyLink.isURLSafe()", () => {
       ShadyLink.isURLSafe("https://127.0.0.1/path", {
         collectableSetRegistry,
         file: "file.js",
-        location: { start: { line: 1, column: 0 }, end: { line: 1, column: 0 } }
+        location: { start: { line: 1, column: 0 }, end: { line: 1, column: 0 } },
+        metadata: { spec: "react@19.0.1" }
       });
       assert.deepEqual(Array.from(urlSet), [{
         value: "https://127.0.0.1/path",
-        locations: [{ file: "file.js", location: [[[1, 0], [1, 0]]] }]
+        locations: [{ file: "file.js", location: [[[1, 0], [1, 0]]], metadata: { spec: "react@19.0.1" } }]
       }]);
       assert.deepEqual(Array.from(hostnameSet), []);
       assert.deepEqual(Array.from(ipSet), [{
         value: "127.0.0.1",
-        locations: [{ file: "file.js", location: [[[1, 0], [1, 0]]] }]
+        locations: [{ file: "file.js", location: [[[1, 0], [1, 0]]], metadata: { spec: "react@19.0.1" } }]
       }]);
     });
   });

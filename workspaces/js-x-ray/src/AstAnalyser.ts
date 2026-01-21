@@ -56,6 +56,7 @@ export interface RuntimeOptions {
    * @default JsSourceParser
    */
   customParser?: SourceParser;
+  metadata?: Record<string, unknown>;
 }
 
 export interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
@@ -102,12 +103,12 @@ export interface AstAnalyserOptions {
   collectables?: CollectableSet[];
   /**
    * Configures the sensitivity level for warning detection.
-   * 
+   *
    * - `conservative` (default): Strict detection to minimize false positives.
    *   Suitable for scanning ecosystem libraries.
    * - `aggressive`: Relaxed constraints to surface more warnings.
    *   Provides maximum visibility for local project security auditing.
-   * 
+   *
    * @default "conservative"
    */
   sensitivity?: Sensitivity;
@@ -173,7 +174,8 @@ export class AstAnalyser {
       isMinified = false,
       removeHTMLComments = false,
       initialize,
-      finalize
+      finalize,
+      metadata
     } = options;
 
     const parser = options.customParser ?? AstAnalyser.DefaultParser;
@@ -183,7 +185,7 @@ export class AstAnalyser {
       void 0
     );
 
-    const source = new SourceFile(location);
+    const source = new SourceFile(location, metadata);
     source.sensitivity = this.#sensitivity;
     if (trojan.verify(str)) {
       source.warnings.push(

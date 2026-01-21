@@ -15,34 +15,39 @@ describe("CollectableSet", () => {
     const collectableSet = new CollectableSet("url");
     collectableSet.add("https://example.com", {
       file: "str.js",
-      location: [[0, 0], [0, 0]]
+      location: [[0, 0], [0, 0]],
+      metadata: { spec: "react@19.0.1" }
     });
 
     collectableSet.add("https://example.com", {
       file: "str.js",
-      location: [[5, 5], [7, 8]]
+      location: [[5, 5], [7, 8]],
+      metadata: { spec: "react@19.0.1" }
     });
 
     collectableSet.add("https://example.com", {
       file: "other.js",
-      location: [[0, 0], [0, 0]]
+      location: [[0, 0], [0, 0]],
+      metadata: { spec: "react@19.0.1" }
     });
 
     collectableSet.add("https://other.com", {
-      location: [[0, 0], [0, 0]]
+      location: [[0, 0], [0, 0]],
+      metadata: { spec: "react@19.0.1" }
     });
 
     assert.deepEqual(Array.from(collectableSet), [
       {
         value: "https://example.com",
         locations: [
-          { file: "str.js", location: [[[0, 0], [0, 0]], [[5, 5], [7, 8]]] },
-          { file: "other.js", location: [[[0, 0], [0, 0]]] }
+          { file: "str.js", location: [[[0, 0], [0, 0]]], metadata: { spec: "react@19.0.1" } },
+          { file: "str.js", location: [[[5, 5], [7, 8]]], metadata: { spec: "react@19.0.1" } },
+          { file: "other.js", location: [[[0, 0], [0, 0]]], metadata: { spec: "react@19.0.1" } }
         ]
       },
       {
         value: "https://other.com",
-        locations: [{ file: null, location: [[[0, 0], [0, 0]]] }]
+        locations: [{ file: null, location: [[[0, 0], [0, 0]]], metadata: { spec: "react@19.0.1" } }]
       }
     ]);
   });

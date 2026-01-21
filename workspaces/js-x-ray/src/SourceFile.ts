@@ -37,9 +37,11 @@ export class SourceFile {
   flags = new Set<SourceFlags>();
   path = new SourceFilePath();
   sensitivity?: Sensitivity;
+  metadata?: Record<string, unknown>;
 
-  constructor(sourceLocation?: string) {
+  constructor(sourceLocation?: string, metadata?: Record<string, unknown>) {
     this.path.use(sourceLocation);
+    this.metadata = metadata;
   }
 
   addDependency(
