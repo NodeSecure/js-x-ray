@@ -20,7 +20,7 @@ import { generateWarning } from "../warnings.ts";
  * JSON.stringify(process["env"])
  * JSON.stringify(process[`env`])
  */
-function validateNode(
+function validateJsonStringify(
   node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
@@ -60,7 +60,31 @@ function validateNode(
   return [false];
 }
 
-function main(
+/**
+ * @description Detect direct process.env access (for aggressive mode)
+ * @example
+ * process.env
+ * const env = process.env
+ */
+function validateProcessEnv(
+  node: ESTree.Node,
+  ctx: ProbeContext
+): [boolean, any?] {
+  if (node.type !== "MemberExpression") {
+    return [false];
+  }
+
+  const memberExprId = [...getMemberExpressionIdentifier(node as ESTree.MemberExpression)].join(".");
+  if (memberExprId === "process.env") {
+    ctx.setEntryPoint("process.env");
+
+    return [true];
+  }
+
+  return [false];
+}
+
+function defaultHandler(
   node: ESTree.Node,
   ctx: ProbeMainContext
 ) {
@@ -68,6 +92,26 @@ function main(
 
   const warning = generateWarning("serialize-environment", {
     value: "JSON.stringify(process.env)",
+    location: node.loc
+  });
+  sourceFile.warnings.push(warning);
+
+  return signals.Skip;
+}
+
+function processEnvHandler(
+  node: ESTree.Node,
+  ctx: ProbeMainContext
+) {
+  const { sourceFile, signals } = ctx;
+
+  // Only trigger warning in aggressive mode
+  if (sourceFile.sensitivity !== "aggressive") {
+    return null;
+  }
+
+  const warning = generateWarning("serialize-environment", {
+    value: "process.env",
     location: node.loc
   });
   sourceFile.warnings.push(warning);
@@ -91,8 +135,11 @@ function initialize(
 
 export default {
   name: "isSerializeEnv",
-  validateNode,
+  validateNode: [validateJsonStringify, validateProcessEnv],
   initialize,
-  main,
+  main: {
+    default: defaultHandler,
+    "process.env": processEnvHandler
+  },
   breakOnMatch: false
 };
