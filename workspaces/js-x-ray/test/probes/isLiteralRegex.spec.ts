@@ -14,5 +14,6 @@ test("should throw a 'unsafe-regex' warning because the given RegExp Literal is 
 
   assert.strictEqual(sastAnalysis.warnings().length, 1);
   const result = sastAnalysis.getWarning("unsafe-regex");
+  assert.ok(result);
   assert.strictEqual(result.value, "(a+){10}");
 });

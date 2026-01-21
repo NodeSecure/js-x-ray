@@ -1,8 +1,14 @@
 // Import Third-party Dependencies
+import {
+  getCallExpressionIdentifier
+} from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeMainContext } from "../ProbeRunner.ts";
+import type {
+  ProbeMainContext,
+  ProbeContext
+} from "../ProbeRunner.ts";
 import {
   isLiteral,
   isTemplateLiteral
@@ -13,19 +19,18 @@ import { toLiteral } from "../utils/toLiteral.ts";
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
 
+// CONSTANTS
+const kIdentifierOrMemberExps = [
+  "child_process.spawn",
+  "child_process.spawnSync",
+  "child_process.exec",
+  "child_process.execSync"
+];
+
 function isUnsafeCommand(
   command: string
 ): boolean {
   return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
-}
-
-function isSpawnOrExec(
-  name: string
-): boolean {
-  return name === "spawn" ||
-    name === "exec" ||
-    name === "spawnSync" ||
-    name === "execSync";
 }
 
 function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string {
@@ -47,16 +52,17 @@ function concatArrayArgs(
   node: ESTree.CallExpression
 ): string {
   const arrExpr = node.arguments.at(1);
+  let finalizedCommand = command;
 
   if (arrExpr && arrExpr.type === "ArrayExpression") {
     arrExpr.elements
       .filter((element) => isLiteral(element))
       .forEach((element) => {
-        command += ` ${element.value}`;
+        finalizedCommand += ` ${element.value}`;
       });
   }
 
-  return command;
+  return finalizedCommand;
 }
 
 /**
@@ -70,54 +76,29 @@ function concatArrayArgs(
  * exec("csrutil status");
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Node,
+  ctx: ProbeContext
 ): [boolean, any?] {
-  if (node.type !== "CallExpression" || node.arguments.length === 0) {
+  const { tracer } = ctx.sourceFile;
+
+  const id = getCallExpressionIdentifier(
+    node,
+    {
+      externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
+    }
+  );
+  if (
+    id === null
+  ) {
     return [false];
   }
 
-  // const { spawn } = require("child_process");
-  // spawn("...", ["..."]);
-  // or
-  // const { exec } = require("child_process");
-  // exec(...);
-  if (node.type === "CallExpression" &&
-    node.callee.type === "Identifier" &&
-    isSpawnOrExec(node.callee.name)
-  ) {
-    return [true, node.callee.name];
-  }
+  const data = tracer.getDataFromIdentifier(id);
 
-  // child_process.spawn(...) or require("child_process").spawn(...)
-  // child_process.exec(...) or require("child_process").exec(...)
-  if (
-    node.callee.type === "MemberExpression" &&
-    node.callee.property.type === "Identifier" &&
-    isSpawnOrExec(node.callee.property.name)
-  ) {
-    // child_process.spawn(...)
-    // child_process.exec(...)
-    if (
-      node.callee.object.type === "Identifier" &&
-      node.callee.object.name === "child_process"
-    ) {
-      return [true, node.callee.property.name];
-    }
-    // require("child_process").spawn(...)
-    // require("child_process").exec(...)
-    if (
-      node.callee.object.type === "CallExpression" &&
-      node.callee.object.callee.type === "Identifier" &&
-      node.callee.object.callee.name === "require" &&
-      node.callee.object.arguments.length === 1 &&
-      node.callee.object.arguments[0].type === "Literal" &&
-      node.callee.object.arguments[0].value === "child_process"
-    ) {
-      return [true, node.callee.property.name];
-    }
-  }
-
-  return [false];
+  return data && kIdentifierOrMemberExps.includes(data.name) ? [
+    true,
+    data.name.slice("child_process.".length)
+  ] : [false];
 }
 
 function main(
@@ -132,7 +113,7 @@ function main(
   }
 
   let command = getCommand(commandArg);
-  
+
   // Aggressive mode: warn on any child_process usage
   if (sourceFile.sensitivity === "aggressive") {
     // Handle spawn/spawnSync array arguments
@@ -170,8 +151,22 @@ function main(
   return null;
 }
 
+function initialize(
+  ctx: ProbeContext
+) {
+  kIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
+    const moduleName = identifierOrMemberExp.split(".")[0];
+
+    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
+      followConsecutiveAssignment: true,
+      moduleName
+    });
+  });
+}
+
 export default {
   name: "isUnsafeCommand",
   validateNode,
-  main
+  main,
+  initialize
 };

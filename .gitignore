@@ -108,3 +108,4 @@ temp/
 .vscode/
 .idea/
 workspaces/**/temp/
+workspaces/**/temp.ts

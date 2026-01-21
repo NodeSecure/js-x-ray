@@ -78,13 +78,16 @@ function initialize(
   tracer
     .trace("JSON.stringify", {
       followConsecutiveAssignment: true
-    }).trace("os.userInfo", {
+    })
+    .trace("os.userInfo", {
       moduleName: "os",
       followConsecutiveAssignment: true
-    }).trace("os.networkInterfaces", {
+    })
+    .trace("os.networkInterfaces", {
       moduleName: "os",
       followConsecutiveAssignment: true
-    }).trace("os.cpus", {
+    })
+    .trace("os.cpus", {
       moduleName: "os",
       followConsecutiveAssignment: true
     })

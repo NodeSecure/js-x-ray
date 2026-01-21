@@ -23,6 +23,7 @@ test("should throw a 'unsafe-regex' warning because the given RegExp Object is u
 
   assert.equal(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-regex");
+  assert.ok(warning);
   assert.equal(warning.value, "(a+){10}");
 });
 
@@ -34,5 +35,6 @@ test("should throw a 'unsafe-regex' warning because the given RegExp Object (wit
 
   assert.equal(sastAnalysis.warnings().length, 1);
   const warning = sastAnalysis.getWarning("unsafe-regex");
+  assert.ok(warning);
   assert.equal(warning.value, "(a+){10}");
 });

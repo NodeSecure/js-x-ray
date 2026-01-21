@@ -184,7 +184,8 @@ export class ProbeRunner {
 
         if (typeof probe.main === "function") {
           mainHandler = probe.main;
-        } else {
+        }
+        else {
           const selectedName = this.#selectedEntryPoints.get(probe);
           const handlerName = (selectedName && selectedName in probe.main)
             ? selectedName
