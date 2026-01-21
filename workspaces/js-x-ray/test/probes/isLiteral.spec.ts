@@ -349,7 +349,6 @@ describe("email collection", () => {
     assert.strictEqual(emails[0].value, "test@example.com");
     assert.ok(emails[0].locations.length > 0);
     assert.ok(emails[0].locations[0].location);
-    // Assert file and metadata
     const locationInfo = emails[0].locations[0];
     assert.strictEqual(locationInfo.file, "test.js");
     assert.strictEqual(locationInfo.metadata, undefined);
