@@ -442,3 +442,63 @@ test("should not be able to follow re-assignment of a traced return value when f
     name: "user"
   }]);
 });
+
+test("should get an ImportEvent when there when an import declartion is encountered", () => {
+  const helpers = createTracer();
+  helpers.tracer.trace("os.userInfo");
+
+  const importEvents = helpers.getImportArray();
+
+  helpers.walkOnCode(`
+    import os from "node:os";
+
+    const foo = os.userInfo();
+
+    console.log(foo);
+  `);
+
+  assert.strictEqual(importEvents.length, 1);
+  const [importEvent] = importEvents;
+  assert.strictEqual(importEvent.moduleName, "os");
+  assert.strictEqual(importEvent.value, "node:os");
+  assert.deepEqual(importEvent.location, {
+    end: {
+      column: 29,
+      line: 2
+    },
+    start: {
+      column: 4,
+      line: 2
+    }
+  });
+});
+
+test("should get an ImportEvent when an require call is encountered", () => {
+  const helpers = createTracer();
+  helpers.tracer.trace("os.userInfo");
+
+  const importEvents = helpers.getImportArray();
+
+  helpers.walkOnCode(`
+    const os = require("node:os");
+
+    const foo = os.userInfo();
+
+    console.log(foo);
+  `);
+
+  assert.strictEqual(importEvents.length, 1);
+  const [importEvent] = importEvents;
+  assert.strictEqual(importEvent.moduleName, "os");
+  assert.strictEqual(importEvent.value, "node:os");
+  assert.deepEqual(importEvent.location, {
+    end: {
+      column: 32,
+      line: 2
+    },
+    start: {
+      column: 23,
+      line: 2
+    }
+  });
+});

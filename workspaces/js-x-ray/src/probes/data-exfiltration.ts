@@ -2,6 +2,7 @@
 import {
   getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
+import { VariableTracer, type ImportEventPayload } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
@@ -10,6 +11,8 @@ import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../util
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
+const kSensitiveModules = new Set(["os", "dns"]);
+
 const kSensitiveMethods = [
   "os.userInfo",
   "os.networkInterfaces",
@@ -23,6 +26,9 @@ function validateNode(
   node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
+  if (ctx.sourceFile.sensitivity === "aggressive") {
+    return [false];
+  }
   const tracer = ctx.sourceFile.tracer;
   const id = getCallExpressionIdentifier(node);
 
@@ -74,7 +80,8 @@ function main(
 function initialize(
   ctx: ProbeContext<DataExfiltrationContextDef>
 ) {
-  const { sourceFile: { tracer } } = ctx;
+  const { sourceFile, context } = ctx;
+  const { tracer } = sourceFile;
   tracer
     .trace("JSON.stringify", {
       followConsecutiveAssignment: true
@@ -92,6 +99,18 @@ function initialize(
       moduleName: "dns",
       followConsecutiveAssignment: true
     });
+
+  if (sourceFile.sensitivity !== "aggressive") {
+    return;
+  }
+  tracer.on(VariableTracer.ImportEvent, ({
+    moduleName,
+    location
+  }: ImportEventPayload) => {
+    if (kSensitiveModules.has(moduleName) && !(moduleName in context!)) {
+      context![moduleName] = [toArrayLocation(location ?? undefined)];
+    }
+  });
 }
 
 function finalize(ctx: ProbeContext<DataExfiltrationContextDef>) {

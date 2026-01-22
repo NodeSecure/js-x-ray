@@ -71,8 +71,22 @@ export interface TracedIdentifierReport {
   assignmentMemory: AssignmentMemory[];
 }
 
+export interface AssignmentEventPayload {
+  name: string;
+  identifierOrMemberExpr: string;
+  id: string;
+  location: ESTree.SourceLocation | null | undefined;
+}
+
+export interface ImportEventPayload {
+  moduleName: string;
+  value: string;
+  location: ESTree.SourceLocation | null | undefined;
+}
+
 export class VariableTracer extends EventEmitter {
   static AssignmentEvent = Symbol("AssignmentEvent");
+  static ImportEvent = Symbol("ImportEvent");
 
   // PUBLIC PROPERTIES
   literalIdentifiers = new Map<string, string>();
@@ -312,6 +326,12 @@ export class VariableTracer extends EventEmitter {
 
     this.importedModules.add(moduleName);
 
+    this.emit(VariableTracer.ImportEvent, {
+      moduleName,
+      value: node.source.value,
+      location: node.loc
+    });
+
     // import * as boo from "crypto";
     if (node.specifiers[0].type === "ImportNamespaceSpecifier") {
       const importNamespaceNode = node.specifiers[0];
@@ -347,6 +367,12 @@ export class VariableTracer extends EventEmitter {
     }
     const moduleName = stripNodePrefix(moduleNameLiteral.value);
     this.importedModules.add(moduleName);
+
+    this.emit(VariableTracer.ImportEvent, {
+      moduleName,
+      value: moduleNameLiteral.value,
+      location: moduleNameLiteral.loc
+    });
 
     switch (id.type) {
       case "Identifier":
