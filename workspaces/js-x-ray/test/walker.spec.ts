@@ -244,7 +244,7 @@ describe("walk", () => {
       };
 
       walk(ast, {
-        [phase](node: ESTree.Node) {
+        [phase](this: any, node: ESTree.Node) {
           if (node.type === "Identifier" && node.name === "b") {
             this.replace(forty_two);
           }
@@ -315,7 +315,7 @@ describe("walk", () => {
       };
 
       walk(ast, {
-        [phase](node: ESTree.Node) {
+        [phase](this: any, node: ESTree.Node) {
           if (node.type === "Identifier" && node.name === "b") {
             this.remove();
           }
@@ -369,7 +369,7 @@ describe("walk", () => {
 
       const visitedIndex: number[] = [];
       walk(ast, {
-        [phase](node, ctx) {
+        [phase](this: any, node: any, ctx: any) {
           if (node.type === "VariableDeclarator") {
             visitedIndex.push(ctx.index);
             if (node.id.name === "a" || node.id.name === "b") {

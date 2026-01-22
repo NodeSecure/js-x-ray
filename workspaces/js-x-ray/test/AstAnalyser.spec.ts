@@ -357,7 +357,7 @@ describe("AstAnalyser", () => {
       assert.equal(result.warnings.length, 1);
     });
 
-    it("should call initialize and finalize of every probes at the end", async(t) => {
+    it("should call initialize and finalize of every probes at the end", async() => {
       const calls: string[] = [];
       await new AstAnalyser(
         {
@@ -368,13 +368,13 @@ describe("AstAnalyser", () => {
                 calls.push("initialize");
               },
               validateNode: () => [true],
-              main: t.mock.fn(),
+              main: () => null,
               finalize: () => calls.push("finalize")
             },
             {
               name: "classic probe",
               validateNode: () => [true],
-              main: t.mock.fn()
+              main: () => null
             }
 
           ],

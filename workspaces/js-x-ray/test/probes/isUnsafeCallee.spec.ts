@@ -17,6 +17,7 @@ test("should detect eval", () => {
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
+  assert.ok(result);
   assert.equal(result.kind, kWarningUnsafeStmt);
   assert.equal(result.value, "eval");
 });
@@ -39,6 +40,7 @@ test("should detect for unsafe Function statement", () => {
     .execute(ast.body);
 
   const result = sastAnalysis.getWarning(kWarningUnsafeStmt);
+  assert.ok(result);
   assert.equal(result.kind, kWarningUnsafeStmt);
   assert.equal(result.value, "Function");
 });

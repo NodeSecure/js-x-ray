@@ -79,11 +79,11 @@ export function getSastAnalysis(
             return;
           }
 
-          self.sourceFile.tracer.walk(node);
-
-          const action = probeRunner.walk(node);
-          if (action === "skip") {
-            this.skip();
+          for (const probeNode of self.sourceFile.walk(node)) {
+            const action = probeRunner.walk(probeNode);
+            if (action === "skip") {
+              this.skip();
+            }
           }
         }
       });

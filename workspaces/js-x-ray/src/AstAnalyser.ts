@@ -209,10 +209,11 @@ export class AstAnalyser {
         return;
       }
 
-      source.walk(node);
-      const action = probeRunner.walk(node);
-      if (action === "skip") {
-        this.skip();
+      for (const probeNode of source.walk(node)) {
+        const action = probeRunner.walk(probeNode);
+        if (action === "skip") {
+          this.skip();
+        }
       }
     });
 

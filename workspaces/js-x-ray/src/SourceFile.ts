@@ -11,6 +11,7 @@ import type {
   Dependency,
   Sensitivity
 } from "./AstAnalyser.ts";
+import { InlinedRequire } from "./probes/isRequire/InlinedRequire.ts";
 import { Deobfuscator } from "./Deobfuscator.ts";
 import { rootLocation, toArrayLocation } from "./utils/index.ts";
 import {
@@ -160,7 +161,20 @@ export class SourceFile {
 
   walk(
     node: ESTree.Node
-  ): void {
+  ): ESTree.Node[] {
+    const split = InlinedRequire.split(node);
+    if (split !== null) {
+      this.tracer.walk(split.virtualDeclaration);
+      if (split.rebuildExpression) {
+        this.tracer.walk(split.rebuildExpression);
+      }
+
+      return [
+        split.virtualDeclaration,
+        ...(split.rebuildExpression ? [split.rebuildExpression] : [])
+      ];
+    }
+
     this.tracer.walk(node);
     this.deobfuscator.walk(node);
 
@@ -171,6 +185,8 @@ export class SourceFile {
     else if (node.type === "CatchClause") {
       this.inTryStatement = false;
     }
+
+    return [node];
   }
 }
 

