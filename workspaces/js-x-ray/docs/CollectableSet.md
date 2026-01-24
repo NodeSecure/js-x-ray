@@ -30,6 +30,8 @@ for (const { value, locations } of hostnameSet) {
 ## API
 
 ```ts
+type Type = "url" | "hostname" | "ip" | "email" | (string & {});
+
 type Location<T = Record<string, unknown>> = {
   file: string | null;
   location: SourceArrayLocation[];
@@ -37,8 +39,8 @@ type Location<T = Record<string, unknown>> = {
 }
 
 class CollectableSet<T = Record<string, unknown>> {
-  type: string;
-  constructor(type: string);
+  type: Type;
+  constructor(type: Type);
 
   add(
     value: string,

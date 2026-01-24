@@ -1,16 +1,16 @@
 // Import Internal Dependencies
-import { CollectableSet } from "./CollectableSet.ts";
+import { CollectableSet, type Type } from "./CollectableSet.ts";
 import type { SourceArrayLocation } from "./utils/toArrayLocation.ts";
 
 export class CollectableSetRegistry {
-  #collectableSets: Map<string, CollectableSet> = new Map();
+  #collectableSets: Map<Type, CollectableSet> = new Map();
   constructor(collectableSets: CollectableSet[]) {
     collectableSets.forEach((collectableSet) => {
       this.#collectableSets.set(collectableSet.type, collectableSet);
     });
   }
 
-  add(type: string, { value, file, location, metadata }: {
+  add(type: Type, { value, file, location, metadata }: {
     value: string;
     file?: string | null;
     location: SourceArrayLocation;
@@ -20,7 +20,7 @@ export class CollectableSetRegistry {
     collectableSet?.add(value, { file, location, metadata });
   }
 
-  has(type: string): boolean {
+  has(type: Type): boolean {
     return this.#collectableSets.has(type);
   }
 }

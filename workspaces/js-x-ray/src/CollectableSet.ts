@@ -1,6 +1,8 @@
 // Import Internal Dependencies
 import { type SourceArrayLocation } from "./utils/toArrayLocation.ts";
 
+export type Type = "url" | "hostname" | "ip" | "email" | (string & {});
+
 export type Location<T = Record<string, unknown>> = {
   file: string | null;
   location: SourceArrayLocation[];
@@ -9,7 +11,7 @@ export type Location<T = Record<string, unknown>> = {
 
 export class CollectableSet<T = Record<string, unknown>> {
   #entries: Map<string, Map<string | null, { location: SourceArrayLocation; metadata?: T; }[]>> = new Map();
-  type: string;
+  type: Type;
   constructor(type: string) {
     this.type = type;
   }
