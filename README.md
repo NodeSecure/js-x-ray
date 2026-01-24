@@ -106,6 +106,7 @@ type WarningName = "parsing-error"
 | "unsafe-command"
 | "shady-link"
 | "synchronous-io"
+| "log-usage"
 | "serialize-environment";
 
 declare const warnings: Record<WarningName, {
@@ -144,7 +145,8 @@ This section describes all the possible warnings returned by JSXRay. Click on th
 | [shady-link](./docs/shady-link.md) | ❌ | The code contains a shady/unsafe link |
 | [synchronous-io](./docs/synchronous-io.md) | ✔️ | The code contains a synchronous IO call. |
 | [serialize-environment](./docs/serialize-environment.md) | ❌ | The code attempts to serialize process.env which could lead to environment variable exfiltration |
-| [data-exfiltration](./docs/data-exfiltration.md) | ❌ | the code potentially attemps to transfer sensitive data wihtout authorization from a computer or network to an external location. |
+| [data-exfiltration](./docs/data-exfiltration.md) |  ❌| the code potentially attemps to transfer sensitive data wihtout authorization from a computer or network to an external location. |
+| [log-usage](./docs/log-usage.md) | ❌ | The code contains a log call. |
 
 
 ## Workspaces
