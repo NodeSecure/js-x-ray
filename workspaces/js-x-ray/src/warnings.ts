@@ -10,7 +10,7 @@ import {
 } from "./utils/toArrayLocation.ts";
 
 export type OptionalWarningName =
-  | "synchronous-io";
+  | "synchronous-io" | "log-usage";
 
 export type WarningName =
   | "parsing-error"
@@ -114,6 +114,11 @@ export const warnings = Object.freeze({
   "data-exfiltration": {
     i18n: "sast_warnings.data_exfiltration",
     severity: "Warning",
+    experimental: false
+  },
+  "log-usage": {
+    i18n: "sast_warnings.log_usage",
+    severity: "Information",
     experimental: false
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;

@@ -5,6 +5,7 @@ import assert from "node:assert";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import logUsage from "./probes/log-usage.ts";
 import dataExfiltration from "./probes/data-exfiltration.ts";
 import isArrayExpression from "./probes/isArrayExpression.ts";
 import isBinaryExpression from "./probes/isBinaryExpression.ts";
@@ -97,7 +98,8 @@ export class ProbeRunner {
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {
-    "synchronous-io": isSyncIO
+    "synchronous-io": isSyncIO,
+    "log-usage": logUsage
   };
 
   constructor(
