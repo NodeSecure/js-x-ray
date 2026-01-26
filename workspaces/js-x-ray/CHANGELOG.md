@@ -1,5 +1,87 @@
 # @nodesecure/js-x-ray
 
+## 11.4.0
+
+### Minor Changes
+
+- [#468](https://github.com/NodeSecure/js-x-ray/pull/468) [`317d679`](https://github.com/NodeSecure/js-x-ray/commit/317d679447b19177459805807b80c91511125e38) Thanks [@7amed3li](https://github.com/7amed3li)! - feat(isLiteral): add email collection using CollectableSet API
+
+  Implemented email detection and collection in the isLiteral probe. The probe now identifies email addresses in string literals using the same regex pattern as the CLI and collects them via the CollectableSet API.
+
+  - Added email regex constant matching CLI implementation
+  - Email addresses are now collected when CollectableSet("email") is provided
+  - Added comprehensive test cases covering valid/invalid formats and edge cases
+
+- [#462](https://github.com/NodeSecure/js-x-ray/pull/462) [`ed0a637`](https://github.com/NodeSecure/js-x-ray/commit/ed0a637f74f067178ac2482cddc75983ee35bef1) Thanks [@7amed3li](https://github.com/7amed3li)! - Support multiple named main handlers in probes (resolves #460)
+
+  Introduces support for multiple named main entrypoints in probes, allowing probes to define different handlers for various analysis scenarios. This enables more flexible probe implementations while maintaining full backward compatibility.
+
+  **Key Changes:**
+
+  - Added `NamedMainHandlers` type supporting multiple handler functions with required `default` handler
+  - Extended `ProbeContext` with `setEntryPoint(handlerName: string)` method for handler selection
+  - Updated `Probe` interface to accept either single `main` function or `NamedMainHandlers` object
+  - Implemented handler resolution logic in `ProbeRunner#runProbe` with automatic cleanup
+  - Added comprehensive test coverage (all 14 existing tests + 8 new tests passing)
+
+  **Backward Compatibility:**
+
+  - Existing probes with single `main` function continue to work without changes
+  - `setEntryPoint` method available but optional for backward-compatible probes
+  - No breaking changes to existing API
+
+  This is the core infrastructure PR. Future work will include example probe refactoring and documentation updates.
+
+- [#456](https://github.com/NodeSecure/js-x-ray/pull/456) [`9f4e420`](https://github.com/NodeSecure/js-x-ray/commit/9f4e420128f36fd9cd409a3a02bcd0653fe59257) Thanks [@7amed3li](https://github.com/7amed3li)! - Add sensitivity option to AstAnalyser for configurable warning detection
+
+  Introduces a new sensitivity option in AstAnalyserOptions that allows users to control the strictness of warning detection:
+
+  - conservative (default): Maintains current strict behavior to minimize false positives. Suitable for scanning ecosystem libraries.
+  - aggressive: Detects all child_process usage for maximum visibility in local project scanning.
+
+  This change implements the sensitivity option for the isUnsafeCommand probe. Additional probes (isSerializeEnv, data-exfiltration) can be updated in future releases.
+
+- [#480](https://github.com/NodeSecure/js-x-ray/pull/480) [`d9e0481`](https://github.com/NodeSecure/js-x-ray/commit/d9e0481502a853d69f27262594509002f33366e1) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): add sql-injection probe
+
+- [#467](https://github.com/NodeSecure/js-x-ray/pull/467) [`8948caa`](https://github.com/NodeSecure/js-x-ray/commit/8948caad67efd6080ae43b150d8a406a8a56ec6c) Thanks [@7amed3li](https://github.com/7amed3li)! - feat(isSerializeEnv): add named handler for direct process.env access detection
+
+  Introduces a named handler pattern in the `isSerializeEnv` probe to detect direct `process.env` access when running in **aggressive** sensitivity mode.
+
+  **Changes:**
+
+  - Added `validateProcessEnv` validator to detect `process.env` MemberExpression nodes
+  - Added `processEnvHandler` named handler that triggers only in aggressive mode
+  - Converted probe export to use `NamedMainHandlers` pattern with `default` and `process.env` handlers
+  - Existing `JSON.stringify(process.env)` detection remains unchanged (backward compatible)
+
+  **Behavior:**
+
+  - **Conservative mode (default)**: Only flags `process.env` when used with `JSON.stringify`
+  - **Aggressive mode**: Additionally flags any direct `process.env` access
+
+  Relates to #367
+
+- [#454](https://github.com/NodeSecure/js-x-ray/pull/454) [`bad3093`](https://github.com/NodeSecure/js-x-ray/commit/bad3093a550a6f19321f260559112327b99685a9) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): isUnsafeCommand transform TemplateLiteral to Literal
+
+- [#464](https://github.com/NodeSecure/js-x-ray/pull/464) [`18fc25a`](https://github.com/NodeSecure/js-x-ray/commit/18fc25a540119b02e07407cd42d0d59eee1bafb9) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): collectable set can add metadata
+
+- [#479](https://github.com/NodeSecure/js-x-ray/pull/479) [`8848684`](https://github.com/NodeSecure/js-x-ray/commit/8848684332fdcd6bdce9f16886fc2b21270efc14) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): implement log-usage probe
+
+- [#471](https://github.com/NodeSecure/js-x-ray/pull/471) [`e288c04`](https://github.com/NodeSecure/js-x-ray/commit/e288c045fe24f58b4344350a23d9b2d2b7f1b824) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: generate data-exfiltration warning on import when the sensitivity is aggressive
+
+- [#463](https://github.com/NodeSecure/js-x-ray/pull/463) [`e621d91`](https://github.com/NodeSecure/js-x-ray/commit/e621d9173b8b5cd5653e3e13b33ace1e70be99c1) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): do not detect file: as shady link
+
+- [#469](https://github.com/NodeSecure/js-x-ray/pull/469) [`c4fad05`](https://github.com/NodeSecure/js-x-ray/commit/c4fad058293a398245b4e6ff3db2fbcbb7561d40) Thanks [@fraxken](https://github.com/fraxken)! - Introduce new VirtualIdentifier to split inlined require() with chained MemberExpr/CallExpr
+
+- [#478](https://github.com/NodeSecure/js-x-ray/pull/478) [`029031c`](https://github.com/NodeSecure/js-x-ray/commit/029031cc747596af933a65ec1aa8d36e87c26f1e) Thanks [@clemgbld](https://github.com/clemgbld)! - refactor(js-x-ray): type the type of CollectableSet
+
+### Patch Changes
+
+- [#482](https://github.com/NodeSecure/js-x-ray/pull/482) [`9b51811`](https://github.com/NodeSecure/js-x-ray/commit/9b5181119280ae0f206bbc764af2b902928b9fe5) Thanks [@clemgbld](https://github.com/clemgbld)! - fix(js-x-ray): fix 32 bit ip addresses false positive
+
+- Updated dependencies [[`e288c04`](https://github.com/NodeSecure/js-x-ray/commit/e288c045fe24f58b4344350a23d9b2d2b7f1b824)]:
+  - @nodesecure/tracer@3.1.0
+
 ## 11.3.0
 
 ### Minor Changes

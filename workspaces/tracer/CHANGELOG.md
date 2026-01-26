@@ -1,5 +1,11 @@
 # @nodesecure/tracer
 
+## 3.1.0
+
+### Minor Changes
+
+- [#471](https://github.com/NodeSecure/js-x-ray/pull/471) [`e288c04`](https://github.com/NodeSecure/js-x-ray/commit/e288c045fe24f58b4344350a23d9b2d2b7f1b824) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: generate data-exfiltration warning on import when the sensitivity is aggressive
+
 ## 3.0.0
 
 ### Major Changes
