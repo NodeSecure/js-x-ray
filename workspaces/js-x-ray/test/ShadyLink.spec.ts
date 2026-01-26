@@ -421,3 +421,19 @@ describe("ShadyLink.isURLSafe()", () => {
     });
   });
 });
+
+describe("ShadyLink.isValidIpAddress()", () => {
+  it("should be a valid ip address", () => {
+    assert.ok(ShadyLink.isValidIPAddress("127.0.0.1"));
+  });
+
+  it("should not be a valid address", () => {
+    assert.ok(!ShadyLink.isValidIPAddress("127.0.0.1.1"));
+  });
+
+  // https://github.com/NodeSecure/js-x-ray/issues/474
+  it("should not interpret a plain integer as an ip address", () => {
+    assert.ok(!ShadyLink.isValidIPAddress("1"));
+    assert.ok(!ShadyLink.isValidIPAddress("12130706433"));
+  });
+});

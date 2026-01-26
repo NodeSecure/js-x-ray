@@ -125,7 +125,7 @@ export class ShadyLink {
   }
 
   static isValidIPAddress(input: string) {
-    return ipaddress.isValid(input);
+    return /\D/.test(input) && ipaddress.isValid(input);
   }
 
   static isIpAddressSafe(
