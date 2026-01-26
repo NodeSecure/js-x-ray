@@ -6,6 +6,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import logUsage from "./probes/log-usage.ts";
+import sqlInjection from "./probes/sql-injection.ts";
 import dataExfiltration from "./probes/data-exfiltration.ts";
 import isArrayExpression from "./probes/isArrayExpression.ts";
 import isBinaryExpression from "./probes/isBinaryExpression.ts";
@@ -94,7 +95,8 @@ export class ProbeRunner {
     isArrayExpression,
     isUnsafeCommand,
     isSerializeEnv,
-    dataExfiltration
+    dataExfiltration,
+    sqlInjection
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {

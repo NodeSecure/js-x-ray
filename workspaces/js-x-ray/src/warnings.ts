@@ -27,6 +27,7 @@ export type WarningName =
   | "unsafe-import"
   | "serialize-environment"
   | "data-exfiltration"
+  | "sql-injection"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -119,6 +120,11 @@ export const warnings = Object.freeze({
   "log-usage": {
     i18n: "sast_warnings.log_usage",
     severity: "Information",
+    experimental: false
+  },
+  "sql-injection": {
+    i18n: "sast_warnings.sql_injection",
+    severity: "Warning",
     experimental: false
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;
