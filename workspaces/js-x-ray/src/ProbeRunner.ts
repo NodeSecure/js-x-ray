@@ -26,6 +26,7 @@ import isSyncIO from "./probes/isSyncIO.ts";
 import isUnsafeCallee from "./probes/isUnsafeCallee.ts";
 import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
 import isWeakCrypto from "./probes/isWeakCrypto.ts";
+import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
@@ -100,7 +101,8 @@ export class ProbeRunner {
     isUnsafeCommand,
     isSerializeEnv,
     dataExfiltration,
-    sqlInjection
+    sqlInjection,
+    isMonkeyPatch
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {
