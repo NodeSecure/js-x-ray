@@ -1,6 +1,5 @@
 // Import Third-party Dependencies
 import {
-  getCallExpressionIdentifier,
   getMemberExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
@@ -10,6 +9,7 @@ import type {
   ProbeContext,
   ProbeMainContext
 } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**
@@ -26,14 +26,7 @@ function validateJsonStringify(
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
 
-  const id = getCallExpressionIdentifier(node);
-
-  if (id === null) {
-    return [false];
-  }
-  const data = tracer.getDataFromIdentifier(id);
-
-  if (data === null || data.identifierOrMemberExpr !== "JSON.stringify") {
+  if (ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
@@ -141,5 +134,6 @@ export default {
     default: defaultHandler,
     "process.env": processEnvHandler
   },
-  breakOnMatch: false
+  breakOnMatch: false,
+  context: {}
 };

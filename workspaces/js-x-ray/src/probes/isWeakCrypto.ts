@@ -1,9 +1,9 @@
 // Import Third-party Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
   isLiteral
 } from "../types/estree.ts";
@@ -19,20 +19,17 @@ const kWeakAlgorithms = new Set([
 ]);
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
 
-  const id = getCallExpressionIdentifier(node);
-  if (id === null || !tracer.importedModules.has("crypto")) {
+  if (!tracer.importedModules.has("crypto")) {
     return [false];
   }
 
-  const data = tracer.getDataFromIdentifier(id);
-
   return [
-    data !== null && data.identifierOrMemberExpr === "crypto.createHash"
+    ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr === "crypto.createHash"
   ];
 }
 
@@ -68,5 +65,6 @@ export default {
   validateNode,
   main,
   initialize,
-  breakOnMatch: false
+  breakOnMatch: false,
+  context: {}
 };

@@ -1,7 +1,4 @@
 // Import Third-party Dependencies
-import {
-  getCallExpressionIdentifier
-} from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
@@ -9,6 +6,7 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
   isLiteral,
   isTemplateLiteral
@@ -76,24 +74,10 @@ function concatArrayArgs(
  * exec("csrutil status");
  */
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  const id = getCallExpressionIdentifier(
-    node,
-    {
-      externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
-    }
-  );
-  if (
-    id === null
-  ) {
-    return [false];
-  }
-
-  const data = tracer.getDataFromIdentifier(id);
+  const data = ctx.context?.[CALL_EXPRESSION_DATA];
 
   return data && kIdentifierOrMemberExps.includes(data.name) ? [
     true,
@@ -168,5 +152,6 @@ export default {
   name: "isUnsafeCommand",
   validateNode,
   main,
-  initialize
+  initialize,
+  context: {}
 };

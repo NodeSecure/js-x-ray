@@ -1,9 +1,9 @@
 // Import Third-party Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 
@@ -13,22 +13,14 @@ const kLogUsageMethods = new Set(["console.log", "console.info", "console.warn",
 type LogUsageContextDef = Record<string, SourceArrayLocation[]>;
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-  const id = getCallExpressionIdentifier(node);
+  const identifierOrMemberExpr = ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr;
 
-  if (id === null) {
-    return [false];
-  }
-
-  const data = tracer.getDataFromIdentifier(id);
-
-  return [data !== null &&
-    Boolean(data.identifierOrMemberExpr) &&
-    kLogUsageMethods.has(data.identifierOrMemberExpr),
-  data?.identifierOrMemberExpr];
+  return [
+    kLogUsageMethods.has(identifierOrMemberExpr),
+    identifierOrMemberExpr];
 }
 
 function initialize(

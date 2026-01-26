@@ -8,4 +8,5 @@ export {
 export * from "./SourceFile.ts";
 export * from "./warnings.ts";
 export * from "./CollectableSet.ts";
+export * from "./contants.ts";
 

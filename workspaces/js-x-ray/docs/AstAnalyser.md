@@ -253,3 +253,31 @@ export const advancedProbe = {
 > [!IMPORTANT]
 > The `setEntryPoint` setting is **ephemeral**. It applies only to the current node being processed and is automatically cleared (reset to default) immediately after the handler is executed. This prevents state leakage between different nodes.
 
+### Precomputed Call Expression Data
+
+For performance optimization, probes can access precomputed call expression data instead of repeatedly calling `getCallExpressionIdentifier` and `tracer.getDataFromIdentifier`.
+
+**Available symbols:**
+- `CALL_EXPRESSION_DATA` - Basic call expression identifier data
+
+**Enable in your probe:**
+```ts
+import { CALL_EXPRESSION_DATA } from "@nodesecure/js-x-ray";
+
+export const optimizedProbe = {
+  name: "optimizedProbe",
+  validateNode: (node, ctx) => {
+    // Access precomputed data instead of manual calls
+    const data = ctx.context?.[CALL_EXPRESSION_DATA];
+    return [data?.identifierOrMemberExpr === "JSON.stringify"];
+  },
+  main: (node, ctx) => {
+    // Use the precomputed data in main function too
+    const data = ctx.context?.[CALL_EXPRESSION_DATA];
+    // Your logic here
+  },
+  context: {} // Required to enable precomputed data
+};
+```
+
+The data is automatically injected for `CallExpression` nodes and provides `TracedIdentifierReport` with properties like `identifierOrMemberExpr`, `name`, etc. This optimization is optional but recommended for probes that frequently analyze call expressions.

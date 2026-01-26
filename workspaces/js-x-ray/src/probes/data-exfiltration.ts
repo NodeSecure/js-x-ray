@@ -7,6 +7,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -29,15 +30,8 @@ function validateNode(
   if (ctx.sourceFile.sensitivity === "aggressive") {
     return [false];
   }
-  const tracer = ctx.sourceFile.tracer;
-  const id = getCallExpressionIdentifier(node);
 
-  if (id === null) {
-    return [false];
-  }
-  const data = tracer.getDataFromIdentifier(id);
-
-  if (data === null || data.identifierOrMemberExpr !== "JSON.stringify") {
+  if (ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
