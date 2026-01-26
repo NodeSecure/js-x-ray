@@ -1,9 +1,9 @@
 // Import Third-party Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
@@ -39,28 +39,21 @@ const kSyncIOIdentifierOrMemberExps = [
 ];
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
-  const id = getCallExpressionIdentifier(
-    node,
-    {
-      externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
-    }
-  );
+
   if (
-    id === null ||
     !kTracedNodeCoreModules.some((moduleName) => tracer.importedModules.has(moduleName))
   ) {
     return [false];
   }
 
-  const data = tracer.getDataFromIdentifier(id);
+  const data = ctx.context?.[CALL_EXPRESSION_DATA];
 
   return [
-    data !== null &&
-    data.identifierOrMemberExpr.endsWith("Sync")
+    data?.identifierOrMemberExpr.endsWith("Sync")
   ];
 }
 
@@ -93,5 +86,6 @@ export default {
   validateNode,
   main,
   initialize,
-  breakOnMatch: false
+  breakOnMatch: false,
+  context: {}
 };

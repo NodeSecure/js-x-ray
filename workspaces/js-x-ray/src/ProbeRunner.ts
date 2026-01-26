@@ -3,6 +3,10 @@ import assert from "node:assert";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
+import {
+  getCallExpressionIdentifier
+} from "@nodesecure/estree-ast-utils";
+import type { TracedIdentifierReport } from "@nodesecure/tracer";
 
 // Import Internal Dependencies
 import logUsage from "./probes/log-usage.ts";
@@ -26,12 +30,12 @@ import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
 import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
+import { CALL_EXPRESSION_DATA } from "./contants.ts";
 
-// CONSTANTS
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 
 export type ProbeReturn = void | null | symbol;
-export type ProbeContextDef = Record<string, any>;
+export type ProbeContextDef = Record<string | symbol, any>;
 
 export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef> = {
   default: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
@@ -215,12 +219,27 @@ export class ProbeRunner {
   ): null | "skip" {
     const breakGroups = new Set<string>();
 
+    let tracedIdentifierReport: TracedIdentifierReport | null | undefined;
+
+    if (node.type === "CallExpression") {
+      const id = getCallExpressionIdentifier(node, {
+        externalIdentifierLookup: (name) => this.sourceFile.tracer.literalIdentifiers.get(name) ?? null
+      });
+      if (id !== null) {
+        tracedIdentifierReport = this.sourceFile.tracer.getDataFromIdentifier(id);
+      }
+    }
+
     for (const probe of this.probes) {
       if (probe.breakGroup && breakGroups.has(probe.breakGroup)) {
         continue;
       }
 
       try {
+        if (probe.context && tracedIdentifierReport) {
+          probe.context[CALL_EXPRESSION_DATA] = tracedIdentifierReport;
+        }
+
         const signal = this.#runProbe(probe, node);
         if (signal === ProbeRunner.Signals.Continue) {
           continue;
@@ -242,6 +261,9 @@ export class ProbeRunner {
       }
       finally {
         probe.teardown?.(this.#getProbeContext(probe));
+        if (probe.context) {
+          delete probe.context[CALL_EXPRESSION_DATA];
+        }
       }
     }
 
