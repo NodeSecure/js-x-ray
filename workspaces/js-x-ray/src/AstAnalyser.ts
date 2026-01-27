@@ -247,7 +247,8 @@ export class AstAnalyser {
         removeHTMLComments = false,
         initialize,
         finalize,
-        customParser
+        customParser,
+        metadata
       } = options;
 
       const str = await fs.readFile(pathToFile, "utf-8");
@@ -260,7 +261,8 @@ export class AstAnalyser {
         removeHTMLComments,
         initialize,
         finalize,
-        customParser
+        customParser,
+        metadata
       });
 
       if (packageName !== null) {
@@ -301,7 +303,8 @@ export class AstAnalyser {
         removeHTMLComments = false,
         initialize,
         finalize,
-        customParser
+        customParser,
+        metadata
       } = options;
 
       const str = fsSync.readFileSync(pathToFile, "utf-8");
@@ -314,7 +317,8 @@ export class AstAnalyser {
         removeHTMLComments,
         initialize,
         finalize,
-        customParser
+        customParser,
+        metadata
       });
 
       if (packageName !== null) {

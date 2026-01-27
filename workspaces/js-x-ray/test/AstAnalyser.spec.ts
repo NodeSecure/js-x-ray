@@ -331,6 +331,39 @@ describe("AstAnalyser", () => {
       assert.deepEqual(calls[1].arguments, [url2, { packageName: "foobar2" }]);
     });
 
+    it("should collect the full url and the ip address", async() => {
+      const oneLineContent = "const IPv4URL = 'http://127.0.0.1:80/script'";
+      const tmpdir = os.tmpdir();
+      const tempOneLineFile = path.join(tmpdir, "temp-oneline.js");
+
+      writeFileSync(tempOneLineFile, oneLineContent);
+
+      const urlSet = new CollectableSet("url");
+      const ipSet = new CollectableSet("ip");
+      const hostnameSet = new CollectableSet("hostname");
+      const collectables = [urlSet, ipSet, hostnameSet];
+
+      try {
+        await new AstAnalyser({
+          collectables
+        }).analyseFile(tempOneLineFile, {
+          metadata: { spec: "react@19.0.1" }
+        });
+      }
+      finally {
+        unlinkSync(tempOneLineFile);
+      }
+      assert.deepEqual(Array.from(urlSet), [{
+        value: "http://127.0.0.1/script",
+        locations: [{ file: tmpdir, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
+      }]);
+      assert.deepEqual(Array.from(hostnameSet), []);
+      assert.deepEqual(Array.from(ipSet), [{
+        value: "127.0.0.1",
+        locations: [{ file: tmpdir, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
+      }]);
+    });
+
     it("should implement new customProbes while keeping default probes", async() => {
       const result = await new AstAnalyser(
         {
@@ -565,6 +598,39 @@ describe("AstAnalyser", () => {
       finally {
         unlinkSync(tempOneLineFile);
       }
+    });
+
+    it("should collect infrastructure components", () => {
+      const oneLineContent = "const IPv4URL = 'http://127.0.0.1:80/script'";
+      const tmpdir = os.tmpdir();
+      const tempOneLineFile = path.join(tmpdir, "temp-oneline.js");
+
+      writeFileSync(tempOneLineFile, oneLineContent);
+
+      const urlSet = new CollectableSet("url");
+      const ipSet = new CollectableSet("ip");
+      const hostnameSet = new CollectableSet("hostname");
+      const collectables = [urlSet, ipSet, hostnameSet];
+
+      try {
+        new AstAnalyser({
+          collectables
+        }).analyseFileSync(tempOneLineFile, {
+          metadata: { spec: "react@19.0.1" }
+        });
+      }
+      finally {
+        unlinkSync(tempOneLineFile);
+      }
+      assert.deepEqual(Array.from(urlSet), [{
+        value: "http://127.0.0.1/script",
+        locations: [{ file: tmpdir, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
+      }]);
+      assert.deepEqual(Array.from(hostnameSet), []);
+      assert.deepEqual(Array.from(ipSet), [{
+        value: "127.0.0.1",
+        locations: [{ file: tmpdir, location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
+      }]);
     });
 
     describe("hooks", () => {
