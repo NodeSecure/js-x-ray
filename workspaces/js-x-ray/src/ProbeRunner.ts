@@ -173,6 +173,21 @@ export class ProbeRunner {
     };
   }
 
+  #getProbeHandler(
+    probe: Probe
+  ): (node: any, ctx: ProbeMainContext) => ProbeReturn {
+    if (typeof probe.main === "function") {
+      return probe.main;
+    }
+
+    const selectedName = this.#selectedEntryPoints.get(probe);
+    const handlerName = (selectedName && selectedName in probe.main)
+      ? selectedName
+      : "default";
+
+    return probe.main[handlerName];
+  }
+
   #runProbe(
     probe: Probe,
     node: ESTree.Node
@@ -186,29 +201,18 @@ export class ProbeRunner {
         node,
         ctx
       );
-
-      if (isMatching) {
-        let mainHandler: (node: any, ctx: ProbeMainContext) => ProbeReturn;
-
-        if (typeof probe.main === "function") {
-          mainHandler = probe.main;
-        }
-        else {
-          const selectedName = this.#selectedEntryPoints.get(probe);
-          const handlerName = (selectedName && selectedName in probe.main)
-            ? selectedName
-            : "default";
-          mainHandler = probe.main[handlerName];
-        }
-
-        this.#selectedEntryPoints.delete(probe);
-
-        return mainHandler(node, {
-          ...ctx,
-          signals: ProbeRunner.Signals,
-          data
-        });
+      if (!isMatching) {
+        continue;
       }
+
+      const mainHandler = this.#getProbeHandler(probe);
+      this.#selectedEntryPoints.delete(probe);
+
+      return mainHandler(node, {
+        ...ctx,
+        signals: ProbeRunner.Signals,
+        data
+      });
     }
 
     return null;
