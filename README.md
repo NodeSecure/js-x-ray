@@ -83,6 +83,32 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 > [!TIP]
 > There are also a lot of suspicious code examples in the `./workspaces/js-x-ray/examples` directory. Feel free to try the tool on these files.
 
+### Scanning a complete project
+
+By itself, JS-X-Ray does not provide utilities to walk and scan a complete project. However, NodeSecure has packages to achieve that:
+
+```ts
+import { ManifestManager } from "@nodesecure/mama";
+import { NpmTarball } from "@nodesecure/tarball";
+
+const mama = await ManifestManager.fromPackageJSON(
+  "./path/to/package.json"
+);
+const extractor = new NpmTarball(mama);
+
+const {
+  composition, // Project composition (files, dependencies, extensions)
+  conformance, // License conformance (SPDX)
+  code         // JS-X-Ray analysis results
+} = await extractor.scanFiles();
+
+console.log(code);
+```
+
+The `NpmTarball` class uses JS-X-Ray under the hood, and `ManifestManager` locates entry (input) files for analysis.
+
+Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis. See the [EntryFilesAnalyser API documentation](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md) for more details.
+
 ## API
 
 - [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
