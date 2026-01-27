@@ -87,6 +87,7 @@ The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
 
 - [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
+- [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
 
 ## Warnings
 
