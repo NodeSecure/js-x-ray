@@ -15,7 +15,7 @@ import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
-const kEmailRegex = /^[^\.\s@:](?:[^\s@:]*[^\s@:.])?@[^\.\s@]+(?:\.[^.\s@]+)*$/;
+const kEmailRegex = /^[^.\s@:](?:[^\s@:]*[^\s@:.])?@[^.\s@]+(?:\.[^.\s@]+)*$/;
 /**
  * @description Search for Literal AST Node
  * @see https://github.com/estree/estree/blob/master/es5.md#literal
