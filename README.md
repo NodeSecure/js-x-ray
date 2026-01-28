@@ -117,66 +117,123 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 
 ## Warnings
 
-This section describes how use the `warnings` export.
-
 ```ts
-type WarningName = "parsing-error"
-| "encoded-literal"
-| "unsafe-regex"
-| "unsafe-stmt"
-| "short-identifiers"
-| "suspicious-literal"
-| "suspicious-file"
-| "obfuscated-code"
-| "weak-crypto"
-| "unsafe-import"
-| "unsafe-command"
-| "shady-link"
-| "synchronous-io"
-| "log-usage"
-| "serialize-environment"
-| "monkey-patch";
+type OptionalWarningName =
+  | "synchronous-io"
+  | "log-usage";
+
+type WarningName =
+  | "parsing-error"
+  | "encoded-literal"
+  | "unsafe-regex"
+  | "unsafe-stmt"
+  | "short-identifiers"
+  | "suspicious-literal"
+  | "suspicious-file"
+  | "obfuscated-code"
+  | "weak-crypto"
+  | "shady-link"
+  | "unsafe-command"
+  | "unsafe-import"
+  | "serialize-environment"
+  | "data-exfiltration"
+  | "sql-injection"
+  | "monkey-patch"
+  | OptionalWarningName;
+
+interface Warning<T = WarningName> {
+  kind: T | (string & {});
+  file?: string;
+  value: string | null;
+  source: string;
+  location: null | SourceArrayLocation | SourceArrayLocation[];
+  i18n: string;
+  severity: "Information" | "Warning" | "Critical";
+  experimental?: boolean;
+}
 
 declare const warnings: Record<WarningName, {
   i18n: string;
   severity: "Information" | "Warning" | "Critical";
-  experimental?: boolean;
+  experimental: boolean;
 }>;
 ```
 
-We make a call to `i18n` through the package `NodeSecure/i18n` to get the translation.
+### Optional Warnings
+
+Some warnings are not included by default and must be explicitly requested through the `AstAnalyser` API.
+
+```js
+import { AstAnalyser } from "@nodesecure/js-x-ray";
+
+// Enable all optional warnings
+const scanner = new AstAnalyser({
+  optionalWarnings: true
+});
+
+// Or enable specific optional warnings
+const scannerSpecific = new AstAnalyser({
+  optionalWarnings: ["synchronous-io", "log-usage"]
+});
+```
+
+The following warnings are optional:
+- `synchronous-io` - Detects synchronous I/O operations that could impact performance
+- `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
+
+### Internationalization (i18n)
+
+Warnings support internationalization through the `@nodesecure/i18n` package. Each warning has an i18n key that can be used to retrieve localized descriptions.
 
 ```js
 import * as jsxray from "@nodesecure/js-x-ray";
 import * as i18n from "@nodesecure/i18n";
 
-console.log(i18n.getTokenSync(jsxray.warnings["parsing-error"].i18n));
+const message = i18n.getTokenSync(
+  jsxray.warnings["parsing-error"].i18n
+);
+console.log(message);
 ```
 
-### Legends
+### Warning Catalog
 
-This section describes all the possible warnings returned by JSXRay. Click on the warning **name** for additional information and examples.
+Click on the warning **name** for detailed documentation and examples.
 
-| name | experimental | description |
+#### Critical Severity
+
+| Name | Experimental | Description |
 | --- | :-: | --- |
-| [parsing-error](./docs/parsing-error.md) | ❌ | The AST parser throw an error |
-| [unsafe-import](./docs/unsafe-import.md) | ❌ | Unable to follow an import (`require`, `require.resolve`) statement/expr. |
-| [unsafe-regex](./docs/unsafe-regex.md) | ❌ | A regular expression has been detected as unsafe and may be used for a ReDoS attack |
-| [unsafe-stmt](./docs//unsafe-stmt.md) | ❌ | Usage of dangerous statements like `eval()` or `Function("")` |
-| [unsafe-command](./docs/unsafe-command.md) | ✔️ | Usage of suspicious commands in `spawn()` or `exec()` |
-| [encoded-literal](./docs/encoded-literal.md) | ❌ | An encoded literal has been detected (it can be an hexadecimal value, Unicode sequence or a base64 string) |
-| [short-identifiers](./docs/short-identifiers.md) | ❌ | This means that all identifiers have an average length below 1.5 |
-| [suspicious-literal](./docs/suspicious-literal.md) | ❌ | A suspicious literal has been found in the source code |
-| [suspicious-file](./docs/suspicious-file.md) | ❌ | A suspicious file with more than ten encoded literals in it |
-| [obfuscated-code](./docs/obfuscated-code.md) | ✔️ | There's a very high probability that the code is obfuscated |
-| [weak-crypto](./docs/weak-crypto.md) | ❌ | The code probably contains a weak crypto algorithm (e.g., MD5, SHA1, …) |
-| [shady-link](./docs/shady-link.md) | ❌ | The code contains a shady/unsafe link |
-| [synchronous-io](./docs/synchronous-io.md) | ✔️ | The code contains a synchronous IO call. |
-| [serialize-environment](./docs/serialize-environment.md) | ❌ | The code attempts to serialize process.env which could lead to environment variable exfiltration |
-| [data-exfiltration](./docs/data-exfiltration.md) | ❌ | the code potentially attemps to transfer sensitive data wihtout authorization from a computer or network to an external location. |
-| [log-usage](./docs/log-usage.md) | ❌ | The code contains a log call. |
-| [sql-injection](./docs/sql-injection.md) | ❌ | The code contains a SQL injection vulnerability |
-| [monkey-patch](./docs/monkey-patch.md) | ❌ | The code alters built-in JavaScript prototype properties |
+| [suspicious-file](./docs/suspicious-file.md) | No | Suspicious file containing more than ten encoded literals |
+| [obfuscated-code](./docs/obfuscated-code.md) | **Yes** | High probability of code obfuscation detected |
+
+#### Warning Severity
+
+| Name | Experimental | Description |
+| --- | :-: | --- |
+| [unsafe-import](./docs/unsafe-import.md) | No | Unable to follow an import (`require`, `require.resolve`) statement |
+| [unsafe-regex](./docs/unsafe-regex.md) | No | Unsafe regular expression that may be vulnerable to ReDoS attacks |
+| [unsafe-stmt](./docs/unsafe-stmt.md) | No | Usage of dangerous statements like `eval()` or `Function("")` |
+| [unsafe-command](./docs/unsafe-command.md) | **Yes** | Suspicious commands detected in `spawn()` or `exec()` |
+| [short-identifiers](./docs/short-identifiers.md) | No | Average identifier length below 1.5 characters (possible obfuscation) |
+| [suspicious-literal](./docs/suspicious-literal.md) | No | Suspicious literal values detected in source code |
+| [weak-crypto](./docs/weak-crypto.md) | No | Usage of weak cryptographic algorithms (MD5, SHA1, etc.) |
+| [shady-link](./docs/shady-link.md) | No | Suspicious or potentially malicious URLs detected |
+| [synchronous-io](./docs/synchronous-io.md) ⚠️ | **Yes** | Synchronous I/O operations that may impact performance |
+| [serialize-environment](./docs/serialize-environment.md) | No | Attempts to serialize `process.env` (potential data exfiltration) |
+| [data-exfiltration](./docs/data-exfiltration.md) | No | Potential unauthorized transfer of sensitive data |
+| [sql-injection](./docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
+| [monkey-patch](./docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
+
+#### Information Severity
+
+| Name | Experimental | Description |
+| --- | :-: | --- |
+| [parsing-error](./docs/parsing-error.md) | No | AST parser encountered an error while analyzing the code |
+| [encoded-literal](./docs/encoded-literal.md) | No | Encoded literal detected (hexadecimal, Unicode, base64) |
+| [log-usage](./docs/log-usage.md) ⚠️ | No | Usage of logging functions (console.log, logger methods, etc.) |
+
+> [!NOTE]
+> Warnings marked with ⚠️ are optional and must be explicitly enabled (see [Optional Warnings](#optional-warnings) section).
 
 ## Workspaces
 
