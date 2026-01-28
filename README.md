@@ -115,6 +115,14 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
 - [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
 
+## Benchmarks
+
+This utility helps measure and track the performance of `js-x-ray` using [mitata](https://github.com/evanwashere/mitata).
+
+To run the benchmarks:
+1. Navigate to `workspaces/js-x-ray`.
+2. Run `npm run bench`.
+
 ## Warnings
 
 This section describes how use the `warnings` export.
