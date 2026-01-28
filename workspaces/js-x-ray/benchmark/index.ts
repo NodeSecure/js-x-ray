@@ -2,7 +2,6 @@
 // Import Node.js Dependencies
 import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 
 // Import Third-party Dependencies
 import { run, bench, group } from "mitata";
@@ -11,10 +10,7 @@ import { run, bench, group } from "mitata";
 import { AstAnalyser } from "../src/index.ts";
 
 // Constants
-const __dirname = typeof import.meta.dirname === "string"
-  ? import.meta.dirname
-  : fileURLToPath(new URL(".", import.meta.url));
-const EXAMPLES_DIR = resolve(__dirname, "../examples");
+const EXAMPLES_DIR = resolve(import.meta.dirname, "../examples");
 
 interface Fixture {
   name: string;
