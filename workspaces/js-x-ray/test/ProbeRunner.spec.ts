@@ -178,7 +178,7 @@ describe("ProbeRunner", () => {
       const mainCallArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
       assert.ok(mainCallArgs, "mainCallArgs should be defined");
       assert.strictEqual(mainCallArgs[0], astNode);
-      
+
       assertProbeMainContext(mainCallArgs[1], {
         sourceFile,
         collectableSetRegistry: registry,
@@ -226,7 +226,7 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: undefined
       };
-      
+
       const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
       assert.ok(validateNodeArgs);
       assert.strictEqual(validateNodeArgs[0], astNode);
@@ -265,7 +265,7 @@ describe("ProbeRunner", () => {
       assert.strictEqual(result, "skip");
       assert.strictEqual(fakeProbe.teardown.mock.calls.length, 1);
     });
-    
+
     it("should trigger setEntryPoint and be cleared after execution", () => {
       const fakeProbe = {
         validateNode: mock.fn((node: ESTree.Node, { setEntryPoint }) => {
@@ -383,12 +383,12 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: fakeCtx
       };
-      
+
       const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
       assert.ok(validateNodeArgs, "validateNodeArgs should be defined");
       assert.strictEqual(validateNodeArgs[0], astNode);
       assertProbeCtx((validateNodeArgs as any)[1], expectedContext);
-      
+
       const mainArgs = fakeProbe.main.mock.calls.at(0)?.arguments;
       assert.ok(mainArgs, "mainArgs should be defined");
       assert.strictEqual((mainArgs as any)[0], astNode);
@@ -397,14 +397,14 @@ describe("ProbeRunner", () => {
         data: null,
         signals: ProbeRunner.Signals
       });
-      
+
       const initializeArgs = fakeProbe.initialize.mock.calls.at(0)?.arguments;
       assert.ok(initializeArgs);
       assertProbeCtx((initializeArgs as any)[0], {
         ...expectedContext,
         context: undefined
       });
-      
+
       const finalizeArgs = fakeProbe.finalize.mock.calls.at(0)?.arguments;
       assert.ok(finalizeArgs, "finalizeArgs should be defined");
       assertProbeCtx(finalizeArgs[0], expectedContext);
@@ -442,7 +442,7 @@ describe("ProbeRunner", () => {
         sourceFile,
         context: fakeCtx
       };
-      
+
       const validateNodeArgs = fakeProbe.validateNode.mock.calls.at(0)?.arguments;
       assert.ok(validateNodeArgs);
       assert.strictEqual(validateNodeArgs[0], astNode);
