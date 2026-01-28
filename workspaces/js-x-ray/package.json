@@ -21,7 +21,8 @@
     "prepublishOnly": "npm run build",
     "build": "tsc",
     "test-only": "node --test-reporter=spec --test ./test/**/*.spec.ts",
-    "test": "c8 --all --src ./src -r html npm run test-only"
+    "test": "c8 --all --src ./src -r html npm run test-only",
+    "bench": "node --expose-gc --import=tsx ./benchmark/index.ts"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
@@ -63,6 +64,8 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
-    "astring": "1.9.0"
+    "astring": "1.9.0",
+    "mitata": "1.0.34",
+    "tsx": "^4.21.0"
   }
 }
