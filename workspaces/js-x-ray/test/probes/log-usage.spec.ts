@@ -10,7 +10,7 @@ import { AstAnalyser } from "../../src/index.ts";
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/logUsage/", import.meta.url);
 
-test("it should detect log methods", async () => {
+test("it should detect log methods", async() => {
   const fixtureFiles = await fs.readdir(kFixtureURL);
   for (const fixtureFile of fixtureFiles) {
     const fixture = readFileSync(new URL(fixtureFile, kFixtureURL), "utf-8");

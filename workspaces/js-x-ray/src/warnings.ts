@@ -10,7 +10,8 @@ import {
 } from "./utils/toArrayLocation.ts";
 
 export type OptionalWarningName =
-  | "synchronous-io" | "log-usage";
+  | "synchronous-io"
+  | "log-usage";
 
 export type WarningName =
   | "parsing-error"
@@ -28,6 +29,7 @@ export type WarningName =
   | "serialize-environment"
   | "data-exfiltration"
   | "sql-injection"
+  | "monkey-patch"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -124,6 +126,11 @@ export const warnings = Object.freeze({
   },
   "sql-injection": {
     i18n: "sast_warnings.sql_injection",
+    severity: "Warning",
+    experimental: false
+  },
+  "monkey-patch": {
+    i18n: "sast_warnings.monkey_patch",
     severity: "Warning",
     experimental: false
   }

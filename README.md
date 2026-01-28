@@ -134,7 +134,8 @@ type WarningName = "parsing-error"
 | "shady-link"
 | "synchronous-io"
 | "log-usage"
-| "serialize-environment";
+| "serialize-environment"
+| "monkey-patch";
 
 declare const warnings: Record<WarningName, {
   i18n: string;
@@ -175,7 +176,7 @@ This section describes all the possible warnings returned by JSXRay. Click on th
 | [data-exfiltration](./docs/data-exfiltration.md) | ❌ | the code potentially attemps to transfer sensitive data wihtout authorization from a computer or network to an external location. |
 | [log-usage](./docs/log-usage.md) | ❌ | The code contains a log call. |
 | [sql-injection](./docs/sql-injection.md) | ❌ | The code contains a SQL injection vulnerability |
-
+| [monkey-patch](./docs/monkey-patch.md) | ❌ | The code alters built-in JavaScript prototype properties |
 
 ## Workspaces
 

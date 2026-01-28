@@ -296,9 +296,9 @@ describe("email collection", () => {
 
     const emails = Array.from(emailSet);
     assert.strictEqual(emails.length, 3);
-    assert.ok(emails.some(e => e.value === "user@example.com"));
-    assert.ok(emails.some(e => e.value === "name.surname@domain.co.uk"));
-    assert.ok(emails.some(e => e.value === "test123@test-domain.org"));
+    assert.ok(emails.some((e) => e.value === "user@example.com"));
+    assert.ok(emails.some((e) => e.value === "name.surname@domain.co.uk"));
+    assert.ok(emails.some((e) => e.value === "test123@test-domain.org"));
   });
 
   test("should not collect invalid email formats", () => {
@@ -311,7 +311,7 @@ describe("email collection", () => {
     `;
     const ast = parseScript(str);
     const emailSet = new CollectableSet("email");
-    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
+    getSastAnalysis(isLiteral, { collectables: [emailSet] })
       .execute(ast.body);
 
     const emails = Array.from(emailSet);
@@ -327,21 +327,21 @@ describe("email collection", () => {
     `;
     const ast = parseScript(str);
     const emailSet = new CollectableSet("email");
-    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
+    getSastAnalysis(isLiteral, { collectables: [emailSet] })
       .execute(ast.body);
 
     const emails = Array.from(emailSet);
     assert.strictEqual(emails.length, 3);
-    assert.ok(emails.some(e => e.value === "admin@site.com"));
-    assert.ok(emails.some(e => e.value === "support@help.io"));
-    assert.ok(emails.some(e => e.value === "info@company.net"));
+    assert.ok(emails.some((e) => e.value === "admin@site.com"));
+    assert.ok(emails.some((e) => e.value === "support@help.io"));
+    assert.ok(emails.some((e) => e.value === "info@company.net"));
   });
 
   test("should track email locations correctly", () => {
     const str = `const email = "test@example.com";`;
     const ast = parseScript(str);
     const emailSet = new CollectableSet("email");
-    const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet], location: "test.js" })
+    getSastAnalysis(isLiteral, { collectables: [emailSet], location: "test.js" })
       .execute(ast.body);
 
     const emails = Array.from(emailSet);
