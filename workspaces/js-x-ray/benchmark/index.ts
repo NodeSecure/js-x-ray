@@ -77,6 +77,4 @@ group("Obfuscated Code Analysis", () => {
   }
 });
 
-await run({
-  colors: true
-});
+await run();
