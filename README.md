@@ -17,25 +17,39 @@
     </a>
 </p>
 
-JavaScript AST analysis. This package has been created to export the [NodeSecure](https://github.com/NodeSecure/cli) AST analysis to enable better code evolution and allow better access to developers and researchers.
+**JS-X-Ray** is a JavaScript & TypeScript [SAST](https://github.com/resources/articles/what-is-sast) for identifying malicious patterns, security vulnerabilities, and code anomalies. Think of it as ESLint, but dedicated to security analysis. Originally created for [NodeSecure CLI](https://github.com/NodeSecure/cli), JS-X-Ray has become an independent and serious option for supply chain protection.
 
-The goal is to quickly identify dangerous code and patterns for developers and security researchers. Interpreting the results of this tool will still require you to have basic knowledge of secure coding.
+## 🔎 How It Works
 
-## Goals
-The objective of the project is to detect potentially suspicious JavaScript code. The target is code that is added or injected for malicious purposes.
+JS-X-Ray parses code into an **Abstract Syntax Tree (AST)** using [Meriyah](https://github.com/meriyah/meriyah) with no extensive usage of RegEx or Semgrep rules. This enables variable tracing, dynamic import resolution, and detection of sophisticated obfuscation that pattern-matching tools miss. The tradeoff is that JS-X-Ray is purely dedicated to the JavaScript/TypeScript ecosystem.
 
-Most of the time hackers will try to hide the behaviour of their code as much as possible to avoid being spotted or easily understood. The work of the library is to understand and analyze these patterns that will allow us to detect malicious code.
-
-## Feature Highlight
+## 💡 Features
 - Retrieve required dependencies and files for Node.js
-- Detect unsafe regular expressions
-- Get warnings when the AST analysis detects a problem or is unable to follow a statement
-- Highlight common attack patterns and API usages
-- Follow the usage of dangerous Node.js globals
-- Detect obfuscated code and, when possible, the tool that has been used
-- Detect potential performance issues related to usage of synchronous API from Node.js core.
+  - Track `require()`, `import`, and dynamic imports with full tracing capabilities
+  - Detect untraceable and malicious import patterns
+- Scan entire projects with multi-file analysis capabilities
+- Extract infrastructure components (URLs, IPs, emails)
+- Detect malicious code patterns
+  - Obfuscated code with tool identification (freejsobfuscator, jsfuck, jjencode, obfuscator.io, morse, Trojan Source)
+  - Data exfiltration and unauthorized system information collection
+  - Suspicious files with excessive encoded literals
+- Identify vulnerable code patterns
+  - Unsafe statements (`eval()`, `Function()` constructor)
+  - ReDoS vulnerabilities in regular expressions
+  - SQL injection vulnerabilities
+  - Unsafe shell commands in `spawn()` or `exec()` calls
+  - `process.env` serialization attempts
+- Flag weak cryptographic usage
+  - Deprecated algorithms (MD5, SHA1, MD4, MD2, RIPEMD160)
+- Detect code quality issues
+  - Monkey-patching of built-in prototypes
+  - Encoded literals (hex, Unicode, base64)
+  - Suspicious URLs and links
+  - Short identifier lengths (obfuscation indicators)
+  - Synchronous I/O and logging usage (optional)
+- Configurable sensitivity modes (conservative/aggressive) and extensible probe system 
 
-## Getting Started
+## 💃 Getting Started
 
 This package is available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 
@@ -45,7 +59,7 @@ $ npm i @nodesecure/js-x-ray
 $ yarn add @nodesecure/js-x-ray
 ```
 
-## Usage example
+## 👀 Usage example
 
 Create a local `.js` file with the following content:
 ```js
@@ -109,7 +123,7 @@ The `NpmTarball` class uses JS-X-Ray under the hood, and `ManifestManager` locat
 
 Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis. See the [EntryFilesAnalyser API documentation](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md) for more details.
 
-## API
+## 📚 API
 
 - [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
