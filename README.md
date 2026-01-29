@@ -242,6 +242,7 @@ Click on one of the links to access the documentation of the workspace:
 | name | package and link |
 | --- | --- |
 | js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
+| js-x-ray-ai | [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai) |
 | estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
 | tracer | [@nodesecure/tracer](./workspaces/tracer) |
 | sec-literal | [@nodesecure/sec-literal](./workspaces/sec-literal) |
