@@ -30,6 +30,8 @@ jobs:
         run: npm install --ignore-scripts
       - name: Build typescript sources
         run: npm run build
+      - name: Run lint
+        run: npm run lint
       - name: Run tests
         run: npm run test
       - name: Send coverage report to Codecov
