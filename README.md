@@ -115,6 +115,7 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
 - [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
 
+
 ## Warnings
 
 ```ts
@@ -253,6 +254,14 @@ $ npm i @nodesecure/estree-ast-util
 # or
 $ yarn add @nodesecure/estree-ast-util
 ```
+
+## Benchmarks
+
+The performance of js-x-ray is measured and tracked using [mitata](https://github.com/evanwashere/mitata).
+
+To run the benchmarks:
+1. Navigate to `workspaces/js-x-ray`.
+2. Run `npm run bench`.
 
 ## Contributors ✨
 
