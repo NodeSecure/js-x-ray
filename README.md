@@ -31,7 +31,7 @@ JS-X-Ray parses code into an **Abstract Syntax Tree (AST)** using [Meriyah](http
   - Track `require()`, `import`, and dynamic imports with full tracing capabilities
   - Detect untraceable and malicious import patterns
 - Scan entire projects with multi-file analysis capabilities
-- Extract infrastructure components (URLs, IPs, emails)
+- Extract infrastructure components (URLs, IPs, hostnames, emails)
 - Detect malicious code patterns
   - Obfuscated code with tool identification (freejsobfuscator, jsfuck, jjencode, obfuscator.io, morse, Trojan Source)
   - Data exfiltration and unauthorized system information collection
