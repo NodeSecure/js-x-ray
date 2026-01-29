@@ -236,7 +236,28 @@ Click on the warning **name** for detailed documentation and examples.
 > [!NOTE]
 > Warnings marked with ⚠️ are optional and must be explicitly enabled (see [Optional Warnings](#optional-warnings) section).
 
-## Workspaces
+## Contributors guide
+
+If you are a developer **looking to contribute** to the project, you must first read the [CONTRIBUTING](./CONTRIBUTING.md) guide.
+
+Once you have finished your development, check that the tests (and linter) are still good by running the following script:
+
+```bash
+$ npm run check
+```
+
+> [!CAUTION]
+> In case you introduce a new feature or fix a bug, make sure to include tests for it as well.
+
+### Benchmarks
+
+The performance of js-x-ray is measured and tracked using [mitata](https://github.com/evanwashere/mitata).
+
+To run the benchmarks:
+1. Navigate to `workspaces/js-x-ray`.
+2. Run `npm run bench`.
+
+### Workspaces
 
 Click on one of the links to access the documentation of the workspace:
 
@@ -255,14 +276,6 @@ $ npm i @nodesecure/estree-ast-util
 # or
 $ yarn add @nodesecure/estree-ast-util
 ```
-
-## Benchmarks
-
-The performance of js-x-ray is measured and tracked using [mitata](https://github.com/evanwashere/mitata).
-
-To run the benchmarks:
-1. Navigate to `workspaces/js-x-ray`.
-2. Run `npm run bench`.
 
 ## Contributors ✨
 
