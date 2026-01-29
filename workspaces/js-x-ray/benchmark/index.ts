@@ -12,6 +12,10 @@ import { AstAnalyser } from "../src/index.ts";
 // Constants
 const EXAMPLES_DIR = resolve(import.meta.dirname, "../examples");
 
+const KILOBYTE = 1024;
+const SMALL_THRESHOLD = 10 * KILOBYTE;
+const LARGE_THRESHOLD = 50 * KILOBYTE;
+
 interface Fixture {
   name: string;
   content: string;
@@ -42,9 +46,9 @@ function formatFileSize(fixture: Fixture): string {
 
 group("AstAnalyser.analyse()", () => {
   const sortedFixtures = [...fixtures].sort((a, b) => a.size - b.size);
-  const smallFixture = sortedFixtures[0];
-  const mediumFixture = sortedFixtures[Math.floor(sortedFixtures.length / 2)];
-  const largeFixture = sortedFixtures[sortedFixtures.length - 1];
+  const smallFixture = sortedFixtures.find((f) => f.size < SMALL_THRESHOLD) || sortedFixtures[0];
+  const mediumFixture = sortedFixtures.find((f) => f.size >= SMALL_THRESHOLD && f.size < LARGE_THRESHOLD);
+  const largeFixture = sortedFixtures.find((f) => f.size >= LARGE_THRESHOLD) || sortedFixtures[sortedFixtures.length - 1];
 
   if (smallFixture) {
     bench(`Small File (${formatFileSize(smallFixture)})`, () => {
