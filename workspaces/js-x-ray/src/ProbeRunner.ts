@@ -229,7 +229,7 @@ export class ProbeRunner {
 
     if (node.type === "CallExpression") {
       const id = getCallExpressionIdentifier(node, {
-        externalIdentifierLookup: (name) => this.sourceFile.tracer.literalIdentifiers.get(name) ?? null
+        externalIdentifierLookup: (name) => this.sourceFile.tracer.literalIdentifiers.get(name)?.value ?? null
       });
       if (id !== null) {
         tracedIdentifierReport = this.sourceFile.tracer.getDataFromIdentifier(id);

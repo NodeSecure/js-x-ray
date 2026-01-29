@@ -93,7 +93,7 @@ function main(
     case "Identifier":
       if (sourceFile.tracer.literalIdentifiers.has(arg.name)) {
         sourceFile.addDependency(
-          sourceFile.tracer.literalIdentifiers.get(arg.name)!,
+          sourceFile.tracer.literalIdentifiers.get(arg.name)?.value!,
           node.loc
         );
       }
@@ -115,7 +115,7 @@ function main(
     case "ArrayExpression": {
       const value = [
         ...arrayExpressionToString(arg, {
-          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null
+          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name)?.value ?? null
         })
       ]
         .join("")
@@ -143,7 +143,7 @@ function main(
 
       try {
         const iter = concatBinaryExpression(arg, {
-          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name) ?? null,
+          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name)?.value ?? null,
           stopOnUnsupportedNode: true
         });
 

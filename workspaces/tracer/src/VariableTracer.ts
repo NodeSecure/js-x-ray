@@ -8,9 +8,10 @@ import {
   getCallExpressionIdentifier,
   getMemberExpressionIdentifier,
   getVariableDeclarationIdentifiers,
-  isLiteral
+  isLiteral,
+  toLiteral
 } from "@nodesecure/estree-ast-utils";
-import type { ESTree } from "meriyah";
+import { type ESTree } from "meriyah";
 import { match } from "ts-pattern";
 
 // Import Internal Dependencies
@@ -84,12 +85,17 @@ export interface ImportEventPayload {
   location: ESTree.SourceLocation | null | undefined;
 }
 
+export interface LiteralIdentifier {
+  value: string;
+  type: "Literal" | "TemplateLiteral";
+}
+
 export class VariableTracer extends EventEmitter {
   static AssignmentEvent = Symbol("AssignmentEvent");
   static ImportEvent = Symbol("ImportEvent");
 
   // PUBLIC PROPERTIES
-  literalIdentifiers = new Map<string, string>();
+  literalIdentifiers = new Map<string, LiteralIdentifier>();
   importedModules = new Set<string>();
 
   // PRIVATE PROPERTIES
@@ -299,7 +305,7 @@ export class VariableTracer extends EventEmitter {
     const callExprArguments = getCallExpressionArguments(
       node,
       {
-        externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
+        externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
       }
     );
     if (callExprArguments === null) {
@@ -310,7 +316,10 @@ export class VariableTracer extends EventEmitter {
     if (typeof callExprArgumentNode === "string") {
       this.literalIdentifiers.set(
         id.name,
-        Buffer.from(callExprArgumentNode, "base64").toString()
+        {
+          value: Buffer.from(callExprArgumentNode, "base64").toString(),
+          type: "Literal"
+        }
       );
     }
   }
@@ -401,7 +410,18 @@ export class VariableTracer extends EventEmitter {
     switch (childNode.type) {
       // let foo = "10"; <-- "foo" is the key and "10" the value
       case "Literal": {
-        this.literalIdentifiers.set(id.name, String(childNode.value));
+        this.literalIdentifiers.set(id.name, {
+          value: String(childNode.value),
+          type: childNode.type
+        });
+        break;
+      }
+      // const x = `hello ${name}`; "x" is the key and "hello ${0}" the value
+      case "TemplateLiteral": {
+        this.literalIdentifiers.set(id.name, {
+          value: toLiteral(childNode),
+          type: childNode.type
+        });
         break;
       }
 
@@ -520,7 +540,7 @@ export class VariableTracer extends EventEmitter {
           ...getMemberExpressionIdentifier(
             childNode,
             {
-              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name) ?? null
+              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
             }
           )
         ];
