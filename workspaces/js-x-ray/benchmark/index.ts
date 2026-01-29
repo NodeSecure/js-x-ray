@@ -46,27 +46,28 @@ function formatFileSize(fixture: Fixture): string {
 
 group("AstAnalyser.analyse()", () => {
   const sortedFixtures = [...fixtures].sort((a, b) => a.size - b.size);
-  const smallFixture = sortedFixtures.find((f) => f.size < SMALL_THRESHOLD) || sortedFixtures[0];
-  const mediumFixture = sortedFixtures.find((f) => f.size >= SMALL_THRESHOLD && f.size < LARGE_THRESHOLD);
-  const largeFixture = sortedFixtures.find((f) => f.size >= LARGE_THRESHOLD) || sortedFixtures[sortedFixtures.length - 1];
 
-  if (smallFixture) {
-    bench(`Small File (${formatFileSize(smallFixture)})`, () => {
-      analyser.analyse(smallFixture.content);
+  const smallFixtures = sortedFixtures.filter((f) => f.size < SMALL_THRESHOLD);
+  const mediumFixtures = sortedFixtures.filter((f) => f.size >= SMALL_THRESHOLD && f.size < LARGE_THRESHOLD);
+  const largeFixtures = sortedFixtures.filter((f) => f.size >= LARGE_THRESHOLD);
+
+  for (const fixture of smallFixtures) {
+    bench(`Small File (${formatFileSize(fixture)})`, () => {
+      analyser.analyse(fixture.content);
     });
   }
 
-  if (mediumFixture) {
-    bench(`Medium File (${formatFileSize(mediumFixture)})`, () => {
-      analyser.analyse(mediumFixture.content);
+  for (const fixture of mediumFixtures) {
+    bench(`Medium File (${formatFileSize(fixture)})`, () => {
+      analyser.analyse(fixture.content);
     });
   }
 
-  if (largeFixture) {
-    bench(`Large File (${formatFileSize(largeFixture)})`, () => {
-      analyser.analyse(largeFixture.content);
+  for (const fixture of largeFixtures) {
+    bench(`Large File (${formatFileSize(fixture)})`, () => {
+      analyser.analyse(fixture.content);
     })
-    // Large files might need GC between runs to be stable
+      // Large files might need GC between runs to be stable
       .gc("inner");
   }
 });
