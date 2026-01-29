@@ -200,7 +200,7 @@ $ yarn add @nodesecure/estree-ast-util
 
 ## Benchmarks
 
-This utility helps measure and track the performance of `js-x-ray` using [mitata](https://github.com/evanwashere/mitata).
+The performance of js-x-ray is measured and tracked using [mitata](https://github.com/evanwashere/mitata).
 
 To run the benchmarks:
 1. Navigate to `workspaces/js-x-ray`.
