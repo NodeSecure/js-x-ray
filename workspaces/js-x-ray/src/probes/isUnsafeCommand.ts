@@ -1,5 +1,6 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
+import { toLiteral } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
 import type {
@@ -12,7 +13,6 @@ import {
   isTemplateLiteral
 } from "../types/estree.ts";
 import { generateWarning } from "../warnings.ts";
-import { toLiteral } from "../utils/toLiteral.ts";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];

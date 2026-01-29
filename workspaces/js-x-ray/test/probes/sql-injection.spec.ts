@@ -27,6 +27,34 @@ describe("sql-injection", () => {
     });
   });
 
+  test("should detect sql injection assigned in a variable", () => {
+    const query = "`SELECT * FROM users WHERE id = ${userId}`";
+    const code = `const userId = req.query.id;
+                  const query = ${query};
+                  db.query(query);`;
+
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
+    assert.strictEqual(outputWarnings.length, 1);
+    assert.deepEqual(outputWarnings[0].kind, "sql-injection");
+    assert.strictEqual(outputWarnings[0].value, query.replace(/\$\{[^}]*\}/, "${0}").replace(/`/g, ""));
+  });
+
+  test("should not detect sql injection when the query is not a TemplateLiteral in variable", () => {
+    const code = `const query = "SELECT * FROM users WHERE id = 1";
+                  db.query(query);`;
+
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
+    assert.strictEqual(outputWarnings.length, 0);
+  });
+
+  test("should not detect sql injection when the variable is not an sql query", () => {
+    const code = `const query = \`hello \${name}\`;
+                  db.query(query);`;
+
+    const { warnings: outputWarnings } = new AstAnalyser().analyse(code);
+    assert.strictEqual(outputWarnings.length, 0);
+  });
+
   test("should be case insensitive", () => {
     const queries = [
       "`SeLEcT * FRoM users wHERe eMail = ${email}`",

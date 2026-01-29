@@ -138,7 +138,23 @@ test("it should be able to Trace a require Assignment with atob", () => {
   assert.strictEqual(eventOne.id, "xo");
 
   assert.ok(helpers.tracer.literalIdentifiers.has("ff"));
-  assert.strictEqual(helpers.tracer.literalIdentifiers.get("ff"), "os");
+  assert.deepEqual(helpers.tracer.literalIdentifiers.get("ff"), {
+    value: "os",
+    type: "Literal"
+  });
+});
+
+test("it should be able to Trace template literals who has being assigned", () => {
+  const helpers = createTracer();
+
+  helpers.walkOnCode(`
+    const x = \`hello \${name}\`;
+  `);
+  assert.ok(helpers.tracer.literalIdentifiers.has("x"));
+  assert.deepEqual(helpers.tracer.literalIdentifiers.get("x"), {
+    value: `hello \${${0}}`,
+    type: "TemplateLiteral"
+  });
 });
 
 test("it should be able to Trace a global assignment using a LogicalExpression", () => {

@@ -1,29 +1,50 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
+import { toLiteral } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
-import type { ProbeMainContext } from "../ProbeRunner.ts";
-import { toLiteral } from "../utils/toLiteral.ts";
+import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kSqlInjectionRegex = /(select\s+.*\s+from|insert\s+into|delete\s+from|update\s+.*\s+set)/i;
 
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Node,
+  { sourceFile: { tracer } }: ProbeContext
 ): [boolean, any?] {
   if (node.type !== "CallExpression") {
     return [false];
   }
 
   for (const argNode of node.arguments) {
-    if (argNode.type !== "TemplateLiteral" || argNode.expressions.length === 0) {
-      continue;
-    }
+    switch (argNode.type) {
+      case "Identifier": {
+        if (!tracer.literalIdentifiers.has(argNode.name)) {
+          break;
+        }
 
-    const literal = toLiteral(argNode);
-    if (kSqlInjectionRegex.test(literal)) {
-      return [true, literal];
+        const literalIdentifier = tracer.literalIdentifiers.get(argNode.name);
+
+        if (literalIdentifier!.type !== "TemplateLiteral" ||
+          !kSqlInjectionRegex.test(literalIdentifier!.value)) {
+          break;
+        }
+
+        return [true, tracer.literalIdentifiers.get(argNode.name)?.value];
+      }
+
+      case "TemplateLiteral": {
+        if (argNode.expressions.length === 0) {
+          break;
+        }
+        const literal = toLiteral(argNode);
+        if (!kSqlInjectionRegex.test(literal)) {
+          break;
+        }
+
+        return [true, literal];
+      }
     }
   }
 

@@ -4,6 +4,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { concatBinaryExpression } from "./concatBinaryExpression.ts";
+import { toLiteral } from "./toLiteral.ts";
 import {
   type DefaultOptions,
   noop
@@ -39,6 +40,12 @@ export function getCallExpressionArguments(
         if (typeof arg.value === "string") {
           literalsNode.push(hexToString(arg.value));
         }
+
+        break;
+      }
+      case "TemplateLiteral": {
+        const literal = toLiteral(arg);
+        literalsNode.push(literal);
 
         break;
       }
