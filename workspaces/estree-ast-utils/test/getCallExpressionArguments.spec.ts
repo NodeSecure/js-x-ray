@@ -60,4 +60,15 @@ describe("getCallExpressionArguments", () => {
 
     assert.deepEqual(args, ["hello world"]);
   });
+
+  test("resolve the TemplateLiteral and return is Literal value", () => {
+    /* eslint-disable-next-line no-template-curly-in-string */
+    const [astNode] = codeToAst("foo(`hello ${name}`);");
+    const args = getCallExpressionArguments(
+      getExpressionFromStatement(astNode)
+    );
+
+    /* eslint-disable-next-line no-template-curly-in-string */
+    assert.deepEqual(args, ["hello ${0}"]);
+  });
 });

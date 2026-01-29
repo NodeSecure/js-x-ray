@@ -7,4 +7,5 @@ export * from "./getMemberExpressionIdentifier.ts";
 export * from "./getVariableDeclarationIdentifiers.ts";
 export type { DefaultOptions } from "./options.ts";
 export * from "./utils/is.ts";
+export * from "./toLiteral.ts";
 
