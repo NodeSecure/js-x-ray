@@ -1,5 +1,11 @@
 # @nodesecure/estree-ast-utils
 
+## 4.3.0
+
+### Minor Changes
+
+- [#501](https://github.com/NodeSecure/js-x-ray/pull/501) [`1c2c39f`](https://github.com/NodeSecure/js-x-ray/commit/1c2c39fecc9a584e8788507a822023d10bd87c7c) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: detect identifier sql-injection
+
 ## 4.2.0
 
 ### Minor Changes

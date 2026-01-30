@@ -1,5 +1,31 @@
 # @nodesecure/js-x-ray
 
+## 11.5.0
+
+### Minor Changes
+
+- [#494](https://github.com/NodeSecure/js-x-ray/pull/494) [`3686651`](https://github.com/NodeSecure/js-x-ray/commit/3686651862cb376059353d370518c16e55e70653) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): detect more sync IO method for crypto module
+
+- [#505](https://github.com/NodeSecure/js-x-ray/pull/505) [`4800d5d`](https://github.com/NodeSecure/js-x-ray/commit/4800d5d0470eed3c51f15258b1723ec1b3a4b349) Thanks [@fraxken](https://github.com/fraxken)! - Implement i18n translation locally for warnings
+
+- [#483](https://github.com/NodeSecure/js-x-ray/pull/483) [`996be20`](https://github.com/NodeSecure/js-x-ray/commit/996be20594911b2de0cb7cb36da5addb81b9f6be) Thanks [@clemgbld](https://github.com/clemgbld)! - refactor(js-x-ray): valideProbe optimisation on CallExpressionIdentifier with tracer
+
+- [#486](https://github.com/NodeSecure/js-x-ray/pull/486) [`4259011`](https://github.com/NodeSecure/js-x-ray/commit/425901199e1153cec1cde067731a1c3b789d36a3) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): add metadata in analyzeFile and analyzeFileSync in AstAnalyzer
+
+- [#485](https://github.com/NodeSecure/js-x-ray/pull/485) [`cf75218`](https://github.com/NodeSecure/js-x-ray/commit/cf75218976d590dbcde663484523a70add75f2af) Thanks [@fraxken](https://github.com/fraxken)! - Implement a new monkey-patch warning/probe
+
+- [#501](https://github.com/NodeSecure/js-x-ray/pull/501) [`1c2c39f`](https://github.com/NodeSecure/js-x-ray/commit/1c2c39fecc9a584e8788507a822023d10bd87c7c) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: detect identifier sql-injection
+
+- [#491](https://github.com/NodeSecure/js-x-ray/pull/491) [`4674d38`](https://github.com/NodeSecure/js-x-ray/commit/4674d383c94b18aff56a299d4a8f14ed90adea32) Thanks [@fraxken](https://github.com/fraxken)! - Enhance ProbeRunner runProbe readability by removing tabs and implementing a new private method #getProbeHandler
+
+### Patch Changes
+
+- [#496](https://github.com/NodeSecure/js-x-ray/pull/496) [`667cccf`](https://github.com/NodeSecure/js-x-ray/commit/667cccf3163cbad20ba9ca0a3802f1b012e6ae20) Thanks [@7amed3li](https://github.com/7amed3li)! - feat: add performance benchmarks using mitata
+
+- Updated dependencies [[`1c2c39f`](https://github.com/NodeSecure/js-x-ray/commit/1c2c39fecc9a584e8788507a822023d10bd87c7c)]:
+  - @nodesecure/tracer@4.0.0
+  - @nodesecure/estree-ast-utils@4.3.0
+
 ## 11.4.0
 
 ### Minor Changes
