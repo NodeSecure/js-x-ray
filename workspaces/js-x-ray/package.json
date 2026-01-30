@@ -64,6 +64,7 @@
     "ts-pattern": "^5.0.6"
   },
   "devDependencies": {
+    "@nodesecure/i18n": "4.0.3",
     "astring": "1.9.0",
     "mitata": "1.0.34"
   }

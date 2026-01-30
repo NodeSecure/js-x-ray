@@ -1,3 +1,6 @@
+// Import Node.js Dependencies
+import path from "node:path";
+
 export * from "./AstAnalyser.ts";
 export * from "./EntryFilesAnalyser.ts";
 export * from "./JsSourceParser.ts";
@@ -10,3 +13,6 @@ export * from "./warnings.ts";
 export * from "./CollectableSet.ts";
 export * from "./contants.ts";
 
+export function i18nLocation() {
+  return path.join(import.meta.dirname, "i18n");
+}

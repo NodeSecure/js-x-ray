@@ -207,6 +207,8 @@ Warnings support internationalization through the `@nodesecure/i18n` package. Ea
 import * as jsxray from "@nodesecure/js-x-ray";
 import * as i18n from "@nodesecure/i18n";
 
+await i18n.extendFromSystemPath(jsxray.i18nLocation());
+
 const message = i18n.getTokenSync(
   jsxray.warnings["parsing-error"].i18n
 );
