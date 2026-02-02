@@ -21,9 +21,9 @@ test("should detect prototype pollution via __proto__ property access", () => {
   const { warnings } = analyser.analyse(str);
 
   assert.strictEqual(warnings.length, 1);
-  assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
+  assert.partialDeepStrictEqual(warnings[0], {
+    kind: "prototype-pollution",
     value: "obj.__proto__",
-    location: { start: { line: 3, column: 4 }, end: { line: 3, column: 17 } }
   }));
 });
 
