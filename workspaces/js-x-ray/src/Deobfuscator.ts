@@ -1,10 +1,10 @@
 // Import Third-party Dependencies
-import { getVariableDeclarationIdentifiers } from "@nodesecure/estree-ast-utils";
 import { Patterns, Utils } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 import { match } from "ts-pattern";
 
 // Import Internal Dependencies
+import { getVariableDeclarationIdentifiers } from "./estree/index.ts";
 import { NodeCounter } from "./NodeCounter.ts";
 import { extractNode } from "./utils/index.ts";
 

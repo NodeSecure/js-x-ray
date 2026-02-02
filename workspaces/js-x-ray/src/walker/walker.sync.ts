@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { isNode } from "../types/estree.ts";
+import { isNode } from "../estree/types.ts";
 import { WalkerBase, type WalkerContext } from "./walker.base.ts";
 
 export type SyncHandler = (

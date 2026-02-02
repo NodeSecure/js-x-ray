@@ -2,6 +2,10 @@
 import { EventEmitter } from "node:events";
 
 // Import Third-party Dependencies
+import { type ESTree } from "meriyah";
+import { match } from "ts-pattern";
+
+// Import Internal Dependencies
 import {
   extractLogicalExpression,
   getCallExpressionArguments,
@@ -10,11 +14,7 @@ import {
   getVariableDeclarationIdentifiers,
   isLiteral,
   toLiteral
-} from "@nodesecure/estree-ast-utils";
-import { type ESTree } from "meriyah";
-import { match } from "ts-pattern";
-
-// Import Internal Dependencies
+} from "./estree/index.ts";
 import {
   getSubMemberExpressionSegments,
   isEvilIdentifierPath,

@@ -15,6 +15,16 @@ import { walk } from "../src/walker/index.ts";
 import { CollectableSet } from "../src/CollectableSet.ts";
 import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
+export function getExpressionFromStatement(node: any) {
+  return node.type === "ExpressionStatement" ? node.expression : null;
+}
+
+export function getExpressionFromStatementIf(
+  node: any
+) {
+  return node.type === "ExpressionStatement" ? node.expression : node;
+}
+
 export function getWarningKind(
   warnings: Warning[]
 ): string[] {

@@ -3,18 +3,18 @@ import assert from "node:assert";
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { getCallExpressionIdentifier } from "../src/index.ts";
-import { codeToAst, getExpressionFromStatement } from "./utils.ts";
+import { getCallExpressionIdentifier } from "../../src/estree/index.ts";
+import { parseScript, getExpressionFromStatement } from "../helpers.ts";
 
 test("given a JavaScript eval CallExpression then it must return eval", () => {
-  const [astNode] = codeToAst("eval(\"this\");");
+  const [astNode] = parseScript("eval(\"this\");").body;
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
   assert.strictEqual(nodeIdentifier, "eval");
 });
 
 test("given a Function(`...`)() Double CallExpression then it must return the Function literal identifier", () => {
-  const [astNode] = codeToAst("Function(\"return this\")();");
+  const [astNode] = parseScript("Function(\"return this\")();").body;
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
   assert.strictEqual(nodeIdentifier, "Function");
@@ -22,7 +22,7 @@ test("given a Function(`...`)() Double CallExpression then it must return the Fu
 
 test(`given a Function("...")() Double CallExpression with resolveCallExpression options disabled
 then it must return null`, () => {
-  const [astNode] = codeToAst("Function(\"return this\")();");
+  const [astNode] = parseScript("Function(\"return this\")();").body;
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: false }
@@ -32,7 +32,7 @@ then it must return null`, () => {
 });
 
 test("given a JavaScript AssignmentExpression then it must return null", () => {
-  const [astNode] = codeToAst("foo = 10;");
+  const [astNode] = parseScript("foo = 10;").body;
   const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 
   assert.strictEqual(nodeIdentifier, null);
@@ -40,7 +40,7 @@ test("given a JavaScript AssignmentExpression then it must return null", () => {
 
 test(`given a require statement immediatly invoked with resolveCallExpression options enabled
 then it must return require literal identifier`, () => {
-  const [astNode] = codeToAst("require('foo')();");
+  const [astNode] = parseScript("require('foo')();").body;
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: true }
@@ -51,7 +51,7 @@ then it must return require literal identifier`, () => {
 
 test(`given a require statement immediatly invoked with resolveCallExpression options disabled
 then it must return null`, () => {
-  const [astNode] = codeToAst("require('foo')();");
+  const [astNode] = parseScript("require('foo')();").body;
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: false }
@@ -62,7 +62,7 @@ then it must return null`, () => {
 
 test(`given two CallExpression with a MemberExpression coming first
   then it must return the full identifier path`, () => {
-  const [astNode] = codeToAst("foo.bar().yo();");
+  const [astNode] = parseScript("foo.bar().yo();").body;
   const nodeIdentifier = getCallExpressionIdentifier(
     getExpressionFromStatement(astNode),
     { resolveCallExpression: true }

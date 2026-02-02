@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { isNode } from "../types/estree.ts";
+import { isNode } from "../estree/types.ts";
 
 export type NodeExtractorCallback<T> = (node: T) => void;
 export type NodeOrNull = ESTree.Node | null;

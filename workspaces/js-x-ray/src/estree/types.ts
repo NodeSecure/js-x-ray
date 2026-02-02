@@ -51,3 +51,11 @@ export function isCallExpression(
 ): node is ESTree.CallExpression {
   return isNode(node) && node.type === "CallExpression";
 }
+
+export interface DefaultOptions {
+  externalIdentifierLookup?(name: string): string | null;
+}
+
+export function noop(_name: string): string | null {
+  return null;
+}

@@ -4,7 +4,7 @@ import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
 import { SourceFile } from "../SourceFile.ts";
-import type { Literal, RegExpLiteral } from "../types/estree.ts";
+import type { Literal, RegExpLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**

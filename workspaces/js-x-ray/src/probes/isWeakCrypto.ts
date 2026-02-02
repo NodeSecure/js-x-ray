@@ -6,7 +6,7 @@ import type { ProbeContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
   isLiteral
-} from "../types/estree.ts";
+} from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS

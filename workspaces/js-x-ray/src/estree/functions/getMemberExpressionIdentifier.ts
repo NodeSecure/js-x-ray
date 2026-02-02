@@ -7,7 +7,7 @@ import { concatBinaryExpression } from "./concatBinaryExpression.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.ts";
+} from "../types.ts";
 
 /**
  * Return the complete identifier of a MemberExpression

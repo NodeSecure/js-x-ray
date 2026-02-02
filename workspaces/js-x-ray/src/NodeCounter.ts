@@ -3,7 +3,7 @@ import FrequencySet from "frequency-set";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { isNode } from "./types/estree.ts";
+import { isNode } from "./estree/types.ts";
 
 function noop() {
   return true;

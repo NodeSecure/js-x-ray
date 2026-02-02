@@ -3,15 +3,15 @@ import assert from "node:assert";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { getVariableDeclarationIdentifiers } from "../src/index.ts";
+import { getVariableDeclarationIdentifiers } from "../../src/estree/index.ts";
 import {
-  codeToAst,
+  parseScript,
   getExpressionFromStatementIf
-} from "./utils.ts";
+} from "../helpers.ts";
 
 describe("getVariableDeclarationIdentifiers", () => {
   test("return empty array when the node is not a VariableDeclaration", () => {
-    const [astNode] = codeToAst("foobar();");
+    const [astNode] = parseScript("foobar();").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -20,7 +20,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return the Identifier from VariableDeclaration", () => {
-    const [astNode] = codeToAst("const a = 1;");
+    const [astNode] = parseScript("const a = 1;").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -32,7 +32,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return all Identifiers from VariableDeclaration", () => {
-    const [astNode] = codeToAst("const a = 1, b = 2;");
+    const [astNode] = parseScript("const a = 1, b = 2;").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -53,7 +53,7 @@ describe("getVariableDeclarationIdentifiers", () => {
     ];
 
     for (const code of cases) {
-      const [astNode] = codeToAst(code);
+      const [astNode] = parseScript(code).body;
       const iter = getVariableDeclarationIdentifiers(
         getExpressionFromStatementIf(astNode)
       );
@@ -71,7 +71,7 @@ describe("getVariableDeclarationIdentifiers", () => {
     ];
 
     for (const code of cases) {
-      const [astNode] = codeToAst(code);
+      const [astNode] = parseScript(code).body;
       const iter = getVariableDeclarationIdentifiers(
         getExpressionFromStatementIf(astNode)
       );
@@ -83,7 +83,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return deeply destructured Identifier", () => {
-    const [astNode] = codeToAst("const { hello: { world } } = {}");
+    const [astNode] = parseScript("const { hello: { world } } = {}").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -94,7 +94,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return the Identifier in an AssignmentExpression", () => {
-    const [astNode] = codeToAst("(foo = 5)");
+    const [astNode] = parseScript("(foo = 5)").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -105,7 +105,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return all Identifiers of a SequenceExpression", () => {
-    const [astNode] = codeToAst("(foo = 5, bar = null)");
+    const [astNode] = parseScript("(foo = 5, bar = null)").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -116,7 +116,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return the Property identifiers of a given ObjectExpression", () => {
-    const [astNode] = codeToAst("({ foo: 1, bar: 2 });");
+    const [astNode] = parseScript("({ foo: 1, bar: 2 });").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );
@@ -127,7 +127,7 @@ describe("getVariableDeclarationIdentifiers", () => {
   });
 
   test("return the Identifiers of VariableDeclarator id and init", () => {
-    const [astNode] = codeToAst("const hello = { foo: 1, bar: 2 };");
+    const [astNode] = parseScript("const hello = { foo: 1, bar: 2 };").body;
     const iter = getVariableDeclarationIdentifiers(
       getExpressionFromStatementIf(astNode)
     );

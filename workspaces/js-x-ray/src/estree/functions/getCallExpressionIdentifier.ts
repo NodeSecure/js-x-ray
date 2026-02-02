@@ -6,7 +6,7 @@ import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.t
 import {
   type DefaultOptions,
   noop
-} from "./options.ts";
+} from "../types.ts";
 
 export interface GetCallExpressionIdentifierOptions extends DefaultOptions {
   /**

@@ -8,7 +8,7 @@ import { toLiteral } from "./toLiteral.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.ts";
+} from "../types.ts";
 
 export function getCallExpressionArguments(
   node: ESTree.Node,

@@ -1,24 +1,8 @@
-<p align="center">
-  <h1 align="center">
-    @nodesecure/estree-ast-utils
-  </h1>
-</p>
+# ESTree utilities documentation
 
-<p align="center">
-  ESTree compliant utilities to manipulate, extract and transform AST nodes.
-</p>
+This directory contains internal utilities for working with ESTree AST nodes.
 
-## Getting Started
-
-This package is available in the Node Package Repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
-
-```bash
-$ npm i @nodesecure/estree-ast-utils
-# or
-$ yarn add @nodesecure/estree-ast-utils
-```
-
-## API
+## Common Options
 
 Most utility options extend the `DefaultOptions` interface:
 
@@ -30,7 +14,7 @@ export interface DefaultOptions {
 
 You can provide a custom `externalIdentifierLookup` function to enable the utilities to resolve identifiers from external sources—such as **VariableTracer**, for example.
 
----
+## APIs
 
 <details>
 <summary>arrayExpressionToString(node: ESTree.Node | null, options?: ArrayExpressionToStringOptions): IterableIterator< string ></summary>
@@ -208,7 +192,3 @@ const [foo, bar] = [1, 2];
 will return `"foo"` then `"bar"`.
 
 </details>
-
-## License
-
-MIT

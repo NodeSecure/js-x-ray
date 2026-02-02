@@ -6,11 +6,11 @@ import { test } from "node:test";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { extractLogicalExpression } from "../src/index.ts";
-import { codeToAst, getExpressionFromStatement } from "./utils.ts";
+import { extractLogicalExpression } from "../../src/estree/index.ts";
+import { parseScript, getExpressionFromStatement } from "../helpers.ts";
 
 test("it should extract two Nodes from a LogicalExpression with two operands", () => {
-  const [astNode] = codeToAst("5 || 10");
+  const [astNode] = parseScript("5 || 10").body;
   const iter = extractLogicalExpression(
     getExpressionFromStatement(astNode)
   );
@@ -28,7 +28,7 @@ test("it should extract two Nodes from a LogicalExpression with two operands", (
 });
 
 test("it should extract all nodes and add up all Literal values", () => {
-  const [astNode] = codeToAst("5 || 10 || 15 || 20");
+  const [astNode] = parseScript("5 || 10 || 15 || 20").body;
   const iter = extractLogicalExpression(
     getExpressionFromStatement(astNode)
   );
@@ -39,7 +39,7 @@ test("it should extract all nodes and add up all Literal values", () => {
 });
 
 test("it should extract all Nodes but with different operators and a LogicalExpr on the right", () => {
-  const [astNode] = codeToAst("5 || 10 && 55");
+  const [astNode] = parseScript("5 || 10 && 55").body;
   const iter = extractLogicalExpression(
     getExpressionFromStatement(astNode)
   );
