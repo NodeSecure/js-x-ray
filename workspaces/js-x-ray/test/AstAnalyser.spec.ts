@@ -18,7 +18,7 @@ import {
   kWarningUnsafeDanger,
   kWarningUnsafeImport,
   kWarningUnsafeStmt
-} from "./utils/index.ts";
+} from "./helpers.ts";
 import { CollectableSet } from "../src/CollectableSet.ts";
 
 // CONSTANTS

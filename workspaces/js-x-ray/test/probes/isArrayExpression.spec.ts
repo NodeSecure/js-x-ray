@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isArrayExpression from "../../src/probes/isArrayExpression.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("it should trigger analyzeLiteral method one time", (t) => {
   const str = "['foo']";

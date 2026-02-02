@@ -44,20 +44,53 @@ const kUnsafeGlobalCallExpression = new Set(["eval", "Function"]);
 
 export interface DataIdentifierOptions {
   /**
+   * If true, removes global identifier prefixes (globalThis, window, etc.)
    * @default false
+   * @example "globalThis.require" becomes "require"
    */
   removeGlobalIdentifier?: boolean;
 }
 
 export interface SourceTraced {
+  /**
+   * If true, assignments to other variables will also be traced
+   * @default false
+   * @example const r = require; // 'r' will also be traced
+   */
   followConsecutiveAssignment?: boolean;
+
+  /**
+   * If true, return values assigned to variables will be traced
+   * @default false
+   * @example const result = someTracedFunction();
+   */
   followReturnValueAssignement?: boolean;
+
+  /**
+   * Module name to associate with this traced identifier
+   * Used to track if the module has been imported
+   * @default null
+   */
   moduleName?: string | null;
+
+  /**
+   * Human-readable name for this traced identifier
+   * @default identifierOrMemberExpr
+   */
   name?: string;
 }
 
 export interface AssignmentMemory {
+  /**
+   * Type of assignment:
+   * - "AliasBinding": Direct variable assignment (const x = require)
+   * - "ReturnValueAssignment": Assignment from function return (const x = require())
+   */
   type: "AliasBinding" | "ReturnValueAssignment";
+
+  /**
+   * Name of the variable that received the assignment
+   */
   name: string;
 }
 
@@ -67,8 +100,20 @@ export interface Traced extends Required<SourceTraced> {
 }
 
 export interface TracedIdentifierReport {
+  /**
+   * Human-readable name of the traced identifier
+   */
   name: string;
+
+  /**
+   * Full identifier or member expression being traced
+   * @example "process.mainModule.require"
+   */
   identifierOrMemberExpr: string;
+
+  /**
+   * History of assignments made to this traced identifier
+   */
   assignmentMemory: AssignmentMemory[];
 }
 

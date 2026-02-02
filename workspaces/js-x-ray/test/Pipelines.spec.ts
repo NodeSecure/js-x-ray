@@ -9,7 +9,7 @@ import {
 } from "../src/index.ts";
 import {
   getWarningKind
-} from "./utils/index.ts";
+} from "./helpers.ts";
 
 describe("AstAnalyser pipelines", () => {
   test("should iterate once on the pipeline", () => {

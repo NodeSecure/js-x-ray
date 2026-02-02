@@ -4,7 +4,7 @@ import { describe, test } from "node:test";
 
 // Import Internal Dependencies
 import isMonkeyPatch, { JS_TYPES } from "../../src/probes/isMonkeyPatch.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 describe("isMonkeyPatch", () => {
   test("should detect monkey patching via direct prototype assignment", (t) => {

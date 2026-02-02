@@ -6,14 +6,14 @@ import {
   SourceFile,
   type Dependency,
   type Warning
-} from "../../src/index.ts";
+} from "../src/index.ts";
 import {
   ProbeRunner,
   type Probe
-} from "../../src/ProbeRunner.ts";
-import { walk } from "../../src/walker/index.ts";
-import { CollectableSet } from "../../src/CollectableSet.ts";
-import { CollectableSetRegistry } from "../../src/CollectableSetRegistry.ts";
+} from "../src/ProbeRunner.ts";
+import { walk } from "../src/walker/index.ts";
+import { CollectableSet } from "../src/CollectableSet.ts";
+import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
 export function getWarningKind(
   warnings: Warning[]

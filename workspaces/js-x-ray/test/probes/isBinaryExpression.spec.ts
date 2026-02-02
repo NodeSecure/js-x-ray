@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isBinaryExpression from "../../src/probes/isBinaryExpression.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("should detect 1 deep binary expression", () => {
   const str = "0x1*-0x12df+-0x1fb9*-0x1+0x2*-0x66d";

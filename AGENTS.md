@@ -10,7 +10,6 @@ JS-X-Ray is a sophisticated JavaScript AST (Abstract Syntax Tree) analysis tool 
 - **Main Package**: `@nodesecure/js-x-ray` - Primary analysis engine
 - **Supporting Workspaces**:
   - `@nodesecure/estree-ast-utils` - AST manipulation utilities
-  - `@nodesecure/tracer` - Variable and assignment tracking
   - `@nodesecure/sec-literal` - JavaScript literal analysis
   - `@nodesecure/ts-source-parser` - TypeScript source parsing
   - `@nodesecure/js-x-ray-ai` - AI-powered analysis capabilities

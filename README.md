@@ -131,7 +131,7 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 - [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
 - [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
-
+- [VariableTracer](./workspaces/js-x-ray/docs/VariableTracer.md)
 
 ## Warnings
 
@@ -285,7 +285,6 @@ Click on one of the links to access the documentation of the workspace:
 | js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
 | js-x-ray-ai | [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai) |
 | estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
-| tracer | [@nodesecure/tracer](./workspaces/tracer) |
 | sec-literal | [@nodesecure/sec-literal](./workspaces/sec-literal) |
 | ts-source-parser | [@nodesecure/ts-source-parser](./workspaces/ts-source-parser) |
 

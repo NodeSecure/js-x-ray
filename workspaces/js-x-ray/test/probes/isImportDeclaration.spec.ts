@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isImportDeclaration from "../../src/probes/isImportDeclaration.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("should detect 1 dependency for an ImportNamespaceSpecifier", () => {
   const str = "import * as foo from \"bar\"";

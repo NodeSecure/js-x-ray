@@ -6,7 +6,6 @@ import type { ESTree } from "meriyah";
 import {
   getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
-import type { TracedIdentifierReport } from "@nodesecure/tracer";
 
 // Import Internal Dependencies
 import logUsage from "./probes/log-usage.ts";
@@ -28,6 +27,7 @@ import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
 import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 
+import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
 import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
