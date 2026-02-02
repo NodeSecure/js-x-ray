@@ -15,10 +15,9 @@ function validateNode(
 
   if (node.type === "MemberExpression") {
     const parts = [...getMemberExpressionIdentifier(node)];
-    const fullPath = parts.join(".");
 
     if (parts.at(-1) === "__proto__") {
-      return [true, fullPath];
+      return [true, parts.join(".")];
     }
   }
 
