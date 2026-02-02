@@ -1,4 +1,8 @@
+// Import Third-party Dependencies
 import type { ESTree } from "meriyah";
+import { getMemberExpressionIdentifier } from "@nodesecure/estree-ast-utils";
+
+// Import Internal Dependencies
 import { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -10,11 +14,11 @@ function validateNode(
   }
 
   if (node.type === "MemberExpression") {
-    if (
-      (node.property.type === "Identifier" && node.property.name === "__proto__" && !node.computed) ||
-      (node.property.type === "Literal" && node.property.value === "__proto__")
-    ) {
-      return [true, "member"];
+    const parts = [...getMemberExpressionIdentifier(node)];
+    const fullPath = parts.join(".");
+
+    if (parts.at(-1) === "__proto__") {
+      return [true, fullPath];
     }
   }
 
@@ -25,20 +29,20 @@ function main(
   node: ESTree.Literal | ESTree.MemberExpression,
   options: {
     sourceFile: SourceFile;
-    data?: "literal" | "member";
-    signals: { Skip: symbol };
+    data?: string;
+    signals: { Skip: symbol; };
   }
 ) {
   const { sourceFile, data, signals } = options;
 
   sourceFile.warnings.push(
     generateWarning("prototype-pollution", {
-      value: data === "literal" ? "__proto__" : "obj.__proto__",
+      value: data === "literal" ? "__proto__" : data!,
       location: node.loc ?? null
     })
   );
 
-  return data === "member" ? signals.Skip : undefined;
+  return data !== "literal" ? signals.Skip : undefined;
 }
 
 export default {

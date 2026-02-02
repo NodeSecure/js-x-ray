@@ -9,15 +9,7 @@ import type { ESTree } from "meriyah";
 import { AstAnalyser } from "../../src/AstAnalyser.ts";
 import { generateWarning } from "../../src/warnings.ts";
 
-function createSourceLocation(
-  start: [number, number],
-  end: [number, number]
-): ESTree.SourceLocation {
-  return {
-    start: { line: start[0], column: start[1] },
-    end: { line: end[0], column: end[1] }
-  };
-}
+
 
 test("should detect prototype pollution via __proto__ property access", () => {
   const str = `
@@ -31,7 +23,7 @@ test("should detect prototype pollution via __proto__ property access", () => {
   assert.strictEqual(warnings.length, 1);
   assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
     value: "obj.__proto__",
-    location: createSourceLocation([3, 4], [3, 17])
+    location: { start: { line: 3, column: 4 }, end: { line: 3, column: 17 } }
   }));
 });
 
@@ -47,7 +39,7 @@ test("should detect prototype pollution via computed property access", () => {
   assert.strictEqual(warnings.length, 1);
   assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
     value: "obj.__proto__",
-    location: createSourceLocation([3, 4], [3, 20])
+    location: { start: { line: 3, column: 4 }, end: { line: 3, column: 20 } }
   }));
 });
 
@@ -64,6 +56,6 @@ test("should detect prototype pollution via __proto__ literal", () => {
   assert.strictEqual(warnings.length, 1);
   assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
     value: "__proto__",
-    location: createSourceLocation([2, 16], [2, 27])
+    location: { start: { line: 2, column: 16 }, end: { line: 2, column: 27 } }
   }));
 });
