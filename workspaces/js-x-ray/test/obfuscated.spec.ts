@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import {
   AstAnalyser
 } from "../src/index.ts";
-import { getWarningKind } from "./utils/index.ts";
+import { getWarningKind } from "./helpers.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/obfuscated/", import.meta.url);

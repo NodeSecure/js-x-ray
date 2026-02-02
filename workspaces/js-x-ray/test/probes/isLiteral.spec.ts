@@ -4,7 +4,7 @@ import { describe, test } from "node:test";
 
 // Import Internal Dependencies
 import isLiteral from "../../src/probes/isLiteral.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 import { CollectableSet } from "../../src/CollectableSet.ts";
 
 test("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", (t) => {

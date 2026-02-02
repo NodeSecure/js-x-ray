@@ -2,10 +2,10 @@
 import {
   getCallExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
-import { VariableTracer, type ImportEventPayload } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";

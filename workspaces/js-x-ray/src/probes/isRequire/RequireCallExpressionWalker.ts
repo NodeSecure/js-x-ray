@@ -8,10 +8,10 @@ import {
   getMemberExpressionIdentifier
 } from "@nodesecure/estree-ast-utils";
 import { Hex } from "@nodesecure/sec-literal";
-import { VariableTracer } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import type { VariableTracer } from "../../VariableTracer.ts";
 import {
   isCallExpression,
   isLiteral

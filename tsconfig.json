@@ -12,9 +12,6 @@
     },
     {
       "path": "./workspaces/estree-ast-utils"
-    },
-    {
-      "path": "./workspaces/tracer"
     }
   ]
 }

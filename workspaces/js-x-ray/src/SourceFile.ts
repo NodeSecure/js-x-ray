@@ -3,10 +3,10 @@ import path from "node:path";
 
 // Import Third-party Dependencies
 import { Literal, Utils } from "@nodesecure/sec-literal";
-import { VariableTracer } from "@nodesecure/tracer";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { VariableTracer } from "./VariableTracer.ts";
 import type {
   Dependency,
   Sensitivity

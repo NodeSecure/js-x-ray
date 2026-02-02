@@ -3,4 +3,7 @@ export * from "./isMinifiedCode.ts";
 export * from "./isOneLineExpressionExport.ts";
 export * from "./notNullOrUndefined.ts";
 export * from "./toArrayLocation.ts";
-
+export * from "./isEvilIdentifier.ts";
+export * from "./stripNodePrefix.ts";
+export * from "./getSubMemberExpressionSegments.ts";
+export * from "./makePrefixRemover.ts";

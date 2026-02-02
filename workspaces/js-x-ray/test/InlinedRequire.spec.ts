@@ -6,7 +6,7 @@ import { describe, it, beforeEach } from "node:test";
 import { generate } from "astring";
 
 // Import Internal Dependencies
-import { parseScript } from "./utils/index.ts";
+import { parseScript } from "./helpers.ts";
 import { InlinedRequire } from "../src/probes/isRequire/InlinedRequire.ts";
 import { VirtualVariableIdentifier } from "../src/VirtualVariableIdentifier.ts";
 

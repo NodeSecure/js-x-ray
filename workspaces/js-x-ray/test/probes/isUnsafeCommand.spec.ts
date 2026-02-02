@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isUnsafeCommand from "../../src/probes/isUnsafeCommand.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 // CONSTANTS
 const kWarningUnsafeCommand = "unsafe-command";

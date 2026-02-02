@@ -10,9 +10,6 @@
       "path": "../estree-ast-utils"
     },
     {
-      "path": "../tracer"
-    },
-    {
       "path": "../sec-literal"
     },
     {

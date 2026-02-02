@@ -54,7 +54,6 @@
   "dependencies": {
     "@nodesecure/estree-ast-utils": "^4.3.0",
     "@nodesecure/sec-literal": "^1.4.0",
-    "@nodesecure/tracer": "^4.0.0",
     "@nodesecure/ts-source-parser": "1.1.0",
     "digraph-js": "2.2.4",
     "frequency-set": "^2.1.0",

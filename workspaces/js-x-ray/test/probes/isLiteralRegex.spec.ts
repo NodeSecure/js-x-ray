@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isLiteralRegex from "../../src/probes/isLiteralRegex.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("should throw a 'unsafe-regex' warning because the given RegExp Literal is unsafe", () => {
   const str = "const foo = /(a+){10}/g;";

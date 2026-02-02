@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isRegexObject from "../../src/probes/isRegexObject.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("should not throw a warning because the given Literal RegExp is considered 'safe'", () => {
   const str = "const foo = new RegExp('^hello');";

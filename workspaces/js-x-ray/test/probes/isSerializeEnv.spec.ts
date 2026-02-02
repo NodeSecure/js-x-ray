@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isSerializeEnv from "../../src/probes/isSerializeEnv.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("should detect JSON.stringify(process.env)", () => {
   const str = "JSON.stringify(process.env)";

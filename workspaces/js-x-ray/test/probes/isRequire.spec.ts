@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 // Import Internal Dependencies
 import isRequire from "../../src/probes/isRequire/isRequire.ts";
-import { getSastAnalysis, parseScript } from "../utils/index.ts";
+import { getSastAnalysis, parseScript } from "../helpers.ts";
 
 test("it should ignore require CallExpression with no (zero) arguments", () => {
   const str = `
