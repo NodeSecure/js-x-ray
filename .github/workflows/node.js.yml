@@ -6,7 +6,8 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   test:
@@ -36,6 +37,15 @@ jobs:
         run: npm run test
       - name: Send coverage report to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v4.0.0-beta.3
+      - name: Run Snapshot Benchmark
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
+        run: node --expose-gc --experimental-strip-types ./workspaces/js-x-ray/benchmark/write-snapshot.ts
+      - name: Auto-commit Snapshot Changes
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
+        with:
+          commit_message: "chore: automated snapshot update [skip ci]"
+          file_pattern: "./workspaces/js-x-ray/benchmark/report.json"
   automerge:
     if: >
       github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
