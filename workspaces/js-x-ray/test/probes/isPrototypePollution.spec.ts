@@ -1,5 +1,5 @@
 // Import Node.js Dependencies
-import test, { TestContext } from "node:test";
+import { test, type TestContext } from "node:test";
 
 // Import Internal Dependencies
 import { AstAnalyser } from "../../src/AstAnalyser.ts";
