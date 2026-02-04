@@ -11,7 +11,8 @@ import {
 
 export type OptionalWarningName =
   | "synchronous-io"
-  | "log-usage";
+  | "log-usage"
+  | "insecure-random";
 
 export type WarningName =
   | "parsing-error"
@@ -30,6 +31,7 @@ export type WarningName =
   | "data-exfiltration"
   | "sql-injection"
   | "monkey-patch"
+  | "insecure-random"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -132,6 +134,11 @@ export const warnings = Object.freeze({
   "monkey-patch": {
     i18n: "sast_warnings.monkey_patch",
     severity: "Warning",
+    experimental: false
+  },
+  "insecure-random": {
+    i18n: "sast_warnings.insecure_random",
+    severity: "Information",
     experimental: false
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;

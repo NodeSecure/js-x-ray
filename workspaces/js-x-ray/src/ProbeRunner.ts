@@ -23,6 +23,7 @@ import isUnsafeCallee from "./probes/isUnsafeCallee.ts";
 import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
 import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
+import isRandom from "./probes/isRandom.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -107,7 +108,8 @@ export class ProbeRunner {
 
   static Optionals: Record<OptionalWarningName, Probe> = {
     "synchronous-io": isSyncIO,
-    "log-usage": logUsage
+    "log-usage": logUsage,
+    "insecure-random": isRandom
   };
 
   constructor(
