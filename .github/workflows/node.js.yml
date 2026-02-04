@@ -38,10 +38,10 @@ jobs:
       - name: Send coverage report to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v4.0.0-beta.3
       - name: Run Snapshot Benchmark
-        if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x' && github.event.pull_request.head.repo.fork == false
         run: node --expose-gc --experimental-strip-types ./workspaces/js-x-ray/benchmark/write-snapshot.ts
       - name: Auto-commit Snapshot Changes
-        if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x' && github.event.pull_request.head.repo.fork == false
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
         with:
           commit_message: "chore: automated snapshot update [skip ci]"

@@ -1,0 +1,41 @@
+name: Benchmark Regenerator
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  regenerate-benchmark-on-merge:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.repo.fork == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: master
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24.x
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build typescript sources
+        run: npm run build
+      - name: Regenerate Snapshot
+        run: node --expose-gc --experimental-strip-types ./workspaces/js-x-ray/benchmark/write-snapshot.ts
+
+      - name: Create Benchmark PR
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        with:
+          commit-message: "chore: update benchmark report.json"
+          branch: fix/benchmark-fork-${{ github.event.pull_request.number }}
+          title: "chore: benchmark update for PR #${{ github.event.pull_request.number }}"
+          body: |
+            Automated benchmark update following the merge of PR #${{ github.event.pull_request.number }} from a fork.
+          delete-branch: true
