@@ -41,11 +41,42 @@ jobs:
         if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
         run: node --expose-gc --experimental-strip-types ./workspaces/js-x-ray/benchmark/write-snapshot.ts
       - name: Auto-commit Snapshot Changes
-        if: github.event_name == 'pull_request' && matrix.node-version == '24.x'
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x' && github.event.pull_request.head.repo.fork == false
         uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9
         with:
           commit_message: "chore: automated snapshot update [skip ci]"
           file_pattern: "./workspaces/js-x-ray/benchmark/report.json"
+      - name: Read updated report
+        id: read_report
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x' && github.event.pull_request.head.repo.fork == true
+        run: |
+          REPORT=$(cat ./workspaces/js-x-ray/benchmark/report.json)
+          echo "json_content<<EOF" >> $GITHUB_OUTPUT
+          echo "$REPORT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Comment JSON on PR
+        if: github.event_name == 'pull_request' && matrix.node-version == '24.x' && github.event.pull_request.head.repo.fork == true
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "### 📊 Benchmark Snapshot Update Required"
+          edit-mode: replace
+          body: |
+            ### 📊 Benchmark Snapshot Update Required
+
+            If you made any update to the application code please copy the JSON below and overwrite the content in:
+            `./workspaces/js-x-ray/benchmark/report.json` and push the changes to this PR.
+
+            <details>
+            <summary>Click to expand and copy JSON</summary>
+
+            ```json
+            ${{ steps.read_report.outputs.json_content }}
+            ```
+
+            </details>
+
+            > **Tip:** You can click the copy icon in the top-right corner of the code block above!
   automerge:
     if: >
       github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
