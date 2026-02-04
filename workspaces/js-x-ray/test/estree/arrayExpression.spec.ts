@@ -9,16 +9,16 @@ import { IteratorMatcher } from "iterator-matcher";
 import {
   arrayExpressionToString,
   joinArrayExpression
-} from "../src/index.ts";
+} from "../../src/estree/index.ts";
 import {
-  codeToAst,
+  parseScript,
   getExpressionFromStatement,
   getExpressionFromStatementIf
-} from "./utils.ts";
+} from "../helpers.ts";
 
 describe("arrayExpressionToString", () => {
   test("given an ArrayExpression with two Literals then the iterable must return them one by one", () => {
-    const [astNode] = codeToAst("['foo', 'bar']");
+    const [astNode] = parseScript("['foo', 'bar']").body;
     const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
     const iterResult = new IteratorMatcher()
@@ -35,7 +35,7 @@ describe("arrayExpressionToString", () => {
     literalIdentifiers.set("foo", "1");
     literalIdentifiers.set("bar", "2");
 
-    const [astNode] = codeToAst("[foo, bar]");
+    const [astNode] = parseScript("[foo, bar]").body;
     const iter = arrayExpressionToString(
       getExpressionFromStatement(astNode),
       {
@@ -55,7 +55,7 @@ describe("arrayExpressionToString", () => {
   test(`given an ArrayExpression with two numbers
     then the function must convert them as char code
     and return them in the iterable`, () => {
-    const [astNode] = codeToAst("[65, 66]");
+    const [astNode] = parseScript("[65, 66]").body;
     const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
     const iterResult = new IteratorMatcher()
@@ -68,7 +68,7 @@ describe("arrayExpressionToString", () => {
   });
 
   test("given an ArrayExpression with empty Literals then the iterable must return no values", () => {
-    const [astNode] = codeToAst("['', '']");
+    const [astNode] = parseScript("['', '']").body;
     const iter = arrayExpressionToString(getExpressionFromStatement(astNode));
 
     const iterResult = [...iter];
@@ -77,7 +77,7 @@ describe("arrayExpressionToString", () => {
   });
 
   test("given an AST that is not an ArrayExpression then it must return immediately", () => {
-    const [astNode] = codeToAst("const foo = 5;");
+    const [astNode] = parseScript("const foo = 5;").body;
     const iter = arrayExpressionToString(astNode);
 
     const iterResult = [...iter];
@@ -88,7 +88,7 @@ describe("arrayExpressionToString", () => {
 
 describe("joinArrayExpression", () => {
   test("should return null if the node is not a CallExpression", () => {
-    const [ast] = codeToAst("const a = 1;");
+    const [ast] = parseScript("const a = 1;").body;
     assert.strictEqual(
       joinArrayExpression(getExpressionFromStatementIf(ast)),
       null
@@ -96,7 +96,7 @@ describe("joinArrayExpression", () => {
   });
 
   test("should combine and return the IP", () => {
-    const [ast] = codeToAst(`["127","0","0","1"].join(".");`);
+    const [ast] = parseScript(`["127","0","0","1"].join(".");`).body;
     assert.strictEqual(
       joinArrayExpression(getExpressionFromStatementIf(ast)),
       "127.0.0.1"
@@ -104,12 +104,12 @@ describe("joinArrayExpression", () => {
   });
 
   test("should combine multiple depth of joined ArrayExpression", () => {
-    const [ast] = codeToAst(`[
+    const [ast] = parseScript(`[
       ["hello", "world"].join(" "),
       "0",
       "0",
       "1"
-    ].join(".");`);
+    ].join(".");`).body;
     assert.strictEqual(
       joinArrayExpression(getExpressionFromStatementIf(ast)),
       "hello world.0.0.1"
@@ -121,7 +121,7 @@ describe("joinArrayExpression", () => {
     literalIdentifiers.set("a", "1");
     literalIdentifiers.set("b", "2");
 
-    const [ast] = codeToAst("[a, b].join('.');");
+    const [ast] = parseScript("[a, b].join('.');").body;
     assert.strictEqual(
       joinArrayExpression(
         getExpressionFromStatementIf(ast),

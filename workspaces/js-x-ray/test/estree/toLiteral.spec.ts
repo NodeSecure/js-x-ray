@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { toLiteral } from "../src/toLiteral.ts";
+import { toLiteral } from "../../src/estree/index.ts";
 
 describe("toLiteral", () => {
   it("should transform a TemplateLiteral to a literal", () => {

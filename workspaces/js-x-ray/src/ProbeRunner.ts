@@ -3,9 +3,6 @@ import assert from "node:assert";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import {
-  getCallExpressionIdentifier
-} from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
 import logUsage from "./probes/log-usage.ts";
@@ -31,6 +28,9 @@ import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
 import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
+import {
+  getCallExpressionIdentifier
+} from "./estree/index.ts";
 import { CALL_EXPRESSION_DATA } from "./contants.ts";
 
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");

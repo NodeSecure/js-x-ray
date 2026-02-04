@@ -3,15 +3,15 @@ import assert from "node:assert";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { getCallExpressionArguments } from "../src/index.ts";
+import { getCallExpressionArguments } from "../../src/estree/index.ts";
 import {
-  codeToAst,
+  parseScript,
   getExpressionFromStatement
-} from "./utils.ts";
+} from "../helpers.ts";
 
 describe("getCallExpressionArguments", () => {
   test("return null when the node is not a CallExpression", () => {
-    const [astNode] = codeToAst("const a = 1;");
+    const [astNode] = parseScript("const a = 1;").body;
     const args = getCallExpressionArguments(
       astNode
     );
@@ -19,7 +19,7 @@ describe("getCallExpressionArguments", () => {
   });
 
   test("return the first Literal Node of eval CallExpression", () => {
-    const [astNode] = codeToAst("eval(\"this\");");
+    const [astNode] = parseScript("eval(\"this\");").body;
     const args = getCallExpressionArguments(
       getExpressionFromStatement(astNode)
     );
@@ -28,7 +28,7 @@ describe("getCallExpressionArguments", () => {
   });
 
   test("return all Literal Nodes from the CallExpression", () => {
-    const [astNode] = codeToAst("eval('1', foo(), '2', 10);");
+    const [astNode] = parseScript("eval('1', foo(), '2', 10);").body;
     const args = getCallExpressionArguments(
       getExpressionFromStatement(astNode)
     );
@@ -37,7 +37,7 @@ describe("getCallExpressionArguments", () => {
   });
 
   test("resolve the BinaryExpression and return is Literal value", () => {
-    const [astNode] = codeToAst("foo('1' + '2');");
+    const [astNode] = parseScript("foo('1' + '2');").body;
     const args = getCallExpressionArguments(
       getExpressionFromStatement(astNode)
     );
@@ -50,11 +50,11 @@ describe("getCallExpressionArguments", () => {
       ["myVar", "hello world"]
     ]);
 
-    const [astNode] = codeToAst("foo(myVar);");
+    const [astNode] = parseScript("foo(myVar);").body;
     const args = getCallExpressionArguments(
       getExpressionFromStatement(astNode),
       {
-        externalIdentifierLookup: (name) => literals.get(name) ?? null
+        externalIdentifierLookup: (name: string) => literals.get(name) ?? null
       }
     );
 
@@ -63,7 +63,7 @@ describe("getCallExpressionArguments", () => {
 
   test("resolve the TemplateLiteral and return is Literal value", () => {
     /* eslint-disable-next-line no-template-curly-in-string */
-    const [astNode] = codeToAst("foo(`hello ${name}`);");
+    const [astNode] = parseScript("foo(`hello ${name}`);").body;
     const args = getCallExpressionArguments(
       getExpressionFromStatement(astNode)
     );

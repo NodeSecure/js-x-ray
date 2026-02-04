@@ -1,9 +1,9 @@
 // Import Third-party Dependencies
-import { joinArrayExpression } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 import { match } from "ts-pattern";
 
 // Import Internal Dependencies
+import { joinArrayExpression } from "../estree/index.ts";
 import { walkEnter } from "../walker/index.ts";
 import type { Pipeline } from "./Runner.class.ts";
 

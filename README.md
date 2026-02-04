@@ -268,6 +268,13 @@ $ npm run check
 > [!CAUTION]
 > In case you introduce a new feature or fix a bug, make sure to include tests for it as well.
 
+### Internal APIs
+
+For contributors working on the JS-X-Ray internals, the following resources document low-level utilities and AST manipulation patterns:
+
+- [ESTree utilities](./workspaces/js-x-ray/src/estree/README.md) - Low-level helpers to manipulate ESTree AST nodes
+- [ESTree assignment and declaration patterns (french)](./workspaces/js-x-ray/docs/estree/patterns-french.md) - Reference guide for JavaScript assignment and declaration patterns in AST form
+
 ### Benchmarks
 
 The performance of js-x-ray is measured and tracked using [mitata](https://github.com/evanwashere/mitata).
@@ -286,7 +293,6 @@ Click on one of the links to access the documentation of the workspace:
 | --- | --- |
 | js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
 | js-x-ray-ai | [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai) |
-| estree-ast-utils | [@nodesecure/estree-ast-utils](./workspaces/estree-ast-utils) |
 | sec-literal | [@nodesecure/sec-literal](./workspaces/sec-literal) |
 | ts-source-parser | [@nodesecure/ts-source-parser](./workspaces/ts-source-parser) |
 

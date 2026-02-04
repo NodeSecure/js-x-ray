@@ -6,11 +6,11 @@ import { test } from "node:test";
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
-import { getMemberExpressionIdentifier } from "../src/index.ts";
-import { codeToAst, getExpressionFromStatement } from "./utils.ts";
+import { getMemberExpressionIdentifier } from "../../src/estree/index.ts";
+import { parseScript, getExpressionFromStatement } from "../helpers.ts";
 
 test("it must return all literals part of the given MemberExpression", () => {
-  const [astNode] = codeToAst("foo.bar.xd");
+  const [astNode] = parseScript("foo.bar.xd").body;
   const iter = getMemberExpressionIdentifier(
     getExpressionFromStatement(astNode)
   );
@@ -26,7 +26,7 @@ test("it must return all literals part of the given MemberExpression", () => {
 });
 
 test("it must return all computed properties of the given MemberExpression", () => {
-  const [astNode] = codeToAst("foo['bar']['xd']");
+  const [astNode] = parseScript("foo['bar']['xd']").body;
   const iter = getMemberExpressionIdentifier(
     getExpressionFromStatement(astNode)
   );
@@ -43,7 +43,7 @@ test("it must return all computed properties of the given MemberExpression", () 
 
 test(`given a MemberExpression with a computed property containing a deep tree of BinaryExpression
   then it must return all literals parts even the last one which is the concatenation of the BinaryExpr`, () => {
-  const [astNode] = codeToAst("foo.bar[\"k\" + \"e\" + \"y\"]");
+  const [astNode] = parseScript("foo.bar[\"k\" + \"e\" + \"y\"]").body;
   const iter = getMemberExpressionIdentifier(
     getExpressionFromStatement(astNode)
   );
@@ -64,7 +64,7 @@ test(`given a MemberExpression with computed properties containing identifiers
   literalIdentifiers.set("foo", "hello");
   literalIdentifiers.set("yo", "bar");
 
-  const [astNode] = codeToAst("hey[foo][yo]");
+  const [astNode] = parseScript("hey[foo][yo]").body;
   const iter = getMemberExpressionIdentifier(
     getExpressionFromStatement(astNode),
     {

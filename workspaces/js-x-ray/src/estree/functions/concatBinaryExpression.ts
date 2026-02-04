@@ -6,7 +6,7 @@ import { arrayExpressionToString } from "./arrayExpression.ts";
 import {
   type DefaultOptions,
   noop
-} from "./options.ts";
+} from "../types.ts";
 
 // CONSTANTS
 const kBinaryExprTypes = new Set([

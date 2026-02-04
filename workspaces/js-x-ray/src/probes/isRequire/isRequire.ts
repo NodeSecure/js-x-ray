@@ -1,17 +1,17 @@
 /* eslint-disable consistent-return */
 
 // Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
+// Import Internal Dependencies
 import {
   arrayExpressionToString,
   concatBinaryExpression,
   getCallExpressionArguments,
   getCallExpressionIdentifier
-} from "@nodesecure/estree-ast-utils";
-import type { ESTree } from "meriyah";
-
-// Import Internal Dependencies
+} from "../../estree/index.ts";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { isLiteral } from "../../types/estree.ts";
+import { isLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.ts";
 

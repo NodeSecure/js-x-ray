@@ -10,7 +10,6 @@
     "clean": "clear-ts-build"
   },
   "workspaces": [
-    "workspaces/estree-ast-utils",
     "workspaces/sec-literal",
     "workspaces/ts-source-parser",
     "workspaces/js-x-ray",

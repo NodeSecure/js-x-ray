@@ -8,7 +8,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { ShadyLink } from "../ShadyLink.ts";
 import { SourceFile } from "../SourceFile.ts";
-import type { Literal } from "../types/estree.ts";
+import type { Literal } from "../estree/types.ts";
 import { toArrayLocation } from "../utils/toArrayLocation.ts";
 import { generateWarning } from "../warnings.ts";
 import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";

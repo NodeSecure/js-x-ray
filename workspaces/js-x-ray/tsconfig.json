@@ -7,9 +7,6 @@
   "include": ["src"],
   "references": [
     {
-      "path": "../estree-ast-utils"
-    },
-    {
       "path": "../sec-literal"
     },
     {

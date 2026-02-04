@@ -1,8 +1,8 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { toLiteral } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
+import { toLiteral } from "../estree/index.ts";
 import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
 

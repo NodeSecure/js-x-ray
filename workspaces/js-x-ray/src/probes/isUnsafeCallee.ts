@@ -1,8 +1,8 @@
 // Import Third-party Dependencies
-import { getCallExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { getCallExpressionIdentifier } from "../estree/index.ts";
 import type { ProbeMainContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
 

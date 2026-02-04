@@ -6,11 +6,11 @@ import { test } from "node:test";
 import { IteratorMatcher } from "iterator-matcher";
 
 // Import Internal Dependencies
-import { concatBinaryExpression } from "../src/index.ts";
-import { codeToAst, getExpressionFromStatement } from "./utils.ts";
+import { concatBinaryExpression } from "../../src/estree/index.ts";
+import { parseScript, getExpressionFromStatement } from "../helpers.ts";
 
 test("given a BinaryExpression of two literals then the iterable must return Literal values", () => {
-  const [astNode] = codeToAst("'foo' + 'bar' + 'xd'");
+  const [astNode] = parseScript("'foo' + 'bar' + 'xd'").body;
   const iter = concatBinaryExpression(getExpressionFromStatement(astNode));
 
   const iterResult = new IteratorMatcher()
@@ -24,7 +24,7 @@ test("given a BinaryExpression of two literals then the iterable must return Lit
 });
 
 test("given a BinaryExpression of two ArrayExpression then the iterable must return Array values as string", () => {
-  const [astNode] = codeToAst("['A'] + ['B']");
+  const [astNode] = parseScript("['A'] + ['B']").body;
   const iter = concatBinaryExpression(getExpressionFromStatement(astNode));
 
   const iterResult = new IteratorMatcher()
@@ -41,7 +41,7 @@ test("given a BinaryExpression of two Identifiers then the iterable must the tra
   literalIdentifiers.set("foo", "A");
   literalIdentifiers.set("bar", "B");
 
-  const [astNode] = codeToAst("foo + bar");
+  const [astNode] = parseScript("foo + bar").body;
   const iter = concatBinaryExpression(
     getExpressionFromStatement(astNode),
     {
@@ -61,7 +61,7 @@ test("given a BinaryExpression of two Identifiers then the iterable must the tra
 test("given a one level BinaryExpression with an unsupported node it should throw an Error", () => {
   const literalIdentifiers = new Map<string, string>();
 
-  const [astNode] = codeToAst("evil() + 's'");
+  const [astNode] = parseScript("evil() + 's'").body;
   try {
     const iter = concatBinaryExpression(getExpressionFromStatement(astNode), {
       externalIdentifierLookup: (name: string) => literalIdentifiers.get(name) ?? null,
@@ -77,7 +77,7 @@ test("given a one level BinaryExpression with an unsupported node it should thro
 test("given a Deep BinaryExpression with an unsupported node it should throw an Error", () => {
   const literalIdentifiers = new Map<string, string>();
 
-  const [astNode] = codeToAst("'a' + evil() + 's'");
+  const [astNode] = parseScript("'a' + evil() + 's'").body;
   try {
     const iter = concatBinaryExpression(getExpressionFromStatement(astNode), {
       externalIdentifierLookup: (name: string) => literalIdentifiers.get(name) ?? null,

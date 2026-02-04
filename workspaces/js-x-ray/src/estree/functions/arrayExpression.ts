@@ -6,14 +6,12 @@ import {
   getMemberExpressionIdentifier
 } from "./getMemberExpressionIdentifier.ts";
 import {
-  type DefaultOptions,
-  noop
-} from "./options.ts";
-import {
   isCallExpression,
   isLiteral,
-  isNode
-} from "./utils/is.ts";
+  isNode,
+  noop,
+  type DefaultOptions
+} from "../types.ts";
 
 export interface ArrayExpressionToStringOptions extends DefaultOptions {
   /**

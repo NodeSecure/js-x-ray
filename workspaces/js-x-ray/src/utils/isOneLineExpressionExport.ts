@@ -1,8 +1,10 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
+
+// Import Internal Dependencies
 import {
   getCallExpressionIdentifier
-} from "@nodesecure/estree-ast-utils";
+} from "../estree/index.ts";
 
 export function isOneLineExpressionExport(
   body: ESTree.Program["body"]

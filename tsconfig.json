@@ -9,9 +9,6 @@
     },
     {
       "path": "./workspaces/ts-source-parser"
-    },
-    {
-      "path": "./workspaces/estree-ast-utils"
     }
   ]
 }

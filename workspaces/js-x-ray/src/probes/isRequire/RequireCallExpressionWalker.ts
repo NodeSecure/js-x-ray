@@ -2,20 +2,20 @@
 import path from "node:path";
 
 // Import Third-party Dependencies
-import {
-  arrayExpressionToString,
-  getCallExpressionArguments,
-  getMemberExpressionIdentifier
-} from "@nodesecure/estree-ast-utils";
 import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import {
+  arrayExpressionToString,
+  getCallExpressionArguments,
+  getMemberExpressionIdentifier
+} from "../../estree/index.ts";
 import type { VariableTracer } from "../../VariableTracer.ts";
 import {
   isCallExpression,
   isLiteral
-} from "../../types/estree.ts";
+} from "../../estree/types.ts";
 import { walkEnter } from "../../walker/index.ts";
 
 export class RequireCallExpressionWalker {
