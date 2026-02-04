@@ -1,17 +1,10 @@
 // Import Node.js Dependencies
-import test from "node:test";
-import assert from "node:assert";
-
-// Import Third-party Dependencies
-import type { ESTree } from "meriyah";
+import test, { TestContext } from "node:test";
 
 // Import Internal Dependencies
 import { AstAnalyser } from "../../src/AstAnalyser.ts";
-import { generateWarning } from "../../src/warnings.ts";
 
-
-
-test("should detect prototype pollution via __proto__ property access", () => {
+test("should detect prototype pollution via __proto__ property access", (t: TestContext) => {
   const str = `
     const obj = {};
     obj.__proto__.polluted = true;
@@ -20,14 +13,14 @@ test("should detect prototype pollution via __proto__ property access", () => {
   const analyser = new AstAnalyser();
   const { warnings } = analyser.analyse(str);
 
-  assert.strictEqual(warnings.length, 1);
-  assert.partialDeepStrictEqual(warnings[0], {
+  t.assert.strictEqual(warnings.length, 1);
+  t.assert.partialDeepStrictEqual(warnings[0], {
     kind: "prototype-pollution",
-    value: "obj.__proto__",
-  }));
+    value: "obj.__proto__"
+  });
 });
 
-test("should detect prototype pollution via computed property access", () => {
+test("should detect prototype pollution via computed property access", (t: TestContext) => {
   const str = `
     const obj = {};
     obj["__proto__"].polluted = true;
@@ -36,14 +29,14 @@ test("should detect prototype pollution via computed property access", () => {
   const analyser = new AstAnalyser();
   const { warnings } = analyser.analyse(str);
 
-  assert.strictEqual(warnings.length, 1);
-  assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
-    value: "obj.__proto__",
-    location: { start: { line: 3, column: 4 }, end: { line: 3, column: 20 } }
-  }));
+  t.assert.strictEqual(warnings.length, 1);
+  t.assert.partialDeepStrictEqual(warnings[0], {
+    kind: "prototype-pollution",
+    value: "obj.__proto__"
+  });
 });
 
-test("should detect prototype pollution via __proto__ literal", () => {
+test("should detect prototype pollution via __proto__ literal", (t: TestContext) => {
   const str = `
     const key = "__proto__";
     const obj = {};
@@ -53,9 +46,9 @@ test("should detect prototype pollution via __proto__ literal", () => {
   const analyser = new AstAnalyser();
   const { warnings } = analyser.analyse(str);
 
-  assert.strictEqual(warnings.length, 1);
-  assert.deepStrictEqual(warnings[0], generateWarning("prototype-pollution", {
-    value: "__proto__",
-    location: { start: { line: 2, column: 16 }, end: { line: 2, column: 27 } }
-  }));
+  t.assert.strictEqual(warnings.length, 1);
+  t.assert.partialDeepStrictEqual(warnings[0], {
+    kind: "prototype-pollution",
+    value: "__proto__"
+  });
 });

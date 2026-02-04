@@ -41,7 +41,7 @@ function main(
     })
   );
 
-  return data !== "literal" ? signals.Skip : undefined;
+  return data === "literal" ? undefined : signals.Skip;
 }
 
 export default {
