@@ -19,7 +19,8 @@ const sast_warnings = {
   data_exfiltration: "Detects serialization of sensitive system information (os.userInfo, os.networkInterfaces, os.cpus, dns.getServers) which could indicate unauthorized data collection for external transmission.",
   log_usage: "Usage of console logging methods (log, info, warn, error, debug) that may expose sensitive information in production environments.",
   sql_injection: "Template literals with interpolated expressions in SQL queries (SELECT, INSERT, UPDATE, DELETE) without proper parameterization, creating potential SQL injection vulnerabilities.",
-  monkey_patch: "Modification of native prototypes or global objects at runtime, which introduces security risks including flow hijacking, global side effects, and potential concealment of malicious activities."
+  monkey_patch: "Modification of native prototypes or global objects at runtime, which introduces security risks including flow hijacking, global side effects, and potential concealment of malicious activities.",
+  insecure_random: "Usage of insecure random number generation using Math.random(). Math.random() is not cryptographically secure and should not be used for security-sensitive operations."
 };
 
 export default {
