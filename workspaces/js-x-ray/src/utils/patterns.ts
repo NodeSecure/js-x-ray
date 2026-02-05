@@ -1,8 +1,9 @@
 // Import Third-party Dependencies
 import FrequencySet from "frequency-set";
+import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { toValue, type ESTreeLiteral } from "./literal.ts";
+import { toValue } from "../estree/index.ts";
 
 /**
  * @description get the common string prefix (at the start) pattern
@@ -11,8 +12,8 @@ import { toValue, type ESTreeLiteral } from "./literal.ts";
  * commonStringPrefix("bromance", "brother"); // "bro"
  */
 export function commonStringPrefix(
-  leftAnyValue: ESTreeLiteral | string,
-  rightAnyValue: ESTreeLiteral | string
+  leftAnyValue: ESTree.Literal | string,
+  rightAnyValue: ESTree.Literal | string
 ): string | null {
   const leftStr = toValue(leftAnyValue);
   const rightStr = toValue(rightAnyValue);

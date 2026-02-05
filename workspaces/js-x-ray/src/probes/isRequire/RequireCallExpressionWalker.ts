@@ -2,10 +2,10 @@
 import path from "node:path";
 
 // Import Third-party Dependencies
-import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { Hex } from "../../utils/index.ts";
 import {
   arrayExpressionToString,
   getCallExpressionArguments,

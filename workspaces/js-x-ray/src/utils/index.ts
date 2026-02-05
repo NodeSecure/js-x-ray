@@ -7,3 +7,8 @@ export * from "./isEvilIdentifier.ts";
 export * from "./stripNodePrefix.ts";
 export * from "./getSubMemberExpressionSegments.ts";
 export * from "./makePrefixRemover.ts";
+export * from "./stringSuspicionScore.ts";
+export * from "./isSvg.ts";
+export * from "./isStringBase64.ts";
+export * from "./patterns.ts";
+export * as Hex from "./hex.ts";

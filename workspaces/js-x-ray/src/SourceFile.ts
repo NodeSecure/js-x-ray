@@ -2,7 +2,6 @@
 import path from "node:path";
 
 // Import Third-party Dependencies
-import { Literal, Utils } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
@@ -13,7 +12,12 @@ import type {
 } from "./AstAnalyser.ts";
 import { InlinedRequire } from "./probes/isRequire/InlinedRequire.ts";
 import { Deobfuscator } from "./Deobfuscator.ts";
-import { rootLocation, toArrayLocation } from "./utils/index.ts";
+import {
+  rootLocation,
+  toArrayLocation,
+  isSvg,
+  isStringBase64
+} from "./utils/index.ts";
 import {
   generateWarning,
   type Warning
@@ -74,7 +78,7 @@ export class SourceFile {
 
   addEncodedLiteral(
     value: string,
-    location = rootLocation()
+    location: ESTree.SourceLocation | undefined | null
   ) {
     if (this.encodedLiterals.size > kMaximumEncodedLiterals) {
       return;
@@ -82,7 +86,7 @@ export class SourceFile {
 
     if (this.encodedLiterals.has(value)) {
       const index = this.encodedLiterals.get(value)!;
-      this.warnings[index].location.push(toArrayLocation(location));
+      this.warnings[index].location.push(toArrayLocation(location ?? rootLocation()));
 
       return;
     }
@@ -92,19 +96,26 @@ export class SourceFile {
   }
 
   analyzeLiteral(
-    node: any,
+    node: ESTree.Literal,
     inArrayExpr = false
   ) {
-    if (typeof node.value !== "string" || Utils.isSvg(node)) {
+    if (typeof node.value !== "string" || isSvg(node)) {
       return;
     }
     this.deobfuscator.analyzeString(node.value);
 
-    const {
-      hasHexadecimalSequence,
-      hasUnicodeSequence,
-      isBase64
-    } = Literal.defaultAnalysis(node)!;
+    const hasRawValue = "raw" in node;
+    const hasHexadecimalSequence = hasRawValue ?
+      /\\x[a-fA-F0-9]{2}/g.exec(node.raw!) !== null :
+      null;
+    const hasUnicodeSequence = hasRawValue ?
+      /\\u[a-fA-F0-9]{4}/g.exec(node.raw!) !== null :
+      null;
+    const isBase64 = isStringBase64(
+      String(node.value),
+      { allowEmpty: false }
+    );
+
     if ((hasHexadecimalSequence || hasUnicodeSequence) && isBase64) {
       if (inArrayExpr) {
         this.deobfuscator.encodedArrayValue++;

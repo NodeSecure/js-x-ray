@@ -7,3 +7,4 @@ export * from "./functions/getMemberExpressionIdentifier.ts";
 export * from "./functions/getVariableDeclarationIdentifiers.ts";
 export * from "./functions/toLiteral.ts";
 export * from "./types.ts";
+export * from "./literal.ts";

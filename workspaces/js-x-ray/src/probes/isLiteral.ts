@@ -2,14 +2,16 @@
 import { builtinModules } from "node:module";
 
 // Import Third-party Dependencies
-import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { ShadyLink } from "../ShadyLink.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal } from "../estree/types.ts";
-import { toArrayLocation } from "../utils/toArrayLocation.ts";
+import {
+  toArrayLocation,
+  Hex
+} from "../utils/index.ts";
 import { generateWarning } from "../warnings.ts";
 import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";
 
