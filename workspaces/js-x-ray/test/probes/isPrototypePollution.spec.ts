@@ -14,10 +14,10 @@ test("should detect prototype pollution via __proto__ property access", (t: Test
   const { warnings } = analyser.analyse(str);
 
   t.assert.strictEqual(warnings.length, 1);
-  t.assert.partialDeepStrictEqual(warnings[0], {
-    kind: "prototype-pollution",
-    value: "obj.__proto__"
-  });
+  t.assert.deepStrictEqual(
+    { kind: warnings[0].kind, value: warnings[0].value },
+    { kind: "prototype-pollution", value: "obj.__proto__" }
+  );
 });
 
 test("should detect prototype pollution via computed property access", (t: TestContext) => {
@@ -30,10 +30,10 @@ test("should detect prototype pollution via computed property access", (t: TestC
   const { warnings } = analyser.analyse(str);
 
   t.assert.strictEqual(warnings.length, 1);
-  t.assert.partialDeepStrictEqual(warnings[0], {
-    kind: "prototype-pollution",
-    value: "obj.__proto__"
-  });
+  t.assert.deepStrictEqual(
+    { kind: warnings[0].kind, value: warnings[0].value },
+    { kind: "prototype-pollution", value: "obj.__proto__" }
+  );
 });
 
 test("should detect prototype pollution via __proto__ literal", (t: TestContext) => {
@@ -47,8 +47,8 @@ test("should detect prototype pollution via __proto__ literal", (t: TestContext)
   const { warnings } = analyser.analyse(str);
 
   t.assert.strictEqual(warnings.length, 1);
-  t.assert.partialDeepStrictEqual(warnings[0], {
-    kind: "prototype-pollution",
-    value: "__proto__"
-  });
+  t.assert.deepStrictEqual(
+    { kind: warnings[0].kind, value: warnings[0].value },
+    { kind: "prototype-pollution", value: "__proto__" }
+  );
 });

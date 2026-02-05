@@ -1,8 +1,8 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { getMemberExpressionIdentifier } from "@nodesecure/estree-ast-utils";
 
 // Import Internal Dependencies
+import { getMemberExpressionIdentifier } from "../estree/index.ts";
 import { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
