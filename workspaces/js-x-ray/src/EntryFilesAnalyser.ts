@@ -4,7 +4,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Import Third-party Dependencies
-import { TsSourceParser } from "@nodesecure/ts-source-parser";
 import {
   DiGraph,
   type VertexBody,
@@ -17,10 +16,11 @@ import {
   type ReportOnFile,
   type RuntimeFileOptions
 } from "./AstAnalyser.ts";
+import { TsSourceParser } from "./parsers/TsSourceParser.ts";
 import {
   JsSourceParser,
   type SourceParser
-} from "./JsSourceParser.ts";
+} from "./parsers/JsSourceParser.ts";
 
 // CONSTANTS
 const kDefaultExtensions = [

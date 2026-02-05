@@ -6,9 +6,6 @@
     },
     {
       "path": "./workspaces/sec-literal"
-    },
-    {
-      "path": "./workspaces/ts-source-parser"
     }
   ]
 }

@@ -7,7 +7,7 @@ import path from "node:path";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { JsSourceParser, type SourceParser } from "./JsSourceParser.ts";
+import { JsSourceParser, type SourceParser } from "./parsers/JsSourceParser.ts";
 import * as trojan from "./obfuscators/trojan-source.ts";
 import {
   PipelineRunner,

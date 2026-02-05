@@ -8,9 +8,6 @@
   "references": [
     {
       "path": "../sec-literal"
-    },
-    {
-      "path": "../ts-source-parser"
     }
   ]
 }

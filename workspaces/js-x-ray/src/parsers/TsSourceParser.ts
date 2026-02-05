@@ -1,15 +1,19 @@
 // Import Third-party Dependencies
-import { parse, TSESTree } from "@typescript-eslint/typescript-estree";
-
-type ParseOptions = Parameters<typeof parse>[1];
+import {
+  parse,
+  TSESTree,
+  type TSESTreeOptions
+} from "@typescript-eslint/typescript-estree";
 
 // CONSTANTS
-const kTypeScriptParsingOptions: ParseOptions = {
+const kTypeScriptParsingOptions: TSESTreeOptions = {
   jsDocParsingMode: "none",
   jsx: true,
   loc: true,
   range: false
 };
+
+export type { TSESTreeOptions };
 
 export class TsSourceParser {
   static FileExtensions = new Set([
@@ -21,7 +25,7 @@ export class TsSourceParser {
 
   parse(
     source: string,
-    options: ParseOptions = {}
+    options: TSESTreeOptions = {}
   ): TSESTree.Program["body"] {
     const { body } = parse(source, {
       ...kTypeScriptParsingOptions,
