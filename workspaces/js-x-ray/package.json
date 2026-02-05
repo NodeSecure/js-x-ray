@@ -53,7 +53,7 @@
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
     "@nodesecure/sec-literal": "^1.4.0",
-    "@nodesecure/ts-source-parser": "1.1.0",
+    "@typescript-eslint/typescript-estree": "8.53.1",
     "digraph-js": "2.2.4",
     "frequency-set": "^2.1.0",
     "ipaddr.js": "2.3.0",

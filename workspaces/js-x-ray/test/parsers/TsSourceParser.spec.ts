@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { TsSourceParser } from "../src/TsSourceParser.ts";
+import { TsSourceParser } from "../../src/index.ts";
 
 describe("TsSourceParser", () => {
   describe("parse", () => {

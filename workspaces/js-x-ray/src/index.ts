@@ -3,7 +3,8 @@ import path from "node:path";
 
 export * from "./AstAnalyser.ts";
 export * from "./EntryFilesAnalyser.ts";
-export * from "./JsSourceParser.ts";
+export * from "./parsers/JsSourceParser.ts";
+export * from "./parsers/TsSourceParser.ts";
 export {
   Pipelines,
   type Pipeline

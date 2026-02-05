@@ -24,7 +24,7 @@
 
 ## 🔎 How It Works
 
-JS-X-Ray parses code into an **Abstract Syntax Tree (AST)** using [Meriyah](https://github.com/meriyah/meriyah) with no extensive usage of RegEx or Semgrep rules. This enables variable tracing, dynamic import resolution, and detection of sophisticated obfuscation that pattern-matching tools miss. The tradeoff is that JS-X-Ray is purely dedicated to the JavaScript/TypeScript ecosystem.
+JS-X-Ray parses JS or TS code into an **Abstract Syntax Tree (AST)** with no extensive usage of RegEx or Semgrep rules. This enables variable tracing, dynamic import resolution, and detection of sophisticated obfuscation that pattern-matching tools miss. The tradeoff is that JS-X-Ray is purely dedicated to the JavaScript/TypeScript ecosystem.
 
 ## 💡 Features
 - Retrieve required dependencies and files for Node.js
@@ -50,7 +50,8 @@ JS-X-Ray parses code into an **Abstract Syntax Tree (AST)** using [Meriyah](http
   - Suspicious URLs and links
   - Short identifier lengths (obfuscation indicators)
   - Synchronous I/O and logging usage (optional)
-- Configurable sensitivity modes (conservative/aggressive) and extensible probe system 
+- Configurable sensitivity modes (conservative/aggressive) and extensible probe system
+- Support both JavaScript and TypeScript
 
 ## 💃 Getting Started
 
@@ -131,6 +132,7 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 - [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
 - [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
 - [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
+- [SourceParser](./workspaces/js-x-ray/docs/SourceParser.md)
 - [VariableTracer](./workspaces/js-x-ray/docs/VariableTracer.md)
 
 ## Warnings
