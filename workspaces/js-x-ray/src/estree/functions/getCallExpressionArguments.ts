@@ -1,8 +1,8 @@
 // Import Third-party Dependencies
-import { Hex } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { Hex } from "../../utils/index.ts";
 import { concatBinaryExpression } from "./concatBinaryExpression.ts";
 import { toLiteral } from "./toLiteral.ts";
 import {

@@ -295,8 +295,6 @@ Click on one of the links to access the documentation of the workspace:
 | --- | --- |
 | js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
 | js-x-ray-ai | [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai) |
-| sec-literal | [@nodesecure/sec-literal](./workspaces/sec-literal) |
-| ts-source-parser | [@nodesecure/ts-source-parser](./workspaces/ts-source-parser) |
 
 These packages are available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 ```bash

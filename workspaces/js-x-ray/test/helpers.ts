@@ -2,6 +2,7 @@
 import * as meriyah from "meriyah";
 
 // Import Internal Dependencies
+import type { ESTreeLiteral } from "../src/estree/literal.ts";
 import {
   SourceFile,
   type Dependency,
@@ -14,6 +15,19 @@ import {
 import { walk } from "../src/walker/index.ts";
 import { CollectableSet } from "../src/CollectableSet.ts";
 import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
+
+// @see https://github.com/estree/estree/blob/master/es5.md#literal
+export function createLiteral(
+  value: string,
+  includeRaw = false
+): ESTreeLiteral {
+  const node: ESTreeLiteral = { type: "Literal", value };
+  if (includeRaw) {
+    node.raw = value;
+  }
+
+  return node;
+}
 
 export function getExpressionFromStatement(node: any) {
   return node.type === "ExpressionStatement" ? node.expression : null;

@@ -7,7 +7,7 @@ import {
   commonHexadecimalPrefix,
   commonStringPrefix,
   commonStringSuffix
-} from "../src/patterns.ts";
+} from "../../src/utils/index.ts";
 
 describe("commonStringPrefix()", () => {
   test("must return null for two strings that have no common prefix", () => {

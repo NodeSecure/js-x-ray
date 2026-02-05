@@ -19,7 +19,7 @@ So it's possible for a string with more than 45 characters to come out with a sc
 - there is space in the first 45 characters of the string.
 - less than 70 unique characters.
 
-The implementation is done in the [@nodesecure/sec-literal](https://github.com/NodeSecure/sec-literal/blob/main/src/utils.js) package and look like this:
+The implementation look like this:
 ```js
 function stringCharDiversity(str, charsToExclude = []) {
   const data = new Set(str);

@@ -4,8 +4,8 @@ import { randomBytes } from "node:crypto";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { CONSTANTS, isHex, isSafe } from "../src/hex.ts";
-import { createLiteral } from "./utils/index.ts";
+import { CONSTANTS, isHex, isSafe } from "../../src/utils/hex.ts";
+import { createLiteral } from "../helpers.ts";
 
 describe("isHex()", () => {
   test("must return true for random 4 character hexadecimal values", () => {

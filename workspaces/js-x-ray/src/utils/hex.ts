@@ -1,6 +1,9 @@
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
-import { toRaw, toValue, type ESTreeLiteral } from "./literal.ts";
-import * as Utils from "./utils.ts";
+import { toValue, toRaw } from "../estree/index.ts";
+import { stringCharDiversity } from "./stringSuspicionScore.ts";
 
 // CONSTANTS
 const kUnsafeHexValues = new Set([
@@ -25,7 +28,7 @@ export const CONSTANTS = Object.freeze({
  * @description detect if the given string is an Hexadecimal value
  */
 export function isHex(
-  anyValue: ESTreeLiteral | string
+  anyValue: ESTree.Literal | string
 ): boolean {
   const value = toValue(anyValue);
 
@@ -36,14 +39,14 @@ export function isHex(
  * @description detect if the given string is a safe Hexadecimal value
  */
 export function isSafe(
-  anyValue: ESTreeLiteral | string
+  anyValue: ESTree.Literal | string
 ): boolean {
   const rawValue = toRaw(anyValue);
   if (typeof rawValue === "undefined" || kUnsafeHexValues.has(rawValue)) {
     return false;
   }
 
-  const charCount = Utils.stringCharDiversity(rawValue);
+  const charCount = stringCharDiversity(rawValue);
   if (
     /^([0-9]+|[a-z]+|[A-Z]+)$/g.test(rawValue)
     || rawValue.length <= 5

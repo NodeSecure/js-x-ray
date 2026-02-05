@@ -10,7 +10,6 @@
     "clean": "clear-ts-build"
   },
   "workspaces": [
-    "workspaces/sec-literal",
     "workspaces/js-x-ray",
     "workspaces/js-x-ray-ai"
   ],

@@ -1,12 +1,15 @@
 // Import Third-party Dependencies
-import { Patterns, Utils } from "@nodesecure/sec-literal";
 import type { ESTree } from "meriyah";
 import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import { getVariableDeclarationIdentifiers } from "./estree/index.ts";
 import { NodeCounter } from "./NodeCounter.ts";
-import { extractNode } from "./utils/index.ts";
+import {
+  extractNode,
+  stringSuspicionScore,
+  commonHexadecimalPrefix
+} from "./utils/index.ts";
 
 import * as freejsobfuscator from "./obfuscators/freejsobfuscator.ts";
 import * as jjencode from "./obfuscators/jjencode.ts";
@@ -110,10 +113,16 @@ export class Deobfuscator {
     }
   }
 
+  #isMorse(
+    str: string
+  ): boolean {
+    return /^[.-]{1,5}(?:[\s\t]+[.-]{1,5})*(?:[\s\t]+[.-]{1,5}(?:[\s\t]+[.-]{1,5})*)*$/g.test(str);
+  }
+
   analyzeString(
     str: string
   ): void {
-    const score = Utils.stringSuspicionScore(str);
+    const score = stringSuspicionScore(str);
     if (score !== 0) {
       this.literalScores.push(score);
     }
@@ -126,7 +135,7 @@ export class Deobfuscator {
     }
 
     // Searching for morse string like "--.- --.--"
-    if (Utils.isMorse(str)) {
+    if (this.#isMorse(str)) {
       this.morseLiterals.add(str);
     }
   }
@@ -201,7 +210,7 @@ export class Deobfuscator {
       return "morse";
     }
 
-    const { prefix } = Patterns.commonHexadecimalPrefix(
+    const { prefix } = commonHexadecimalPrefix(
       this.identifiers.flatMap(
         ({ name }) => (typeof name === "string" ? [name] : [])
       )
