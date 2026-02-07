@@ -1,5 +1,23 @@
 # @nodesecure/js-x-ray
 
+## 11.6.0
+
+### Minor Changes
+
+- [#511](https://github.com/NodeSecure/js-x-ray/pull/511) [`cd46792`](https://github.com/NodeSecure/js-x-ray/commit/cd4679232236259123f6ef2d34e465a66e0c5977) Thanks [@fraxken](https://github.com/fraxken)! - Migrate VariableTracer class to js-x-ray workspace
+
+- [#517](https://github.com/NodeSecure/js-x-ray/pull/517) [`8597384`](https://github.com/NodeSecure/js-x-ray/commit/8597384cbb0ad29a4a65caad18a8ece2c8724e9b) Thanks [@7amed3li](https://github.com/7amed3li)! - feat: add support for Arabic and Turkish languages
+
+- [#512](https://github.com/NodeSecure/js-x-ray/pull/512) [`085c0fd`](https://github.com/NodeSecure/js-x-ray/commit/085c0fd588925fd89a5ed05d9aae704031e0c4eb) Thanks [@7amed3li](https://github.com/7amed3li)! - feat: add prototype pollution detection probe
+
+- [#516](https://github.com/NodeSecure/js-x-ray/pull/516) [`4898768`](https://github.com/NodeSecure/js-x-ray/commit/489876860e1fcf0bceb4ef05983faa7ab877df94) Thanks [@7amed3li](https://github.com/7amed3li)! - Add insecure-random probe to detect Math.random() usage.
+
+- [#520](https://github.com/NodeSecure/js-x-ray/pull/520) [`5991e41`](https://github.com/NodeSecure/js-x-ray/commit/5991e4166081355dc8f6cf415499ffd805f3b2e5) Thanks [@fraxken](https://github.com/fraxken)! - Remove ts-source-parser workspace and migrate TS support natively in JS-X-Ray
+
+- [#513](https://github.com/NodeSecure/js-x-ray/pull/513) [`42888bd`](https://github.com/NodeSecure/js-x-ray/commit/42888bd8c1267673467e18f20583ca50a30a3de2) Thanks [@fraxken](https://github.com/fraxken)! - Migrate estree-ast-utils to JS-X-Ray
+
+- [#522](https://github.com/NodeSecure/js-x-ray/pull/522) [`112d4ee`](https://github.com/NodeSecure/js-x-ray/commit/112d4eeb3b60260ff827e1231c1508936c3c0997) Thanks [@fraxken](https://github.com/fraxken)! - Migrate @nodesecure/sec-literal workspace to JS-X-Ray workspace
+
 ## 11.5.0
 
 ### Minor Changes
