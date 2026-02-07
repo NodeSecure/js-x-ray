@@ -23,6 +23,9 @@ const jsParser = new JsSourceParser();
 const jsBody = jsParser.parse("const foo = 'bar';");
 ```
 
+> [!NOTE]
+> JsSourceParser supports native type striping when the option `stripTypeScriptTypes` is enabled
+
 ## TsSourceParser
 
 TypeScript parser using [@typescript-eslint/typescript-estree](https://typescript-eslint.io/packages/typescript-estree).

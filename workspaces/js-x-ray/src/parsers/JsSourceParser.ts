@@ -1,3 +1,6 @@
+// Import Node.js Dependencies
+import { stripTypeScriptTypes } from "node:module";
+
 // Import Third-party Dependencies
 import {
   parseModule,
@@ -26,6 +29,13 @@ export interface SourceParser {
   parse(source: string, options: unknown): ESTree.Statement[];
 }
 
+export interface JsSourceParserOptions {
+  /**
+   * @default false
+   */
+  stripTypeScriptTypes?: boolean;
+}
+
 export class JsSourceParser implements SourceParser {
   static FileExtensions = new Set([
     ".js",
@@ -34,12 +44,22 @@ export class JsSourceParser implements SourceParser {
     ".jsx"
   ]);
 
+  #stripTypeScriptTypes = false;
+
+  constructor(
+    options: JsSourceParserOptions = {}
+  ) {
+    this.#stripTypeScriptTypes = options.stripTypeScriptTypes ?? false;
+  }
+
   parse(
     source: string
   ): ESTree.Program["body"] {
+    const cleanedSource = this.#stripTypeScriptTypes ? stripTypeScriptTypes(source) : source;
+
     try {
       const { body } = parseModule(
-        source,
+        cleanedSource,
         structuredClone(kParsingOptions)
       );
 
@@ -51,7 +71,7 @@ export class JsSourceParser implements SourceParser {
 
       if (isIllegalReturn) {
         const { body } = parse(
-          source,
+          cleanedSource,
           {
             ...structuredClone(kParsingOptions),
             sourceType: "commonjs"
