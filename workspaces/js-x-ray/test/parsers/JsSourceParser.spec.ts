@@ -29,5 +29,12 @@ describe("JsSourceParser", () => {
         export default data;`;
       new JsSourceParser().parse(code);
     });
+
+    it("should strip TypeScript types when the option is enabled", () => {
+      const code = `function add(a: number, b: number): number {
+        return a + b;
+      }`;
+      new JsSourceParser({ stripTypeScriptTypes: true }).parse(code);
+    });
   });
 });
