@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 11.7.0
+
+### Minor Changes
+
+- [#523](https://github.com/NodeSecure/js-x-ray/pull/523) [`7918a5d`](https://github.com/NodeSecure/js-x-ray/commit/7918a5d4bd4d338b87b52331cfd90acc0400e589) Thanks [@fraxken](https://github.com/fraxken)! - Add support for native type striping inside JsSourceParser using node:module API
+
 ## 11.6.0
 
 ### Minor Changes
