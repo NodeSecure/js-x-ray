@@ -32,6 +32,7 @@ export type WarningName =
   | "sql-injection"
   | "monkey-patch"
   | "insecure-random"
+  | "prototype-pollution"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -139,6 +140,11 @@ export const warnings = Object.freeze({
   "insecure-random": {
     i18n: "sast_warnings.insecure_random",
     severity: "Information",
+    experimental: false
+  },
+  "prototype-pollution": {
+    i18n: "sast_warnings.prototype_pollution",
+    severity: "Warning",
     experimental: false
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;
