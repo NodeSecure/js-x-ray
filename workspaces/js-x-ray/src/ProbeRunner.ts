@@ -24,6 +24,7 @@ import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
 import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 import isRandom from "./probes/isRandom.ts";
+import isPrototypePollution from "./probes/isPrototypePollution.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -103,7 +104,8 @@ export class ProbeRunner {
     isSerializeEnv,
     dataExfiltration,
     sqlInjection,
-    isMonkeyPatch
+    isMonkeyPatch,
+    isPrototypePollution
   ];
 
   static Optionals: Record<OptionalWarningName, Probe> = {
