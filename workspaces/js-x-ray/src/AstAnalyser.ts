@@ -23,6 +23,7 @@ import {
   isOneLineExpressionExport
 } from "./utils/index.ts";
 import { walkEnter } from "./walker/index.ts";
+import { getCallExpressionIdentifier } from "./estree/index.ts";
 import {
   generateWarning,
   type OptionalWarningName,
@@ -203,19 +204,7 @@ export class AstAnalyser {
 
     // we walk each AST Nodes, this is a purely synchronous I/O
     const reducedBody = this.#pipelineRunner.reduce(body);
-    walkEnter(reducedBody, function walk(node) {
-      // Skip the root of the AST.
-      if (Array.isArray(node)) {
-        return;
-      }
-
-      for (const probeNode of source.walk(node)) {
-        const action = probeRunner.walk(probeNode);
-        if (action === "skip") {
-          this.skip();
-        }
-      }
-    });
+    this.#walkEnter(reducedBody, probeRunner);
 
     if (finalize) {
       if (typeof finalize !== "function") {
@@ -235,6 +224,28 @@ export class AstAnalyser {
       dependencies: source.dependencies,
       flags: source.flags
     };
+  }
+
+  #walkEnter(body: ESTree.Statement[], probeRunner: ProbeRunner) {
+    const recur = this.#walkEnter.bind(this);
+    walkEnter(body, function walk(node) {
+      if (Array.isArray(node)) {
+        return;
+      }
+
+      for (const probeNode of probeRunner.sourceFile.walk(node)) {
+        const action = probeRunner.walk(probeNode);
+        if (action === "skip") {
+          this.skip();
+        }
+        if (probeNode.type === "CallExpression" && getCallExpressionIdentifier(probeNode, {
+          resolveCallExpression: true
+        }) === "eval" && probeNode.arguments[0].type === "Literal" && typeof probeNode.arguments[0].value === "string") {
+          const evalBody = AstAnalyser.DefaultParser.parse(probeNode.arguments[0].value, void 0);
+          recur(evalBody, probeRunner);
+        }
+      }
+    });
   }
 
   async analyseFile(

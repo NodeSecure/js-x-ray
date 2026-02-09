@@ -2,8 +2,9 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { getCallExpressionIdentifier } from "../estree/index.ts";
-import type { ProbeMainContext } from "../ProbeRunner.ts";
+import { CALL_EXPRESSION_IDENTIFIER } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**
@@ -13,9 +14,10 @@ import { generateWarning } from "../warnings.ts";
  * Function("return this")();
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Node,
+  ctx: ProbeContext
 ): [boolean, any?] {
-  return isUnsafeCallee(node);
+  return isUnsafeCallee(node, ctx);
 }
 
 function main(
@@ -44,26 +46,26 @@ function main(
   return signals.Skip;
 }
 
+function isFunctionCallee(
+  node: ESTree.CallExpression,
+  identifier: null | string | undefined
+): boolean {
+  return identifier === "Function" && node.callee.type === "CallExpression";
+}
+
 function isEvalCallee(
   node: ESTree.CallExpression
 ): boolean {
   const identifier = getCallExpressionIdentifier(node, {
-    resolveCallExpression: false
+    resolveCallExpression: true
   });
 
   return identifier === "eval";
 }
 
-function isFunctionCallee(
-  node: ESTree.CallExpression
-): boolean {
-  const identifier = getCallExpressionIdentifier(node);
-
-  return identifier === "Function" && node.callee.type === "CallExpression";
-}
-
 export function isUnsafeCallee(
-  node: ESTree.CallExpression | ESTree.Node
+  node: ESTree.CallExpression | ESTree.Node,
+  ctx: ProbeContext
 ): [boolean, "eval" | "Function" | null] {
   if (node.type !== "CallExpression") {
     return [false, null];
@@ -73,7 +75,7 @@ export function isUnsafeCallee(
     return [true, "eval"];
   }
 
-  if (isFunctionCallee(node)) {
+  if (isFunctionCallee(node, ctx.context?.[CALL_EXPRESSION_IDENTIFIER])) {
     return [true, "Function"];
   }
 
@@ -84,5 +86,6 @@ export default {
   name: "isUnsafeCallee",
   validateNode,
   main,
-  breakOnMatch: false
+  breakOnMatch: false,
+  context: {}
 };
