@@ -1,0 +1,41 @@
+name: Benchmark
+
+permissions:
+  contents: write
+  pull-requests: write
+
+on:
+  # Scheduled trigger
+  schedule:
+    # Run every Sunday at 00:00
+    - cron: "0 0 * * 0"
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: 24.x
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Build typescript sources
+        run: npm run build
+      - name: Run Snapshot Benchmark
+        run: node --expose-gc --experimental-strip-types ./workspaces/js-x-ray/benchmark/write-snapshot.ts
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 #v8.1.0
+        with:
+          commit-message: 'chore: update benchmark snapshot'
+          branch: benchmark/update-snapshot
+          delete-branch: true
+          title: 'chore: update benchmark snapshot'
+          body: |
+            Automated benchmark snapshot update
+          labels: |
+            automated
+            benchmark
