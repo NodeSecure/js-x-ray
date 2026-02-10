@@ -3,6 +3,7 @@
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
+import { AstAnalyser } from "../../src/AstAnalyser.ts";
 import isMonkeyPatch, { JS_TYPES } from "../../src/probes/isMonkeyPatch.ts";
 import { getSastAnalysis, parseScript } from "../helpers.ts";
 
@@ -65,6 +66,21 @@ describe("isMonkeyPatch", () => {
 
     t.assert.equal(outputWarnings.length, 1);
     t.assert.partialDeepStrictEqual(outputWarnings[0], {
+      kind: "monkey-patch",
+      value: "Array.prototype"
+    });
+  });
+
+  test("should detect monkey patching via resolved evaluation (eval)", (t) => {
+    const str = `eval("Array.prototype.map = ()=> {}");`;
+
+    const astAnalysis = new AstAnalyser();
+
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.partialDeepStrictEqual(monkeyPatchWarning, {
       kind: "monkey-patch",
       value: "Array.prototype"
     });

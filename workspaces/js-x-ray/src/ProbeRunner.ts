@@ -33,7 +33,7 @@ import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 import {
   getCallExpressionIdentifier
 } from "./estree/index.ts";
-import { CALL_EXPRESSION_DATA } from "./contants.ts";
+import { CALL_EXPRESSION_DATA, CALL_EXPRESSION_IDENTIFIER } from "./contants.ts";
 
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 
@@ -230,6 +230,7 @@ export class ProbeRunner {
     const breakGroups = new Set<string>();
 
     let tracedIdentifierReport: TracedIdentifierReport | null | undefined;
+    let tracedIdentifier: string | null | undefined;
 
     if (node.type === "CallExpression") {
       const id = getCallExpressionIdentifier(node, {
@@ -237,6 +238,7 @@ export class ProbeRunner {
       });
       if (id !== null) {
         tracedIdentifierReport = this.sourceFile.tracer.getDataFromIdentifier(id);
+        tracedIdentifier = id;
       }
     }
 
@@ -247,6 +249,7 @@ export class ProbeRunner {
 
       try {
         if (probe.context && tracedIdentifierReport) {
+          probe.context[CALL_EXPRESSION_IDENTIFIER] = tracedIdentifier;
           probe.context[CALL_EXPRESSION_DATA] = tracedIdentifierReport;
         }
 
@@ -273,6 +276,7 @@ export class ProbeRunner {
         probe.teardown?.(this.#getProbeContext(probe));
         if (probe.context) {
           delete probe.context[CALL_EXPRESSION_DATA];
+          delete probe.context[CALL_EXPRESSION_IDENTIFIER];
         }
       }
     }
