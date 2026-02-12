@@ -29,7 +29,7 @@ import {
   type OptionalWarningName,
   type Warning
 } from "./warnings.ts";
-import { CollectableSet } from "./CollectableSet.ts";
+import type { CollectableSet } from "./CollectableSet.ts";
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 export interface Dependency {

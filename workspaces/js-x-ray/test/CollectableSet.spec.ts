@@ -3,16 +3,16 @@ import { describe, test } from "node:test";
 import assert from "node:assert";
 
 // Import Internal Dependencies
-import { CollectableSet } from "../src/CollectableSet.ts";
+import { DefaultCollectableSet } from "../src/CollectableSet.ts";
 
 describe("CollectableSet", () => {
   test("should get the type of the given CollectableSet", () => {
-    const collectableSet = new CollectableSet("url");
+    const collectableSet = new DefaultCollectableSet("url");
     assert.strictEqual(collectableSet.type, "url");
   });
 
   test("should be able to add a value", () => {
-    const collectableSet = new CollectableSet("url");
+    const collectableSet = new DefaultCollectableSet("url");
     collectableSet.add("https://example.com", {
       file: "str.js",
       location: [[0, 0], [0, 0]],

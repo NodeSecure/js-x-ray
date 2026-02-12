@@ -9,18 +9,25 @@ export type Location<T = Record<string, unknown>> = {
   metadata?: T;
 };
 
-export class CollectableSet<T = Record<string, unknown>> {
+export type CollectableInfos<T = Record<string, unknown>> = {
+  file?: string | null;
+  metadata?: T;
+  location: SourceArrayLocation;
+};
+
+export interface CollectableSet<T = Record<string, unknown>> {
+  add(value: string, infos: CollectableInfos<T>): void;
+  type: Type;
+}
+
+export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
   #entries: Map<string, Map<string | null, { location: SourceArrayLocation; metadata?: T; }[]>> = new Map();
   type: Type;
   constructor(type: string) {
     this.type = type;
   }
 
-  add(value: string, { file = null, location, metadata }: {
-    file?: string | null;
-    metadata?: T;
-    location: SourceArrayLocation;
-  }) {
+  add(value: string, { file = null, location, metadata }: CollectableInfos<T>) {
     if (!this.#entries.has(value)) {
       this.#entries.set(value, new Map([[file, [{ location, metadata }]]]));
 

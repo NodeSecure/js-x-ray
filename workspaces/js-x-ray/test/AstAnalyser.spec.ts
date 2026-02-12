@@ -19,7 +19,7 @@ import {
   kWarningUnsafeImport,
   kWarningUnsafeStmt
 } from "./helpers.ts";
-import { CollectableSet } from "../src/CollectableSet.ts";
+import { DefaultCollectableSet } from "../src/CollectableSet.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.url);
@@ -338,9 +338,9 @@ describe("AstAnalyser", () => {
 
       writeFileSync(tempOneLineFile, oneLineContent);
 
-      const urlSet = new CollectableSet("url");
-      const ipSet = new CollectableSet("ip");
-      const hostnameSet = new CollectableSet("hostname");
+      const urlSet = new DefaultCollectableSet("url");
+      const ipSet = new DefaultCollectableSet("ip");
+      const hostnameSet = new DefaultCollectableSet("hostname");
       const collectables = [urlSet, ipSet, hostnameSet];
 
       try {
@@ -455,9 +455,9 @@ describe("AstAnalyser", () => {
         });
 
         it("should collect the full url and the ip address", () => {
-          const urlSet = new CollectableSet("url");
-          const ipSet = new CollectableSet("ip");
-          const hostnameSet = new CollectableSet("hostname");
+          const urlSet = new DefaultCollectableSet("url");
+          const ipSet = new DefaultCollectableSet("ip");
+          const hostnameSet = new DefaultCollectableSet("hostname");
           const collectables = [urlSet, ipSet, hostnameSet];
           const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
           new AstAnalyser({
@@ -607,9 +607,9 @@ describe("AstAnalyser", () => {
 
       writeFileSync(tempOneLineFile, oneLineContent);
 
-      const urlSet = new CollectableSet("url");
-      const ipSet = new CollectableSet("ip");
-      const hostnameSet = new CollectableSet("hostname");
+      const urlSet = new DefaultCollectableSet("url");
+      const ipSet = new DefaultCollectableSet("ip");
+      const hostnameSet = new DefaultCollectableSet("hostname");
       const collectables = [urlSet, ipSet, hostnameSet];
 
       try {

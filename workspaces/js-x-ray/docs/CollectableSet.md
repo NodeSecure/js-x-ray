@@ -2,13 +2,18 @@
 
 CollectableSet is a specialized data structure for collecting and aggregating infrastructure-related data points (e.g., URLs, hostnames, IPs) during JavaScript AST analysis. It groups locations by value and file, with optional metadata support. Post-analysis, the collected data can be exploited externally (e.g., for network monitoring, security audits, or infrastructure mapping) to derive insights beyond JS-X-Ray's built-in warnings.
 
-- **add(value, options)**: Adds an entry to the set. Groups by value and file.
+- **type**: Type
+- **add(value, infos)**: Adds an entry to the set. Groups by value and file.
+
+CollectableSet is only an interface but Js-X-Ray provides a default implementation named DefaultCollectableSet.
+The default implementation has an additional method to read what it has collected.
+
 - **[Symbol.iterator]()**: Iterates over entries, yielding `{ value, locations }` for each unique value.
 
 ```ts
-import { CollectableSet } from "@nodesecure/js-x-ray";
+import { DefaultCollectableSet } from "@nodesecure/js-x-ray";
 
-const hostnameSet = new CollectableSet<{ spec: string }>("hostname");
+const hostnameSet = new DefaultCollectableSet<{ spec: string }>("hostname");
 
 // Add infrastructure data during analysis (e.g., via probes)
 hostnameSet.add("example.com", {
@@ -30,26 +35,29 @@ for (const { value, locations } of hostnameSet) {
 ## API
 
 ```ts
-type Type = "url" | "hostname" | "ip" | "email" | (string & {});
+export type Type = "url" | "hostname" | "ip" | "email" | (string & {});
 
-type Location<T = Record<string, unknown>> = {
+export type Location<T = Record<string, unknown>> = {
   file: string | null;
   location: SourceArrayLocation[];
   metadata?: T;
+};
+
+export type CollectableInfos<T = Record<string, unknown>> = {
+  file?: string | null;
+  metadata?: T;
+  location: SourceArrayLocation;
+};
+
+export interface CollectableSet<T = Record<string, unknown>> {
+  add(value: string, infos: CollectableInfos<T>): void;
+  type: Type;
 }
 
-class CollectableSet<T = Record<string, unknown>> {
-  type: Type;
-  constructor(type: Type);
+export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
+  // same methods signature than CollectableSet
 
-  add(
-    value: string,
-    { file, location, metadata }: {
-      file?: string | null;
-      location: SourceArrayLocation;
-      metadata?: T;
-    }
-  ): void;
+  constructor(type: Type);
 
   *[Symbol.iterator](): Generator<{
     value: string;
@@ -63,9 +71,9 @@ class CollectableSet<T = Record<string, unknown>> {
 CollectableSet integrates with AstAnalyser via the `collectables` option. Pass an array of CollectableSet instances to gather data during analysis. Probes can populate them, and post-analysis, you can exploit the data for external processing.
 
 ```ts
-import { AstAnalyser, CollectableSet } from "@nodesecure/js-x-ray";
+import { AstAnalyser, DefaultCollectableSet } from "@nodesecure/js-x-ray";
 
-const hostnameSet = new CollectableSet("hostname");
+const hostnameSet = new DefaultCollectableSet("hostname");
 const analyser = new AstAnalyser({
   collectables: [hostnameSet],
   // Other options...
@@ -85,9 +93,9 @@ for (const { value, locations } of hostnameSet) {
 EntryFilesAnalyser uses AstAnalyser internally, so pass collectables via the `astAnalyzer` option for multi-file infrastructure data aggregation. Exploit the data across dependencies for comprehensive checks.
 
 ```ts
-import { EntryFilesAnalyser, CollectableSet } from "@nodesecure/js-x-ray";
+import { EntryFilesAnalyser, DefaultCollectableSet } from "@nodesecure/js-x-ray";
 
-const urlSet = new CollectableSet("url");
+const urlSet = new DefaultCollectableSet("url");
 const analyser = new EntryFilesAnalyser({
   astAnalyzer: new AstAnalyser({ collectables: [urlSet] })
 });
