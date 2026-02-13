@@ -4,7 +4,7 @@ import { describe, beforeEach, it } from "node:test";
 
 // Import Internal Dependencies
 import { ShadyLink } from "../src/ShadyLink.ts";
-import { CollectableSet } from "../src/CollectableSet.ts";
+import { type CollectableSet, DefaultCollectableSet } from "../src/CollectableSet.ts";
 import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
 let urlSet: CollectableSet;
@@ -13,9 +13,9 @@ let ipSet: CollectableSet;
 let collectableSetRegistry: CollectableSetRegistry;
 
 beforeEach(() => {
-  urlSet = new CollectableSet("url");
-  hostnameSet = new CollectableSet("hostname");
-  ipSet = new CollectableSet("ip");
+  urlSet = new DefaultCollectableSet("url");
+  hostnameSet = new DefaultCollectableSet("hostname");
+  ipSet = new DefaultCollectableSet("ip");
   collectableSetRegistry = new CollectableSetRegistry([
     urlSet,
     hostnameSet,

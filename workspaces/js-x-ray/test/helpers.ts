@@ -13,7 +13,7 @@ import {
   type Probe
 } from "../src/ProbeRunner.ts";
 import { walk } from "../src/walker/index.ts";
-import { CollectableSet } from "../src/CollectableSet.ts";
+import type { CollectableSet } from "../src/CollectableSet.ts";
 import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
 // @see https://github.com/estree/estree/blob/master/es5.md#literal

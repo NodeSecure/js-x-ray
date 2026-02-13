@@ -5,7 +5,7 @@ import { describe, test } from "node:test";
 // Import Internal Dependencies
 import isLiteral from "../../src/probes/isLiteral.ts";
 import { getSastAnalysis, parseScript } from "../helpers.ts";
-import { CollectableSet } from "../../src/CollectableSet.ts";
+import { DefaultCollectableSet } from "../../src/CollectableSet.ts";
 
 test("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", (t) => {
   const str = "const foo = '68747470'";
@@ -184,7 +184,7 @@ test("should detect suspicious links when a URL contains a raw IPv6 address with
 
 test("should collect public ip address", () => {
   const str = "const IPV6 = '8.8.8.8';";
-  const ipSet = new CollectableSet("ip");
+  const ipSet = new DefaultCollectableSet("ip");
   const collectables = [ipSet];
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(isLiteral, {
@@ -202,7 +202,7 @@ test("should collect public ip address", () => {
 
 test("should collect and detect private address with an Information severity", () => {
   const str = "const IPV6 = '127.0.0.1';";
-  const ipSet = new CollectableSet("ip");
+  const ipSet = new DefaultCollectableSet("ip");
   const collectables = [ipSet];
   const ast = parseScript(str);
   const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } })
@@ -219,9 +219,9 @@ test("should collect and detect private address with an Information severity", (
 });
 
 test("should collect the full url and the ip address", () => {
-  const urlSet = new CollectableSet("url");
-  const ipSet = new CollectableSet("ip");
-  const hostnameSet = new CollectableSet("hostname");
+  const urlSet = new DefaultCollectableSet("url");
+  const ipSet = new DefaultCollectableSet("ip");
+  const hostnameSet = new DefaultCollectableSet("hostname");
   const collectables = [urlSet, ipSet, hostnameSet];
   const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
   const ast = parseScript(str);
@@ -240,7 +240,7 @@ test("should collect the full url and the ip address", () => {
 test("should not collect a hostname when there is none", () => {
   const str = "const protocol = 'blob://'";
 
-  const hostnameSet = new CollectableSet("hostname");
+  const hostnameSet = new DefaultCollectableSet("hostname");
 
   const collectables = [hostnameSet];
   const ast = parseScript(str);
@@ -252,9 +252,9 @@ test("should not detect file:// link ", () => {
   const str = `worker = realRequire(decodeURIComponent(filename.replace(process.platform === 'win32' ?
       'file:///server' : 'file://server/share/file.txt', '')));`;
 
-  const urlSet = new CollectableSet("url");
-  const ipSet = new CollectableSet("ip");
-  const hostnameSet = new CollectableSet("hostname");
+  const urlSet = new DefaultCollectableSet("url");
+  const ipSet = new DefaultCollectableSet("ip");
+  const hostnameSet = new DefaultCollectableSet("hostname");
   const collectables = [urlSet, ipSet, hostnameSet];
 
   const ast = parseScript(str);
@@ -288,7 +288,7 @@ describe("email collection", () => {
       const email3 = "test123@test-domain.org";
     `;
     const ast = parseScript(str);
-    const emailSet = new CollectableSet("email");
+    const emailSet = new DefaultCollectableSet("email");
     const sastAnalysis = getSastAnalysis(isLiteral, { collectables: [emailSet] })
       .execute(ast.body);
 
@@ -310,7 +310,7 @@ describe("email collection", () => {
       const invalid5 = "user.@example.com";
     `;
     const ast = parseScript(str);
-    const emailSet = new CollectableSet("email");
+    const emailSet = new DefaultCollectableSet("email");
     getSastAnalysis(isLiteral, { collectables: [emailSet] })
       .execute(ast.body);
 
@@ -326,7 +326,7 @@ describe("email collection", () => {
       };
     `;
     const ast = parseScript(str);
-    const emailSet = new CollectableSet("email");
+    const emailSet = new DefaultCollectableSet("email");
     getSastAnalysis(isLiteral, { collectables: [emailSet] })
       .execute(ast.body);
 
@@ -340,7 +340,7 @@ describe("email collection", () => {
   test("should track email locations correctly", () => {
     const str = `const email = "test@example.com";`;
     const ast = parseScript(str);
-    const emailSet = new CollectableSet("email");
+    const emailSet = new DefaultCollectableSet("email");
     getSastAnalysis(isLiteral, { collectables: [emailSet], location: "test.js" })
       .execute(ast.body);
 

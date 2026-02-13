@@ -1,5 +1,5 @@
 // Import Internal Dependencies
-import { CollectableSet, type Type } from "./CollectableSet.ts";
+import type { CollectableSet, Type } from "./CollectableSet.ts";
 import type { SourceArrayLocation } from "./utils/toArrayLocation.ts";
 
 export class CollectableSetRegistry {
