@@ -1,5 +1,15 @@
 # @nodesecure/js-x-ray
 
+## 12.0.0
+
+### Major Changes
+
+- [#530](https://github.com/NodeSecure/js-x-ray/pull/530) [`e123fd2`](https://github.com/NodeSecure/js-x-ray/commit/e123fd2c2781c3882ad7a59f8428df3905f27cac) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray)! expose an interface and a default implementation for CollectableSet
+
+### Minor Changes
+
+- [#528](https://github.com/NodeSecure/js-x-ray/pull/528) [`f33efcd`](https://github.com/NodeSecure/js-x-ray/commit/f33efcd8f3a484151a77213793b544cb9f45e555) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): scan eval argument + isUnsafecalle optmizations
+
 ## 11.7.0
 
 ### Minor Changes
