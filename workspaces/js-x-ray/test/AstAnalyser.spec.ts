@@ -1,4 +1,5 @@
 /* eslint-disable max-nested-callbacks */
+/* eslint-disable max-lines */
 // Import Node.js Dependencies
 import assert from "node:assert";
 import { readFileSync, unlinkSync, writeFileSync } from "node:fs";
@@ -7,7 +8,7 @@ import path from "node:path";
 import { describe, it, type TestContext } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser, JsSourceParser } from "../src/index.ts";
+import { AstAnalyser, type Dependency, JsSourceParser } from "../src/index.ts";
 import { ProbeRunner } from "../src/ProbeRunner.ts";
 import { SourceFile } from "../src/SourceFile.ts";
 import { FakeSourceParser } from "./fixtures/FakeSourceParser.ts";
@@ -17,7 +18,8 @@ import {
   kIncriminedCodeSampleCustomProbe,
   kWarningUnsafeDanger,
   kWarningUnsafeImport,
-  kWarningUnsafeStmt
+  kWarningUnsafeStmt,
+  extractDependencies
 } from "./helpers.ts";
 import { DefaultCollectableSet } from "../src/CollectableSet.ts";
 
@@ -31,7 +33,10 @@ describe("AstAnalyser", () => {
 
   describe("analyse", () => {
     it("should return all dependencies required at runtime", () => {
-      const { dependencies, warnings } = getAnalyser().analyse(`
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const { warnings } = new AstAnalyser({
+        collectables: [dependencySet]
+      }).analyse(`
     const http = require("http");
     const net = require("net");
     const fs = require("fs").promises;
@@ -45,7 +50,7 @@ describe("AstAnalyser", () => {
   `);
 
       assert.strictEqual(warnings.length, 0);
-      assert.deepEqual([...dependencies.keys()],
+      assert.deepEqual([...extractDependencies(dependencySet).keys()],
         ["http", "net", "fs", "assert", "timers", "./aFile.js", "path"]
       );
     });
@@ -95,7 +100,8 @@ describe("AstAnalyser", () => {
     });
 
     it("should be capable to follow a malicious code with hexa computation and reassignments", () => {
-      const { warnings, dependencies } = getAnalyser().analyse(`
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const { warnings } = new AstAnalyser({ collectables: [dependencySet] }).analyse(`
     function unhex(r) {
       return Buffer.from(r, "hex").toString();
     }
@@ -112,7 +118,7 @@ describe("AstAnalyser", () => {
         "unsafe-import",
         "unsafe-stmt"
       ].sort());
-      assert.deepEqual([...dependencies.keys()], ["./test/data"]);
+      assert.deepEqual([...extractDependencies(dependencySet).keys()], ["./test/data"]);
     });
 
     it("should throw a 'short-identifiers' warning for a code with only one-character identifiers", () => {
@@ -129,28 +135,33 @@ describe("AstAnalyser", () => {
     });
 
     it("should detect dependency required under a TryStatement", () => {
-      const { dependencies } = getAnalyser().analyse(`
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      new AstAnalyser({ collectables: [dependencySet] }).analyse(`
     try {
       require("http");
     }
     catch {}
   `);
 
+      const dependencies = extractDependencies(dependencySet);
+
       assert.ok(dependencies.has("http"));
       assert.ok(dependencies.get("http")!.inTry);
     });
 
     it("should return isOneLineRequire true given a single line CJS export", () => {
-      const { dependencies, flags } = getAnalyser().analyse(
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const { flags } = new AstAnalyser({ collectables: [dependencySet] }).analyse(
         "module.exports = require('foo');"
       );
 
       assert.ok(flags.has("oneline-require"));
-      assert.deepEqual([...dependencies.keys()], ["foo"]);
+      assert.deepEqual([...extractDependencies(dependencySet).keys()], ["foo"]);
     });
 
     it("should be capable to extract dependencies name for ECMAScript Modules (ESM)", () => {
-      const { dependencies, warnings } = getAnalyser().analyse(`
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const { warnings } = new AstAnalyser({ collectables: [dependencySet] }).analyse(`
     import * as http from "http";
     import fs from "fs";
     import { foo } from "xd";
@@ -158,7 +169,7 @@ describe("AstAnalyser", () => {
 
       assert.strictEqual(warnings.length, 0);
       assert.deepEqual(
-        [...dependencies.keys()].sort(),
+        [...extractDependencies(dependencySet).keys()].sort(),
         ["http", "fs", "xd"].sort()
       );
     });
@@ -284,14 +295,15 @@ describe("AstAnalyser", () => {
 
   describe("analyseFile", () => {
     it("remove the packageName from the dependencies list", async() => {
-      const result = await getAnalyser().analyseFile(
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const result = await new AstAnalyser({ collectables: [dependencySet] }).analyseFile(
         new URL("depName.js", kFixtureURL),
         { packageName: "foobar" }
       );
 
       assert.ok(result.ok);
       assert.strictEqual(result.warnings.length, 0);
-      assert.deepEqual([...result.dependencies.keys()],
+      assert.deepEqual([...extractDependencies(dependencySet).keys()],
         ["open"]
       );
     });
@@ -524,14 +536,15 @@ describe("AstAnalyser", () => {
 
   describe("analyseFileSync", () => {
     it("remove the packageName from the dependencies list", () => {
-      const result = getAnalyser().analyseFileSync(
+      const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+      const result = new AstAnalyser({ collectables: [dependencySet] }).analyseFileSync(
         new URL("depName.js", kFixtureURL),
         { packageName: "foobar" }
       );
 
       assert.ok(result.ok);
       assert.strictEqual(result.warnings.length, 0);
-      assert.deepEqual([...result.dependencies.keys()],
+      assert.deepEqual([...extractDependencies(dependencySet).keys()],
         ["open"]
       );
     });
@@ -588,12 +601,13 @@ describe("AstAnalyser", () => {
       writeFileSync(tempOneLineFile, oneLineContent);
 
       try {
-        const result = getAnalyser().analyseFileSync(tempOneLineFile);
+        const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+        const result = new AstAnalyser({ collectables: [dependencySet] }).analyseFileSync(tempOneLineFile);
 
         t.assert.ok(result.ok);
         t.assert.ok(result.flags.has("oneline-require"));
         t.assert.strictEqual(result.flags.has("is-minified"), false);
-        t.assert.deepEqual([...result.dependencies.keys()], ["foo"]);
+        t.assert.deepEqual([...extractDependencies(dependencySet).keys()], ["foo"]);
       }
       finally {
         unlinkSync(tempOneLineFile);
@@ -772,11 +786,12 @@ describe("AstAnalyser", () => {
   describe("constructor", () => {
     it("should not throw an error when instantiated without a custom parser", () => {
       assert.doesNotThrow(() => {
-        const analyser = new AstAnalyser();
+        const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+        const analyser = new AstAnalyser({ collectables: [dependencySet] });
         // perform basic operations
-        const result = analyser.analyse("const foo = 'bar';");
+        analyser.analyse("const foo = 'bar';");
         // compare array of keys to an empty array to ensure there are no dependencies in result
-        assert.deepEqual([...result.dependencies.keys()], []);
+        assert.deepEqual([...extractDependencies(dependencySet).keys()], []);
       });
     });
 
@@ -847,9 +862,15 @@ describe("AstAnalyser", () => {
 });
 
 let analyser: AstAnalyser | null = null;
-function getAnalyser(): NonNullable<AstAnalyser> {
+function getAnalyser(): {
+  analyse: AstAnalyser["analyse"];
+  analyseFile: AstAnalyser["analyseFile"];
+  analyseFileSync: AstAnalyser["analyseFileSync"];
+  prepareSource: AstAnalyser["prepareSource"];
+} {
+  const dependencySet = new DefaultCollectableSet("dependency");
   if (!analyser) {
-    analyser = new AstAnalyser();
+    analyser = new AstAnalyser({ collectables: [dependencySet] });
   }
 
   return analyser;

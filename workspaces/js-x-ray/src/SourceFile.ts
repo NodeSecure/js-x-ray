@@ -22,6 +22,8 @@ import {
   generateWarning,
   type Warning
 } from "./warnings.ts";
+import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
+import type { CollectableSet } from "./CollectableSet.ts";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;
@@ -30,6 +32,12 @@ export type SourceFlags =
   | "fetch"
   | "oneline-require"
   | "is-minified";
+
+export type SourceFileOptions = {
+  metadata?: Record<string, unknown>;
+  collectables?: CollectableSet[];
+  packageName?: string;
+};
 
 export class SourceFile {
   tracer = new VariableTracer().enableDefaultTracing();
@@ -43,10 +51,15 @@ export class SourceFile {
   path = new SourceFilePath();
   sensitivity?: Sensitivity;
   metadata?: Record<string, unknown>;
+  collectablesSetRegistry: CollectableSetRegistry;
+  packageName?: string;
 
-  constructor(sourceLocation?: string, metadata?: Record<string, unknown>) {
+  constructor(sourceLocation?: string, options?: SourceFileOptions) {
+    const { metadata, collectables = [] } = options ?? {};
     this.path.use(sourceLocation);
     this.metadata = metadata;
+    this.collectablesSetRegistry = new CollectableSetRegistry(collectables ?? []);
+    this.packageName = options?.packageName;
   }
 
   addDependency(
@@ -65,6 +78,18 @@ export class SourceFile {
       inTry: this.inTryStatement,
       ...(location ? { location } : {})
     });
+    if (this.packageName !== dependencyName) {
+      this.collectablesSetRegistry.add("dependency", {
+        value: dependencyName,
+        file: this.path.location,
+        location: toArrayLocation(location ?? undefined),
+        metadata: {
+          ...this.metadata,
+          inTry: this.inTryStatement,
+          unsafe
+        }
+      });
+    }
 
     if (this.dependencyAutoWarning) {
       this.warnings.push(

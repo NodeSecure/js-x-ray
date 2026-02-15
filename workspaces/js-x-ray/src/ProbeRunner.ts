@@ -29,7 +29,6 @@ import isPrototypePollution from "./probes/isPrototypePollution.ts";
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
-import type { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 import {
   getCallExpressionIdentifier
 } from "./estree/index.ts";
@@ -47,7 +46,6 @@ export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef> = {
 
 export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
   sourceFile: SourceFile;
-  collectableSetRegistry: CollectableSetRegistry;
   context?: T;
   setEntryPoint: (handlerName: string) => void;
 };
@@ -75,7 +73,6 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
 export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
-  #collectableSetRegistry: CollectableSetRegistry;
   #selectedEntryPoints: Map<Probe, string> = new Map();
 
   static Signals = Object.freeze({
@@ -116,11 +113,9 @@ export class ProbeRunner {
 
   constructor(
     sourceFile: SourceFile,
-    collectableSetRegistry: CollectableSetRegistry,
     probes: Probe[] = ProbeRunner.Defaults
   ) {
     this.sourceFile = sourceFile;
-    this.#collectableSetRegistry = collectableSetRegistry;
 
     for (const probe of probes) {
       assert(
@@ -173,7 +168,6 @@ export class ProbeRunner {
 
     return {
       sourceFile: this.sourceFile,
-      collectableSetRegistry: this.#collectableSetRegistry,
       context: probe.context,
       setEntryPoint
     };

@@ -55,11 +55,11 @@ class AstAnalyser {
   ) => Report;
   analyseFile(
     pathToFile: string | URL,
-    options?: RuntimeFileOptions
+    options?: RuntimeOptions
   ): Promise<ReportOnFile>;
   analyseFileSync(
     pathToFile: string | URL,
-    options?: RuntimeFileOptions
+    options?: RuntimeOptions
   ): ReportOnFile;
   prepareSource(source: string, options?: PrepareSourceOptions): string
 }
@@ -83,12 +83,12 @@ interface RuntimeOptions {
   isMinified?: boolean;
   initialize?: (sourceFile: SourceFile) => void;
   finalize?: (sourceFile: SourceFile) => void;
+  packageName?: string;
 }
 
 type SourceFlags = "fetch" | "oneline-require" | "is-minified";
 
 interface Report {
-  dependencies: Map<string, Dependency>;
   warnings: Warning[];
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
@@ -99,7 +99,6 @@ type ReportOnFile = {
   ok: true,
   warnings: Warning[];
   flags: Set<SourceFlags>;
-  dependencies: Map<string, Dependency>;
 } | {
   ok: false,
   warnings: Warning[];
@@ -208,7 +207,6 @@ Result:
   idsLengthAvg: 0,
   stringScore: 0,
   warnings: [ { kind: 'unsafe-danger', location: [Array], source: 'JS-X-Ray' } ],
-  dependencies: Map(0) {},
   flags: Set(0) {},
   isOneLineRequire: false
 }

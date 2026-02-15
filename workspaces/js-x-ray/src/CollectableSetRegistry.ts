@@ -23,4 +23,8 @@ export class CollectableSetRegistry {
   has(type: Type): boolean {
     return this.#collectableSets.has(type);
   }
+
+  get(type: Type): CollectableSet | undefined {
+    return this.#collectableSets.get(type);
+  }
 }

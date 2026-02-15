@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 // Import Internal Dependencies
-import { AstAnalyser, EntryFilesAnalyser } from "../src/index.ts";
+import { AstAnalyser, EntryFilesAnalyser, DefaultCollectableSet } from "../src/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/entryFiles/", import.meta.url);
@@ -15,7 +15,9 @@ const kFixtureTypeScriptURL = new URL("fixtures/entryFilesTs/", import.meta.url)
 
 describe("EntryFilesAnalyser", () => {
   it("should analyze internal dependencies recursively", async(t) => {
-    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
     const entryUrl = new URL("entry.js", kFixtureURL);
     const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
 
@@ -45,7 +47,9 @@ describe("EntryFilesAnalyser", () => {
   });
 
   it("should analyze ESM export statements recursively", async(t) => {
-    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
     const entryUrl = new URL("export.js", kFixtureURL);
 
     const analyseFileMock = t.mock.method(AstAnalyser.prototype, "analyseFile");
@@ -69,7 +73,9 @@ describe("EntryFilesAnalyser", () => {
   });
 
   it("should detect internal deps that failed to be analyzed", async() => {
-    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
     const entryUrl = new URL("entryWithInvalidDep.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
@@ -95,8 +101,10 @@ describe("EntryFilesAnalyser", () => {
 
   it("should extends default extensions", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
-      loadExtensions: (exts) => [...exts, "jsx"]
+      loadExtensions: (exts) => [...exts, "jsx"],
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
     });
+
     const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
@@ -121,7 +129,8 @@ describe("EntryFilesAnalyser", () => {
 
   it("should override default extensions", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
-      loadExtensions: () => ["jsx"]
+      loadExtensions: () => ["jsx"],
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
     });
     const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
@@ -140,7 +149,8 @@ describe("EntryFilesAnalyser", () => {
 
   it("should detect recursive dependencies using DiGraph (with rootPath)", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
-      rootPath: kFixtureURL
+      rootPath: kFixtureURL,
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
     });
     const entryUrl = new URL("recursive/A.js", kFixtureURL);
 
@@ -169,7 +179,9 @@ describe("EntryFilesAnalyser", () => {
   });
 
   it("should detect recursive dependencies using DiGraph but without rootPath everything is absolute", async() => {
-    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
     const entryUrl = new URL("recursive/A.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse(
@@ -187,7 +199,8 @@ describe("EntryFilesAnalyser", () => {
 
   it("should automatically build absolute path for entryFiles when rootPath is provided", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
-      rootPath: kFixtureURL
+      rootPath: kFixtureURL,
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
     });
 
     const generator = entryFilesAnalyser.analyse(
@@ -208,7 +221,8 @@ describe("EntryFilesAnalyser", () => {
   it("should ignore file that does not exist when option ignoreENOENT is provided", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser({
       ignoreENOENT: true,
-      rootPath: kFixtureURL
+      rootPath: kFixtureURL,
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
     });
 
     const entryUrl = new URL("does-not-exists.js", kFixtureURL);
@@ -223,7 +237,9 @@ describe("EntryFilesAnalyser", () => {
   });
 
   it("should parse, analyze and follow dependencies in TypeScript", async(t) => {
-    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
     const entryUrl = new URL("entry.ts", kFixtureTypeScriptURL);
 
     const analyseFileMock = t.mock.method(AstAnalyser.prototype, "analyseFile");

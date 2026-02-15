@@ -3,7 +3,8 @@ import assert from "node:assert";
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser, DefaultCollectableSet, type Dependency } from "../../src/index.ts";
+import { extractDependencies } from "../helpers.ts";
 
 const validTestCases: [string, string[]][] = [
   ["module.exports = require('fs') || require('constants');", ["fs", "constants"]],
@@ -37,10 +38,13 @@ const validTestCases: [string, string[]][] = [
 test("it should return isOneLineRequire true given a single line CJS export with a valid assignment", () => {
   validTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, flags } = new AstAnalyser().analyse(source);
+    const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+    const { flags } = new AstAnalyser({
+      collectables: [dependencySet]
+    }).analyse(source);
 
     assert.ok(flags.has("oneline-require"));
-    assert.deepEqual([...dependencies.keys()], modules);
+    assert.deepEqual([...extractDependencies(dependencySet).keys()], modules);
   });
 });
 
@@ -60,9 +64,12 @@ const invalidTestCases: [string, string[]][] = [
 test("it should return isOneLineRequire false given a single line CJS export with illegal callees", () => {
   invalidTestCases.forEach((test) => {
     const [source, modules] = test;
-    const { dependencies, flags } = new AstAnalyser().analyse(source);
+    const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+    const { flags } = new AstAnalyser({
+      collectables: [dependencySet]
+    }).analyse(source);
 
     assert.ok(flags.has("oneline-require") === false);
-    assert.deepEqual([...dependencies.keys()], modules);
+    assert.deepEqual([...extractDependencies(dependencySet).keys()], modules);
   });
 });

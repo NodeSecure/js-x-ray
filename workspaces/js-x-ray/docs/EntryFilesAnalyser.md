@@ -43,7 +43,7 @@ declare class EntryFilesAnalyser {
    */
   analyse(
     entryFiles: Iterable<string | URL>,
-    options?: RuntimeFileOptions
+    options?: RuntimeOptions
   ): AsyncGenerator<ReportOnFile & { file: string }>;
 }
 ```
