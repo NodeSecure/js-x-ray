@@ -1,9 +1,10 @@
 # CollectableSet
 
-CollectableSet is a specialized data structure for collecting and aggregating infrastructure-related data points (e.g., URLs, hostnames, IPs) during JavaScript AST analysis. It groups locations by value and file, with optional metadata support. Post-analysis, the collected data can be exploited externally (e.g., for network monitoring, security audits, or infrastructure mapping) to derive insights beyond JS-X-Ray's built-in warnings.
+CollectableSet is a specialized data structure for collecting and aggregating infrastructure-related data points (e.g., URLs, hostnames, IPs, dependencies) during JavaScript AST analysis. It groups locations by value and file, with optional metadata support. Post-analysis, the collected data can be exploited externally (e.g., for network monitoring, security audits, or infrastructure mapping) to derive insights beyond JS-X-Ray's built-in warnings.
 
 - **type**: Type
 - **add(value, infos)**: Adds an entry to the set. Groups by value and file.
+- **values()**: Returns an iterable of all values of the CollectableSet.
 
 CollectableSet is only an interface but Js-X-Ray provides a default implementation named DefaultCollectableSet.
 The default implementation has an additional method to read what it has collected.
@@ -35,7 +36,7 @@ for (const { value, locations } of hostnameSet) {
 ## API
 
 ```ts
-export type Type = "url" | "hostname" | "ip" | "email" | (string & {});
+export type Type = "url" | "hostname" | "ip" | "email" | "dependency" | (string & {});
 
 export type Location<T = Record<string, unknown>> = {
   file: string | null;
@@ -52,6 +53,7 @@ export type CollectableInfos<T = Record<string, unknown>> = {
 export interface CollectableSet<T = Record<string, unknown>> {
   add(value: string, infos: CollectableInfos<T>): void;
   type: Type;
+  values(): Iterable<string>;
 }
 
 export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {

@@ -1,7 +1,7 @@
 // Import Internal Dependencies
 import { type SourceArrayLocation } from "./utils/toArrayLocation.ts";
 
-export type Type = "url" | "hostname" | "ip" | "email" | (string & {});
+export type Type = "url" | "hostname" | "ip" | "email" | "dependency" | (string & {});
 
 export type Location<T = Record<string, unknown>> = {
   file: string | null;
@@ -18,6 +18,7 @@ export type CollectableInfos<T = Record<string, unknown>> = {
 export interface CollectableSet<T = Record<string, unknown>> {
   add(value: string, infos: CollectableInfos<T>): void;
   type: Type;
+  values(): Iterable<string>;
 }
 
 export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
@@ -43,6 +44,10 @@ export class DefaultCollectableSet<T = Record<string, unknown>> implements Colle
     }
 
     files?.set(file, [{ location, metadata }]);
+  }
+
+  values(): Iterable<string> {
+    return this.#entries.keys();
   }
 
   * [Symbol.iterator]() {

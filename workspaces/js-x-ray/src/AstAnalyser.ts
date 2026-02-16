@@ -29,14 +29,13 @@ import {
   type OptionalWarningName,
   type Warning
 } from "./warnings.ts";
-import type { CollectableSet } from "./CollectableSet.ts";
+import type { CollectableSet, Type } from "./CollectableSet.ts";
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
-export interface Dependency {
+export type Dependency = {
   unsafe: boolean;
   inTry: boolean;
-  location?: null | ESTree.SourceLocation;
-}
+};
 
 export interface RuntimeOptions {
   /**
@@ -58,14 +57,10 @@ export interface RuntimeOptions {
    */
   customParser?: SourceParser;
   metadata?: Record<string, unknown>;
-}
-
-export interface RuntimeFileOptions extends Omit<RuntimeOptions, "isMinified"> {
   packageName?: string;
 }
 
 export interface Report {
-  dependencies: Map<string, Dependency>;
   warnings: Warning[];
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
@@ -75,7 +70,6 @@ export interface Report {
 export type ReportOnFile = {
   ok: true;
   warnings: Warning[];
-  dependencies: Map<string, Dependency>;
   flags: Set<SourceFlags>;
 } | {
   ok: false;
@@ -126,6 +120,7 @@ export class AstAnalyser {
   probes: Probe[];
   #collectables: CollectableSet[];
   #sensitivity: Sensitivity;
+  #collectableSetRegistry: CollectableSetRegistry;
 
   constructor(options: AstAnalyserOptions = {}) {
     const {
@@ -171,6 +166,7 @@ export class AstAnalyser {
     options: RuntimeOptions = {}
   ): Report {
     const {
+      packageName,
       location,
       isMinified = false,
       removeHTMLComments = false,
@@ -186,7 +182,14 @@ export class AstAnalyser {
       void 0
     );
 
-    const source = new SourceFile(location, metadata);
+    const source = new SourceFile(location, {
+      metadata,
+      collectables: this.#collectables,
+      packageName
+    });
+
+    this.#collectableSetRegistry = source.collectablesSetRegistry;
+
     source.sensitivity = this.#sensitivity;
     if (trojan.verify(str)) {
       source.warnings.push(
@@ -194,7 +197,7 @@ export class AstAnalyser {
       );
     }
 
-    const probeRunner = new ProbeRunner(source, new CollectableSetRegistry(this.#collectables), this.probes);
+    const probeRunner = new ProbeRunner(source, this.probes);
     if (initialize) {
       if (typeof initialize !== "function") {
         throw new TypeError("options.initialize must be a function");
@@ -221,7 +224,6 @@ export class AstAnalyser {
 
     return {
       ...source.getResult(isMinified),
-      dependencies: source.dependencies,
       flags: source.flags
     };
   }
@@ -250,11 +252,11 @@ export class AstAnalyser {
 
   async analyseFile(
     pathToFile: string | URL,
-    options: RuntimeFileOptions = {}
+    options: RuntimeOptions = {}
   ): Promise<ReportOnFile> {
     try {
       const {
-        packageName = null,
+        packageName,
         removeHTMLComments = false,
         initialize,
         finalize,
@@ -273,12 +275,9 @@ export class AstAnalyser {
         initialize,
         finalize,
         customParser,
-        metadata
+        metadata,
+        packageName
       });
-
-      if (packageName !== null) {
-        data.dependencies.delete(packageName);
-      }
 
       // Add is-minified flag if the file is minified and not a one-line require
       if (!data.flags.has("oneline-require") && isMin) {
@@ -287,7 +286,6 @@ export class AstAnalyser {
 
       return {
         ok: true,
-        dependencies: data.dependencies,
         warnings: data.warnings,
         flags: data.flags
       };
@@ -306,11 +304,11 @@ export class AstAnalyser {
 
   analyseFileSync(
     pathToFile: string | URL,
-    options: RuntimeFileOptions = {}
+    options: RuntimeOptions = {}
   ): ReportOnFile {
     try {
       const {
-        packageName = null,
+        packageName,
         removeHTMLComments = false,
         initialize,
         finalize,
@@ -329,12 +327,9 @@ export class AstAnalyser {
         initialize,
         finalize,
         customParser,
-        metadata
+        metadata,
+        packageName
       });
-
-      if (packageName !== null) {
-        data.dependencies.delete(packageName);
-      }
 
       // Add is-minified flag if the file is minified and not a one-line require
       if (!data.flags.has("oneline-require") && isMin) {
@@ -343,7 +338,6 @@ export class AstAnalyser {
 
       return {
         ok: true,
-        dependencies: data.dependencies,
         warnings: data.warnings,
         flags: data.flags
       };
@@ -383,5 +377,9 @@ export class AstAnalyser {
 
   #removeHTMLComment(str: string): string {
     return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
+  }
+
+  getCollectableSet(type: Type) {
+    return this.#collectableSetRegistry.get(type);
   }
 }

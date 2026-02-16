@@ -13,7 +13,6 @@ import {
   Hex
 } from "../utils/index.ts";
 import { generateWarning } from "../warnings.ts";
-import type { CollectableSetRegistry } from "../CollectableSetRegistry.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
@@ -36,10 +35,10 @@ function main(
   node: Literal<string>,
   options: {
     sourceFile: SourceFile;
-    collectableSetRegistry: CollectableSetRegistry;
   }
 ) {
-  const { sourceFile, collectableSetRegistry } = options;
+  const { sourceFile } = options;
+  const collectableSetRegistry = sourceFile.collectablesSetRegistry;
   const location = node.loc ?? void 0;
 
   const shadyLinkOptions = {

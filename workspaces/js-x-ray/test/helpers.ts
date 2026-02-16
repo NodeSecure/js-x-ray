@@ -4,6 +4,7 @@ import * as meriyah from "meriyah";
 // Import Internal Dependencies
 import type { ESTreeLiteral } from "../src/estree/literal.ts";
 import {
+  DefaultCollectableSet,
   SourceFile,
   type Dependency,
   type Warning
@@ -13,8 +14,7 @@ import {
   type Probe
 } from "../src/ProbeRunner.ts";
 import { walk } from "../src/walker/index.ts";
-import type { CollectableSet } from "../src/CollectableSet.ts";
-import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
+import type { CollectableSet, Location } from "../src/CollectableSet.ts";
 
 // @see https://github.com/estree/estree/blob/master/es5.md#literal
 export function createLiteral(
@@ -73,10 +73,10 @@ export function getSastAnalysis(
   probe: Probe,
   options: Options = {}
 ) {
-  const { location, collectables = [], metadata } = options;
+  const { location, collectables = [new DefaultCollectableSet("dependency")], metadata } = options;
 
   return {
-    sourceFile: new SourceFile(location, metadata),
+    sourceFile: new SourceFile(location, { metadata, collectables }),
     getWarning(warning: string): Warning | undefined {
       return this.warnings().find(
         (item: Warning) => item.kind === warning
@@ -86,14 +86,21 @@ export function getSastAnalysis(
       return this.sourceFile.warnings;
     },
     dependencies(): Map<string, Dependency> {
-      return this.sourceFile.dependencies;
+      const dependencySet =
+        collectables.find((collectable) => collectable.type === "dependency") as DefaultCollectableSet<Dependency> | undefined;
+
+      if (!dependencySet) {
+        return new Map();
+      }
+
+      return extractDependencies(dependencySet);
     },
     execute(body: any) {
       if (options.sensitivity) {
         this.sourceFile.sensitivity = options.sensitivity;
       }
 
-      const probeRunner = new ProbeRunner(this.sourceFile, new CollectableSetRegistry(collectables), [probe]);
+      const probeRunner = new ProbeRunner(this.sourceFile, [probe]);
       const self = this;
 
       walk(body, {
@@ -115,6 +122,20 @@ export function getSastAnalysis(
       return this;
     }
   };
+}
+
+export function extractDependencies(dependencySet: DefaultCollectableSet<Dependency>) {
+  const dependencies = new Map<string, Dependency>();
+  for (const { value, locations } of dependencySet) {
+    locations.forEach(({ metadata }: Location<Dependency>) => {
+      dependencies.set(value, {
+        unsafe: metadata?.unsafe ?? false,
+        inTry: metadata?.inTry ?? false
+      });
+    });
+  }
+
+  return dependencies;
 }
 
 export const customProbes: Probe[] = [

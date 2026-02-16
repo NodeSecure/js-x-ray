@@ -3,7 +3,8 @@ import assert from "node:assert";
 import { test } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser, DefaultCollectableSet, type Dependency } from "../../src/index.ts";
+import { extractDependencies } from "../helpers.ts";
 
 /**
  * @see https://github.com/NodeSecure/js-x-ray/issues/178
@@ -15,10 +16,13 @@ const validTestCases = [
 
 test("should not detect unsafe-import for path.join if every argument is a string literal", () => {
   validTestCases.forEach((test) => {
-    const { warnings, dependencies } = new AstAnalyser().analyse(test);
+    const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
+    const { warnings } = new AstAnalyser({
+      collectables: [dependencySet]
+    }).analyse(test);
 
     assert.strictEqual(warnings.length, 0);
-    assert.ok(dependencies.has("../bin.js"));
+    assert.ok(extractDependencies(dependencySet).has("../bin.js"));
   });
 });
 

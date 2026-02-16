@@ -11,23 +11,19 @@ import {
   ProbeRunner
 } from "../src/ProbeRunner.ts";
 import { SourceFile } from "../src/SourceFile.ts";
-import { CollectableSetRegistry } from "../src/CollectableSetRegistry.ts";
 
 function assertProbeCtx(ctx: unknown, expected: {
   sourceFile: SourceFile;
-  collectableSetRegistry: CollectableSetRegistry;
   context?: any;
 }) {
   const c = ctx as any;
   assert.strictEqual(c.sourceFile, expected.sourceFile);
-  assert.strictEqual(c.collectableSetRegistry, expected.collectableSetRegistry);
   assert.deepStrictEqual(c.context, expected.context);
   assert.strictEqual(typeof c.setEntryPoint, "function");
 }
 
 function assertProbeMainContext(ctx: unknown, expected: {
   sourceFile: SourceFile;
-  collectableSetRegistry: CollectableSetRegistry;
   context?: any;
   data?: any;
   signals: any;
@@ -41,7 +37,7 @@ function assertProbeMainContext(ctx: unknown, expected: {
 describe("ProbeRunner", () => {
   describe("constructor", () => {
     it("should instanciate class with Defaults probes when none are provide", () => {
-      const pr = new ProbeRunner(new SourceFile(), new CollectableSetRegistry([]));
+      const pr = new ProbeRunner(new SourceFile());
 
       assert.strictEqual(pr.probes, ProbeRunner.Defaults);
     });
@@ -56,7 +52,6 @@ describe("ProbeRunner", () => {
       ];
 
       const pr = new ProbeRunner(new SourceFile(),
-        new CollectableSetRegistry([]),
         // @ts-expect-error
         fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
@@ -72,7 +67,6 @@ describe("ProbeRunner", () => {
       ];
 
       const pr = new ProbeRunner(new SourceFile(),
-        new CollectableSetRegistry([]),
         // @ts-expect-error
         fakeProbe);
       assert.strictEqual(pr.probes, fakeProbe);
@@ -86,7 +80,6 @@ describe("ProbeRunner", () => {
 
       function instantiateProbeRunner() {
         return new ProbeRunner(new SourceFile(),
-          new CollectableSetRegistry([]),
           // @ts-expect-error
           [fakeProbe]);
       }
@@ -102,7 +95,6 @@ describe("ProbeRunner", () => {
 
       function instantiateProbeRunner() {
         return new ProbeRunner(new SourceFile(),
-          new CollectableSetRegistry([]),
           // @ts-expect-error
           [fakeProbe]);
       }
@@ -120,7 +112,6 @@ describe("ProbeRunner", () => {
       function instantiateProbeRunner() {
         return new ProbeRunner(
           new SourceFile(),
-          new CollectableSetRegistry([]),
           // @ts-expect-error
           [fakeProbe]
         );
@@ -145,7 +136,6 @@ describe("ProbeRunner", () => {
         assert.throws(() => {
           new ProbeRunner(
             new SourceFile(),
-            new CollectableSetRegistry([]),
             [fakeProbe]
           );
         }, {
@@ -164,9 +154,8 @@ describe("ProbeRunner", () => {
         teardown: mock.fn()
       };
 
-      const registry = new CollectableSetRegistry([]);
       // @ts-expect-error
-      const pr = new ProbeRunner(sourceFile, registry, [fakeProbe]);
+      const pr = new ProbeRunner(sourceFile, [fakeProbe]);
 
       const astNode: ESTree.Literal = {
         type: "Literal",
@@ -181,7 +170,6 @@ describe("ProbeRunner", () => {
 
       assertProbeMainContext(mainCallArgs[1], {
         sourceFile,
-        collectableSetRegistry: registry,
         context: undefined,
         data: null,
         signals: ProbeRunner.Signals
@@ -192,7 +180,6 @@ describe("ProbeRunner", () => {
       assert.ok(teardownCallArgs);
       assertProbeCtx(teardownCallArgs[0], {
         sourceFile,
-        collectableSetRegistry: registry,
         context: undefined
       });
     });
@@ -206,10 +193,8 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
-      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -222,7 +207,6 @@ describe("ProbeRunner", () => {
       pr.finalize();
 
       const expectedContext = {
-        collectableSetRegistry: registry,
         sourceFile,
         context: undefined
       };
@@ -251,7 +235,6 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         new SourceFile(),
-        new CollectableSetRegistry([]),
         // @ts-expect-error
         [fakeProbe]
       );
@@ -282,9 +265,8 @@ describe("ProbeRunner", () => {
       };
 
       const sourceFile = new SourceFile();
-      const registry = new CollectableSetRegistry([]);
       // @ts-expect-error
-      const pr = new ProbeRunner(sourceFile, registry, [fakeProbe]);
+      const pr = new ProbeRunner(sourceFile, [fakeProbe]);
 
       const literalNode: ESTree.Literal = { type: "Literal", value: "test" };
       const nonLiteralNode: ESTree.Identifier = { type: "Identifier", name: "foo" };
@@ -327,10 +309,8 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
-      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        registry,
         // @ts-expect-error
         probes
       );
@@ -342,7 +322,6 @@ describe("ProbeRunner", () => {
         const finalizeArgs = probe.finalize.mock.calls.at(0)?.arguments;
         assert.ok(finalizeArgs);
         assertProbeCtx(finalizeArgs[0], {
-          collectableSetRegistry: registry,
           sourceFile,
           context: undefined
         });
@@ -363,10 +342,8 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
-      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -379,7 +356,6 @@ describe("ProbeRunner", () => {
       pr.finalize();
 
       const expectedContext = {
-        collectableSetRegistry: registry,
         sourceFile,
         context: fakeCtx
       };
@@ -422,10 +398,8 @@ describe("ProbeRunner", () => {
 
       const sourceFile = new SourceFile();
 
-      const registry = new CollectableSetRegistry([]);
       const pr = new ProbeRunner(
         sourceFile,
-        registry,
         // @ts-expect-error
         [fakeProbe]
       );
@@ -438,7 +412,6 @@ describe("ProbeRunner", () => {
       pr.finalize();
 
       const expectedContext = {
-        collectableSetRegistry: registry,
         sourceFile,
         context: fakeCtx
       };
@@ -484,7 +457,6 @@ describe("ProbeRunner", () => {
 
       const pr = new ProbeRunner(
         sourceFile,
-        new CollectableSetRegistry([]),
         [fakeProbe]
       );
 

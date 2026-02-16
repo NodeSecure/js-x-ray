@@ -14,7 +14,7 @@ import {
 import {
   AstAnalyser,
   type ReportOnFile,
-  type RuntimeFileOptions
+  type RuntimeOptions
 } from "./AstAnalyser.ts";
 import { TsSourceParser } from "./parsers/TsSourceParser.ts";
 import {
@@ -71,7 +71,7 @@ export class EntryFilesAnalyser {
 
   async* analyse(
     entryFiles: Iterable<string | URL>,
-    options: RuntimeFileOptions = {}
+    options: RuntimeOptions = {}
   ): AsyncGenerator<ReportOnFile & { file: string; }> {
     this.dependencies = new DiGraph();
 
@@ -132,7 +132,7 @@ export class EntryFilesAnalyser {
   async* #analyseFile(
     file: string,
     relativeFile: string,
-    options: RuntimeFileOptions
+    options: RuntimeOptions
   ) {
     this.dependencies.addVertex({
       id: relativeFile,
@@ -149,11 +149,13 @@ export class EntryFilesAnalyser {
     );
     yield { file: relativeFile, ...report };
 
-    if (!report.ok || typeof report.dependencies === "undefined") {
+    const dependencySet = this.astAnalyzer.getCollectableSet("dependency");
+
+    if (!report.ok || typeof dependencySet === "undefined") {
       return;
     }
 
-    for (const [name] of report.dependencies) {
+    for (const name of dependencySet.values()) {
       const depFile = await this.#getInternalDepPath(
         path.join(path.dirname(file), name)
       );
