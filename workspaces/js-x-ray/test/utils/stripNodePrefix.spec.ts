@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 
 // Import Internal Dependencies
 import { stripNodePrefix } from "../../src/utils/index.ts";
+
 describe("stripNodePrefix", () => {
   it("should remove 'node:' prefix from module name", () => {
     assert.strictEqual(stripNodePrefix("node:fs"), "fs");
