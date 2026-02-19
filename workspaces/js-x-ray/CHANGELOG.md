@@ -1,5 +1,19 @@
 # @nodesecure/js-x-ray
 
+## 13.0.0
+
+### Major Changes
+
+- [#532](https://github.com/NodeSecure/js-x-ray/pull/532) [`df7032e`](https://github.com/NodeSecure/js-x-ray/commit/df7032e452aa3c9fa3e87577abd60a90c3ea3712) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray)! dependencies is now considered as collectables and is not in the report anymore
+
+### Patch Changes
+
+- [#537](https://github.com/NodeSecure/js-x-ray/pull/537) [`a0ab086`](https://github.com/NodeSecure/js-x-ray/commit/a0ab086833c80c8b8987d84fd04404cb401b2b60) Thanks [@bashlor](https://github.com/bashlor)! - Add unit tests for stripNodePrefix utility.
+
+- [#538](https://github.com/NodeSecure/js-x-ray/pull/538) [`24c79d2`](https://github.com/NodeSecure/js-x-ray/commit/24c79d2e1fdd9135ac040949f1b605ce1932def0) Thanks [@bashlor](https://github.com/bashlor)! - Add unit tests for toArrayLocation utility
+
+- [#536](https://github.com/NodeSecure/js-x-ray/pull/536) [`1f17f7b`](https://github.com/NodeSecure/js-x-ray/commit/1f17f7b7f3e54c0a41885f76e0b107a2226df8ba) Thanks [@bashlor](https://github.com/bashlor)! - Add unit tests for isMinifiedCode utility.
+
 ## 12.0.0
 
 ### Major Changes
