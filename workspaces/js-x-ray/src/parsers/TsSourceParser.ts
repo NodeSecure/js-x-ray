@@ -1,9 +1,11 @@
 // Import Third-party Dependencies
 import {
   parse,
-  TSESTree,
   type TSESTreeOptions
 } from "@typescript-eslint/typescript-estree";
+import {
+  type ESTree
+} from "meriyah";
 
 // CONSTANTS
 const kTypeScriptParsingOptions: TSESTreeOptions = {
@@ -26,12 +28,17 @@ export class TsSourceParser {
   parse(
     source: string,
     options: TSESTreeOptions = {}
-  ): TSESTree.Program["body"] {
+  ): ESTree.Statement[] {
     const { body } = parse(source, {
       ...kTypeScriptParsingOptions,
       ...options
     });
 
-    return body;
+    /**
+     * Not pretty but the types are not compatible and we know
+     * that the body is compatible with ESTree.Statement[]
+     * since the parser is designed to be compatible with ESTree.
+     */
+    return body as unknown as ESTree.Statement[];
   }
 }

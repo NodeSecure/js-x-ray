@@ -294,6 +294,23 @@ describe("AstAnalyser", () => {
   });
 
   describe("analyseFile", () => {
+    it("should detect typescript extension and use TsSourceParser automatically", async() => {
+      const result = await new AstAnalyser().analyseFile(
+        new URL("test.ts", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(result.warnings.length, 0);
+    });
+
+    it("should throw when providing a typescript declaration file", async() => {
+      await assert.rejects(() => new AstAnalyser().analyseFile(
+        new URL("test.d.ts", kFixtureURL),
+        { packageName: "foobar" }
+      ), { message: "Declaration files are not supported" });
+    });
+
     it("remove the packageName from the dependencies list", async() => {
       const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
       const result = await new AstAnalyser({ collectables: [dependencySet] }).analyseFile(
@@ -535,6 +552,23 @@ describe("AstAnalyser", () => {
   });
 
   describe("analyseFileSync", () => {
+    it("should detect typescript extension and use TsSourceParser automatically", () => {
+      const result = new AstAnalyser().analyseFileSync(
+        new URL("test.ts", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(result.warnings.length, 0);
+    });
+
+    it("should throw when providing a typescript declaration file", () => {
+      assert.throws(() => new AstAnalyser().analyseFileSync(
+        new URL("test.d.ts", kFixtureURL),
+        { packageName: "foobar" }
+      ), { message: "Declaration files are not supported" });
+    });
+
     it("remove the packageName from the dependencies list", () => {
       const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
       const result = new AstAnalyser({ collectables: [dependencySet] }).analyseFileSync(

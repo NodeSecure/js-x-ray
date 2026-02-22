@@ -1,6 +1,7 @@
 {
   "extends": "@openally/config.typescript/esm-ts-next",
   "compilerOptions": {
-    "composite": true
+    "composite": true,
+    "types": ["node"]
   }
 }

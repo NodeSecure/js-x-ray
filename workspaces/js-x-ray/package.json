@@ -20,7 +20,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "tsc",
-    "test-only": "node --test-reporter=spec --test './test/**/*.spec.ts'",
+    "test-only": "node --test-reporter=spec --test ./test/**/*.spec.ts",
     "test": "c8 --all --src ./src -r html npm run test-only",
     "bench": "node --expose-gc --experimental-strip-types ./benchmark/index.ts"
   },

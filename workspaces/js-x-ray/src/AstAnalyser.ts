@@ -7,7 +7,13 @@ import path from "node:path";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { JsSourceParser, type SourceParser } from "./parsers/JsSourceParser.ts";
+import {
+  JsSourceParser,
+  type SourceParser
+} from "./parsers/JsSourceParser.ts";
+import {
+  TsSourceParser
+} from "./parsers/TsSourceParser.ts";
 import * as trojan from "./obfuscators/trojan-source.ts";
 import {
   PipelineRunner,
@@ -254,6 +260,14 @@ export class AstAnalyser {
     pathToFile: string | URL,
     options: RuntimeOptions = {}
   ): Promise<ReportOnFile> {
+    const filePathString = pathToFile instanceof URL ?
+      pathToFile.href :
+      pathToFile;
+
+    if (filePathString.includes("d.ts")) {
+      throw new Error("Declaration files are not supported");
+    }
+
     try {
       const {
         packageName,
@@ -264,9 +278,12 @@ export class AstAnalyser {
         metadata
       } = options;
 
-      const str = await fs.readFile(pathToFile, "utf-8");
-      const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
+      let customParserToUse = customParser;
+      if (!customParser && path.extname(filePathString) === ".ts") {
+        customParserToUse = new TsSourceParser();
+      }
 
+      const str = await fs.readFile(pathToFile, "utf-8");
       const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
         location: path.dirname(filePathString),
@@ -274,7 +291,7 @@ export class AstAnalyser {
         removeHTMLComments,
         initialize,
         finalize,
-        customParser,
+        customParser: customParserToUse,
         metadata,
         packageName
       });
@@ -306,6 +323,14 @@ export class AstAnalyser {
     pathToFile: string | URL,
     options: RuntimeOptions = {}
   ): ReportOnFile {
+    const filePathString = pathToFile instanceof URL ?
+      pathToFile.href :
+      pathToFile;
+
+    if (filePathString.includes("d.ts")) {
+      throw new Error("Declaration files are not supported");
+    }
+
     try {
       const {
         packageName,
@@ -316,9 +341,12 @@ export class AstAnalyser {
         metadata
       } = options;
 
-      const str = fsSync.readFileSync(pathToFile, "utf-8");
-      const filePathString = pathToFile instanceof URL ? pathToFile.href : pathToFile;
+      let customParserToUse = customParser;
+      if (!customParser && path.extname(filePathString) === ".ts") {
+        customParserToUse = new TsSourceParser();
+      }
 
+      const str = fsSync.readFileSync(pathToFile, "utf-8");
       const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
         location: path.dirname(filePathString),
@@ -326,7 +354,7 @@ export class AstAnalyser {
         removeHTMLComments,
         initialize,
         finalize,
-        customParser,
+        customParser: customParserToUse,
         metadata,
         packageName
       });

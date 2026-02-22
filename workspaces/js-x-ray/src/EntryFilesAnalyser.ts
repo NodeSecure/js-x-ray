@@ -134,6 +134,11 @@ export class EntryFilesAnalyser {
     relativeFile: string,
     options: RuntimeOptions
   ) {
+    // Skip declaration files as they are not meant to be analysed
+    if (file.includes("d.ts")) {
+      return;
+    }
+
     this.dependencies.addVertex({
       id: relativeFile,
       adjacentTo: [],
