@@ -306,7 +306,7 @@ $ yarn add @nodesecure/estree-ast-util
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-22-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -345,6 +345,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/7amed3li"><img src="https://avatars.githubusercontent.com/u/190534558?v=4?s=100" width="100px;" alt="Hamed Mohamed"/><br /><sub><b>Hamed Mohamed</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=7amed3li" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/bashlor"><img src="https://avatars.githubusercontent.com/u/39790502?v=4?s=100" width="100px;" alt="Elie Patrice"/><br /><sub><b>Elie Patrice</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=bashlor" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
