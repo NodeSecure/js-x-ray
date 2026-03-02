@@ -18,6 +18,11 @@ const kWeakAlgorithms = new Set([
   "md2"
 ]);
 
+const kTracedFunctions = new Set([
+  "crypto.createHash",
+  "crypto.createHmac"
+]);
+
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
@@ -29,7 +34,7 @@ function validateNode(
   }
 
   return [
-    ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr === "crypto.createHash"
+    kTracedFunctions.has(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
   ];
 }
 
@@ -38,10 +43,12 @@ function initialize(
 ) {
   const { tracer } = ctx.sourceFile;
 
-  tracer.trace("crypto.createHash", {
-    followConsecutiveAssignment: true,
-    moduleName: "crypto"
-  });
+  for (const identifierOrMemberExpr of kTracedFunctions) {
+    tracer.trace(identifierOrMemberExpr, {
+      followConsecutiveAssignment: true,
+      moduleName: "crypto"
+    });
+  }
 }
 
 function main(
