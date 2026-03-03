@@ -1,5 +1,15 @@
 # @nodesecure/js-x-ray
 
+## 14.0.0
+
+### Major Changes
+
+- [#550](https://github.com/NodeSecure/js-x-ray/pull/550) [`84f3497`](https://github.com/NodeSecure/js-x-ray/commit/84f3497a84de9bd313e70912c298090a9d015d31) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray)!: make js-x-ray compatible with other runtimes
+
+### Minor Changes
+
+- [#548](https://github.com/NodeSecure/js-x-ray/pull/548) [`816e672`](https://github.com/NodeSecure/js-x-ray/commit/816e67235d6c1fc1daf699d5bff7d2a9f0f7ef85) Thanks [@fraxken](https://github.com/fraxken)! - Add detection of weak crypto algorithm with Node crypto.createHmac
+
 ## 13.0.0
 
 ### Major Changes
