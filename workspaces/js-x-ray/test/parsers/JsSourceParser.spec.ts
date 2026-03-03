@@ -1,5 +1,6 @@
 // Import Node.js Dependencies
 import { describe, it } from "node:test";
+import { stripTypeScriptTypes } from "node:module";
 
 // Import Internal Dependencies
 import { JsSourceParser } from "../../src/index.ts";
@@ -34,7 +35,7 @@ describe("JsSourceParser", () => {
       const code = `function add(a: number, b: number): number {
         return a + b;
       }`;
-      new JsSourceParser({ stripTypeScriptTypes: true }).parse(code);
+      new JsSourceParser({ stripTypeScriptTypes }).parse(code);
     });
   });
 });

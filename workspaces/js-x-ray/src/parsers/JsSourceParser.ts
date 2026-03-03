@@ -1,6 +1,3 @@
-// Import Node.js Dependencies
-import { stripTypeScriptTypes } from "node:module";
-
 // Import Third-party Dependencies
 import {
   parseModule,
@@ -29,11 +26,10 @@ export interface SourceParser {
   parse(source: string, options: unknown): ESTree.Statement[];
 }
 
+export type StripTypeScriptTypes = (source: string) => string;
+
 export interface JsSourceParserOptions {
-  /**
-   * @default false
-   */
-  stripTypeScriptTypes?: boolean;
+  stripTypeScriptTypes?: StripTypeScriptTypes;
 }
 
 export class JsSourceParser implements SourceParser {
@@ -44,18 +40,18 @@ export class JsSourceParser implements SourceParser {
     ".jsx"
   ]);
 
-  #stripTypeScriptTypes = false;
+  #stripTypeScriptTypes: StripTypeScriptTypes | undefined;
 
   constructor(
     options: JsSourceParserOptions = {}
   ) {
-    this.#stripTypeScriptTypes = options.stripTypeScriptTypes ?? false;
+    this.#stripTypeScriptTypes = options.stripTypeScriptTypes;
   }
 
   parse(
     source: string
   ): ESTree.Program["body"] {
-    const cleanedSource = this.#stripTypeScriptTypes ? stripTypeScriptTypes(source) : source;
+    const cleanedSource = this.#stripTypeScriptTypes ? this.#stripTypeScriptTypes(source) : source;
 
     try {
       const { body } = parseModule(
