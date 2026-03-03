@@ -24,7 +24,8 @@ const jsBody = jsParser.parse("const foo = 'bar';");
 ```
 
 > [!NOTE]
-> JsSourceParser supports native type striping when the option `stripTypeScriptTypes` is enabled
+> `JsSourceParser` supports type stripping by accepting a `stripTypeScriptTypes` function.
+The [built-in Node.js](https://nodejs.org/api/module.html#modulestriptypescripttypescode-options) implementation can be used, if you are on another runtime the [Bun transpiler](https://bun.com/docs/runtime/transpiler#transformsync) can be used for Bun, for Deno there is no built-in implementation yet but third-party type-strippers like [ts-blank-space](https://github.com/bloomberg/ts-blank-space) can be used.
 
 ## TsSourceParser
 
