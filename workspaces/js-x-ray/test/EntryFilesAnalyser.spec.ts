@@ -261,6 +261,22 @@ describe("EntryFilesAnalyser", () => {
     const calls = analyseFileMock.mock.calls;
     assert.strictEqual(calls.length, 2);
   });
+
+  it("should not crash when a parsing error occurs", async() => {
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      ignoreENOENT: true,
+      rootPath: kFixtureURL,
+      astAnalyzer: new AstAnalyser({ collectables: [new DefaultCollectableSet("dependency")] })
+    });
+
+    const entryUrl = new URL("parsing-error.js", kFixtureURL);
+    await assert.doesNotReject(async() => {
+      const generator = entryFilesAnalyser.analyse(
+        [entryUrl]
+      );
+      await fromAsync(generator);
+    });
+  });
 });
 
 // TODO: replace with Array.fromAsync when droping Node.js 20

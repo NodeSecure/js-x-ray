@@ -126,7 +126,7 @@ export class AstAnalyser {
   probes: Probe[];
   #collectables: CollectableSet[];
   #sensitivity: Sensitivity;
-  #collectableSetRegistry: CollectableSetRegistry;
+  #collectableSetRegistry: CollectableSetRegistry | undefined;
 
   constructor(options: AstAnalyserOptions = {}) {
     const {
@@ -408,6 +408,6 @@ export class AstAnalyser {
   }
 
   getCollectableSet(type: Type) {
-    return this.#collectableSetRegistry.get(type);
+    return this.#collectableSetRegistry?.get(type);
   }
 }
