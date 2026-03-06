@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 14.0.1
+
+### Patch Changes
+
+- [#552](https://github.com/NodeSecure/js-x-ray/pull/552) [`8d58a9f`](https://github.com/NodeSecure/js-x-ray/commit/8d58a9fd0569c86668dab8c5ae3ce1bd8cb32aca) Thanks [@clemgbld](https://github.com/clemgbld)! - fix(js-x-ray): fix crash on parsing error
+
 ## 14.0.0
 
 ### Major Changes
