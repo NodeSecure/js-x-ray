@@ -3,21 +3,21 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/NodeSecure/js-x-ray">
-      <img src="https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/refs/heads/master/workspaces/js-x-ray/package.json&query=$.version&label=Version" alt="npm version">
-    </a>
-    <a href="https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE">
-      <img src="https://img.shields.io/github/license/NodeSecure/js-x-ray.svg?style=for-the-badge" alt="license">
-    </a>
-    <a href="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray">
-      <img src="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge" alt="ossf scorecard">
-    </a>
-    <a href="https://slsa.dev/spec/v1.0/levels#build-l3">
-      <img src="https://img.shields.io/badge/SLSA-level%203-green?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABMlBMVEXvMQDvMADwMQDwMADwMADvMADvMADwMADwMQDvMQDvMQDwMADwMADvMADwMADwMADwMQDvMQDvMQDwMQDvMQDwMQDwMADwMADwMQDwMADwMADvMADvMQDvMQDwMADwMQDwMADvMQDwMADwMQDwMADwMADwMADwMADwMADwMADvMQDvMQDwMADwMQDwMADvMQDvMQDwMADvMQDvMQDwMADwMQDwMQDwMQDvMQDwMADvMADwMADwMQDvMQDwMADwMQDwMQDwMQDwMQDvMQDvMQDvMADwMADvMADvMADvMADwMQDwMQDvMADvMQDvMQDvMADvMADvMQDwMQDvMQDvMADvMADvMADvMQDwMQDvMQDvMQDvMADvMADwMADvMQDvMQDvMQDvMADwMADwMQDwMAAAAAA/HoSwAAAAY3RSTlMpsvneQlQrU/LQSWzvM5DzmzeF9Pi+N6vvrk9HuP3asTaPgkVFmO3rUrMjqvL6d0LLTVjI/PuMQNSGOWa/6YU8zNuDLihJ0e6aMGzl8s2IT7b6lIFkRj1mtvQ0eJW95rG0+Sid59x/AAAAAWJLR0Rltd2InwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+YHGg0tGLrTaD4AAACqSURBVAjXY2BgZEqGAGYWVjYGdg4oj5OLm4eRgZcvBcThFxAUEk4WYRAVE09OlpCUkpaRTU6WY0iWV1BUUlZRVQMqUddgSE7W1NLS1gFp0NXTB3KTDQyNjE2Sk03NzC1A3GR1SytrG1s7e4dkBogtjk7OLq5uyTCuu4enl3cyhOvj66fvHxAIEmYICg4JDQuPiAQrEmGIio6JjZOFOjSegSHBBMpOToxPAgCJfDZC/m2KHgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0wNy0yNlQxMzo0NToyNCswMDowMC8AywoAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMDctMjZUMTM6NDU6MjQrMDA6MDBeXXO2AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAABJRU5ErkJggg==" alt="slsa level3">
-    </a>
-    <a href="https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22Node.js+CI%22">
-      <img src="https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/node.js.yml?style=for-the-badge" alt="github ci workflow">
-    </a>
+  <a href="https://github.com/NodeSecure/js-x-ray">
+    <img src="https://img.shields.io/badge/dynamic/json.svg?style=for-the-badge&url=https://raw.githubusercontent.com/NodeSecure/js-x-ray/refs/heads/master/workspaces/js-x-ray/package.json&query=$.version&label=Version" alt="npm version">
+  </a>
+  <a href="https://github.com/NodeSecure/js-x-ray/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/NodeSecure/js-x-ray.svg?style=for-the-badge" alt="license">
+  </a>
+  <a href="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray">
+    <img src="https://api.securityscorecards.dev/projects/github.com/NodeSecure/js-x-ray/badge?style=for-the-badge" alt="ossf scorecard">
+  </a>
+  <a href="https://slsa.dev/spec/v1.0/levels#build-l3">
+    <img src="https://img.shields.io/badge/SLSA-level%203-green?style=for-the-badge&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAMAAAAolt3jAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABMlBMVEXvMQDvMADwMQDwMADwMADvMADvMADwMADwMQDvMQDvMQDwMADwMADvMADwMADwMADwMQDvMQDvMQDwMQDvMQDwMQDwMADwMADwMQDwMADwMADvMADvMQDvMQDwMADwMQDwMADvMQDwMADwMQDwMADwMADwMADwMADwMADwMADvMQDvMQDwMADwMQDwMADvMQDvMQDwMADvMQDvMQDwMADwMQDwMQDwMQDvMQDwMADvMADwMADwMQDvMQDwMADwMQDwMQDwMQDwMQDvMQDvMQDvMADwMADvMADvMADvMADwMQDwMQDvMADvMQDvMQDvMADvMADvMQDwMQDvMQDvMADvMADvMADvMQDwMQDvMQDvMQDvMADvMADwMADvMQDvMQDvMQDvMADwMADwMQDwMAAAAAA/HoSwAAAAY3RSTlMpsvneQlQrU/LQSWzvM5DzmzeF9Pi+N6vvrk9HuP3asTaPgkVFmO3rUrMjqvL6d0LLTVjI/PuMQNSGOWa/6YU8zNuDLihJ0e6aMGzl8s2IT7b6lIFkRj1mtvQ0eJW95rG0+Sid59x/AAAAAWJLR0Rltd2InwAAAAlwSFlzAAAOwwAADsMBx2+oZAAAAAd0SU1FB+YHGg0tGLrTaD4AAACqSURBVAjXY2BgZEqGAGYWVjYGdg4oj5OLm4eRgZcvBcThFxAUEk4WYRAVE09OlpCUkpaRTU6WY0iWV1BUUlZRVQMqUddgSE7W1NLS1gFp0NXTB3KTDQyNjE2Sk03NzC1A3GR1SytrG1s7e4dkBogtjk7OLq5uyTCuu4enl3cyhOvj66fvHxAIEmYICg4JDQuPiAQrEmGIio6JjZOFOjSegSHBBMpOToxPAgCJfDZC/m2KHgAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMi0wNy0yNlQxMzo0NToyNCswMDowMC8AywoAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjItMDctMjZUMTM6NDU6MjQrMDA6MDBeXXO2AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAABJRU5ErkJggg==" alt="slsa level3">
+  </a>
+  <a href="https://github.com/NodeSecure/js-x-ray/actions?query=workflow%3A%22Node.js+CI%22">
+    <img src="https://img.shields.io/github/actions/workflow/status/NodeSecure/js-x-ray/node.js.yml?style=for-the-badge" alt="github ci workflow">
+  </a>
 </p>
 
 **JS-X-Ray** is a JavaScript & TypeScript [SAST](https://github.com/resources/articles/what-is-sast) for identifying malicious patterns, security vulnerabilities, and code anomalies. Think of it as ESLint, but dedicated to security analysis. Originally created for [NodeSecure CLI](https://github.com/NodeSecure/cli), JS-X-Ray has become an independent and serious option for supply chain protection.
@@ -27,35 +27,19 @@
 JS-X-Ray parses JS or TS code into an **Abstract Syntax Tree (AST)** with no extensive usage of RegEx or Semgrep rules. This enables variable tracing, dynamic import resolution, and detection of sophisticated obfuscation that pattern-matching tools miss. The tradeoff is that JS-X-Ray is purely dedicated to the JavaScript/TypeScript ecosystem.
 
 ## 💡 Features
-- Retrieve required dependencies and files for Node.js
-  - Track `require()`, `import`, and dynamic imports with full tracing capabilities
-  - Detect untraceable and malicious import patterns
-- Scan entire projects with multi-file analysis capabilities
-- Extract infrastructure components (URLs, IPs, hostnames, emails)
-- Detect malicious code patterns
-  - Obfuscated code with tool identification (freejsobfuscator, jsfuck, jjencode, obfuscator.io, morse, Trojan Source)
-  - Data exfiltration and unauthorized system information collection
-  - Suspicious files with excessive encoded literals
-- Identify vulnerable code patterns
-  - Unsafe statements (`eval()`, `Function()` constructor)
-  - ReDoS vulnerabilities in regular expressions
-  - SQL injection vulnerabilities
-  - Unsafe shell commands in `spawn()` or `exec()` calls
-  - `process.env` serialization attempts
-- Flag weak cryptographic usage
-  - Deprecated algorithms (MD5, SHA1, MD4, MD2, RIPEMD160)
-- Detect code quality issues
-  - Monkey-patching of built-in prototypes
-  - Encoded literals (hex, Unicode, base64)
-  - Suspicious URLs and links
-  - Short identifier lengths (obfuscation indicators)
-  - Synchronous I/O and logging usage (optional)
+
+- Track `require()`, `import`, and dynamic imports with full variable tracing
+- Detect obfuscated code and identify the tool used (jsfuck, jjencode, obfuscator.io, and more)
+- Flag malicious patterns: data exfiltration, `process.env` serialization, unsafe shell commands
+- Detect vulnerable code: `eval()`, `Function()` constructor, ReDoS-prone regexes, SQL injection
+- Flag weak cryptographic algorithms (MD5, SHA1, etc.)
+- Extract infrastructure indicators: URLs, IPs, hostnames, emails
 - Configurable sensitivity modes (conservative/aggressive) and extensible probe system
-- Support both JavaScript and TypeScript
+- Supports both JavaScript and TypeScript
 
 ## 💃 Getting Started
 
-This package is available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
+These packages are available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
 
 ```bash
 $ npm i @nodesecure/js-x-ray
@@ -63,201 +47,27 @@ $ npm i @nodesecure/js-x-ray
 $ yarn add @nodesecure/js-x-ray
 ```
 
-## 👀 Usage example
+## 👀 Usage
 
-Create a local `.js` file with the following content:
-```js
-try  {
-    require("http");
-}
-catch (err) {
-    // do nothing
-}
-const lib = "crypto";
-require(lib);
-require("util");
-require(Buffer.from("6673", "hex").toString());
-```
-
----
-
-Then use `js-x-ray` to run an analysis of the JavaScript code:
 ```js
 import { AstAnalyser } from "@nodesecure/js-x-ray";
-import { readFileSync } from "node:fs";
 
 const scanner = new AstAnalyser();
 
-const { warnings, dependencies } = await scanner.analyseFile(
-  "./file.js"
-);
+const { warnings, dependencies } = await scanner.analyseFile("./file.js");
 
 console.log(dependencies);
 console.dir(warnings, { depth: null });
 ```
 
-The analysis will return: `http` (in try), `crypto`, `util` and `fs`.
+For the full API documentation, warning catalog, and advanced usage, see the [@nodesecure/js-x-ray package README](./workspaces/js-x-ray/README.md).
 
-> [!TIP]
-> There are also a lot of suspicious code examples in the `./workspaces/js-x-ray/examples` directory. Feel free to try the tool on these files.
+## Workspaces
 
-### Scanning a complete project
+- [@nodesecure/js-x-ray](./workspaces/js-x-ray)
+- [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai)
 
-By itself, JS-X-Ray does not provide utilities to walk and scan a complete project. However, NodeSecure has packages to achieve that:
-
-```ts
-import { ManifestManager } from "@nodesecure/mama";
-import { NpmTarball } from "@nodesecure/tarball";
-
-const mama = await ManifestManager.fromPackageJSON(
-  "./path/to/package.json"
-);
-const extractor = new NpmTarball(mama);
-
-const {
-  composition, // Project composition (files, dependencies, extensions)
-  conformance, // License conformance (SPDX)
-  code         // JS-X-Ray analysis results
-} = await extractor.scanFiles();
-
-console.log(code);
-```
-
-The `NpmTarball` class uses JS-X-Ray under the hood, and `ManifestManager` locates entry (input) files for analysis.
-
-Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis. See the [EntryFilesAnalyser API documentation](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md) for more details.
-
-## 📚 API
-
-- [AstAnalyser](./workspaces/js-x-ray/docs/AstAnalyser.md)
-- [EntryFilesAnalyser](./workspaces/js-x-ray/docs/EntryFilesAnalyser.md)
-- [CollectableSet](./workspaces/js-x-ray/docs/CollectableSet.md)
-- [SourceParser](./workspaces/js-x-ray/docs/SourceParser.md)
-- [VariableTracer](./workspaces/js-x-ray/docs/VariableTracer.md)
-
-## Warnings
-
-```ts
-type OptionalWarningName =
-  | "synchronous-io"
-  | "log-usage";
-
-type WarningName =
-  | "parsing-error"
-  | "encoded-literal"
-  | "unsafe-regex"
-  | "unsafe-stmt"
-  | "short-identifiers"
-  | "suspicious-literal"
-  | "suspicious-file"
-  | "obfuscated-code"
-  | "weak-crypto"
-  | "shady-link"
-  | "unsafe-command"
-  | "unsafe-import"
-  | "serialize-environment"
-  | "data-exfiltration"
-  | "sql-injection"
-  | "monkey-patch"
-  | OptionalWarningName;
-
-interface Warning<T = WarningName> {
-  kind: T | (string & {});
-  file?: string;
-  value: string | null;
-  source: string;
-  location: null | SourceArrayLocation | SourceArrayLocation[];
-  i18n: string;
-  severity: "Information" | "Warning" | "Critical";
-  experimental?: boolean;
-}
-
-declare const warnings: Record<WarningName, {
-  i18n: string;
-  severity: "Information" | "Warning" | "Critical";
-  experimental: boolean;
-}>;
-```
-
-### Optional Warnings
-
-Some warnings are not included by default and must be explicitly requested through the `AstAnalyser` API.
-
-```js
-import { AstAnalyser } from "@nodesecure/js-x-ray";
-
-// Enable all optional warnings
-const scanner = new AstAnalyser({
-  optionalWarnings: true
-});
-
-// Or enable specific optional warnings
-const scannerSpecific = new AstAnalyser({
-  optionalWarnings: ["synchronous-io", "log-usage"]
-});
-```
-
-The following warnings are optional:
-- `synchronous-io` - Detects synchronous I/O operations that could impact performance
-- `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
-
-### Internationalization (i18n)
-
-Warnings support internationalization through the `@nodesecure/i18n` package. Each warning has an i18n key that can be used to retrieve localized descriptions.
-
-```js
-import * as jsxray from "@nodesecure/js-x-ray";
-import * as i18n from "@nodesecure/i18n";
-
-await i18n.extendFromSystemPath(jsxray.i18nLocation());
-
-const message = i18n.getTokenSync(
-  jsxray.warnings["parsing-error"].i18n
-);
-console.log(message);
-```
-
-### Warning Catalog
-
-Click on the warning **name** for detailed documentation and examples.
-
-#### Critical Severity
-
-| Name | Experimental | Description |
-| --- | :-: | --- |
-| [suspicious-file](./docs/suspicious-file.md) | No | Suspicious file containing more than ten encoded literals |
-| [obfuscated-code](./docs/obfuscated-code.md) | **Yes** | High probability of code obfuscation detected |
-
-#### Warning Severity
-
-| Name | Experimental | Description |
-| --- | :-: | --- |
-| [unsafe-import](./docs/unsafe-import.md) | No | Unable to follow an import (`require`, `require.resolve`) statement |
-| [unsafe-regex](./docs/unsafe-regex.md) | No | Unsafe regular expression that may be vulnerable to ReDoS attacks |
-| [unsafe-stmt](./docs/unsafe-stmt.md) | No | Usage of dangerous statements like `eval()` or `Function("")` |
-| [unsafe-command](./docs/unsafe-command.md) | **Yes** | Suspicious commands detected in `spawn()` or `exec()` |
-| [short-identifiers](./docs/short-identifiers.md) | No | Average identifier length below 1.5 characters (possible obfuscation) |
-| [suspicious-literal](./docs/suspicious-literal.md) | No | Suspicious literal values detected in source code |
-| [weak-crypto](./docs/weak-crypto.md) | No | Usage of weak cryptographic algorithms (MD5, SHA1, etc.) |
-| [shady-link](./docs/shady-link.md) | No | Suspicious or potentially malicious URLs detected |
-| [synchronous-io](./docs/synchronous-io.md) ⚠️ | **Yes** | Synchronous I/O operations that may impact performance |
-| [serialize-environment](./docs/serialize-environment.md) | No | Attempts to serialize `process.env` (potential data exfiltration) |
-| [data-exfiltration](./docs/data-exfiltration.md) | No | Potential unauthorized transfer of sensitive data |
-| [sql-injection](./docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
-| [monkey-patch](./docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
-
-#### Information Severity
-
-| Name | Experimental | Description |
-| --- | :-: | --- |
-| [parsing-error](./docs/parsing-error.md) | No | AST parser encountered an error while analyzing the code |
-| [encoded-literal](./docs/encoded-literal.md) | No | Encoded literal detected (hexadecimal, Unicode, base64) |
-| [log-usage](./docs/log-usage.md) ⚠️ | No | Usage of logging functions (console.log, logger methods, etc.) |
-
-> [!NOTE]
-> Warnings marked with ⚠️ are optional and must be explicitly enabled (see [Optional Warnings](#optional-warnings) section).
-
-## Contributors guide
+## 🐥 Contributors guide
 
 If you are a developer **looking to contribute** to the project, you must first read the [CONTRIBUTING](./CONTRIBUTING.md) guide.
 
@@ -286,22 +96,6 @@ To run the benchmarks:
 2. Run `npm run bench`.
 
 The benchmark results are stored in workspaces/js-x-ray/benchmark/report.json. Do not edit this file manually; it is automatically updated on every pull request.
-
-### Workspaces
-
-Click on one of the links to access the documentation of the workspace:
-
-| name | package and link |
-| --- | --- |
-| js-x-ray | [@nodesecure/js-x-ray](./workspaces/js-x-ray) |
-| js-x-ray-ai | [@nodesecure/js-x-ray-ai](./workspaces/js-x-ray-ai) |
-
-These packages are available in the Node package repository and can be easily installed with [npm](https://docs.npmjs.com/getting-started/what-is-npm) or [yarn](https://yarnpkg.com).
-```bash
-$ npm i @nodesecure/estree-ast-util
-# or
-$ yarn add @nodesecure/estree-ast-util
-```
 
 ## Contributors ✨
 
