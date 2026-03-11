@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 14.0.2
+
+### Patch Changes
+
+- [#554](https://github.com/NodeSecure/js-x-ray/pull/554) [`a56a8ec`](https://github.com/NodeSecure/js-x-ray/commit/a56a8ececea5c73ef8f4a960d9159e81e68d4dc7) Thanks [@fraxken](https://github.com/fraxken)! - Add missing README.md
+
 ## 14.0.1
 
 ### Patch Changes
