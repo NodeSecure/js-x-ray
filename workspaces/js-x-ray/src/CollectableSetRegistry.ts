@@ -2,6 +2,13 @@
 import type { CollectableSet, Type } from "./CollectableSet.ts";
 import type { SourceArrayLocation } from "./utils/toArrayLocation.ts";
 
+export interface CollectableSetRegistryAddOptions {
+  value: string;
+  file?: string | null;
+  location: SourceArrayLocation;
+  metadata?: Record<string, unknown>;
+}
+
 export class CollectableSetRegistry {
   #collectableSets: Map<Type, CollectableSet> = new Map();
   constructor(collectableSets: CollectableSet[]) {
@@ -10,12 +17,12 @@ export class CollectableSetRegistry {
     });
   }
 
-  add(type: Type, { value, file, location, metadata }: {
-    value: string;
-    file?: string | null;
-    location: SourceArrayLocation;
-    metadata?: Record<string, unknown>;
-  }) {
+  add(
+    type: Type,
+    options: CollectableSetRegistryAddOptions
+  ) {
+    const { value, file = null, location, metadata = {} } = options;
+
     const collectableSet = this.#collectableSets.get(type);
     collectableSet?.add(value, { file, location, metadata });
   }

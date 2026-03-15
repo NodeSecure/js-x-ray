@@ -407,7 +407,9 @@ export class AstAnalyser {
     return str.replaceAll(/<!--[\s\S]*?(?:-->)/g, "");
   }
 
-  getCollectableSet(type: Type) {
+  getCollectableSet(
+    type: Type
+  ) {
     return this.#collectableSetRegistry?.get(type);
   }
 }
