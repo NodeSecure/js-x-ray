@@ -14,6 +14,17 @@ const kFixtureURLPath = fileURLToPath(kFixtureURL);
 const kFixtureTypeScriptURL = new URL("fixtures/entryFilesTs/", import.meta.url);
 
 describe("EntryFilesAnalyser", () => {
+  it("should throw when astAnalyzer has no 'dependency' collectable", () => {
+    const astAnalyzer = new AstAnalyser();
+
+    assert.throws(
+      () => new EntryFilesAnalyser({ astAnalyzer }),
+      {
+        message: "astAnalyzer instance must have a 'dependency' collectable"
+      }
+    );
+  });
+
   it("should analyze internal dependencies recursively", async(t) => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("entry.js", kFixtureURL);

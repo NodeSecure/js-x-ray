@@ -23,7 +23,6 @@ import {
   type Warning
 } from "./warnings.ts";
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
-import type { CollectableSet } from "./CollectableSet.ts";
 
 // CONSTANTS
 const kMaximumEncodedLiterals = 10;
@@ -35,8 +34,8 @@ export type SourceFlags =
 
 export type SourceFileOptions = {
   metadata?: Record<string, unknown>;
-  collectables?: CollectableSet[];
   packageName?: string;
+  collectableRegistry?: CollectableSetRegistry;
 };
 
 export class SourceFile {
@@ -54,11 +53,15 @@ export class SourceFile {
   collectablesSetRegistry: CollectableSetRegistry;
   packageName?: string;
 
-  constructor(sourceLocation?: string, options?: SourceFileOptions) {
-    const { metadata, collectables = [] } = options ?? {};
+  constructor(
+    sourceLocation?: string,
+    options?: SourceFileOptions
+  ) {
+    const { metadata, collectableRegistry } = options ?? {};
+
     this.path.use(sourceLocation);
     this.metadata = metadata;
-    this.collectablesSetRegistry = new CollectableSetRegistry(collectables ?? []);
+    this.collectablesSetRegistry = collectableRegistry ?? new CollectableSetRegistry([]);
     this.packageName = options?.packageName;
   }
 

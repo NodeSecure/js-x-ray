@@ -124,11 +124,12 @@ export class AstAnalyser {
 
   #pipelineRunner: PipelineRunner;
   probes: Probe[];
-  #collectables: CollectableSet[];
   #sensitivity: Sensitivity;
   #collectableSetRegistry: CollectableSetRegistry | undefined;
 
-  constructor(options: AstAnalyserOptions = {}) {
+  constructor(
+    options: AstAnalyserOptions = {}
+  ) {
     const {
       customProbes = [],
       optionalWarnings = false,
@@ -139,7 +140,9 @@ export class AstAnalyser {
     } = options;
 
     this.#pipelineRunner = new PipelineRunner(pipelines);
-    this.#collectables = collectables;
+    this.#collectableSetRegistry = new CollectableSetRegistry(
+      collectables ?? []
+    );
     this.#sensitivity = sensitivity;
 
     let probes = ProbeRunner.Defaults;
@@ -190,11 +193,9 @@ export class AstAnalyser {
 
     const source = new SourceFile(location, {
       metadata,
-      collectables: this.#collectables,
-      packageName
+      packageName,
+      collectableRegistry: this.#collectableSetRegistry
     });
-
-    this.#collectableSetRegistry = source.collectablesSetRegistry;
 
     source.sensitivity = this.#sensitivity;
     if (trojan.verify(str)) {
