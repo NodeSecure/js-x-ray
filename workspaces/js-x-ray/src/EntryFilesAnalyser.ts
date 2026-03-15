@@ -21,6 +21,7 @@ import {
   JsSourceParser,
   type SourceParser
 } from "./parsers/JsSourceParser.ts";
+import { DefaultCollectableSet } from "./CollectableSet.ts";
 
 // CONSTANTS
 const kDefaultExtensions = [
@@ -52,13 +53,18 @@ export class EntryFilesAnalyser {
     options: EntryFilesAnalyserOptions = {}
   ) {
     const {
-      astAnalyzer = new AstAnalyser(),
+      astAnalyzer = new AstAnalyser({
+        collectables: [
+          new DefaultCollectableSet("dependency")
+        ]
+      }),
       loadExtensions,
       rootPath = null,
       ignoreENOENT = false
     } = options;
 
     this.astAnalyzer = astAnalyzer;
+
     const rawAllowedExtensions = loadExtensions
       ? loadExtensions(kDefaultExtensions)
       : kDefaultExtensions;
