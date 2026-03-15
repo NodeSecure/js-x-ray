@@ -351,7 +351,7 @@ describe("email collection", () => {
     assert.ok(emails[0].locations[0].location);
     const locationInfo = emails[0].locations[0];
     assert.strictEqual(locationInfo.file, "test.js");
-    assert.strictEqual(locationInfo.metadata, undefined);
+    assert.deepStrictEqual(locationInfo.metadata, {});
     assert.deepStrictEqual(locationInfo.location, [[[1, 14], [1, 32]]]);
   });
 });
