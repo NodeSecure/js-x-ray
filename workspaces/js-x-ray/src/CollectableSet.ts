@@ -24,7 +24,10 @@ export interface CollectableSet<T = Record<string, unknown>> {
 export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
   #entries: Map<string, Map<string | null, { location: SourceArrayLocation; metadata?: T; }[]>> = new Map();
   type: Type;
-  constructor(type: string) {
+
+  constructor(
+    type: Type
+  ) {
     this.type = type;
   }
 
