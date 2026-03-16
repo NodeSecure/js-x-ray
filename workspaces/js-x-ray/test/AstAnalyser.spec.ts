@@ -1,4 +1,5 @@
 /* eslint-disable max-nested-callbacks */
+
 /* eslint-disable max-lines */
 // Import Node.js Dependencies
 import assert from "node:assert";
@@ -29,6 +30,66 @@ const kFixtureURL = new URL("fixtures/searchRuntimeDependencies/", import.meta.u
 describe("AstAnalyser", () => {
   it("should have a default parser instance of JsSourceParser", () => {
     assert.ok(AstAnalyser.DefaultParser instanceof JsSourceParser);
+  });
+
+  describe("EventEmitter - ParsingError", () => {
+    it("should emit a ParsingError event when analyseFile encounters a parsing error", async() => {
+      const analyser = new AstAnalyser();
+
+      const { promise: emitted, resolve } = Promise.withResolvers<{ error: Error; file: string; }>();
+      analyser.once(AstAnalyser.ParsingError, (evt) => resolve(evt));
+
+      const result = await analyser.analyseFile(
+        new URL("parsingError.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.strictEqual(result.ok, false);
+
+      const { error, file } = await emitted;
+      assert.ok(error instanceof Error);
+      assert.ok(file.includes("parsingError.js"));
+    });
+
+    it("should emit a ParsingError event when analyseFileSync encounters a parsing error", () => {
+      const analyser = new AstAnalyser();
+      const events: { error: Error; file: string; }[] = [];
+
+      analyser.on(AstAnalyser.ParsingError, (evt) => events.push(evt));
+
+      const result = analyser.analyseFileSync(
+        new URL("parsingError.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(events.length, 1);
+      assert.ok(events[0].error instanceof Error);
+      assert.ok(events[0].file.includes("parsingError.js"));
+    });
+
+    it("should not emit a ParsingError event when parsing succeeds", async() => {
+      const analyser = new AstAnalyser();
+      let emitted = false;
+
+      analyser.on(AstAnalyser.ParsingError, () => {
+        emitted = true;
+      });
+
+      const result = await analyser.analyseFile(
+        new URL("depName.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(emitted, false);
+    });
+
+    it("should be an instance of EventEmitter", () => {
+      const analyser = new AstAnalyser();
+      assert.strictEqual(typeof analyser.on, "function");
+      assert.strictEqual(typeof analyser.emit, "function");
+    });
   });
 
   describe("analyse", () => {

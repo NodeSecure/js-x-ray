@@ -2,6 +2,7 @@
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { EventEmitter } from "node:events";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
@@ -119,7 +120,17 @@ export interface PrepareSourceOptions {
   removeHTMLComments?: boolean;
 }
 
-export class AstAnalyser {
+export type AstAnalyserEvents = {
+  [AstAnalyser.ParsingError]: [
+    {
+      error: Error;
+      file: string;
+    }
+  ];
+};
+
+export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
+  static ParsingError = Symbol("ParsingError");
   static DefaultParser: SourceParser = new JsSourceParser();
 
   #pipelineRunner: PipelineRunner;
@@ -130,6 +141,7 @@ export class AstAnalyser {
   constructor(
     options: AstAnalyserOptions = {}
   ) {
+    super();
     const {
       customProbes = [],
       optionalWarnings = false,
@@ -235,7 +247,10 @@ export class AstAnalyser {
     };
   }
 
-  #walkEnter(body: ESTree.Statement[], probeRunner: ProbeRunner) {
+  #walkEnter(
+    body: ESTree.Statement[],
+    probeRunner: ProbeRunner
+  ) {
     const recur = this.#walkEnter.bind(this);
     walkEnter(body, function walk(node) {
       if (Array.isArray(node)) {
@@ -269,25 +284,27 @@ export class AstAnalyser {
       throw new Error("Declaration files are not supported");
     }
 
+    const {
+      packageName,
+      removeHTMLComments = false,
+      initialize,
+      finalize,
+      customParser,
+      metadata
+    } = options;
+
+    let customParserToUse = customParser;
+    if (!customParser && path.extname(filePathString) === ".ts") {
+      customParserToUse = new TsSourceParser();
+    }
+
+    const str = await fs.readFile(pathToFile, "utf-8");
+    const isMin = filePathString.includes(".min") || isMinifiedCode(str);
+    const location = path.dirname(filePathString);
+
     try {
-      const {
-        packageName,
-        removeHTMLComments = false,
-        initialize,
-        finalize,
-        customParser,
-        metadata
-      } = options;
-
-      let customParserToUse = customParser;
-      if (!customParser && path.extname(filePathString) === ".ts") {
-        customParserToUse = new TsSourceParser();
-      }
-
-      const str = await fs.readFile(pathToFile, "utf-8");
-      const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
-        location: path.dirname(filePathString),
+        location,
         isMinified: isMin,
         removeHTMLComments,
         initialize,
@@ -309,6 +326,11 @@ export class AstAnalyser {
       };
     }
     catch (error: any) {
+      this.emit(AstAnalyser.ParsingError, {
+        error,
+        file: filePathString
+      });
+
       return {
         ok: false,
         warnings: [
@@ -332,25 +354,27 @@ export class AstAnalyser {
       throw new Error("Declaration files are not supported");
     }
 
+    const {
+      packageName,
+      removeHTMLComments = false,
+      initialize,
+      finalize,
+      customParser,
+      metadata
+    } = options;
+
+    let customParserToUse = customParser;
+    if (!customParser && path.extname(filePathString) === ".ts") {
+      customParserToUse = new TsSourceParser();
+    }
+
+    const str = fsSync.readFileSync(pathToFile, "utf-8");
+    const isMin = filePathString.includes(".min") || isMinifiedCode(str);
+    const location = path.dirname(filePathString);
+
     try {
-      const {
-        packageName,
-        removeHTMLComments = false,
-        initialize,
-        finalize,
-        customParser,
-        metadata
-      } = options;
-
-      let customParserToUse = customParser;
-      if (!customParser && path.extname(filePathString) === ".ts") {
-        customParserToUse = new TsSourceParser();
-      }
-
-      const str = fsSync.readFileSync(pathToFile, "utf-8");
-      const isMin = filePathString.includes(".min") || isMinifiedCode(str);
       const data = this.analyse(str, {
-        location: path.dirname(filePathString),
+        location,
         isMinified: isMin,
         removeHTMLComments,
         initialize,
@@ -372,6 +396,11 @@ export class AstAnalyser {
       };
     }
     catch (error: any) {
+      this.emit(AstAnalyser.ParsingError, {
+        error,
+        file: filePathString
+      });
+
       return {
         ok: false,
         warnings: [
