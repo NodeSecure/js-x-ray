@@ -1,5 +1,21 @@
 # @nodesecure/js-x-ray
 
+## 14.1.0
+
+### Minor Changes
+
+- [#565](https://github.com/NodeSecure/js-x-ray/pull/565) [`986ab06`](https://github.com/NodeSecure/js-x-ray/commit/986ab0640997728e2c49be98f37b606651ca7886) Thanks [@fraxken](https://github.com/fraxken)! - Reduce parsing-error surface on AstAnalyser and implement EventEmitter to catch ParsingError
+
+- [#561](https://github.com/NodeSecure/js-x-ray/pull/561) [`2c88c91`](https://github.com/NodeSecure/js-x-ray/commit/2c88c914cc4d60d86b654864f66e6491afdf01ca) Thanks [@fraxken](https://github.com/fraxken)! - Move CollectableRegistrySet into AstAnalyser instead of SourceFile allowing to refuse any AstAnalyser without dependency collectable in EntryFileAnalyser class
+
+### Patch Changes
+
+- [#554](https://github.com/NodeSecure/js-x-ray/pull/554) [`a56a8ec`](https://github.com/NodeSecure/js-x-ray/commit/a56a8ececea5c73ef8f4a960d9159e81e68d4dc7) Thanks [@fraxken](https://github.com/fraxken)! - Add missing README.md
+
+- [#564](https://github.com/NodeSecure/js-x-ray/pull/564) [`ae26978`](https://github.com/NodeSecure/js-x-ray/commit/ae269783615f4efbc8f9276dcb9ca0e49f771b90) Thanks [@fraxken](https://github.com/fraxken)! - Add missing Type for DefaultCollectableSet constructor
+
+- [#560](https://github.com/NodeSecure/js-x-ray/pull/560) [`375687b`](https://github.com/NodeSecure/js-x-ray/commit/375687bdb96dd10f1e08b647fdbf3eb04f497fb5) Thanks [@fraxken](https://github.com/fraxken)! - Implement the dependency DefaultCollectableSet when initializing the default AstAnalyser class in EntryFilesAnalyser
+
 ## 14.0.1
 
 ### Patch Changes
