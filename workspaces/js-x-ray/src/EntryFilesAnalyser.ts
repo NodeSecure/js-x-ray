@@ -64,6 +64,9 @@ export class EntryFilesAnalyser {
     } = options;
 
     this.astAnalyzer = astAnalyzer;
+    if (this.astAnalyzer.getCollectableSet("dependency") === void 0) {
+      throw new Error("astAnalyzer instance must have a 'dependency' collectable");
+    }
 
     const rawAllowedExtensions = loadExtensions
       ? loadExtensions(kDefaultExtensions)

@@ -2,13 +2,15 @@
 import * as meriyah from "meriyah";
 
 // Import Internal Dependencies
-import type { ESTreeLiteral } from "../src/estree/literal.ts";
 import {
   DefaultCollectableSet,
   SourceFile,
   type Dependency,
   type Warning
 } from "../src/index.ts";
+import {
+  CollectableSetRegistry
+} from "../src/CollectableSetRegistry.ts";
 import {
   ProbeRunner,
   type Probe
@@ -20,8 +22,8 @@ import type { CollectableSet, Location } from "../src/CollectableSet.ts";
 export function createLiteral(
   value: string,
   includeRaw = false
-): ESTreeLiteral {
-  const node: ESTreeLiteral = { type: "Literal", value };
+): meriyah.ESTree.Literal {
+  const node: meriyah.ESTree.Literal = { type: "Literal", value };
   if (includeRaw) {
     node.raw = value;
   }
@@ -73,10 +75,17 @@ export function getSastAnalysis(
   probe: Probe,
   options: Options = {}
 ) {
-  const { location, collectables = [new DefaultCollectableSet("dependency")], metadata } = options;
+  const {
+    location,
+    collectables = [new DefaultCollectableSet("dependency")],
+    metadata
+  } = options;
 
   return {
-    sourceFile: new SourceFile(location, { metadata, collectables }),
+    sourceFile: new SourceFile(location, {
+      metadata,
+      collectableRegistry: new CollectableSetRegistry(collectables)
+    }),
     getWarning(warning: string): Warning | undefined {
       return this.warnings().find(
         (item: Warning) => item.kind === warning
