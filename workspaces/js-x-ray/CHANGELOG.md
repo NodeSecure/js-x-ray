@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 14.2.0
+
+### Minor Changes
+
+- [#566](https://github.com/NodeSecure/js-x-ray/pull/566) [`2094896`](https://github.com/NodeSecure/js-x-ray/commit/209489610a179e6712e24b025132848ec49ff283) Thanks [@fraxken](https://github.com/fraxken)! - Implement a new fileMetadata options to configure metadata for each files
+
 ## 14.1.0
 
 ### Minor Changes
