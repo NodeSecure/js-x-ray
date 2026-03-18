@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 
 // Import Internal Dependencies
-import { AstAnalyser, EntryFilesAnalyser } from "../src/index.ts";
+import { AstAnalyser, DefaultCollectableSet, EntryFilesAnalyser } from "../src/index.ts";
 
 // CONSTANTS
 const kFixtureURL = new URL("fixtures/entryFiles/", import.meta.url);
@@ -256,6 +256,129 @@ describe("EntryFilesAnalyser", () => {
     // Check that shared dependencies are not analyzed several times
     const calls = analyseFileMock.mock.calls;
     assert.strictEqual(calls.length, 2);
+  });
+
+  it("should pass fileMetadata per file to the dependency collectable", async() => {
+    const depSet = new DefaultCollectableSet("dependency");
+    const astAnalyzer = new AstAnalyser({
+      collectables: [depSet]
+    });
+
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: kFixtureURL,
+      astAnalyzer
+    });
+    const entryUrl = new URL("entry.js", kFixtureURL);
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl],
+      {
+        fileMetadata: (file) => {
+          return { customFile: path.basename(file) };
+        }
+      }
+    );
+    await fromAsync(generator);
+
+    for (const { locations } of depSet) {
+      for (const loc of locations) {
+        assert.ok(loc.metadata);
+        assert.ok("customFile" in loc.metadata);
+      }
+    }
+  });
+
+  it("should merge fileMetadata with global metadata in collectables", async() => {
+    const depSet = new DefaultCollectableSet("dependency");
+    const astAnalyzer = new AstAnalyser({
+      collectables: [depSet]
+    });
+
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: kFixtureURL,
+      astAnalyzer
+    });
+    const entryUrl = new URL("entry.js", kFixtureURL);
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl],
+      {
+        metadata: { project: "test-project" },
+        fileMetadata: (file) => {
+          return { customFile: path.basename(file) };
+        }
+      }
+    );
+    await fromAsync(generator);
+
+    for (const { locations } of depSet) {
+      for (const loc of locations) {
+        assert.ok(loc.metadata);
+        assert.strictEqual(loc.metadata.project, "test-project");
+        assert.ok("customFile" in loc.metadata);
+      }
+    }
+  });
+
+  it("should allow fileMetadata to override global metadata in collectables", async() => {
+    const depSet = new DefaultCollectableSet("dependency");
+    const astAnalyzer = new AstAnalyser({
+      collectables: [depSet]
+    });
+
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: kFixtureURL,
+      astAnalyzer
+    });
+    const entryUrl = new URL("entry.js", kFixtureURL);
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl],
+      {
+        metadata: { origin: "global" },
+        fileMetadata: () => {
+          return { origin: "per-file" };
+        }
+      }
+    );
+    await fromAsync(generator);
+
+    for (const { locations } of depSet) {
+      for (const loc of locations) {
+        assert.ok(loc.metadata);
+        assert.strictEqual(loc.metadata.origin, "per-file");
+      }
+    }
+  });
+
+  it("should not mutate global metadata when using fileMetadata", async() => {
+    const astAnalyzer = new AstAnalyser({
+      collectables: [
+        new DefaultCollectableSet("dependency")
+      ]
+    });
+
+    const entryFilesAnalyser = new EntryFilesAnalyser({
+      rootPath: kFixtureURL,
+      astAnalyzer
+    });
+    const entryUrl = new URL("entry.js", kFixtureURL);
+
+    const globalMetadata = { project: "test-project" };
+
+    const generator = entryFilesAnalyser.analyse(
+      [entryUrl],
+      {
+        metadata: globalMetadata,
+        fileMetadata: () => {
+          return { extra: "value" };
+        }
+      }
+    );
+    await fromAsync(generator);
+
+    assert.deepStrictEqual(globalMetadata, { project: "test-project" });
+    assert.strictEqual("extra" in globalMetadata, false);
   });
 
   it("should not crash when a parsing error occurs", async() => {
