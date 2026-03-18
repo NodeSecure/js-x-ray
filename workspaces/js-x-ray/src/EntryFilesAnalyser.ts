@@ -37,6 +37,10 @@ export interface EntryFilesAnalyserOptions {
   ignoreENOENT?: boolean;
 }
 
+export interface EntryFilesRuntimeOptions extends RuntimeOptions {
+  fileMetadata?: (file: string) => Record<string, unknown>;
+}
+
 export class EntryFilesAnalyser {
   static Parsers = {
     js: new JsSourceParser(),
@@ -80,7 +84,7 @@ export class EntryFilesAnalyser {
 
   async* analyse(
     entryFiles: Iterable<string | URL>,
-    options: RuntimeOptions = {}
+    options: EntryFilesRuntimeOptions = {}
   ): AsyncGenerator<ReportOnFile & { file: string; }> {
     this.dependencies = new DiGraph();
 
@@ -141,7 +145,7 @@ export class EntryFilesAnalyser {
   async* #analyseFile(
     file: string,
     relativeFile: string,
-    options: RuntimeOptions
+    options: EntryFilesRuntimeOptions
   ) {
     // Skip declaration files as they are not meant to be analysed
     if (file.includes("d.ts")) {
@@ -154,10 +158,20 @@ export class EntryFilesAnalyser {
       body: {}
     });
 
+    const {
+      metadata = {},
+      fileMetadata = () => {
+        return {};
+      },
+      ...runtimeOptions
+    } = options;
+    const finalMetadata = Object.assign(structuredClone(metadata), fileMetadata(file));
+
     const report = await this.astAnalyzer.analyseFile(
       file,
       {
-        ...options,
+        ...runtimeOptions,
+        metadata: finalMetadata,
         customParser: this.#getParserFromFileExtension(file)
       }
     );
