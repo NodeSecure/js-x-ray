@@ -13,9 +13,9 @@ export function* getVariableDeclarationIdentifiers(
   node: ESTree.Node,
   options: GetVariableDeclarationIdentifiersOptions = {}
 ): IterableIterator<{
-    name: string;
-    assignmentId: ESTree.Identifier;
-  }> {
+  name: string;
+  assignmentId: ESTree.Identifier;
+}> {
   const { prefix = null } = options;
 
   switch (node.type) {
