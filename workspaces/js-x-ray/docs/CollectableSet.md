@@ -1,49 +1,61 @@
 # CollectableSet
 
-CollectableSet is a specialized data structure for collecting and aggregating infrastructure-related data points (e.g., URLs, hostnames, IPs, dependencies) during JavaScript AST analysis. It groups locations by value and file, with optional metadata support. Post-analysis, the collected data can be exploited externally (e.g., for network monitoring, security audits, or infrastructure mapping) to derive insights beyond JS-X-Ray's built-in warnings.
+During AST analysis, js-x-ray encounters interesting string values embedded in code: hostnames, URLs, IP addresses, email addresses, imported module specifiers. The built-in **warnings** system flags security anomalies; collectables serve a different purpose: **structured data extraction** for post-analysis use.
 
-- **type**: Type
-- **add(value, infos)**: Adds an entry to the set. Groups by value and file.
-- **values()**: Returns an iterable of all values of the CollectableSet.
-
-CollectableSet is only an interface but Js-X-Ray provides a default implementation named DefaultCollectableSet.
-The default implementation has an additional method to read what it has collected.
-
-- **[Symbol.iterator]()**: Iterates over entries, yielding `{ value, locations }` for each unique value.
+A `CollectableSet` acts as a side-channel output, populated during analysis and read afterwards. Instead of discarding these values once a warning is (or isn't) emitted, you capture them in a typed collection that you can then forward to other tools or process yourself.
 
 ```ts
-import { DefaultCollectableSet } from "@nodesecure/js-x-ray";
+import {
+  AstAnalyser,
+  DefaultCollectableSet
+} from "@nodesecure/js-x-ray";
 
-const hostnameSet = new DefaultCollectableSet<{ spec: string }>("hostname");
-
-// Add infrastructure data during analysis (e.g., via probes)
-hostnameSet.add("example.com", {
-  file: "src/index.js",
-  location: [{ start: { line: 5, column: 10 }, end: { line: 5, column: 21 } }],
-  metadata: { spec: "@nodesecure/scanner" }
+const hostnames = new DefaultCollectableSet("hostname");
+const analyser = new AstAnalyser({
+  collectables: [hostnames]
 });
 
-// Post-analysis exploitation: Iterate and process data
-for (const { value, locations } of hostnameSet) {
-  console.log(`Found hostname: ${value}`);
-  locations.forEach(({ file, location, metadata }) => {
-    // Example: Log or export for further analysis
-    console.log(`  In ${file}: ${JSON.stringify(location)} (${metadata?.spec})`);
-  });
+analyser.analyse("const url = 'https://example.com';");
+
+for (const { value, locations } of hostnames) {
+  console.log(value, locations);
 }
 ```
 
-## API
+Each collectable instance focuses on a single **type** of value (e.g., hostnames). Internally, it deduplicates by value and groups locations by file:
+
+```
+value "example.com"
+  > file "src/a.js"
+      - location [line 5, col 10-21]
+      - location [line 12, col 4-15]
+  > file "src/b.js"
+      - location [line 2, col 0-11]
+```
+
+If the same hostname appears in three files, you get one entry with three location groups, not three separate entries.
+
+## Types
+
+The built-in `Type` values cover the most common infrastructure data points:
+
+| Type | Description |
+|---|---|
+| `"url"` | Full URLs |
+| `"hostname"` | Extracted hostnames |
+| `"ip"` | IP addresses |
+| `"email"` | Email addresses |
+| `"dependency"` | Imported module specifiers |
 
 ```ts
-export type Type = "url" | "hostname" | "ip" | "email" | "dependency" | (string & {});
+type Type = "url" | "hostname" | "ip" | "email" | "dependency" | (string & {});
+```
 
-export type Location<T = Record<string, unknown>> = {
-  file: string | null;
-  location: SourceArrayLocation[];
-  metadata?: T;
-};
+The type is open-ended (`string & {}`) so you can define custom types for domain-specific needs.
 
+## Interface and implementation
+
+```ts
 export type CollectableInfos<T = Record<string, unknown>> = {
   file?: string | null;
   metadata?: T;
@@ -51,14 +63,33 @@ export type CollectableInfos<T = Record<string, unknown>> = {
 };
 
 export interface CollectableSet<T = Record<string, unknown>> {
-  add(value: string, infos: CollectableInfos<T>): void;
   type: Type;
+  add(
+    value: string,
+    infos: CollectableInfos<T>
+  ): void;
   values(): Iterable<string>;
 }
+```
+
+`CollectableSet<T>` is a minimal interface with three members:
+
+- `type` — identifies what kind of values this set collects.
+- `add(value, infos)` — called by probes during analysis to record a value and its source location. `infos` accepts an optional `metadata` field (typed as `T`) for probe-specific data attached to each occurrence.
+- `values()` — returns the unique collected values with no location data. Useful for quick existence checks without iterating over the full location graph.
+
+You can implement it yourself to control how collected data is stored or processed.
+
+For most use cases, `DefaultCollectableSet<T>` is sufficient. It implements the interface and adds `[Symbol.iterator]`, which yields `{ value, locations }` pairs once analysis is complete. The generic parameter `T` types the `metadata` field carried on each location entry.
+
+```ts
+export type Location<T = Record<string, unknown>> = {
+  file: string | null;
+  location: SourceArrayLocation[];
+  metadata?: T;
+};
 
 export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
-  // same methods signature than CollectableSet
-
   constructor(type: Type);
 
   *[Symbol.iterator](): Generator<{
@@ -68,49 +99,80 @@ export class DefaultCollectableSet<T = Record<string, unknown>> implements Colle
 }
 ```
 
-## Usage with AstAnalyser
+## Usage
 
-CollectableSet integrates with AstAnalyser via the `collectables` option. Pass an array of CollectableSet instances to gather data during analysis. Probes can populate them, and post-analysis, you can exploit the data for external processing.
+### AstAnalyser
+
+Pass one or more collectable instances via the `collectables` option. After calling `analyse()`, iterate the set to read results.
+
+The `analyse()` method accepts an optional `metadata` field. Whatever is passed there is attached to every entry recorded during that analysis call, which lets you tag results with caller-specific context (e.g. the package name, a scan identifier, or any structured data your downstream tooling needs).
 
 ```ts
-import { AstAnalyser, DefaultCollectableSet } from "@nodesecure/js-x-ray";
+import {
+  AstAnalyser,
+  DefaultCollectableSet
+} from "@nodesecure/js-x-ray";
 
-const hostnameSet = new DefaultCollectableSet("hostname");
+interface ScanMetadata {
+  packageName: string;
+}
+
+const hostnames = new DefaultCollectableSet<ScanMetadata>("hostname");
 const analyser = new AstAnalyser({
-  collectables: [hostnameSet],
-  // Other options...
+  collectables: [hostnames]
 });
 
-// Analyze code
-const result = analyser.analyse("const url = 'https://example.com';");
+analyser.analyse(source, {
+  metadata: { packageName: "lodash" }
+});
 
-// Post-analysis exploitation
-for (const { value, locations } of hostnameSet) {
-  console.log(`Hostname: ${value}`, locations);
+for (const { value, locations } of hostnames) {
+  for (const { file, metadata } of locations) {
+    console.log(value, file, metadata?.packageName);
+  }
 }
 ```
 
-## Usage with EntryFilesAnalyser
+### EntryFilesAnalyser
 
-EntryFilesAnalyser uses AstAnalyser internally, so pass collectables via the `astAnalyzer` option for multi-file infrastructure data aggregation. Exploit the data across dependencies for comprehensive checks.
+Pass collectable instances via the `collectables` option of `AstAnalyser`.
+
+The same instance is reused across every file `EntryFilesAnalyser` processes, so data accumulates in a single set and is ready to read once the full analysis finishes.
+
+The `analyse()` method accepts two complementary metadata options:
+
+- `metadata` — a static object merged into every file's analysis context.
+- `fileMetadata` — a function called per file that returns file-specific metadata. Its result is merged on top of `metadata`, so it can extend or override shared fields for a given file.
 
 ```ts
-import { EntryFilesAnalyser, DefaultCollectableSet } from "@nodesecure/js-x-ray";
+import {
+  AstAnalyser,
+  EntryFilesAnalyser,
+  DefaultCollectableSet
+} from "@nodesecure/js-x-ray";
 
-const urlSet = new DefaultCollectableSet("url");
+interface ScanMetadata {
+  scanId: string;
+  file: string;
+}
+
+const urls = new DefaultCollectableSet<ScanMetadata>("url");
 const analyser = new EntryFilesAnalyser({
-  astAnalyzer: new AstAnalyser({ collectables: [urlSet] })
+  astAnalyzer: new AstAnalyser({
+    collectables: [urls]
+  })
 });
 
-// Analyze multiple files
-for await (const report of analyser.analyse(["src/index.js"])) {
-  // Analysis happens here
+for await (const report of analyser.analyse(["src/index.js"], {
+  metadata: { scanId: "abc-123" },
+  fileMetadata: (file) => ({ file })
+})) {
+  // analysis runs here
 }
 
-// Post-analysis: Exploit aggregated data
-for (const { value, locations } of urlSet) {
-  console.log(`Aggregated url: ${value}`, locations);
+for (const { value, locations } of urls) {
+  for (const { file, metadata } of locations) {
+    console.log(value, file, metadata?.scanId);
+  }
 }
 ```
-
-This enables exploitation across files.
