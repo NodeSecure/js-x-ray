@@ -1,15 +1,18 @@
 // Import Node.js Dependencies
 import assert from "node:assert";
-import { promises as fs, readFileSync } from "node:fs";
+import {
+  promises as fs,
+  readFileSync
+} from "node:fs";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
 import { AstAnalyser } from "../../src/index.ts";
 
-// Constants
+// CONSTANTS
 const kFixtureURL = new URL("fixtures/weakCrypto/", import.meta.url);
 
-describe("isWeakCrypto", () => {
+describe("isWeakCrypto probe", () => {
   describe("crypto.createHash", () => {
     it(`should detect weak algorithm when createHash is destructured from crypto
       (e.g. \`const { createHash } = require('crypto')\`)`, async() => {

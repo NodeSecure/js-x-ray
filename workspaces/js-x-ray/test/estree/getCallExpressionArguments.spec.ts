@@ -9,7 +9,7 @@ import {
   getExpressionFromStatement
 } from "../helpers.ts";
 
-describe("getCallExpressionArguments", () => {
+describe("estree.getCallExpressionArguments", () => {
   test("return null when the node is not a CallExpression", () => {
     const [astNode] = parseScript("const a = 1;").body;
     const args = getCallExpressionArguments(

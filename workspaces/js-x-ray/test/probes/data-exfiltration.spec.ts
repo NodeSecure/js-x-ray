@@ -9,9 +9,9 @@ import { AstAnalyser } from "../../src/index.ts";
 
 const FIXTURE_URL = new URL("fixtures/dataExfiltration/", import.meta.url);
 
-describe("data exfiltration", () => {
+describe("data-exfiltration probe", () => {
   describe("sensitivity: conservative", () => {
-    test("it should report a warning in case of `JSON.stringify(sensitiveData) for member expression`", async() => {
+    test("should report a warning in case of `JSON.stringify(sensitiveData) for member expression`", async() => {
       const fixturesDir = new URL("memberExpression/", FIXTURE_URL);
       const fixtureFiles = await fs.readdir(fixturesDir);
 
@@ -30,7 +30,7 @@ describe("data exfiltration", () => {
       }
     });
 
-    test("it should report a warning in case of `JSON.stringify(sensitiveData) for direct call expression`", async() => {
+    test("should report a warning in case of `JSON.stringify(sensitiveData) for direct call expression`", async() => {
       const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
       const fixtureFiles = await fs.readdir(fixturesDir);
 

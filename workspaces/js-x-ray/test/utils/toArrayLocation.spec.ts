@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { toArrayLocation } from "../../src/utils/index.ts";
 
-describe("toArrayLocation", () => {
+describe("utils.toArrayLocation", () => {
   it("should convert a valid SourceLocation to array format", () => {
     const location = {
       start: { line: 1, column: 2 },

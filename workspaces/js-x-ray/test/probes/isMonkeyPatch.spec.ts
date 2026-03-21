@@ -7,7 +7,7 @@ import { AstAnalyser } from "../../src/AstAnalyser.ts";
 import isMonkeyPatch, { JS_TYPES } from "../../src/probes/isMonkeyPatch.ts";
 import { getSastAnalysis, parseScript } from "../helpers.ts";
 
-describe("isMonkeyPatch", () => {
+describe("isMonkeyPatch probe", () => {
   test("should detect monkey patching via direct prototype assignment", (t) => {
     t.plan(JS_TYPES.size * 2);
 

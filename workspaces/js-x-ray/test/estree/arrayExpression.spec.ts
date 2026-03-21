@@ -16,7 +16,7 @@ import {
   getExpressionFromStatementIf
 } from "../helpers.ts";
 
-describe("arrayExpressionToString", () => {
+describe("estree.arrayExpressionToString", () => {
   test("given an ArrayExpression with two Literals then the iterable must return them one by one", () => {
     const [astNode] = parseScript("['foo', 'bar']").body;
     const iter = arrayExpressionToString(getExpressionFromStatement(astNode));

@@ -9,7 +9,7 @@ import {
   getExpressionFromStatementIf
 } from "../helpers.ts";
 
-describe("getVariableDeclarationIdentifiers", () => {
+describe("estree.getVariableDeclarationIdentifiers", () => {
   test("return empty array when the node is not a VariableDeclaration", () => {
     const [astNode] = parseScript("foobar();").body;
     const iter = getVariableDeclarationIdentifiers(

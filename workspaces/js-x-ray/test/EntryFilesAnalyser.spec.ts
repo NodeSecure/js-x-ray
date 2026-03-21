@@ -36,7 +36,7 @@ describe("EntryFilesAnalyser", () => {
       entryUrl,
       deepEntryUrl
     ]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -64,7 +64,7 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse([
       entryUrl
     ]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -84,7 +84,7 @@ describe("EntryFilesAnalyser", () => {
     const entryUrl = new URL("entryWithInvalidDep.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -112,7 +112,7 @@ describe("EntryFilesAnalyser", () => {
     const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -138,7 +138,7 @@ describe("EntryFilesAnalyser", () => {
     const entryUrl = new URL("entryWithVariousDepExtensions.js", kFixtureURL);
 
     const generator = entryFilesAnalyser.analyse([entryUrl]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -159,7 +159,7 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse(
       [entryUrl]
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     assert.deepEqual(
       [...entryFilesAnalyser.dependencies.findCycles()],
@@ -187,7 +187,7 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse(
       [entryUrl]
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     for (const [from, to] of [...entryFilesAnalyser.dependencies.findCycles()]) {
       assert.ok(path.isAbsolute(from));
@@ -205,7 +205,7 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse(
       ["recursive/A.js"]
     );
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     const files = reports.map((report) => path.normalize(report.file));
     assert.deepEqual(
@@ -229,7 +229,7 @@ describe("EntryFilesAnalyser", () => {
       [entryUrl]
     );
 
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
     assert.strictEqual(reports.length, 0);
     assert.strictEqual(entryFilesAnalyser.dependencies.hasVertex("does-not-exists.js"), false);
   });
@@ -243,7 +243,7 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse([
       entryUrl
     ]);
-    const reports = await fromAsync(generator);
+    const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
       reports.map((report) => report.file),
@@ -278,7 +278,7 @@ describe("EntryFilesAnalyser", () => {
         }
       }
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     for (const { locations } of depSet) {
       for (const loc of locations) {
@@ -309,7 +309,7 @@ describe("EntryFilesAnalyser", () => {
         }
       }
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     for (const { locations } of depSet) {
       for (const loc of locations) {
@@ -341,7 +341,7 @@ describe("EntryFilesAnalyser", () => {
         }
       }
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     for (const { locations } of depSet) {
       for (const loc of locations) {
@@ -375,7 +375,7 @@ describe("EntryFilesAnalyser", () => {
         }
       }
     );
-    await fromAsync(generator);
+    await Array.fromAsync(generator);
 
     assert.deepStrictEqual(globalMetadata, { project: "test-project" });
     assert.strictEqual("extra" in globalMetadata, false);
@@ -392,20 +392,7 @@ describe("EntryFilesAnalyser", () => {
       const generator = entryFilesAnalyser.analyse(
         [entryUrl]
       );
-      await fromAsync(generator);
+      await Array.fromAsync(generator);
     });
   });
 });
-
-// TODO: replace with Array.fromAsync when droping Node.js 20
-async function fromAsync<T>(
-  asyncIter: AsyncIterable<T>
-): Promise<T[]> {
-  const items: T[] = [];
-
-  for await (const item of asyncIter) {
-    items.push(item);
-  }
-
-  return items;
-}

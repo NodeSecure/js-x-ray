@@ -5,7 +5,7 @@ import { describe, test } from "node:test";
 // Import Internal Dependencies
 import { notNullOrUndefined } from "../../src/utils/index.ts";
 
-describe("notNullOrUndefined", () => {
+describe("utils.notNullOrUndefined", () => {
   test("given a null or undefined primitive value then it must always return false", () => {
     assert.strictEqual(notNullOrUndefined(null), false, "null primitive value should return false");
     assert.strictEqual(notNullOrUndefined(void 0), false, "undefined primitive value should return false");

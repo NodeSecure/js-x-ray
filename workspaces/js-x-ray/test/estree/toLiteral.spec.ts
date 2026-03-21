@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { toLiteral } from "../../src/estree/index.ts";
 
-describe("toLiteral", () => {
+describe("estree.toLiteral", () => {
   it("should transform a TemplateLiteral to a literal", () => {
     assert.strictEqual(toLiteral({
       type: "TemplateLiteral",
