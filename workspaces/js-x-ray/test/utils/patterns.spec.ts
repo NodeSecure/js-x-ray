@@ -9,7 +9,7 @@ import {
   commonStringSuffix
 } from "../../src/utils/index.ts";
 
-describe("commonStringPrefix()", () => {
+describe("utils.commonStringPrefix()", () => {
   test("must return null for two strings that have no common prefix", () => {
     assert.strictEqual(
       commonStringPrefix("boo", "foo"),
@@ -27,7 +27,7 @@ describe("commonStringPrefix()", () => {
   });
 });
 
-describe("commonStringSuffix()", () => {
+describe("utils.commonStringSuffix()", () => {
   test("must return the common suffix for the two strings with a shared suffix", () => {
     assert.strictEqual(
       commonStringSuffix("boo", "foo"),
@@ -45,7 +45,7 @@ describe("commonStringSuffix()", () => {
   });
 });
 
-describe("commonHexadecimalPrefix()", () => {
+describe("utils.commonHexadecimalPrefix()", () => {
   test("should throw a TypeError if identifiersArray is not an Array", () => {
     // @ts-expect-error
     assert.throws(() => commonHexadecimalPrefix(10), {

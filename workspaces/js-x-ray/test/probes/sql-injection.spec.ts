@@ -6,7 +6,7 @@ import { describe, test } from "node:test";
 // Import Internal Dependencies
 import { AstAnalyser } from "../../src/index.ts";
 
-describe("sql-injection", () => {
+describe("sql-injection probe", () => {
   test("should detect sql injection on select queries", () => {
     const queries = [
       "`SELECT * FROM users WHERE email = ${email}`",

@@ -8,7 +8,7 @@ import { AstAnalyser } from "../../src/index.ts";
 
 const FIXTURE_URL = new URL("fixtures/syncIO/", import.meta.url);
 
-describe("isSyncIO", () => {
+describe("isSyncIO probe", () => {
   test("it should report a warning in case of *Sync(...params)` usage", async() => {
     const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
     const fixtureFiles = await fs.readdir(fixturesDir);

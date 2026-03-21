@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { AstAnalyser, DefaultCollectableSet } from "../../src/index.ts";
 
-describe("probe: isESMExport", () => {
+describe("isESMExport probe", () => {
   it("should detect ExportNamedDeclaration statement with a Literal source as dependency", () => {
     const code = `
       export { foo } from "./bar.js";

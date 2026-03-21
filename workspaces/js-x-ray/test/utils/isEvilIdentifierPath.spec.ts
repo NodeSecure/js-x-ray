@@ -5,7 +5,7 @@ import { describe, test } from "node:test";
 // Import Internal Dependencies
 import { isEvilIdentifierPath } from "../../src/utils/index.ts";
 
-describe("isEvilIdentifierPath", () => {
+describe("utils.isEvilIdentifierPath", () => {
   test("given a random prototype method name then it should return false", () => {
     const result = isEvilIdentifierPath(
       "Function.prototype.foo"

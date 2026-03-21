@@ -8,7 +8,7 @@ import { parseScript } from "meriyah";
 // Import Internal Dependencies
 import { isOneLineExpressionExport } from "../../src/utils/index.ts";
 
-describe("isOneLineExpressionExport()", () => {
+describe("utils.isOneLineExpressionExport()", () => {
   it("should return false for empty body", () => {
     assert.strictEqual(isOneLineExpressionExport([]), false);
   });

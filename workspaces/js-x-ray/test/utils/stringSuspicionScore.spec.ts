@@ -9,7 +9,7 @@ import {
   stringSuspicionScore
 } from "../../src/utils/index.ts";
 
-describe("stringCharDiversity()", () => {
+describe("utils.stringCharDiversity()", () => {
   it("should return the number of unique characters in a string", () => {
     assert.strictEqual(stringCharDiversity("helloo!"), 5);
   });
@@ -19,7 +19,7 @@ describe("stringCharDiversity()", () => {
   });
 });
 
-describe("stringSuspicionScore()", () => {
+describe("utils.stringSuspicionScore()", () => {
   it("should return 0 for strings shorter than 45 characters", () => {
     for (let strSize = 1; strSize < 45; strSize++) {
       // We generate a random String (with slice it in two because a size of 20 for hex is 40 bytes).

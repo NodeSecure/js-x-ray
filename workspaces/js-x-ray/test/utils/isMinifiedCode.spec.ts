@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { isMinifiedCode } from "../../src/utils/index.ts";
 
-describe("isMinifiedCode", () => {
+describe("utils.isMinifiedCode", () => {
   it("should return false for formatted multi-line code", () => {
     const formattedCode = `
             function add(a, b) {

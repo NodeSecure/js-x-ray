@@ -5,7 +5,7 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { makePrefixRemover } from "../../src/utils/index.ts";
 
-describe("makePrefixRemover", () => {
+describe("utils.makePrefixRemover", () => {
   it("returns the original string when no dot is present", () => {
     const strip = makePrefixRemover(["window"]);
     assert.strictEqual(strip("foo"), "foo");

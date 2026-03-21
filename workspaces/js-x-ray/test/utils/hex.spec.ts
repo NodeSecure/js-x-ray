@@ -7,7 +7,7 @@ import { describe, test } from "node:test";
 import { CONSTANTS, isHex, isSafe } from "../../src/utils/hex.ts";
 import { createLiteral } from "../helpers.ts";
 
-describe("isHex()", () => {
+describe("utils.isHex()", () => {
   test("must return true for random 4 character hexadecimal values", () => {
     const hexValue = randomBytes(4).toString("hex");
 
@@ -38,7 +38,7 @@ describe("isHex()", () => {
   });
 });
 
-describe("isSafe()", () => {
+describe("utils.isSafe()", () => {
   test("must return true for a value with a length lower or equal five characters", () => {
     assert.ok(isSafe("h2l5x"));
   });
