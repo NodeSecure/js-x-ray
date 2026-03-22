@@ -38,8 +38,9 @@ describe("EntryFilesAnalyser", () => {
     ]);
     const reports = await Array.fromAsync(generator);
 
+    // Order is non-deterministic due to concurrent processing; check the set of files
     assert.deepEqual(
-      reports.map((report) => report.file),
+      reports.map((report) => report.file).sort(),
       [
         entryUrl,
         new URL("deps/dep1.js", kFixtureURL),
@@ -47,7 +48,7 @@ describe("EntryFilesAnalyser", () => {
         new URL("deps/dep2.js", kFixtureURL),
         deepEntryUrl,
         new URL("deps/dep3.js", kFixtureURL)
-      ].map((url) => fileURLToPath(url))
+      ].map((url) => fileURLToPath(url)).sort()
     );
 
     // Check that shared dependencies are not analyzed several times
@@ -114,8 +115,9 @@ describe("EntryFilesAnalyser", () => {
     const generator = entryFilesAnalyser.analyse([entryUrl]);
     const reports = await Array.fromAsync(generator);
 
+    // Order is non-deterministic due to concurrent processing; check the set of files
     assert.deepEqual(
-      reports.map((report) => report.file),
+      reports.map((report) => report.file).sort(),
       [
         entryUrl,
         new URL("deps/default.js", kFixtureURL),
@@ -127,7 +129,7 @@ describe("EntryFilesAnalyser", () => {
         new URL("deps/dep.node", kFixtureURL),
         new URL("deps/default.jsx", kFixtureURL),
         new URL("deps/dep.jsx", kFixtureURL)
-      ].map((url) => fileURLToPath(url))
+      ].map((url) => fileURLToPath(url)).sort()
     );
   });
 

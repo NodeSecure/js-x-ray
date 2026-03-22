@@ -109,3 +109,5 @@ temp/
 .idea/
 workspaces/**/temp/
 workspaces/**/temp.ts
+
+.claude
