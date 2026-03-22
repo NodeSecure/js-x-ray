@@ -76,6 +76,34 @@ function validateNodeAssignment(
   return validateMemberExpression(node.left, ctx);
 }
 
+function resolveDefinePropertyIdentifier(
+  node: ESTree.CallExpression,
+  ctx: ProbeContext
+): string | null {
+  const id = getCallExpressionIdentifier(node);
+  if (id === "Object.defineProperty" || id === "Reflect.defineProperty") {
+    return id;
+  }
+
+  if (id === null || !id.includes(".")) {
+    return null;
+  }
+
+  const [objectPart, ...rest] = id.split(".");
+  const methodName = rest.join(".");
+
+  if (methodName !== "defineProperty") {
+    return null;
+  }
+
+  const resolved = resolveJsTypeName(objectPart, ctx);
+  if (resolved === "Object" || resolved === "Reflect") {
+    return `${resolved}.defineProperty`;
+  }
+
+  return null;
+}
+
 function validateDefineProperty(
   node: ESTree.Node,
   ctx: ProbeContext
@@ -83,11 +111,9 @@ function validateDefineProperty(
   if (node.type !== "CallExpression") {
     return [false];
   }
-  const id = getCallExpressionIdentifier(node);
 
-  if (
-    (id !== "Object.defineProperty" && id !== "Reflect.defineProperty")
-  ) {
+  const resolvedId = resolveDefinePropertyIdentifier(node, ctx);
+  if (resolvedId === null) {
     return [false];
   }
 
@@ -99,6 +125,22 @@ function validateDefineProperty(
   return validateMemberExpression(firstArg, ctx);
 }
 
+function resolveJsTypeName(
+  name: string,
+  ctx: ProbeContext
+): string | null {
+  if (JS_TYPES.has(name)) {
+    return name;
+  }
+
+  const tracedData = ctx.sourceFile.tracer.getDataFromIdentifier(name);
+  if (tracedData !== null && JS_TYPES.has(tracedData.identifierOrMemberExpr)) {
+    return tracedData.identifierOrMemberExpr;
+  }
+
+  return null;
+}
+
 function validateMemberExpression(
   node: ESTree.MemberExpression,
   ctx: ProbeContext
@@ -107,8 +149,13 @@ function validateMemberExpression(
     externalIdentifierLookup: (name: string) => ctx.sourceFile.tracer.literalIdentifiers.get(name)?.value ?? null
   });
 
-  const jsTypeName = iter.next().value;
-  if (typeof jsTypeName !== "string" || !JS_TYPES.has(jsTypeName)) {
+  const rawName = iter.next().value;
+  if (typeof rawName !== "string") {
+    return [false];
+  }
+
+  const jsTypeName = resolveJsTypeName(rawName, ctx);
+  if (jsTypeName === null) {
     return [false];
   }
 
@@ -116,6 +163,18 @@ function validateMemberExpression(
     iter.next().value === "prototype",
     `${jsTypeName}.prototype`
   ];
+}
+
+function initialize(
+  ctx: ProbeContext
+) {
+  const { tracer } = ctx.sourceFile;
+
+  for (const jsType of JS_TYPES) {
+    tracer.trace(jsType, {
+      followConsecutiveAssignment: true
+    });
+  }
 }
 
 function main(
@@ -135,5 +194,8 @@ export default {
     validateNodeAssignment,
     validateDefineProperty
   ],
-  main
+  main,
+  initialize,
+  breakOnMatch: false,
+  context: {}
 };

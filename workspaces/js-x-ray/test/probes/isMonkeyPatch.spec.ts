@@ -85,4 +85,90 @@ describe("isMonkeyPatch probe", () => {
       value: "Array.prototype"
     });
   });
+
+  test("should detect monkey patching via variable re-assignment (VariableTracer)", (t) => {
+    const str = `const Arr = Array;\nArr.prototype.map = function() {};`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.ok(monkeyPatchWarning, "should find monkey-patch warning");
+    t.assert.partialDeepStrictEqual(monkeyPatchWarning, {
+      kind: "monkey-patch",
+      value: "Array.prototype"
+    });
+  });
+
+  test("should detect monkey patching via chained variable re-assignment", (t) => {
+    const str = `const A = Array;\nconst B = A;\nB.prototype.includes = function() {};`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.ok(monkeyPatchWarning, "should find monkey-patch warning");
+    t.assert.partialDeepStrictEqual(monkeyPatchWarning, {
+      kind: "monkey-patch",
+      value: "Array.prototype"
+    });
+  });
+
+  test("should detect monkey patching via re-assigned variable with Object.defineProperty", (t) => {
+    const str = `const Obj = Object;\nObj.defineProperty(Array.prototype, "map", {
+      value: function() {}
+    });`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.ok(monkeyPatchWarning, "should find monkey-patch warning");
+    t.assert.partialDeepStrictEqual(monkeyPatchWarning, {
+      kind: "monkey-patch",
+      value: "Array.prototype"
+    });
+  });
+
+  test("should detect monkey patching via re-assigned prototype target with Object.defineProperty", (t) => {
+    const str = `const Str = String;\nObject.defineProperty(Str.prototype, "trim", {
+      value: function() { return ""; }
+    });`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.ok(monkeyPatchWarning, "should find monkey-patch warning");
+    t.assert.partialDeepStrictEqual(monkeyPatchWarning, {
+      kind: "monkey-patch",
+      value: "String.prototype"
+    });
+  });
+
+  test("should NOT detect monkey patching for non-native types", (t) => {
+    const str = `const MyClass = class {};\nMyClass.prototype.foo = function() {};`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.equal(monkeyPatchWarning, undefined);
+  });
+
+  test("should NOT detect monkey patching for unrelated variable assignments", (t) => {
+    const str = `const x = 42;\nconst y = "hello";`;
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.equal(monkeyPatchWarning, undefined);
+  });
 });
