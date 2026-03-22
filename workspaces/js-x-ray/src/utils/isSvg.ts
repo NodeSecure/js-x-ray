@@ -5,13 +5,21 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { toValue } from "../estree/index.ts";
 
+// CONSTANTS
+const kSvgPathStartRegex = /^[mzlhvcsqta]\s*[-+.0-9][^mlhvzcsqta]+/i;
+const kSvgPathEndRegex = /[\dz]$/i;
+
 export function isSvg(
   strOrLiteral: ESTree.Literal | string
 ): boolean {
   try {
     const value = toValue(strOrLiteral);
 
-    return isStringSvg(value) || isSvgPath(value);
+    const trimmed = value.trimStart();
+
+    return (
+      trimmed.startsWith("<") && isStringSvg(value)
+    ) || isSvgPath(value);
   }
   catch {
     return false;
@@ -30,6 +38,6 @@ export function isSvgPath(
   const trimStr = str.trim();
 
   return trimStr.length > 4
-    && /^[mzlhvcsqta]\s*[-+.0-9][^mlhvzcsqta]+/i.test(trimStr)
-    && /[\dz]$/i.test(trimStr);
+    && kSvgPathStartRegex.test(trimStr)
+    && kSvgPathEndRegex.test(trimStr);
 }

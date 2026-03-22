@@ -20,6 +20,11 @@ export interface SyncWalkerVisitorContext {
 export class SyncWalker extends WalkerBase {
   enter: SyncHandler | undefined;
   leave: SyncHandler | undefined;
+  #childCtx: SyncWalkerVisitorContext = {
+    parent: null,
+    prop: undefined,
+    index: undefined
+  };
 
   constructor(
     enter?: SyncHandler,
@@ -85,14 +90,20 @@ export class SyncWalker extends WalkerBase {
         const nodes: unknown[] = value;
         for (let i = 0; i < nodes.length; i++) {
           const item = nodes[i];
-          const removeItem = isNode(item) && !this.visit(item, { parent: returnedNode, prop: key, index: i });
+          this.#childCtx.parent = returnedNode;
+          this.#childCtx.prop = key;
+          this.#childCtx.index = i;
+          const removeItem = isNode(item) && !this.visit(item, this.#childCtx);
           if (removeItem) {
             i--;
           }
         }
       }
       else if (isNode(value)) {
-        this.visit(value, { parent: returnedNode, prop: key, index: null });
+        this.#childCtx.parent = returnedNode;
+        this.#childCtx.prop = key;
+        this.#childCtx.index = null;
+        this.visit(value, this.#childCtx);
       }
     }
 

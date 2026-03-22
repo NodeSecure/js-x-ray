@@ -3,7 +3,6 @@ import { EventEmitter } from "node:events";
 
 // Import Third-party Dependencies
 import { type ESTree } from "meriyah";
-import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import {
@@ -481,10 +480,13 @@ export class VariableTracer extends EventEmitter {
        */
       case "ObjectExpression": {
         for (const property of childNode.properties) {
-          const node = match(property)
-            .with({ type: "Property" }, (prop) => prop.value)
-            .with({ type: "SpreadElement" }, (prop) => prop.argument)
-            .otherwise(() => null);
+          let node: ESTree.Node | null = null;
+          if (property.type === "Property") {
+            node = property.value;
+          }
+          else if (property.type === "SpreadElement") {
+            node = property.argument;
+          }
 
           node && this.#walkVariableDeclaratorInitialization(
             variableDeclaratorNode,

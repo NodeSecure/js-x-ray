@@ -1,5 +1,4 @@
 // Import Third-party Dependencies
-import FrequencySet from "frequency-set";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
@@ -20,17 +19,16 @@ export function commonStringPrefix(
 
   // The length of leftStr cannot be greater than that rightStr
   const minLen = leftStr.length > rightStr.length ? rightStr.length : leftStr.length;
-  let commonStr = "";
+  let len = 0;
 
   for (let id = 0; id < minLen; id++) {
-    if (leftStr.charAt(id) !== rightStr.charAt(id)) {
+    if (leftStr[id] !== rightStr[id]) {
       break;
     }
-
-    commonStr += leftStr.charAt(id);
+    len++;
   }
 
-  return commonStr === "" ? null : commonStr;
+  return len === 0 ? null : leftStr.slice(0, len);
 }
 
 function reverseString(
@@ -67,7 +65,7 @@ export function commonHexadecimalPrefix(
   if (!Array.isArray(identifiersArray)) {
     throw new TypeError("identifiersArray must be an Array");
   }
-  const prefix = new FrequencySet();
+  const prefix = new Map<string, number>();
 
   mainLoop: for (const value of identifiersArray.slice().sort()) {
     for (const [cp, count] of prefix) {
@@ -77,21 +75,21 @@ export function commonHexadecimalPrefix(
       }
 
       if (commonStr === cp || commonStr.startsWith(cp)) {
-        prefix.add(cp);
+        prefix.set(cp, count + 1);
       }
       else if (cp.startsWith(commonStr)) {
         prefix.delete(cp);
-        prefix.add(commonStr, count + 1);
+        prefix.set(commonStr, count + 1);
       }
       continue mainLoop;
     }
 
-    prefix.add(value);
+    prefix.set(value, 1);
   }
 
   // We remove one-time occurences (because they are normal variables)
   let oneTimeOccurence = 0;
-  for (const [key, value] of prefix.entries()) {
+  for (const [key, value] of prefix) {
     if (value === 1) {
       prefix.delete(key);
       oneTimeOccurence++;

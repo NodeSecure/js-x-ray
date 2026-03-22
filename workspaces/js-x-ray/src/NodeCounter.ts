@@ -1,5 +1,4 @@
 // Import Third-party Dependencies
-import FrequencySet from "frequency-set";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
@@ -24,7 +23,7 @@ export class NodeCounter<T extends ESTree.Node = ESTree.Node> {
   lookup: string | null = null;
 
   #count = 0;
-  #properties: FrequencySet<string> | null = null;
+  #properties: Map<string, number> | null = null;
   #filterFn: NodeCounterFilterCallback<T> = noop;
   #matchFn: NodeCounterMatchCallback<T> = noop;
 
@@ -49,7 +48,7 @@ export class NodeCounter<T extends ESTree.Node = ESTree.Node> {
     this.lookup = typeResult[2]?.slice(1, -1) ?? null;
     this.name = options?.name ?? this.type;
     if (this.lookup) {
-      this.#properties = new FrequencySet();
+      this.#properties = new Map<string, number>();
     }
 
     this.#filterFn = options.filter ?? noop;
@@ -83,7 +82,8 @@ export class NodeCounter<T extends ESTree.Node = ESTree.Node> {
       this.#matchFn(castedNode, this);
     }
     else if (this.lookup in node) {
-      this.#properties?.add(node[this.lookup]);
+      const key = node[this.lookup];
+      this.#properties?.set(key, (this.#properties.get(key) ?? 0) + 1);
       this.#matchFn(castedNode, this);
     }
   }

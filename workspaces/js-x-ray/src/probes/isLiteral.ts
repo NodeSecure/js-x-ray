@@ -49,7 +49,7 @@ function main(
   };
 
   // We are searching for value obfuscated as hex of a minimum length of 4.
-  if (/^[0-9A-Fa-f]{4,}$/g.test(node.value)) {
+  if (/^[0-9A-Fa-f]{4,}$/.test(node.value)) {
     const value = Buffer.from(node.value, "hex").toString();
     sourceFile.deobfuscator.analyzeString(value);
 
