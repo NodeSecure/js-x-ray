@@ -3,6 +3,7 @@ import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { EventEmitter } from "node:events";
+import { performance } from "node:perf_hooks";
 
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
@@ -72,15 +73,27 @@ export interface Report {
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
+  /**
+   * The execution time of the analysis in milliseconds.
+   */
+  executionTime: number;
 }
 
 export type ReportOnFile = {
   ok: true;
   warnings: Warning[];
   flags: Set<SourceFlags>;
+  /**
+   * The execution time of the analysis in milliseconds.
+   */
+  executionTime: number;
 } | {
   ok: false;
   warnings: Warning[];
+  /**
+   * The execution time of the analysis in milliseconds.
+   */
+  executionTime: number;
 };
 
 export type Sensitivity = "conservative" | "aggressive";
@@ -186,6 +199,8 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
     str: string,
     options: RuntimeOptions = {}
   ): Report {
+    const startTime = performance.now();
+
     const {
       packageName,
       location,
@@ -241,9 +256,12 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
       source.flags.add("oneline-require");
     }
 
+    const executionTime = performance.now() - startTime;
+
     return {
       ...source.getResult(isMinified),
-      flags: source.flags
+      flags: source.flags,
+      executionTime
     };
   }
 
@@ -276,6 +294,8 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
     pathToFile: string | URL,
     options: RuntimeOptions = {}
   ): Promise<ReportOnFile> {
+    const startTime = performance.now();
+
     const filePathString = pathToFile instanceof URL ?
       pathToFile.href :
       pathToFile;
@@ -319,10 +339,13 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
         data.flags.add("is-minified");
       }
 
+      const executionTime = performance.now() - startTime;
+
       return {
         ok: true,
         warnings: data.warnings,
-        flags: data.flags
+        flags: data.flags,
+        executionTime
       };
     }
     catch (error: any) {
@@ -331,13 +354,16 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
         file: filePathString
       });
 
+      const executionTime = performance.now() - startTime;
+
       return {
         ok: false,
         warnings: [
           generateWarning("parsing-error", {
             value: error.message
           })
-        ]
+        ],
+        executionTime
       };
     }
   }
@@ -346,6 +372,8 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
     pathToFile: string | URL,
     options: RuntimeOptions = {}
   ): ReportOnFile {
+    const startTime = performance.now();
+
     const filePathString = pathToFile instanceof URL ?
       pathToFile.href :
       pathToFile;
@@ -389,10 +417,13 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
         data.flags.add("is-minified");
       }
 
+      const executionTime = performance.now() - startTime;
+
       return {
         ok: true,
         warnings: data.warnings,
-        flags: data.flags
+        flags: data.flags,
+        executionTime
       };
     }
     catch (error: any) {
@@ -401,13 +432,16 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
         file: filePathString
       });
 
+      const executionTime = performance.now() - startTime;
+
       return {
         ok: false,
         warnings: [
           generateWarning("parsing-error", {
             value: error.message
           })
-        ]
+        ],
+        executionTime
       };
     }
   }
