@@ -9,12 +9,12 @@ import { generateWarning } from "../warnings.ts";
 
 /**
  * OWASP recommended minimum scrypt parameter combinations.
- * Each entry is [minN, minP] — sorted by N descending.
- * All recommendations assume r >= 8.
+ * Each entry is [minCost, minParallelization] — sorted by cost descending.
+ * All recommendations assume blockSize >= 8.
  *
  * @see https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#scrypt
  */
-const kOWASPMinParams: [cost: number, parallelization: number][] = [
+const kOWASPMinParams: [minCost: number, minParallelization: number][] = [
   [131072, 1],
   [65536, 2],
   [32768, 3],
@@ -49,18 +49,18 @@ function extractNumericParam(
   return null;
 }
 
-function isWeakScryptParams(N: number, r: number, p: number): boolean {
-  if (r < kMinBlockSize) {
+function isWeakScryptParams(cost: number, blockSize: number, parallelization: number): boolean {
+  if (blockSize < kMinBlockSize) {
     return true;
   }
 
-  for (const [cost, parallelization] of kOWASPMinParams) {
-    if (N >= cost) {
-      return p < parallelization;
+  for (const [minCost, minParallelization] of kOWASPMinParams) {
+    if (cost >= minCost) {
+      return parallelization < minParallelization;
     }
   }
 
-  // N is below the lowest OWASP recommendation (2^13 = 8192)
+  // cost is below the lowest OWASP recommendation (2^13 = 8192)
   return true;
 }
 
