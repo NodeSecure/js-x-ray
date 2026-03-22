@@ -25,6 +25,7 @@ import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 import isRandom from "./probes/isRandom.ts";
 import isPrototypePollution from "./probes/isPrototypePollution.ts";
+import isCryptoApiMisuse from "./probes/isCryptoApiMisuse.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -108,7 +109,8 @@ export class ProbeRunner {
   static Optionals: Record<OptionalWarningName, Probe> = {
     "synchronous-io": isSyncIO,
     "log-usage": logUsage,
-    "insecure-random": isRandom
+    "insecure-random": isRandom,
+    "crypto-api-misuse": isCryptoApiMisuse
   };
 
   constructor(

@@ -20,7 +20,8 @@ const sast_warnings = {
   log_usage: "Üretim ortamlarında hassas bilgileri ifşa edebilecek console günlükleme yöntemlerinin (log, info, warn, error, debug) kullanımı.",
   sql_injection: "SQL sorgularında (SELECT, INSERT, UPDATE, DELETE) uygun parametreleştirme yapılmadan kullanılan ifadeler içeren şablon dizeleri, potansiyel SQL enjeksiyonu güvenlik açıkları oluşturur.",
   monkey_patch: "Çalışma zamanında yerel prototiplerin veya global nesnelerin değiştirilmesi; akış ele geçirme, global yan etkiler ve kötü niyetli faaliyetlerin gizlenmesi dahil olmak üzere güvenlik riskleri oluşturur.",
-  insecure_random: "Math.random() kullanılarak güvensiz rastgele sayı üretimi. Math.random() kriptografik olarak güvenli değildir ve güvenliğe duyarlı işlemler için kullanılmamalıdır."
+  insecure_random: "Math.random() kullanılarak güvensiz rastgele sayı üretimi. Math.random() kriptografik olarak güvenli değildir ve güvenliğe duyarlı işlemler için kullanılmamalıdır.",
+  crypto_api_misuse: "Node.js crypto API'sinin potansiyel olarak güvensiz kullanımı tespit edildi. Bu, yetersiz PBKDF2 iterasyon sayısını (minimum 100.000 önerilir) veya anahtar türetme fonksiyonları için zayıf/eksik tuz kullanımını içerir."
 };
 
 export default {

@@ -12,7 +12,8 @@ import {
 export type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
-  | "insecure-random";
+  | "insecure-random"
+  | "crypto-api-misuse";
 
 export type WarningName =
   | "parsing-error"
@@ -33,6 +34,7 @@ export type WarningName =
   | "monkey-patch"
   | "insecure-random"
   | "prototype-pollution"
+  | "crypto-api-misuse"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -144,6 +146,11 @@ export const warnings = Object.freeze({
   },
   "prototype-pollution": {
     i18n: "sast_warnings.prototype_pollution",
+    severity: "Warning",
+    experimental: false
+  },
+  "crypto-api-misuse": {
+    i18n: "sast_warnings.crypto_api_misuse",
     severity: "Warning",
     experimental: false
   }
