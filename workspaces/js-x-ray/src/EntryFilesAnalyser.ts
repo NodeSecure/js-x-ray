@@ -117,6 +117,7 @@ export class EntryFilesAnalyser {
       null : fileURLToPathExtended(rootPath);
     this.ignoreENOENT = ignoreENOENT;
     this.#packageDependencies = new Set(packageDependencies);
+    this.stats = { filesAnalyzed: 0, totalDependencies: 0 };
   }
 
   async* analyse(
