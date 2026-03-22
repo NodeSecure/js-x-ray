@@ -26,6 +26,7 @@ JS-X-Ray parses JS or TS code into an **Abstract Syntax Tree (AST)** with no ext
   - `process.env` serialization attempts
 - Flag weak cryptographic usage
   - Deprecated algorithms (MD5, SHA1, MD4, MD2, RIPEMD160)
+  - Weak scrypt parameters (insufficient cost, short or hardcoded salt)
 - Detect code quality issues
   - Monkey-patching of built-in prototypes
   - Encoded literals (hex, Unicode, base64)
@@ -122,7 +123,8 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 ```ts
 type OptionalWarningName =
   | "synchronous-io"
-  | "log-usage";
+  | "log-usage"
+  | "weak-scrypt";
 
 type WarningName =
   | "parsing-error"
@@ -175,13 +177,14 @@ const scanner = new AstAnalyser({
 
 // Or enable specific optional warnings
 const scannerSpecific = new AstAnalyser({
-  optionalWarnings: ["synchronous-io", "log-usage"]
+  optionalWarnings: ["synchronous-io", "log-usage", "weak-scrypt"]
 });
 ```
 
 The following warnings are optional:
 - `synchronous-io` - Detects synchronous I/O operations that could impact performance
 - `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
+- `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
 
 ### Internationalization (i18n)
 
@@ -227,6 +230,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [data-exfiltration](https://github.com/NodeSecure/js-x-ray/blob/master/docs/data-exfiltration.md) | No | Potential unauthorized transfer of sensitive data |
 | [sql-injection](https://github.com/NodeSecure/js-x-ray/blob/master/docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
+| [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
 
 #### Information Severity
 
