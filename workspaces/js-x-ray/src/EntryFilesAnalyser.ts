@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // Import Third-party Dependencies
+import combineAsyncIterators from "combine-async-iterators";
 import {
   DiGraph,
   type VertexBody,
@@ -30,11 +31,37 @@ const kDefaultExtensions = [
   "node"
 ];
 
+export type ReportOnEntryFile = ReportOnFile & {
+  file: string;
+};
+
 export interface EntryFilesAnalyserOptions {
+  /**
+   * An instance of `AstAnalyser` to use for analysing the entry files.
+   * If not provided, a default instance will be created with a `DefaultCollectableSet` for "dependency".
+   */
   astAnalyzer?: AstAnalyser;
-  loadExtensions?: (defaults: string[]) => string[];
+  /**
+   * A function that receives the default allowed extensions and
+   * returns a new array of extensions to allow when resolving internal dependencies.
+   */
+  loadExtensions?: (
+    defaults: string[]
+  ) => string[];
   rootPath?: string | URL;
+  /**
+   * Whether to ignore ENOENT errors when analysing files.
+   * If set to `true`, files that do not exist will be skipped without throwing an error.
+   *
+   * @default false
+   */
   ignoreENOENT?: boolean;
+  /**
+   * A set of dependencies to ignore when resolving internal dependencies.
+   *
+   * @default []
+   */
+  packageDependencies?: Iterable<string>;
 }
 
 export interface EntryFilesRuntimeOptions extends RuntimeOptions {
@@ -48,6 +75,8 @@ export class EntryFilesAnalyser {
   } as const satisfies Record<string, SourceParser>;
 
   #rootPath: string | null = null;
+  #depPathCache = new Map<string, Promise<string | null>>();
+  #packageDependencies: Set<string>;
   astAnalyzer: AstAnalyser;
   allowedExtensions: Set<string>;
   dependencies: DiGraph<VertexDefinition<VertexBody>>;
@@ -64,7 +93,8 @@ export class EntryFilesAnalyser {
       }),
       loadExtensions,
       rootPath = null,
-      ignoreENOENT = false
+      ignoreENOENT = false,
+      packageDependencies = []
     } = options;
 
     this.astAnalyzer = astAnalyzer;
@@ -80,14 +110,17 @@ export class EntryFilesAnalyser {
     this.#rootPath = rootPath === null ?
       null : fileURLToPathExtended(rootPath);
     this.ignoreENOENT = ignoreENOENT;
+    this.#packageDependencies = new Set(packageDependencies);
   }
 
   async* analyse(
     entryFiles: Iterable<string | URL>,
     options: EntryFilesRuntimeOptions = {}
-  ): AsyncGenerator<ReportOnFile & { file: string; }> {
+  ): AsyncGenerator<ReportOnEntryFile> {
     this.dependencies = new DiGraph();
+    this.#depPathCache.clear();
 
+    const generators: AsyncGenerator<ReportOnEntryFile>[] = [];
     for (const entryFile of new Set(entryFiles)) {
       const normalizedEntryFile = this.#normalizeAndCleanEntryFile(entryFile);
 
@@ -95,14 +128,18 @@ export class EntryFilesAnalyser {
         this.ignoreENOENT &&
         !await this.#fileExists(normalizedEntryFile)
       ) {
-        return;
+        continue;
       }
 
-      yield* this.#analyseFile(
+      generators.push(this.#analyseFile(
         normalizedEntryFile,
         this.#getRelativeFilePath(normalizedEntryFile),
         options
-      );
+      ));
+    }
+
+    if (generators.length > 0) {
+      yield* combineAsyncIterators(...generators);
     }
   }
 
@@ -163,30 +200,41 @@ export class EntryFilesAnalyser {
       fileMetadata = () => {
         return {};
       },
+      finalize: userFinalize,
       ...runtimeOptions
     } = options;
-    const finalMetadata = Object.assign(structuredClone(metadata), fileMetadata(file));
+    const finalMetadata = Object.assign(
+      structuredClone(metadata),
+      fileMetadata(file)
+    );
 
+    let fileDependencies = new Set<string>();
     const report = await this.astAnalyzer.analyseFile(
       file,
       {
         ...runtimeOptions,
         metadata: finalMetadata,
-        customParser: this.#getParserFromFileExtension(file)
+        customParser: this.#getParserFromFileExtension(file),
+        finalize: (sourceFile) => {
+          fileDependencies = new Set(sourceFile.dependencies.keys());
+          userFinalize?.(sourceFile);
+        }
       }
     );
     yield { file: relativeFile, ...report };
 
-    const dependencySet = this.astAnalyzer.getCollectableSet("dependency");
-
-    if (!report.ok || typeof dependencySet === "undefined") {
+    if (!report.ok) {
       return;
     }
 
-    for (const name of dependencySet.values()) {
-      const depFile = await this.#getInternalDepPath(
-        path.join(path.dirname(file), name)
-      );
+    const depFiles = await Promise.all(
+      Array.from(fileDependencies)
+        .filter((name) => !this.#packageDependencies.has(name))
+        .map((name) => this.#getInternalDepPath(path.join(path.dirname(file), name)))
+    );
+
+    const generators: AsyncGenerator<ReportOnEntryFile>[] = [];
+    for (const depFile of depFiles) {
       if (depFile === null) {
         continue;
       }
@@ -199,20 +247,32 @@ export class EntryFilesAnalyser {
           body: {}
         });
 
-        yield* this.#analyseFile(
-          depFile,
-          depRelativeFile,
-          options
-        );
+        generators.push(this.#analyseFile(depFile, depRelativeFile, options));
       }
 
-      this.dependencies.addEdge({
-        from: relativeFile, to: depRelativeFile
-      });
+      this.dependencies.addEdge({ from: relativeFile, to: depRelativeFile });
+    }
+
+    if (generators.length > 0) {
+      yield* combineAsyncIterators(...generators);
     }
   }
 
-  async #getInternalDepPath(
+  #getInternalDepPath(
+    filePath: string
+  ): Promise<string | null> {
+    const cached = this.#depPathCache.get(filePath);
+    if (cached !== undefined) {
+      return cached;
+    }
+
+    const promise = this.#resolveInternalDepPath(filePath);
+    this.#depPathCache.set(filePath, promise);
+
+    return promise;
+  }
+
+  async #resolveInternalDepPath(
     filePath: string
   ): Promise<string | null> {
     const fileExtension = path.extname(filePath);
