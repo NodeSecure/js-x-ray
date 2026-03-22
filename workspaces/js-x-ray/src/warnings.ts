@@ -12,7 +12,8 @@ import {
 export type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
-  | "insecure-random";
+  | "insecure-random"
+  | "weak-scrypt";
 
 export type WarningName =
   | "parsing-error"
@@ -146,6 +147,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.prototype_pollution",
     severity: "Warning",
     experimental: false
+  },
+  "weak-scrypt": {
+    i18n: "sast_warnings.weak_scrypt",
+    severity: "Warning",
+    experimental: true
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;
 
