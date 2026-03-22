@@ -14,7 +14,7 @@ import { generateWarning } from "../warnings.ts";
  *
  * @see https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#scrypt
  */
-const OWASP_MIN_PARAMS: [number, number][] = [
+const kOWASPMinParams: [cost: number, parallelization: number][] = [
   [131072, 1],
   [65536, 2],
   [32768, 3],
@@ -22,12 +22,12 @@ const OWASP_MIN_PARAMS: [number, number][] = [
   [8192, 10]
 ];
 
-const MIN_BLOCK_SIZE = 8;
+const kMinBlockSize = 8;
 
 // Node.js crypto.scrypt defaults
-const DEFAULT_COST = 16384;
-const DEFAULT_BLOCK_SIZE = 8;
-const DEFAULT_PARALLELIZATION = 1;
+const kDefaultCost = 16384;
+const kDefaultBlockSize = 8;
+const kDefaultParallelization = 1;
 
 const tracedFunctions = new Set(["crypto.scrypt"]);
 
@@ -50,13 +50,13 @@ function extractNumericParam(
 }
 
 function isWeakScryptParams(N: number, r: number, p: number): boolean {
-  if (r < MIN_BLOCK_SIZE) {
+  if (r < kMinBlockSize) {
     return true;
   }
 
-  for (const [minN, minP] of OWASP_MIN_PARAMS) {
-    if (N >= minN) {
-      return p < minP;
+  for (const [cost, parallelization] of kOWASPMinParams) {
+    if (N >= cost) {
+      return p < parallelization;
     }
   }
 
@@ -113,9 +113,9 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     ) {
       if (
         isWeakScryptParams(
-          costValue ?? DEFAULT_COST,
-          blockSizeValue ?? DEFAULT_BLOCK_SIZE,
-          parallelizationValue ?? DEFAULT_PARALLELIZATION
+          costValue ?? kDefaultCost,
+          blockSizeValue ?? kDefaultBlockSize,
+          parallelizationValue ?? kDefaultParallelization
         )
       ) {
         sourceFile.warnings.push(
