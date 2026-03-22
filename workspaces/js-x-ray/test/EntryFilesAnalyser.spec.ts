@@ -397,4 +397,83 @@ describe("EntryFilesAnalyser", () => {
       await Array.fromAsync(generator);
     });
   });
+
+  describe("stats", () => {
+    it("should return the number of files analyzed and total dependencies", async() => {
+      const entryFilesAnalyser = new EntryFilesAnalyser();
+      const entryUrl = new URL("entry.js", kFixtureURL);
+      const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
+
+      const generator = entryFilesAnalyser.analyse([
+        entryUrl,
+        deepEntryUrl
+      ]);
+      await Array.fromAsync(generator);
+
+      assert.strictEqual(entryFilesAnalyser.stats.filesAnalyzed, 6);
+      assert.strictEqual(entryFilesAnalyser.stats.totalDependencies, 8);
+    });
+
+    it("should return stats for a single entry file with ESM exports", async() => {
+      const entryFilesAnalyser = new EntryFilesAnalyser();
+      const entryUrl = new URL("export.js", kFixtureURL);
+
+      const generator = entryFilesAnalyser.analyse([entryUrl]);
+      await Array.fromAsync(generator);
+
+      assert.strictEqual(entryFilesAnalyser.stats.filesAnalyzed, 2);
+      assert.strictEqual(entryFilesAnalyser.stats.totalDependencies, 2);
+    });
+
+    it("should return stats for recursive dependencies", async() => {
+      const entryFilesAnalyser = new EntryFilesAnalyser({
+        rootPath: kFixtureURL
+      });
+      const entryUrl = new URL("recursive/A.js", kFixtureURL);
+
+      const generator = entryFilesAnalyser.analyse([entryUrl]);
+      await Array.fromAsync(generator);
+
+      assert.strictEqual(entryFilesAnalyser.stats.filesAnalyzed, 2);
+      assert.strictEqual(entryFilesAnalyser.stats.totalDependencies, 2);
+    });
+
+    it("should return zero stats when no files are analyzed", async() => {
+      const entryFilesAnalyser = new EntryFilesAnalyser({
+        ignoreENOENT: true,
+        rootPath: kFixtureURL
+      });
+
+      const entryUrl = new URL("does-not-exists.js", kFixtureURL);
+
+      const generator = entryFilesAnalyser.analyse([entryUrl]);
+      await Array.fromAsync(generator);
+
+      assert.strictEqual(entryFilesAnalyser.stats.filesAnalyzed, 0);
+      assert.strictEqual(entryFilesAnalyser.stats.totalDependencies, 0);
+    });
+
+    it("should reset stats on each analyse call", async() => {
+      const entryFilesAnalyser = new EntryFilesAnalyser();
+
+      // First analysis with multiple entry files
+      const entryUrl = new URL("entry.js", kFixtureURL);
+      const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
+      const generator1 = entryFilesAnalyser.analyse([entryUrl, deepEntryUrl]);
+      await Array.fromAsync(generator1);
+
+      assert.strictEqual(entryFilesAnalyser.stats.filesAnalyzed, 6);
+      assert.strictEqual(entryFilesAnalyser.stats.totalDependencies, 8);
+
+      // Verify stats are correct with a fresh instance
+      const efa2 = new EntryFilesAnalyser();
+      const exportUrl = new URL("export.js", kFixtureURL);
+      const generator2 = efa2.analyse([exportUrl]);
+      await Array.fromAsync(generator2);
+
+      assert.strictEqual(efa2.stats.filesAnalyzed, 2);
+      assert.strictEqual(efa2.stats.totalDependencies, 2);
+    });
+  });
+
 });

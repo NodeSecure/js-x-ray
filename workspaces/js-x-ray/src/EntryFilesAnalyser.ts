@@ -64,6 +64,11 @@ export interface EntryFilesAnalyserOptions {
   packageDependencies?: Iterable<string>;
 }
 
+export interface EntryFilesAnalyserStats {
+  filesAnalyzed: number;
+  totalDependencies: number;
+}
+
 export interface EntryFilesRuntimeOptions extends RuntimeOptions {
   fileMetadata?: (file: string) => Record<string, unknown>;
 }
@@ -80,6 +85,7 @@ export class EntryFilesAnalyser {
   astAnalyzer: AstAnalyser;
   allowedExtensions: Set<string>;
   dependencies: DiGraph<VertexDefinition<VertexBody>>;
+  stats: EntryFilesAnalyserStats;
   ignoreENOENT: boolean;
 
   constructor(
@@ -119,6 +125,7 @@ export class EntryFilesAnalyser {
   ): AsyncGenerator<ReportOnEntryFile> {
     this.dependencies = new DiGraph();
     this.#depPathCache.clear();
+    this.stats = { filesAnalyzed: 0, totalDependencies: 0 };
 
     const generators: AsyncGenerator<ReportOnEntryFile>[] = [];
     for (const entryFile of new Set(entryFiles)) {
@@ -221,11 +228,14 @@ export class EntryFilesAnalyser {
         }
       }
     );
+    this.stats.filesAnalyzed++;
     yield { file: relativeFile, ...report };
 
     if (!report.ok) {
       return;
     }
+
+    this.stats.totalDependencies = fileDependencies.size;
 
     const depFiles = await Promise.all(
       Array.from(fileDependencies)
