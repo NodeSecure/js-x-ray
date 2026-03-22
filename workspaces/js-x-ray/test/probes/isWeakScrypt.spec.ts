@@ -53,7 +53,7 @@ describe("isWeakScrypt", () => {
   });
 
   describe("low-cost", () => {
-    it("should warn when cost option is below 16384", () => {
+    it("should warn when cost option is below the lowest OWASP recommendation (N < 8192)", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 1024 }, (err, key) => {});
@@ -67,10 +67,73 @@ describe("isWeakScrypt", () => {
       assert.strictEqual(outputWarnings[0].value, "low-cost");
     });
 
-    it("should not warn when cost option is 16384 or above", () => {
+    it("should warn when cost option is set without sufficient parallelization (N=16384, default p=1)", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 16384 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-cost");
+    });
+
+    it("should warn when blockSize is below 8", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { N: 131072, r: 4 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-cost");
+    });
+
+    it("should warn when parallelization is below OWASP minimum for given cost (N=8192, p=9)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { N: 8192, p: 9 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-cost");
+    });
+
+    it("should not warn when params meet OWASP minimum (N=16384, p=5)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { cost: 16384, parallelization: 5 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
+    });
+
+    it("should not warn when params meet OWASP minimum (N=131072, p=1)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { N: 131072, p: 1, r: 8 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
+    });
+
+    it("should not warn when params meet OWASP minimum (N=8192, p=10)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { N: 8192, p: 10 }, (err, key) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["weak-scrypt"]
