@@ -49,24 +49,24 @@ function main(
   const salt = node.arguments.at(1);
   const options = node.arguments.at(3);
 
-  if (options && options.type === "ObjectExpression") {                              
-    for (const p of options.properties) {                                            
-      if (                                                                           
-        p.type === "Property"                                                        
-        && p.key.type === "Identifier"                                               
-        && p.key.name === "cost"                                                     
-        && p.value.type === "Literal"                                                
+  if (options && options.type === "ObjectExpression") {
+    for (const p of options.properties) {
+      if (
+        p.type === "Property"
+        && p.key.type === "Identifier"
+        && p.key.name === "cost"
+        && p.value.type === "Literal"
         && typeof p.value.value === "number"
-        && p.value.value < 16384                                                     
-      ) {                                                                            
-        sourceFile.warnings.push(generateWarning("weak-scrypt", {                    
-          value: "low-cost",                                                         
-          location: node.loc                                                         
-        }));                                                                         
-        break;                                                                       
-      }                                                                              
-    }             
-  }      
+        && p.value.value < 16384
+      ) {
+        sourceFile.warnings.push(generateWarning("weak-scrypt", {
+          value: "low-cost",
+          location: node.loc
+        }));
+        break;
+      }
+    }
+  }
 
   if (isLiteral(salt)) {
     if (typeof salt.value === "string" && salt.value.length < 16) {
