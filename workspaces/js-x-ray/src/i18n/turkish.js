@@ -20,7 +20,8 @@ const sast_warnings = {
   log_usage: "Üretim ortamlarında hassas bilgileri ifşa edebilecek console günlükleme yöntemlerinin (log, info, warn, error, debug) kullanımı.",
   sql_injection: "SQL sorgularında (SELECT, INSERT, UPDATE, DELETE) uygun parametreleştirme yapılmadan kullanılan ifadeler içeren şablon dizeleri, potansiyel SQL enjeksiyonu güvenlik açıkları oluşturur.",
   monkey_patch: "Çalışma zamanında yerel prototiplerin veya global nesnelerin değiştirilmesi; akış ele geçirme, global yan etkiler ve kötü niyetli faaliyetlerin gizlenmesi dahil olmak üzere güvenlik riskleri oluşturur.",
-  insecure_random: "Math.random() kullanılarak güvensiz rastgele sayı üretimi. Math.random() kriptografik olarak güvenli değildir ve güvenliğe duyarlı işlemler için kullanılmamalıdır."
+  insecure_random: "Math.random() kullanılarak güvensiz rastgele sayı üretimi. Math.random() kriptografik olarak güvenli değildir ve güvenliğe duyarlı işlemler için kullanılmamalıdır.",
+  weak_scrypt: "crypto.scrypt() veya crypto.scryptSync() fonksiyonlarının sabit kodlanmış tuz, kısa tuz (16 bayttan az) veya yetersiz maliyet parametresi (16384'ün altında) gibi güvensiz parametrelerle kullanımı. Bu zayıf yapılandırmalar, parola tabanlı anahtar türetme güvenliğini tehlikeye atar."
 };
 
 export default {

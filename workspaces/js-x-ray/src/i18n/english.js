@@ -20,7 +20,8 @@ const sast_warnings = {
   log_usage: "Usage of console logging methods (log, info, warn, error, debug) that may expose sensitive information in production environments.",
   sql_injection: "Template literals with interpolated expressions in SQL queries (SELECT, INSERT, UPDATE, DELETE) without proper parameterization, creating potential SQL injection vulnerabilities.",
   monkey_patch: "Modification of native prototypes or global objects at runtime, which introduces security risks including flow hijacking, global side effects, and potential concealment of malicious activities.",
-  insecure_random: "Usage of insecure random number generation using Math.random(). Math.random() is not cryptographically secure and should not be used for security-sensitive operations."
+  insecure_random: "Usage of insecure random number generation using Math.random(). Math.random() is not cryptographically secure and should not be used for security-sensitive operations.",
+  weak_scrypt: "Usage of crypto.scrypt() or crypto.scryptSync() with insecure parameters such as hardcoded salt, short salt (less than 16 bytes), or insufficient cost parameter (below 16384). These weak configurations compromise the security of password-based key derivation."
 };
 
 export default {
