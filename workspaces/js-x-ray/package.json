@@ -53,7 +53,7 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "@typescript-eslint/typescript-estree": "8.57.0",
+    "@typescript-eslint/typescript-estree": "8.57.1",
     "combine-async-iterators": "3.0.0",
     "digraph-js": "2.2.4",
     "frequency-set": "^2.1.0",
