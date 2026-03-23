@@ -81,6 +81,7 @@ export class EntryFilesAnalyser {
 
   #rootPath: string | null = null;
   #depPathCache = new Map<string, Promise<string | null>>();
+  #allDependencies = new Set<string>();
   #packageDependencies: Set<string>;
   astAnalyzer: AstAnalyser;
   allowedExtensions: Set<string>;
@@ -118,6 +119,7 @@ export class EntryFilesAnalyser {
     this.ignoreENOENT = ignoreENOENT;
     this.#packageDependencies = new Set(packageDependencies);
     this.stats = { filesAnalyzed: 0, totalDependencies: 0 };
+    this.#allDependencies = new Set<string>();
   }
 
   async* analyse(
@@ -127,6 +129,7 @@ export class EntryFilesAnalyser {
     this.dependencies = new DiGraph();
     this.#depPathCache.clear();
     this.stats = { filesAnalyzed: 0, totalDependencies: 0 };
+    this.#allDependencies = new Set<string>();
 
     const generators: AsyncGenerator<ReportOnEntryFile>[] = [];
     for (const entryFile of new Set(entryFiles)) {
@@ -236,7 +239,10 @@ export class EntryFilesAnalyser {
       return;
     }
 
-    this.stats.totalDependencies = fileDependencies.size;
+    for (const dep of fileDependencies) {
+      this.#allDependencies.add(dep);
+    }
+    this.stats.totalDependencies = this.#allDependencies.size;
 
     const depFiles = await Promise.all(
       Array.from(fileDependencies)

@@ -86,8 +86,8 @@ The `stats` property provides analysis statistics after calling `analyse()`. It 
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `filesAnalyzed` | `number` | Number of files successfully yielded during analysis |
-| `totalDependencies` | `number` | Number of unique dependencies found across all analyzed files |
+| `filesAnalyzed` | `number` | Number of files processed during analysis (including parse failures) |
+| `totalDependencies` | `number` | Number of unique dependency names found across all successfully analyzed files |
 
 ```js
 const efa = new EntryFilesAnalyser();
