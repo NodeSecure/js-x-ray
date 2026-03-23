@@ -93,15 +93,21 @@ interface Report {
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
+  /** Wall-clock analysis time in milliseconds (excludes file I/O). */
+  executionTime: number;
 }
 
 type ReportOnFile = {
   ok: true,
   warnings: Warning[];
   flags: Set<SourceFlags>;
+  /** Wall-clock time including file I/O and analysis, in milliseconds. */
+  executionTime: number;
 } | {
   ok: false,
   warnings: Warning[];
+  /** Wall-clock time including file I/O and analysis, in milliseconds. */
+  executionTime: number;
 }
 ```
 

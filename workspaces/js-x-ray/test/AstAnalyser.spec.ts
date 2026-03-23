@@ -93,6 +93,13 @@ describe("AstAnalyser", () => {
   });
 
   describe("analyse", () => {
+    it("should return executionTime as a non-negative number", () => {
+      const result = getAnalyser().analyse("const foo = 'bar';");
+
+      assert.strictEqual(typeof result.executionTime, "number");
+      assert.ok(result.executionTime >= 0, "executionTime should be non-negative");
+    });
+
     it("should return all dependencies required at runtime", () => {
       const dependencySet = new DefaultCollectableSet<Dependency>("dependency");
       const { warnings } = new AstAnalyser({
@@ -355,6 +362,28 @@ describe("AstAnalyser", () => {
   });
 
   describe("analyseFile", () => {
+    it("should return executionTime as a non-negative number on success", async() => {
+      const result = await new AstAnalyser().analyseFile(
+        new URL("depName.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(typeof result.executionTime, "number");
+      assert.ok(result.executionTime >= 0, "executionTime should be non-negative");
+    });
+
+    it("should return executionTime as a non-negative number on failure", async() => {
+      const result = await new AstAnalyser().analyseFile(
+        new URL("parsingError.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(typeof result.executionTime, "number");
+      assert.ok(result.executionTime >= 0, "executionTime should be non-negative");
+    });
+
     it("should detect typescript extension and use TsSourceParser automatically", async() => {
       const result = await new AstAnalyser().analyseFile(
         new URL("test.ts", kFixtureURL),
@@ -613,6 +642,28 @@ describe("AstAnalyser", () => {
   });
 
   describe("analyseFileSync", () => {
+    it("should return executionTime as a non-negative number on success", () => {
+      const result = new AstAnalyser().analyseFileSync(
+        new URL("depName.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.ok(result.ok);
+      assert.strictEqual(typeof result.executionTime, "number");
+      assert.ok(result.executionTime >= 0, "executionTime should be non-negative");
+    });
+
+    it("should return executionTime as a non-negative number on failure", () => {
+      const result = new AstAnalyser().analyseFileSync(
+        new URL("parsingError.js", kFixtureURL),
+        { packageName: "foobar" }
+      );
+
+      assert.strictEqual(result.ok, false);
+      assert.strictEqual(typeof result.executionTime, "number");
+      assert.ok(result.executionTime >= 0, "executionTime should be non-negative");
+    });
+
     it("should detect typescript extension and use TsSourceParser automatically", () => {
       const result = new AstAnalyser().analyseFileSync(
         new URL("test.ts", kFixtureURL),
