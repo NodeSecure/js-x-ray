@@ -171,4 +171,15 @@ describe("isMonkeyPatch probe", () => {
 
     t.assert.equal(monkeyPatchWarning, undefined);
   });
+
+  test("should NOT detect Object.defineProperty on a static property (no prototype)", (t) => {
+    const str = "Object.defineProperty(Array, 'newStaticMethod', { value: 1 });";
+
+    const astAnalysis = new AstAnalyser();
+    const { warnings } = astAnalysis.analyse(str);
+
+    const monkeyPatchWarning = warnings.find((warning) => warning.kind === "monkey-patch");
+
+    t.assert.equal(monkeyPatchWarning, undefined);
+  });
 });
