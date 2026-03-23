@@ -93,15 +93,18 @@ interface Report {
   flags: Set<SourceFlags>;
   idsLengthAvg: number;
   stringScore: number;
+  executionTime: number;
 }
 
 type ReportOnFile = {
   ok: true,
   warnings: Warning[];
   flags: Set<SourceFlags>;
+  executionTime: number;
 } | {
   ok: false,
   warnings: Warning[];
+  executionTime: number;
 }
 ```
 
