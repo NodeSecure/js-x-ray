@@ -475,5 +475,4 @@ describe("EntryFilesAnalyser", () => {
       assert.strictEqual(efa2.stats.totalDependencies, 2);
     });
   });
-
 });

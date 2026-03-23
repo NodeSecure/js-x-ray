@@ -57,10 +57,16 @@ type ReportOnEntryFile = ReportOnFile & {
   file: string;
 };
 
+interface EntryFilesAnalyserStats {
+  filesAnalyzed: number;
+  totalDependencies: number;
+}
+
 declare class EntryFilesAnalyser {
   public astAnalyzer: AstAnalyser;
   public allowedExtensions: Set<string>;
   public dependencies: DiGraph<VertexDefinition<VertexBody>>;
+  public stats: EntryFilesAnalyserStats;
 
   constructor(options?: EntryFilesAnalyserOptions);
 
@@ -72,6 +78,23 @@ declare class EntryFilesAnalyser {
     options?: RuntimeOptions
   ): AsyncGenerator<ReportOnEntryFile>;
 }
+```
+
+### stats
+
+The `stats` property provides analysis statistics after calling `analyse()`. It is reset at the beginning of each `analyse()` call.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `filesAnalyzed` | `number` | Number of files successfully yielded during analysis |
+| `totalDependencies` | `number` | Number of unique dependencies found across all analyzed files |
+
+```js
+const efa = new EntryFilesAnalyser();
+await Array.fromAsync(efa.analyse(["./index.js"]));
+
+console.log(efa.stats.filesAnalyzed);
+console.log(efa.stats.totalDependencies);
 ```
 
 For more informations about `Report` and `ReportOnFile` interfaces please see [AstAnalyser documentation](./AstAnalyser.md)
