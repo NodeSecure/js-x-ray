@@ -74,6 +74,10 @@ export class ProbeRunner {
   probes: Probe[];
   sourceFile: SourceFile;
   #selectedEntryPoints: Map<Probe, string> = new Map();
+  #breakGroups = new Set<string>();
+  #probeValidateFns = new Map<Probe, ProbeValidationCallback[]>();
+  #probeCtx = new Map<Probe, ProbeContext>();
+  #probeMainCtx = new Map<Probe, ProbeMainContext>();
 
   static Signals = Object.freeze({
     Break: Symbol.for("breakWalk"),
@@ -136,6 +140,32 @@ export class ProbeRunner {
         typeof probe.initialize === "function" || probe.initialize === undefined,
         `Invalid probe ${probe.name}: initialize must be a function or undefined`
       );
+
+      // Pre-build per-probe caches before calling initialize so #getProbeContext can use them.
+      const setEntryPoint = (handlerName: string) => {
+        if (typeof probe.main === "object") {
+          this.#selectedEntryPoints.set(probe, handlerName);
+        }
+      };
+      const ctx: ProbeContext = {
+        sourceFile: this.sourceFile,
+        context: probe.context,
+        setEntryPoint
+      };
+      const mainCtx: ProbeMainContext = {
+        sourceFile: this.sourceFile,
+        context: probe.context,
+        setEntryPoint,
+        signals: ProbeRunner.Signals,
+        data: null
+      };
+      this.#probeCtx.set(probe, ctx);
+      this.#probeMainCtx.set(probe, mainCtx);
+      this.#probeValidateFns.set(
+        probe,
+        Array.isArray(probe.validateNode) ? probe.validateNode : [probe.validateNode]
+      );
+
       if (probe.initialize) {
         const isDefined = Reflect.defineProperty(probe, kProbeOriginalContext, {
           enumerable: false,
@@ -147,9 +177,17 @@ export class ProbeRunner {
           throw new Error(`Failed to define original context for probe '${probe.name}'`);
         }
 
-        const context = probe.initialize(this.#getProbeContext(probe));
+        // Pass a fresh object for initialize so any captured reference reflects
+        // the state at call-time (probe.context is undefined before initialize returns).
+        const context = probe.initialize({
+          sourceFile: this.sourceFile,
+          context: probe.context,
+          setEntryPoint
+        });
         if (context) {
           probe.context = structuredClone(context);
+          ctx.context = probe.context;
+          mainCtx.context = probe.context;
         }
       }
     }
@@ -160,17 +198,10 @@ export class ProbeRunner {
   #getProbeContext(
     probe: Probe
   ): ProbeContext {
-    const setEntryPoint = (handlerName: string) => {
-      if (typeof probe.main === "object") {
-        this.#selectedEntryPoints.set(probe, handlerName);
-      }
-    };
+    const ctx = this.#probeCtx.get(probe)!;
+    ctx.context = probe.context;
 
-    return {
-      sourceFile: this.sourceFile,
-      context: probe.context,
-      setEntryPoint
-    };
+    return ctx;
   }
 
   #getProbeHandler(
@@ -192,8 +223,7 @@ export class ProbeRunner {
     probe: Probe,
     node: ESTree.Node
   ): ProbeReturn {
-    const validationFns = Array.isArray(probe.validateNode) ?
-      probe.validateNode : [probe.validateNode];
+    const validationFns = this.#probeValidateFns.get(probe)!;
     const ctx = this.#getProbeContext(probe);
 
     for (const validateNode of validationFns) {
@@ -208,11 +238,11 @@ export class ProbeRunner {
       const mainHandler = this.#getProbeHandler(probe);
       this.#selectedEntryPoints.delete(probe);
 
-      return mainHandler(node, {
-        ...ctx,
-        signals: ProbeRunner.Signals,
-        data
-      });
+      const mainCtx = this.#probeMainCtx.get(probe)!;
+      mainCtx.context = probe.context;
+      mainCtx.data = data;
+
+      return mainHandler(node, mainCtx);
     }
 
     return null;
@@ -221,7 +251,7 @@ export class ProbeRunner {
   walk(
     node: ESTree.Node
   ): null | "skip" {
-    const breakGroups = new Set<string>();
+    this.#breakGroups.clear();
 
     let tracedIdentifierReport: TracedIdentifierReport | null | undefined;
     let tracedIdentifier: string | null | undefined;
@@ -237,7 +267,7 @@ export class ProbeRunner {
     }
 
     for (const probe of this.probes) {
-      if (probe.breakGroup && breakGroups.has(probe.breakGroup)) {
+      if (probe.breakGroup && this.#breakGroups.has(probe.breakGroup)) {
         continue;
       }
 
@@ -262,7 +292,7 @@ export class ProbeRunner {
             break;
           }
           else {
-            breakGroups.add(breakGroup);
+            this.#breakGroups.add(breakGroup);
           }
         }
       }

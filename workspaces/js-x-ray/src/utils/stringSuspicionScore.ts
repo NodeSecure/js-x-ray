@@ -12,6 +12,12 @@ function stringLength(
     return 0;
   }
 
+  // Fast path: ASCII-only strings have grapheme count === char count
+  // eslint-disable-next-line no-control-regex
+  if (string.length <= 128 || !/[^\u0000-\u007F]/.test(string)) {
+    return string.length;
+  }
+
   let length = 0;
   for (const _ of kLenSegmenter.segment(string)) {
     length++;
@@ -31,7 +37,9 @@ export function stringCharDiversity(
   charsToExclude: Iterable<string> = []
 ): number {
   const data = new Set(str);
-  [...charsToExclude].forEach((char) => data.delete(char));
+  for (const char of charsToExclude) {
+    data.delete(char);
+  }
 
   return data.size;
 }

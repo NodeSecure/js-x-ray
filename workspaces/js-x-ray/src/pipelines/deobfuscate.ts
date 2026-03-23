@@ -1,6 +1,5 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import { joinArrayExpression } from "../estree/index.ts";
@@ -34,11 +33,9 @@ export class Deobfuscate implements Pipeline {
         return;
       }
 
-      match(node)
-        .with({ type: "CallExpression" }, (node) => {
-          this.replaceAndSkip(self.#withCallExpression(node));
-        })
-        .otherwise(() => void 0);
+      if (node.type === "CallExpression") {
+        this.replaceAndSkip(self.#withCallExpression(node));
+      }
     });
 
     return body;

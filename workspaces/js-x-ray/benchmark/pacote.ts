@@ -24,7 +24,13 @@ const kNpmToken = typeof process.env.NODE_SECURE_TOKEN === "string" ?
   {};
 const kPackageSpecs = [
   "typescript@5.9.3",
-  "vis-data@8.0.3"
+  "vis-network@10.0.2",
+  "vis-data@8.0.3",
+  "debug@4.4.3",
+  "chokidar@5.0.0",
+  "glob@13.0.6",
+  "regexp-tree@0.1.27",
+  "pino-std-serializers@7.1.0"
 ];
 
 await using tmpDir = await fs.mkdtempDisposable(

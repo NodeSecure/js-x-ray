@@ -1,6 +1,5 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import { match } from "ts-pattern";
 
 // Import Internal Dependencies
 import { getVariableDeclarationIdentifiers } from "./estree/index.ts";
@@ -116,7 +115,7 @@ export class Deobfuscator {
   #isMorse(
     str: string
   ): boolean {
-    return /^[.-]{1,5}(?:[\s\t]+[.-]{1,5})*(?:[\s\t]+[.-]{1,5}(?:[\s\t]+[.-]{1,5})*)*$/g.test(str);
+    return /^[.-]{1,5}(?:[\s\t]+[.-]{1,5})*(?:[\s\t]+[.-]{1,5}(?:[\s\t]+[.-]{1,5})*)*$/.test(str);
   }
 
   analyzeString(
@@ -143,12 +142,23 @@ export class Deobfuscator {
   walk(
     node: ESTree.Node
   ): void {
-    const nodesToExtract = match(node)
-      .with({ type: "ClassDeclaration" }, (node) => [node.id, node.superClass])
-      .with({ type: "FunctionDeclaration" }, (node) => node.params)
-      .with({ type: "FunctionExpression" }, (node) => node.params)
-      .with({ type: "MethodDefinition" }, (node) => [node.key])
-      .otherwise(() => []);
+    let nodesToExtract: (ESTree.Node | null | undefined)[];
+    switch (node.type) {
+      case "ClassDeclaration":
+        nodesToExtract = [node.id, node.superClass];
+        break;
+      case "FunctionDeclaration":
+        nodesToExtract = node.params;
+        break;
+      case "FunctionExpression":
+        nodesToExtract = node.params;
+        break;
+      case "MethodDefinition":
+        nodesToExtract = [node.key];
+        break;
+      default:
+        nodesToExtract = [];
+    }
 
     const isFunctionParams =
       node.type === "FunctionDeclaration" ||
@@ -159,7 +169,7 @@ export class Deobfuscator {
         name,
         type: isFunctionParams ? "FunctionParams" : node.type
       }),
-      nodesToExtract
+      nodesToExtract.filter((n) => n !== undefined)
     );
 
     this.#counters.forEach((counter) => counter.walk(node));

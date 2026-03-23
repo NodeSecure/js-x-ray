@@ -1,9 +1,18 @@
+/* eslint-disable @stylistic/max-len */
 export interface Base64Options {
   allowMime?: boolean;
   mimeRequired?: boolean;
   paddingRequired?: boolean;
   allowEmpty?: boolean;
 }
+
+// CONSTANTS
+const kDefaultBase64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/i;
+const kBase64NoPaddingRegex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}(==)?|[A-Za-z0-9+/]{3}=?)?$/i;
+const kBase64AllowMimeRegex = /^(data:\w+\/[a-zA-Z+\-.]+;base64,)?(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/i;
+const kBase64AllowMimeNoPaddingRegex = /^(data:\w+\/[a-zA-Z+\-.]+;base64,)?(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}(==)?|[A-Za-z0-9+/]{3}=?)?$/i;
+const kBase64RequireMimeRegex = /^(data:\w+\/[a-zA-Z+\-.]+;base64,)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/i;
+const kBase64RequireMimeNoPaddingRegex = /^(data:\w+\/[a-zA-Z+\-.]+;base64,)(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}(==)?|[A-Za-z0-9+/]{3}=?)?$/i;
 
 export function isStringBase64(
   v: string,
@@ -13,19 +22,23 @@ export function isStringBase64(
     return false;
   }
 
-  let regex = "(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+\\/]{3}=)?";
-  const mimeRegex = "(data:\\w+\\/[a-zA-Z\\+\\-\\.]+;base64,)";
-
   if (opts.mimeRequired === true) {
-    regex = mimeRegex + regex;
-  }
-  else if (opts.allowMime === true) {
-    regex = mimeRegex + "?" + regex;
+    return opts.paddingRequired === false
+      ? kBase64RequireMimeNoPaddingRegex.test(v)
+      : kBase64RequireMimeRegex.test(v);
   }
 
+  if (opts.allowMime === true) {
+    return opts.paddingRequired === false
+      ? kBase64AllowMimeNoPaddingRegex.test(v)
+      : kBase64AllowMimeRegex.test(v);
+  }
+
+  // paddingRequired === false (no mime)
   if (opts.paddingRequired === false) {
-    regex = "(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}(==)?|[A-Za-z0-9+\\/]{3}=?)?";
+    return kBase64NoPaddingRegex.test(v);
   }
 
-  return (new RegExp("^" + regex + "$", "gi")).test(v);
+  // Default: no mime, padding required
+  return kDefaultBase64Regex.test(v);
 }

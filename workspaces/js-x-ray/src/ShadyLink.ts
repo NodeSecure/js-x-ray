@@ -7,6 +7,7 @@ import { toArrayLocation, type SourceArrayLocation } from "./utils/toArrayLocati
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
 // CONSTANTS
+const kIPv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
 const kShadyLinkRegExps = [
   /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org|api\.ipify\.org).*)$/,
   /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|ws|icu|cam|uno|email|stream))$/
@@ -124,8 +125,19 @@ export class ShadyLink {
     return { safe: !isShadyLink };
   }
 
-  static isValidIPAddress(input: string) {
-    return /\D/.test(input) && ipaddress.isValid(input);
+  static isValidIPAddress(input: string): boolean {
+    if (input.length > 45 || /\s/.test(input)) {
+      return false;
+    }
+
+    // Fast path: IPv4 via regex (avoids expensive ipaddr.js parser)
+    const ipv4Match = kIPv4Regex.exec(input);
+    if (ipv4Match !== null) {
+      return ipv4Match.slice(1).every((octet) => Number(octet) <= 255);
+    }
+
+    // IPv6 — still delegate to ipaddr.js
+    return input.includes(":") && ipaddress.isValid(input);
   }
 
   static isIpAddressSafe(
