@@ -87,7 +87,7 @@ describe("isMonkeyPatch probe", () => {
   });
 
   test("should detect monkey patching via variable re-assignment (VariableTracer)", (t) => {
-    const str = `const Arr = Array;\nArr.prototype.map = function() {};`;
+    const str = "const Arr = Array;\nArr.prototype.map = function() {};";
 
     const astAnalysis = new AstAnalyser();
     const { warnings } = astAnalysis.analyse(str);
@@ -102,7 +102,7 @@ describe("isMonkeyPatch probe", () => {
   });
 
   test("should detect monkey patching via chained variable re-assignment", (t) => {
-    const str = `const A = Array;\nconst B = A;\nB.prototype.includes = function() {};`;
+    const str = "const A = Array;\nconst B = A;\nB.prototype.includes = function() {};";
 
     const astAnalysis = new AstAnalyser();
     const { warnings } = astAnalysis.analyse(str);
@@ -151,7 +151,7 @@ describe("isMonkeyPatch probe", () => {
   });
 
   test("should NOT detect monkey patching for non-native types", (t) => {
-    const str = `const MyClass = class {};\nMyClass.prototype.foo = function() {};`;
+    const str = "const MyClass = class {};\nMyClass.prototype.foo = function() {};";
 
     const astAnalysis = new AstAnalyser();
     const { warnings } = astAnalysis.analyse(str);
