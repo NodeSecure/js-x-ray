@@ -226,6 +226,15 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+      "login": "HoyeongJeon",
+      "name": "HoyeongJeon",
+      "avatar_url": "https://avatars.githubusercontent.com/u/78394999?v=4",
+      "profile": "https://securityinit.tistory.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
