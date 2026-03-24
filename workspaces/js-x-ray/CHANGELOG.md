@@ -1,5 +1,21 @@
 # @nodesecure/js-x-ray
 
+## 14.3.0
+
+### Minor Changes
+
+- [#574](https://github.com/NodeSecure/js-x-ray/pull/574) [`c9f3d16`](https://github.com/NodeSecure/js-x-ray/commit/c9f3d16a267a62d748f7ac336d87db0569558799) Thanks [@cskwork](https://github.com/cskwork)! - feat(js-x-ray): return executionTime in AstAnalyser report
+
+- [#579](https://github.com/NodeSecure/js-x-ray/pull/579) [`396fe8a`](https://github.com/NodeSecure/js-x-ray/commit/396fe8ad09b3fad0371dab8acaa3fc8c77103b43) Thanks [@fraxken](https://github.com/fraxken)! - Add new real-package benchmark and optimize EntryFilesAnalyser
+
+- [#578](https://github.com/NodeSecure/js-x-ray/pull/578) [`fa4ecdd`](https://github.com/NodeSecure/js-x-ray/commit/fa4ecdd672ab08c382b7adecee06aead4c0b598a) Thanks [@HoyeongJeon](https://github.com/HoyeongJeon)! - Add weak-scrypt detection probe for crypto.scrypt() misuse
+
+- [#577](https://github.com/NodeSecure/js-x-ray/pull/577) [`1d9a9f8`](https://github.com/NodeSecure/js-x-ray/commit/1d9a9f8e35c76bd69d2b5c2e1cbf80f2f029a618) Thanks [@cskwork](https://github.com/cskwork)! - feat(js-x-ray): enhance monkey patch detection with VariableTracer
+
+### Patch Changes
+
+- [#581](https://github.com/NodeSecure/js-x-ray/pull/581) [`a428043`](https://github.com/NodeSecure/js-x-ray/commit/a4280438669a475901a24d91ac7d75f2588b8c4f) Thanks [@fraxken](https://github.com/fraxken)! - Speedup implemetation by a factor between x2 and x3
+
 ## 14.2.0
 
 ### Minor Changes
