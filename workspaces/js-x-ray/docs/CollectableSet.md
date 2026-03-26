@@ -89,8 +89,22 @@ export type Location<T = Record<string, unknown>> = {
   metadata?: T;
 };
 
+export type CollectableSetData<T = Record<string, unknown>> = {
+  type: Type;
+  entries: Array<{ value: string; locations: Location<T>[]; }>;
+};
+
 export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
   constructor(type: Type);
+
+  static mergeData<T>(
+    set: CollectableSet<T>,
+    data: CollectableSetData<T>
+  ): CollectableSet<T>;
+
+  static fromJSON<T>(data: CollectableSetData<T>): DefaultCollectableSet<T>;
+
+  toJSON(): CollectableSetData<T>;
 
   *[Symbol.iterator](): Generator<{
     value: string;
@@ -132,6 +146,38 @@ for (const { value, locations } of hostnames) {
   }
 }
 ```
+
+### Serialization
+
+`DefaultCollectableSet` supports full serialization to and from plain JSON objects via `toJSON()` and `fromJSON()`.
+
+`toJSON()` produces a plain `CollectableSetData<T>` object that is safe to pass to `JSON.stringify`. `fromJSON()` reconstructs a `DefaultCollectableSet` from that snapshot.
+
+```ts
+const original = new DefaultCollectableSet("hostname");
+original.add("example.com", { file: "index.js", location: [[0, 0], [0, 11]] });
+
+// Serialize
+const snapshot = JSON.stringify(original);
+
+// Restore
+const restored = DefaultCollectableSet.fromJSON(JSON.parse(snapshot));
+```
+
+#### `mergeData`
+
+This is useful when you want to accumulate data from multiple snapshots into a single live set, or when you implement `CollectableSet` yourself and need to hydrate it from serialized data.
+
+```ts
+const live = new DefaultCollectableSet("url");
+
+// Populate from two previously serialized snapshots
+for (const snapshot of snapshots) {
+  DefaultCollectableSet.mergeData(live, snapshot);
+}
+```
+
+`mergeData` expands the `location` arrays stored in each `CollectableSetData` entry back into individual `add()` calls, so the resulting set behaves identically to one that was built by recording each occurrence one at a time.
 
 ### EntryFilesAnalyser
 
