@@ -38,6 +38,25 @@ export class DefaultCollectableSet<
   #entries: Map<string, Entry<T>[]> = new Map();
   type: Type;
 
+  static mergeData<T>(
+    set: CollectableSet<T>,
+    data: CollectableSetData<T>
+  ): CollectableSet<T> {
+    for (const { value, locations } of data.entries) {
+      for (const { file, location, metadata } of locations) {
+        for (const loc of location) {
+          set.add(value, {
+            file,
+            location: loc,
+            ...(metadata && { metadata })
+          });
+        }
+      }
+    }
+
+    return set;
+  }
+
   constructor(
     type: Type
   ) {
@@ -70,18 +89,7 @@ export class DefaultCollectableSet<
     data: CollectableSetData<T>
   ): DefaultCollectableSet<T> {
     const set = new DefaultCollectableSet<T>(data.type);
-
-    for (const { value, locations } of data.entries) {
-      for (const { file, location, metadata } of locations) {
-        for (const loc of location) {
-          set.add(value, {
-            file,
-            location: loc,
-            ...(metadata && { metadata })
-          });
-        }
-      }
-    }
+    DefaultCollectableSet.mergeData(set, data);
 
     return set;
   }

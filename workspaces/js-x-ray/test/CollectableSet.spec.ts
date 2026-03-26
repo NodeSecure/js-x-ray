@@ -116,6 +116,135 @@ describe("DefaultCollectableSet", () => {
     });
   });
 
+  describe("mergeData", () => {
+    test("should return the same set instance that was passed in", () => {
+      const set = new DefaultCollectableSet("url");
+      const data = set.toJSON();
+
+      const returned = DefaultCollectableSet.mergeData(set, data);
+
+      assert.strictEqual(returned, set);
+    });
+
+    test("should populate an empty set from CollectableSetData", () => {
+      const set = new DefaultCollectableSet<{ spec: string; }>("url");
+
+      DefaultCollectableSet.mergeData(set, {
+        type: "url",
+        entries: [
+          {
+            value: "https://example.com",
+            locations: [
+              { file: "str.js", location: [[[0, 0], [0, 10]]], metadata: { spec: "react@19.0.1" } }
+            ]
+          }
+        ]
+      });
+
+      assert.deepEqual(Array.from(set), [
+        {
+          value: "https://example.com",
+          locations: [
+            { file: "str.js", location: [[[0, 0], [0, 10]]], metadata: { spec: "react@19.0.1" } }
+          ]
+        }
+      ]);
+    });
+
+    test("should accumulate into a set that already has entries", () => {
+      const set = new DefaultCollectableSet("hostname");
+      set.add("example.com", { file: "a.js", location: [[0, 0], [0, 11]] });
+
+      DefaultCollectableSet.mergeData(set, {
+        type: "hostname",
+        entries: [
+          {
+            value: "other.com",
+            locations: [{ file: "b.js", location: [[[1, 0], [1, 9]]] }]
+          }
+        ]
+      });
+
+      assert.deepEqual(Array.from(set.values()), ["example.com", "other.com"]);
+    });
+
+    test("should expand multiple locations within a single location entry", () => {
+      const set = new DefaultCollectableSet("url");
+
+      DefaultCollectableSet.mergeData(set, {
+        type: "url",
+        entries: [
+          {
+            value: "https://example.com",
+            locations: [
+              {
+                file: "str.js",
+                location: [[[0, 0], [0, 10]], [[5, 0], [5, 10]]]
+              }
+            ]
+          }
+        ]
+      });
+
+      assert.deepEqual(Array.from(set), [
+        {
+          value: "https://example.com",
+          locations: [
+            { file: "str.js", location: [[[0, 0], [0, 10]]] },
+            { file: "str.js", location: [[[5, 0], [5, 10]]] }
+          ]
+        }
+      ]);
+    });
+
+    test("should handle entries without metadata", () => {
+      const set = new DefaultCollectableSet("dependency");
+
+      DefaultCollectableSet.mergeData(set, {
+        type: "dependency",
+        entries: [
+          {
+            value: "lodash",
+            locations: [{ file: null, location: [[[3, 0], [3, 20]]] }]
+          }
+        ]
+      });
+
+      assert.deepEqual(Array.from(set), [
+        {
+          value: "lodash",
+          locations: [{ file: null, location: [[[3, 0], [3, 20]]] }]
+        }
+      ]);
+    });
+
+    test("should handle an empty entries array without error", () => {
+      const set = new DefaultCollectableSet("ip");
+
+      DefaultCollectableSet.mergeData(set, { type: "ip", entries: [] });
+
+      assert.deepEqual(Array.from(set), []);
+    });
+
+    test("should be compatible with toJSON output (round-trip via mergeData)", () => {
+      const original = new DefaultCollectableSet<{ spec: string; }>("url");
+      original.add("https://example.com", {
+        file: "str.js",
+        location: [[0, 0], [0, 10]],
+        metadata: { spec: "react@19.0.1" }
+      });
+      original.add("https://other.com", {
+        file: null,
+        location: [[2, 0], [2, 18]]
+      });
+
+      const target = new DefaultCollectableSet<{ spec: string; }>("url");
+      DefaultCollectableSet.mergeData(target, original.toJSON());
+
+      assert.deepEqual(Array.from(target), Array.from(original));
+    });
+  });
+
   describe("add", () => {
     test("should get the type of the given CollectableSet", () => {
       const collectableSet = new DefaultCollectableSet("url");
