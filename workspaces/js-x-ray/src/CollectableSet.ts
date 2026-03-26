@@ -15,14 +15,27 @@ export type CollectableInfos<T = Record<string, unknown>> = {
   location: SourceArrayLocation;
 };
 
+export type CollectableSetData<T = Record<string, unknown>> = {
+  type: Type;
+  entries: Array<{ value: string; locations: Location<T>[]; }>;
+};
+
 export interface CollectableSet<T = Record<string, unknown>> {
-  add(value: string, infos: CollectableInfos<T>): void;
+  add(
+    value: string,
+    infos: CollectableInfos<T>
+  ): void;
+  toJSON(): CollectableSetData<T>;
   type: Type;
   values(): Iterable<string>;
 }
 
-export class DefaultCollectableSet<T = Record<string, unknown>> implements CollectableSet<T> {
-  #entries: Map<string, Map<string | null, { location: SourceArrayLocation; metadata?: T; }[]>> = new Map();
+type Entry<T> = { file: string | null; location: SourceArrayLocation; metadata?: T; };
+
+export class DefaultCollectableSet<
+  T = Record<string, unknown>
+> implements CollectableSet<T> {
+  #entries: Map<string, Entry<T>[]> = new Map();
   type: Type;
 
   constructor(
@@ -31,22 +44,46 @@ export class DefaultCollectableSet<T = Record<string, unknown>> implements Colle
     this.type = type;
   }
 
-  add(value: string, { file = null, location, metadata }: CollectableInfos<T>) {
-    if (!this.#entries.has(value)) {
-      this.#entries.set(value, new Map([[file, [{ location, metadata }]]]));
+  add(
+    value: string,
+    { file = null, location, metadata }: CollectableInfos<T>
+  ) {
+    const entry: Entry<T> = { file, location, ...(metadata && { metadata }) };
+    const entries = this.#entries.get(value);
 
-      return;
+    if (entries) {
+      entries.push(entry);
+    }
+    else {
+      this.#entries.set(value, [entry]);
+    }
+  }
+
+  toJSON(): CollectableSetData<T> {
+    return {
+      type: this.type,
+      entries: [...this]
+    };
+  }
+
+  static fromJSON<T>(
+    data: CollectableSetData<T>
+  ): DefaultCollectableSet<T> {
+    const set = new DefaultCollectableSet<T>(data.type);
+
+    for (const { value, locations } of data.entries) {
+      for (const { file, location, metadata } of locations) {
+        for (const loc of location) {
+          set.add(value, {
+            file,
+            location: loc,
+            ...(metadata && { metadata })
+          });
+        }
+      }
     }
 
-    const files = this.#entries.get(value);
-
-    if (files?.has(file)) {
-      files?.get(file)?.push({ location, metadata });
-
-      return;
-    }
-
-    files?.set(file, [{ location, metadata }]);
+    return set;
   }
 
   values(): Iterable<string> {
@@ -54,21 +91,16 @@ export class DefaultCollectableSet<T = Record<string, unknown>> implements Colle
   }
 
   * [Symbol.iterator]() {
-    for (const [value, files] of this.#entries) {
-      const locations: Location<T>[] = [];
-
-      for (const [file, locs] of files) {
-        for (const { location, metadata } of locs) {
-          locations.push({
+    for (const [value, entries] of this.#entries) {
+      yield {
+        value,
+        locations: entries.map(({ file, location, metadata }): Location<T> => {
+          return {
             file,
             location: [location],
             ...(metadata && { metadata })
-          });
-        }
-      }
-
-      yield {
-        value, locations
+          };
+        })
       };
     }
   }
