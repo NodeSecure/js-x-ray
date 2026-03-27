@@ -26,17 +26,23 @@ const kPackageSpecs = [
   "typescript@5.9.3",
   "vis-network@10.0.2",
   "vis-data@8.0.3",
-  "debug@4.4.3",
-  "chokidar@5.0.0",
   "glob@13.0.6",
-  "regexp-tree@0.1.27",
-  "pino-std-serializers@7.1.0"
+  "@nodesecure/js-x-ray@14.1.0",
+  "pino-pretty@13.1.3",
+  "@typescript-eslint/typescript-estree@8.57.0",
+  "semver@7.7.4",
+  "highlight.js@11.11.1",
+  "markdown-it@14.1.1",
+  "@lit/reactive-element@2.1.2",
+  "puppeteer-core@24.37.2",
+  "undici@7.24.4"
 ];
 
 await using tmpDir = await fs.mkdtempDisposable(
   path.join(os.tmpdir(), "nodesecure-")
 );
 
+console.time("total");
 for (const spec of kPackageSpecs) {
   const mama = await extractAndResolve(
     tmpDir.path,
@@ -53,6 +59,7 @@ for (const spec of kPackageSpecs) {
   console.timeEnd(spec);
   console.log(`number of files: ${report.length}`);
 }
+console.timeEnd("total");
 
 async function iterateEntries(
   manifest: LocatedManifestManager

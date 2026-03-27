@@ -67,7 +67,7 @@ export function commonHexadecimalPrefix(
   }
   const prefix = new Map<string, number>();
 
-  mainLoop: for (const value of identifiersArray.slice().sort()) {
+  mainLoop: for (const value of identifiersArray.sort()) {
     for (const [cp, count] of prefix) {
       const commonStr = commonStringPrefix(value, cp);
       if (commonStr === null) {

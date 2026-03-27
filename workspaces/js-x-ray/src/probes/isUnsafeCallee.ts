@@ -84,6 +84,7 @@ export function isUnsafeCallee(
 
 export default {
   name: "isUnsafeCallee",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   breakOnMatch: false,

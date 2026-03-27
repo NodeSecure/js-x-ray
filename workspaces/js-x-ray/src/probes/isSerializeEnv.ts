@@ -128,6 +128,7 @@ function initialize(
 
 export default {
   name: "isSerializeEnv",
+  nodeTypes: ["CallExpression", "MemberExpression"],
   validateNode: [validateJsonStringify, validateProcessEnv],
   initialize,
   main: {

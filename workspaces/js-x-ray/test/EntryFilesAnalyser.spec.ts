@@ -88,13 +88,13 @@ describe("EntryFilesAnalyser", () => {
     const reports = await Array.fromAsync(generator);
 
     assert.deepEqual(
-      reports.map((report) => report.file),
+      reports.map((report) => report.file).sort(),
       [
         entryUrl,
         new URL("deps/invalidDep.js", kFixtureURL),
         new URL("deps/dep1.js", kFixtureURL),
         new URL("shared.js", kFixtureURL)
-      ].map((url) => fileURLToPath(url))
+      ].map((url) => fileURLToPath(url)).sort()
     );
 
     const invalidReports = reports.filter((report) => !report.ok);

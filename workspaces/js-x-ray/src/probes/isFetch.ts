@@ -38,6 +38,7 @@ function main(
 
 export default {
   name: "isFetch",
+  nodeTypes: ["CallExpression"],
   validateNode,
   initialize,
   main,

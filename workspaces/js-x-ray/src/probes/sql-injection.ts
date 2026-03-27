@@ -65,6 +65,7 @@ function main(
 
 export default {
   name: "sql-injection",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   breakOnMatch: false

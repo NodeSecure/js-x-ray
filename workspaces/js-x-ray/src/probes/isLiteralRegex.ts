@@ -36,6 +36,7 @@ function main(
 
 export default {
   name: "isLiteralRegex",
+  nodeTypes: ["Literal"],
   validateNode,
   main,
   breakOnMatch: false

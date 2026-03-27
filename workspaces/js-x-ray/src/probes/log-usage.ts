@@ -60,6 +60,7 @@ function finalize(ctx: ProbeContext<LogUsageContextDef>) {
 
 export default {
   name: "log-usage",
+  nodeTypes: ["CallExpression"],
   validateNode,
   initialize,
   main,

@@ -1,6 +1,5 @@
 // CONSTANTS
 const kCommentPattern = /\/\*[\s\S]*?\*\/\r?\n?|\/\/.{0,200}?(?:\r?\n|$)/g;
-const kTrailingLfPattern = /\r?\n$/;
 
 /**
  * This code has been imported from:
@@ -9,11 +8,29 @@ const kTrailingLfPattern = /\r?\n$/;
 export function isMinifiedCode(
   code: string
 ): boolean {
-  const lines = code
-    .replace(kCommentPattern, "")
-    .replace(kTrailingLfPattern, "")
-    .split("\n")
-    .flatMap((line) => (line.length > 0 ? [line.length] : []));
+  const cleaned = code.replace(kCommentPattern, "");
+  const lines: number[] = [];
+  let lineStart = 0;
+
+  // Replicate /\r?\n$/ without a second regex pass + intermediate string
+  let end = cleaned.length;
+  if (end > 0 && cleaned[end - 1] === "\n") {
+    end--;
+    if (end > 0 && cleaned[end - 1] === "\r") {
+      end--;
+    }
+  }
+
+  // Replicate .split("\n").flatMap(...) without allocating a string[]
+  for (let i = 0; i <= end; i++) {
+    if (i === end || cleaned[i] === "\n") {
+      const len = i - lineStart;
+      if (len > 0) {
+        lines.push(len);
+      }
+      lineStart = i + 1;
+    }
+  }
 
   return lines.length <= 1 || median(lines) > 200;
 }
@@ -21,12 +38,11 @@ export function isMinifiedCode(
 function median(
   values: number[]
 ): number {
-  const toSorted = [...values].sort((a, b) => a - b);
-  const half = Math.floor(toSorted.length / 2);
+  // Sort in-place: `values` is the local `lines` array, not used after this call
+  values.sort((a, b) => a - b);
+  const half = Math.floor(values.length / 2);
 
-  if (toSorted.length % 2) {
-    return toSorted[half];
-  }
-
-  return (toSorted[half - 1] + toSorted[half]) / 2;
+  return values.length % 2
+    ? values[half]
+    : (values[half - 1] + values[half]) / 2;
 }

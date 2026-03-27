@@ -150,6 +150,7 @@ function initialize(
 
 export default {
   name: "isUnsafeCommand",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,

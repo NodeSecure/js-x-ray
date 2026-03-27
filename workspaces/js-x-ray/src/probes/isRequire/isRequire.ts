@@ -184,6 +184,7 @@ function main(
 
 export default {
   name: "isRequire",
+  nodeTypes: ["CallExpression"],
   validateNode: [
     validateNodeRequire,
     validateNodeEvalRequire

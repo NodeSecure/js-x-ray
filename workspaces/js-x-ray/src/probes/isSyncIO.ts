@@ -88,6 +88,7 @@ function main(
 
 export default {
   name: "isSyncIO",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,

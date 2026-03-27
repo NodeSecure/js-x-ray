@@ -39,6 +39,7 @@ function main(
 
 export default {
   name: "isRandom",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,

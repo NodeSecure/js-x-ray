@@ -46,6 +46,7 @@ function main(
 
 export default {
   name: "isPrototypePollution",
+  nodeTypes: ["Literal", "MemberExpression"],
   validateNode,
   main,
   breakOnMatch: false
