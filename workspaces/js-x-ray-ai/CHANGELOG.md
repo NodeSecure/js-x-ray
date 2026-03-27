@@ -1,5 +1,12 @@
 # @nodesecure/js-x-ray-ai
 
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`26724e0`](https://github.com/NodeSecure/js-x-ray/commit/26724e07cc6a466fd327016735f3036c078b7e84), [`5352af7`](https://github.com/NodeSecure/js-x-ray/commit/5352af7612ff2c6c2f75fbbed9d88d1520cb0c64), [`0de5a6f`](https://github.com/NodeSecure/js-x-ray/commit/0de5a6f32d965e13c95fd97da6f3135113e25dc2)]:
+  - @nodesecure/js-x-ray@15.0.0
+
 ## 1.0.4
 
 ### Patch Changes
