@@ -65,6 +65,7 @@ function isRegexConstructor(
 
 export default {
   name: "isRegexObject",
+  nodeTypes: ["NewExpression"],
   validateNode,
   main,
   breakOnMatch: false

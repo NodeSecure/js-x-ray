@@ -113,6 +113,7 @@ function main(
 
 export default {
   name: "isLiteral",
+  nodeTypes: ["Literal"],
   validateNode,
   main,
   breakOnMatch: false

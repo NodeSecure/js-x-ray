@@ -123,7 +123,6 @@ describe("ProbeRunner", () => {
     it("should throw if one the provided probe is sealed or frozen", () => {
       const methods = ["seal", "freeze"];
       for (const method of methods) {
-        // @ts-expect-error
         const fakeProbe = Object[method]({
           name: "frozen-probe",
           initialize() {

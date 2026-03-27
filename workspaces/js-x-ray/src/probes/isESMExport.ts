@@ -44,6 +44,7 @@ function main(
 
 export default {
   name: "isESMExport",
+  nodeTypes: ["ExportNamedDeclaration", "ExportAllDeclaration"],
   validateNode,
   main,
   breakOnMatch: true

@@ -121,6 +121,7 @@ function finalize(ctx: ProbeContext<DataExfiltrationContextDef>) {
 
 const dateExifiltration = {
   name: "dataExfiltration",
+  nodeTypes: ["CallExpression"],
   validateNode,
   initialize,
   finalize,

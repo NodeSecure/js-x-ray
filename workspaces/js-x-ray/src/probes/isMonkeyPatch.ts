@@ -192,6 +192,7 @@ function main(
 
 export default {
   name: "isMonkeyPatch",
+  nodeTypes: ["AssignmentExpression", "CallExpression"],
   validateNode: [
     validateNodeAssignment,
     validateDefineProperty

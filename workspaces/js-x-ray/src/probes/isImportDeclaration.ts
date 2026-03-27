@@ -56,6 +56,7 @@ function main(
 
 export default {
   name: "isImportDeclaration",
+  nodeTypes: ["ImportDeclaration", "ImportExpression"],
   validateNode,
   main,
   breakOnMatch: true,

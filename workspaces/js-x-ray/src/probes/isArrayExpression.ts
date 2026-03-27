@@ -35,6 +35,7 @@ function main(
 
 export default {
   name: "isArrayExpression",
+  nodeTypes: ["ArrayExpression"],
   validateNode,
   main,
   breakOnMatch: false

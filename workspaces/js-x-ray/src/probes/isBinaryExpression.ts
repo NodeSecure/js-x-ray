@@ -68,6 +68,7 @@ function walkBinaryExpression(
 
 export default {
   name: "isBinaryExpression",
+  nodeTypes: ["BinaryExpression"],
   validateNode,
   main,
   breakOnMatch: false

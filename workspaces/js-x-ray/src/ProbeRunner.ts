@@ -61,6 +61,14 @@ export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef>
 
 export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   name: string;
+  /**
+   * The ESTree node types this probe handles. When provided, the probe is only
+   * dispatched for nodes whose `type` matches one of the listed values, which
+   * avoids running `validateNode` on irrelevant nodes.
+   *
+   * Probes that omit this field remain catch-all: they run on every node
+   */
+  nodeTypes?: readonly string[];
   initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
   finalize?: (ctx: ProbeContext<T>) => void;
   validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
@@ -79,6 +87,8 @@ export class ProbeRunner {
   #probeValidateFns = new Map<Probe, ProbeValidationCallback[]>();
   #probeCtx = new Map<Probe, ProbeContext>();
   #probeMainCtx = new Map<Probe, ProbeMainContext>();
+  #nodeTypeIndex = new Map<string, Probe[]>();
+  #catchAllProbes: Probe[] = [];
 
   static Signals = Object.freeze({
     Break: Symbol.for("breakWalk"),
@@ -195,6 +205,20 @@ export class ProbeRunner {
     }
 
     this.probes = probes;
+
+    this.#catchAllProbes = probes.filter(
+      (probe) => !probe.nodeTypes || probe.nodeTypes.length === 0
+    );
+
+    const allNodeTypes = new Set<string>(
+      probes.flatMap((probe) => probe.nodeTypes ?? [])
+    );
+    for (const nodeType of allNodeTypes) {
+      const list = probes.filter(
+        (probe) => !probe.nodeTypes || probe.nodeTypes.length === 0 || probe.nodeTypes.includes(nodeType)
+      );
+      this.#nodeTypeIndex.set(nodeType, list);
+    }
   }
 
   #getProbeContext(
@@ -268,7 +292,10 @@ export class ProbeRunner {
       }
     }
 
-    for (const probe of this.probes) {
+    const probesForNode = this.#nodeTypeIndex.get(
+      node.type
+    ) ?? this.#catchAllProbes;
+    for (const probe of probesForNode) {
       if (probe.breakGroup && this.#breakGroups.has(probe.breakGroup)) {
         continue;
       }

@@ -69,6 +69,7 @@ function main(
 
 export default {
   name: "isWeakCrypto",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,

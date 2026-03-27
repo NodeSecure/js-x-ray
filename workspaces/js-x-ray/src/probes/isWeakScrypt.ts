@@ -150,6 +150,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
 
 export default {
   name: "isWeakScrypt",
+  nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,
