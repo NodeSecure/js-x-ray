@@ -21,7 +21,8 @@ const sast_warnings = {
   sql_injection: "Template literals with interpolated expressions in SQL queries (SELECT, INSERT, UPDATE, DELETE) without proper parameterization, creating potential SQL injection vulnerabilities.",
   monkey_patch: "Modification of native prototypes or global objects at runtime, which introduces security risks including flow hijacking, global side effects, and potential concealment of malicious activities.",
   insecure_random: "Usage of insecure random number generation using Math.random(). Math.random() is not cryptographically secure and should not be used for security-sensitive operations.",
-  weak_scrypt: "Usage of crypto.scrypt() or crypto.scryptSync() with insecure parameters such as hardcoded salt, short salt (less than 16 bytes), or insufficient cost parameter (below 16384). These weak configurations compromise the security of password-based key derivation."
+  weak_scrypt: "Usage of crypto.scrypt() or crypto.scryptSync() with insecure parameters such as hardcoded salt, short salt (less than 16 bytes), or insufficient cost parameter (below 16384). These weak configurations compromise the security of password-based key derivation.",
+  weak_argon2: "Usage of crypto.argon2() or crypto.argon2Sync() with insecure parameters: use of argon2d or argon2i instead of argon2id, hardcoded nonce (salt), or memory/passes/parallelism values below OWASP minimum recommendations. These weak configurations compromise the security of password-based key derivation."
 };
 
 export default {
