@@ -124,7 +124,8 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
-  | "weak-scrypt";
+  | "weak-scrypt"
+  | "weak-argon2";
 
 type WarningName =
   | "parsing-error"
@@ -177,7 +178,7 @@ const scanner = new AstAnalyser({
 
 // Or enable specific optional warnings
 const scannerSpecific = new AstAnalyser({
-  optionalWarnings: ["synchronous-io", "log-usage", "weak-scrypt"]
+  optionalWarnings: ["synchronous-io", "log-usage", "weak-scrypt", "weak-argon2"]
 });
 ```
 
@@ -185,6 +186,7 @@ The following warnings are optional:
 - `synchronous-io` - Detects synchronous I/O operations that could impact performance
 - `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
 - `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
+- `weak-argon2` - Detects weak Argon2 parameters (wrong algorithm, weak parameters, hardcoded nonce)
 
 ### Internationalization (i18n)
 
@@ -231,6 +233,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [sql-injection](https://github.com/NodeSecure/js-x-ray/blob/master/docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
+| [weak-argon2](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-argon2.md) ⚠️ | **Yes** | Usage of weak Argon2 parameters (wrong algorithm, weak parameters, hardcoded nonce) |
 
 #### Information Severity
 
