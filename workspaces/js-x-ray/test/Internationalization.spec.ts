@@ -46,4 +46,15 @@ describe("Internationalization", () => {
     assert(value !== undefined, "French translations should be defined");
     assert(typeof value === "string", "French translation for 'sast_warnings.parsing_error' should be a string");
   });
+
+  it("should have Korean translations", async() => {
+    await i18n.extendFromSystemPath(i18nLocation());
+    await i18n.setLocalLang("korean");
+    await i18n.getLocalLang();
+
+    const value = i18n.getTokenSync("sast_warnings.parsing_error");
+
+    assert(value !== undefined, "Korean translations should be defined");
+    assert(typeof value === "string", "Korean translation for 'sast_warnings.parsing_error' should be a string");
+  });
 });
