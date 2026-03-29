@@ -36,7 +36,7 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "weak-argon2");
-      assert.strictEqual(outputWarnings[0].value, "wrong-algorithm");
+      assert.strictEqual(outputWarnings[0].value, "wrong-algorithm : argon2d");
     });
 
     it("should warn when algorithm is argon2i", () => {
@@ -46,7 +46,47 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "weak-argon2");
-      assert.strictEqual(outputWarnings[0].value, "wrong-algorithm");
+      assert.strictEqual(outputWarnings[0].value, "wrong-algorithm : argon2i");
+    });
+
+    it("should warn when algorithm is an identifier assigned to argon2d", () => {
+      const code = `
+        import crypto from "crypto";
+        const algo = "argon2d";
+        crypto.argon2(algo, { ${safeParams} })
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-argon2"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "weak-argon2");
+      assert.strictEqual(outputWarnings[0].value, "wrong-algorithm : argon2d");
+    });
+
+    it("should not warn when algorithm is an identifier assigned to argon2id", () => {
+      const code = `
+        import crypto from "crypto";
+        const algo = "argon2id";
+        crypto.argon2(algo, { ${safeParams} })
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-argon2"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
+    });
+
+    it("should not warn when algorithm is an unresolvable identifier", () => {
+      const code = `
+        import crypto from "crypto";
+        crypto.argon2(unknownVar, { ${safeParams} })
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["weak-argon2"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
     });
 
     it("should not warn when algorithm is argon2id", () => {
@@ -204,7 +244,7 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 2);
       const values = outputWarnings.map((w) => w.value);
-      assert.ok(values.includes("wrong-algorithm"));
+      assert.ok(values.includes("wrong-algorithm : argon2d"));
       assert.ok(values.includes("weak-parameters"));
     });
 
@@ -220,7 +260,7 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 2);
       const values = outputWarnings.map((w) => w.value);
-      assert.ok(values.includes("wrong-algorithm"));
+      assert.ok(values.includes("wrong-algorithm : argon2d"));
       assert.ok(values.includes("hardcoded-nonce"));
     });
 
@@ -236,7 +276,7 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 3);
       const values = outputWarnings.map((w) => w.value);
-      assert.ok(values.includes("wrong-algorithm"));
+      assert.ok(values.includes("wrong-algorithm : argon2d"));
       assert.ok(values.includes("weak-parameters"));
       assert.ok(values.includes("hardcoded-nonce"));
     });

@@ -73,11 +73,24 @@ function initialize(ctx: ProbeContext) {
 function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   const { sourceFile } = ctx;
   const algorithm = node.arguments.at(0);
+
+  if (algorithm && algorithm.type === "Identifier") {
+    const algorithmName = sourceFile.tracer.literalIdentifiers.get(algorithm.name)?.value;
+    if (algorithmName && algorithmName !== "argon2id") {
+      sourceFile.warnings.push(
+        generateWarning("weak-argon2", {
+          value: `wrong-algorithm : ${algorithmName}`,
+          location: node.loc
+        })
+      );
+    }
+  }
+
   if (isLiteral(algorithm)) {
     if (algorithm.value !== "argon2id") {
       sourceFile.warnings.push(
         generateWarning("weak-argon2", {
-          value: "wrong-algorithm",
+          value: `wrong-algorithm : ${algorithm.value}`,
           location: node.loc
         })
       );
