@@ -142,37 +142,31 @@ export class Deobfuscator {
   walk(
     node: ESTree.Node
   ): void {
-    let nodesToExtract: (ESTree.Node | null | undefined)[];
     switch (node.type) {
       case "ClassDeclaration":
-        nodesToExtract = [node.id, node.superClass];
+        kIdentifierNodeExtractor(
+          ({ name }) => this.identifiers.push({ name, type: node.type }),
+          [node.id, node.superClass].filter((node) => node !== null) as ESTree.Node[]
+        );
         break;
       case "FunctionDeclaration":
-        nodesToExtract = node.params;
-        break;
       case "FunctionExpression":
-        nodesToExtract = node.params;
+        kIdentifierNodeExtractor(
+          ({ name }) => this.identifiers.push({ name, type: "FunctionParams" }),
+          node.params
+        );
         break;
       case "MethodDefinition":
-        nodesToExtract = [node.key];
+        kIdentifierNodeExtractor(
+          ({ name }) => this.identifiers.push({ name, type: node.type }),
+          [node.key]
+        );
         break;
-      default:
-        nodesToExtract = [];
     }
 
-    const isFunctionParams =
-      node.type === "FunctionDeclaration" ||
-      node.type === "FunctionExpression";
-
-    kIdentifierNodeExtractor(
-      ({ name }) => this.identifiers.push({
-        name,
-        type: isFunctionParams ? "FunctionParams" : node.type
-      }),
-      nodesToExtract.filter((n) => n !== undefined)
-    );
-
-    this.#counters.forEach((counter) => counter.walk(node));
+    for (const counter of this.#counters) {
+      counter.walk(node);
+    }
   }
 
   aggregateCounters(): ObfuscatedCounters {
@@ -220,11 +214,13 @@ export class Deobfuscator {
       return "morse";
     }
 
-    const { prefix } = commonHexadecimalPrefix(
-      this.identifiers.flatMap(
-        ({ name }) => (typeof name === "string" ? [name] : [])
-      )
-    );
+    const names: string[] = [];
+    for (const { name } of this.identifiers) {
+      if (typeof name === "string") {
+        names.push(name);
+      }
+    }
+    const { prefix } = commonHexadecimalPrefix(names);
     const uPrefixNames = new Set(Object.keys(prefix));
 
     if (this.identifiers.length > kMinimumIdsCount && uPrefixNames.size > 0) {

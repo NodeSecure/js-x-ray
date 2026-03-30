@@ -16,7 +16,7 @@ export function verify(
   prefix: Record<string, number>
 ) {
   const pValue = Object.keys(prefix).pop()!;
-  const regexStr = `^${RegExp.escape(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`;
+  const regex = new RegExp(`^${RegExp.escape(pValue)}[a-zA-Z]{1,2}[0-9]{0,2}$`);
 
-  return identifiers.every(({ name }) => new RegExp(regexStr).test(name));
+  return identifiers.every(({ name }) => regex.test(name));
 }

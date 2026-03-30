@@ -31,7 +31,8 @@ import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
 import {
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  type GetCallExpressionIdentifierOptions
 } from "./estree/index.ts";
 import { CALL_EXPRESSION_DATA, CALL_EXPRESSION_IDENTIFIER } from "./contants.ts";
 
@@ -89,6 +90,7 @@ export class ProbeRunner {
   #probeMainCtx = new Map<Probe, ProbeMainContext>();
   #nodeTypeIndex = new Map<string, Probe[]>();
   #catchAllProbes: Probe[] = [];
+  #callExprIdentifierOptions: GetCallExpressionIdentifierOptions;
 
   static Signals = Object.freeze({
     Break: Symbol.for("breakWalk"),
@@ -132,6 +134,9 @@ export class ProbeRunner {
     probes: Probe[] = ProbeRunner.Defaults
   ) {
     this.sourceFile = sourceFile;
+    this.#callExprIdentifierOptions = {
+      externalIdentifierLookup: (name) => sourceFile.tracer.literalIdentifiers.get(name)?.value ?? null
+    };
 
     for (const probe of probes) {
       assert(
@@ -283,9 +288,7 @@ export class ProbeRunner {
     let tracedIdentifier: string | null | undefined;
 
     if (node.type === "CallExpression") {
-      const id = getCallExpressionIdentifier(node, {
-        externalIdentifierLookup: (name) => this.sourceFile.tracer.literalIdentifiers.get(name)?.value ?? null
-      });
+      const id = getCallExpressionIdentifier(node, this.#callExprIdentifierOptions);
       if (id !== null) {
         tracedIdentifierReport = this.sourceFile.tracer.getDataFromIdentifier(id);
         tracedIdentifier = id;

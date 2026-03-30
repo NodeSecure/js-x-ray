@@ -28,9 +28,13 @@ export function verify(
     if (!notNullOrUndefined(name)) {
       return false;
     }
-    const charsCode = [...new Set([...name])];
+    for (const char of name) {
+      if (!kJJRegularSymbols.has(char)) {
+        return false;
+      }
+    }
 
-    return charsCode.every((char) => kJJRegularSymbols.has(char));
+    return true;
   }).length;
   const pourcent = ((matchCount / identifiers.length) * 100);
 

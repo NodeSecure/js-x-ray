@@ -69,7 +69,10 @@ export function* getMemberExpressionIdentifier(
 
     // foo.bar["k" + "e" + "y"]
     case "BinaryExpression": {
-      const literal = [...concatBinaryExpression(node.property, options)].join("");
+      let literal = "";
+      for (const part of concatBinaryExpression(node.property, options)) {
+        literal += part;
+      }
       if (literal.trim() !== "") {
         yield literal;
       }

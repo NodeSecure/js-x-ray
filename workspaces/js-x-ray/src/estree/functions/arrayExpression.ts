@@ -100,9 +100,10 @@ export function joinArrayExpression(
     return null;
   }
 
-  const id = Array.from(
-    getMemberExpressionIdentifier(node.callee)
-  ).join(".");
+  let id = "";
+  for (const part of getMemberExpressionIdentifier(node.callee)) {
+    id = id === "" ? part : `${id}.${part}`;
+  }
   if (
     id !== "join" ||
     !isLiteral(node.arguments[0])
@@ -112,13 +113,17 @@ export function joinArrayExpression(
 
   const separator = node.arguments[0].value;
 
-  const iter = arrayExpressionToString(
-    node.callee.object,
-    {
-      ...options,
-      resolveCharCode: false
+  let result = "";
+  let first = true;
+  for (const part of arrayExpressionToString(node.callee.object, { ...options, resolveCharCode: false })) {
+    if (first) {
+      result = part;
+      first = false;
     }
-  );
+    else {
+      result += separator + part;
+    }
+  }
 
-  return [...iter].join(separator);
+  return result;
 }
