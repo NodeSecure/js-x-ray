@@ -199,8 +199,9 @@ export class SourceFile {
   }
 
   walk(
-    node: ESTree.Node
-  ): ESTree.Node[] {
+    node: ESTree.Node,
+    callback: (node: ESTree.Node) => void
+  ): void {
     const split = InlinedRequire.split(node);
     if (split !== null) {
       this.tracer.walk(split.virtualDeclaration);
@@ -208,10 +209,10 @@ export class SourceFile {
         this.tracer.walk(split.rebuildExpression);
       }
 
-      return [
-        split.virtualDeclaration,
-        ...(split.rebuildExpression ? [split.rebuildExpression] : [])
-      ];
+      callback(split.virtualDeclaration);
+      if (split.rebuildExpression) {
+        callback(split.rebuildExpression);
+      }
     }
 
     this.tracer.walk(node);
@@ -225,7 +226,7 @@ export class SourceFile {
       this.inTryStatement = false;
     }
 
-    return [node];
+    callback(node);
   }
 }
 

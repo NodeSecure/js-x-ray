@@ -31,7 +31,7 @@ import {
   isOneLineExpressionExport
 } from "./utils/index.ts";
 import { walkEnter } from "./walker/index.ts";
-import { getCallExpressionIdentifier } from "./estree/index.ts";
+import { getCallExpressionIdentifier, isLiteral } from "./estree/index.ts";
 import {
   generateWarning,
   type OptionalWarningName,
@@ -269,24 +269,32 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
     body: ESTree.Statement[],
     probeRunner: ProbeRunner
   ) {
-    const recur = this.#walkEnter.bind(this);
+    const recursiveWalkEnter = this.#walkEnter.bind(this);
     walkEnter(body, function walk(node) {
       if (Array.isArray(node)) {
         return;
       }
 
-      for (const probeNode of probeRunner.sourceFile.walk(node)) {
-        const action = probeRunner.walk(probeNode);
-        if (action === "skip") {
-          this.skip();
+      probeRunner.sourceFile.walk(
+        node,
+        (probeNode) => {
+          const action = probeRunner.walk(probeNode);
+          if (action === "skip") {
+            this.skip();
+          }
+
+          if (
+            isEvalCallExpr(probeNode) &&
+            isLiteral(probeNode.arguments[0])
+          ) {
+            const evalBody = AstAnalyser.DefaultParser.parse(
+              probeNode.arguments[0].value,
+              void 0
+            );
+            recursiveWalkEnter(evalBody, probeRunner);
+          }
         }
-        if (probeNode.type === "CallExpression" && getCallExpressionIdentifier(probeNode, {
-          resolveCallExpression: true
-        }) === "eval" && probeNode.arguments[0].type === "Literal" && typeof probeNode.arguments[0].value === "string") {
-          const evalBody = AstAnalyser.DefaultParser.parse(probeNode.arguments[0].value, void 0);
-          recur(evalBody, probeRunner);
-        }
-      }
+      );
     });
   }
 
@@ -476,4 +484,13 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
   ) {
     return this.#collectableSetRegistry?.get(type);
   }
+}
+
+function isEvalCallExpr(
+  node: ESTree.Node
+): node is ESTree.CallExpression {
+  return (
+    node.type === "CallExpression" &&
+    getCallExpressionIdentifier(node, { resolveCallExpression: true }) === "eval"
+  );
 }

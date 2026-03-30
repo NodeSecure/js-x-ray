@@ -119,12 +119,12 @@ export function getSastAnalysis(
             return;
           }
 
-          for (const probeNode of self.sourceFile.walk(node)) {
+          self.sourceFile.walk(node, (probeNode) => {
             const action = probeRunner.walk(probeNode);
             if (action === "skip") {
               this.skip();
             }
-          }
+          });
         }
       });
 
