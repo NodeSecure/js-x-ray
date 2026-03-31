@@ -164,15 +164,18 @@ export class SourceFile {
       );
     }
 
-    const identifiersLengthArr = this.deobfuscator.identifiers
-      .filter((value) => value.type !== "Property" && typeof value.name === "string")
-      .map((value) => value.name.length);
+    let filteredLen = 0;
+    let filteredSum = 0;
+    for (const value of this.deobfuscator.identifiers) {
+      if (value.type !== "Property" && typeof value.name === "string") {
+        filteredLen++;
+        filteredSum += value.name.length;
+      }
+    }
+    const idsLengthAvg = filteredLen === 0 ? 0 : filteredSum / filteredLen;
+    const stringScore = sum(this.deobfuscator.literalScores);
 
-    const [idsLengthAvg, stringScore] = [
-      sum(identifiersLengthArr),
-      sum(this.deobfuscator.literalScores)
-    ];
-    if (!isMinified && identifiersLengthArr.length > 5 && idsLengthAvg <= 1.5) {
+    if (!isMinified && filteredLen > 5 && idsLengthAvg <= 1.5) {
       this.warnings.push(
         generateWarning("short-identifiers", { value: String(idsLengthAvg) })
       );
@@ -199,8 +202,9 @@ export class SourceFile {
   }
 
   walk(
-    node: ESTree.Node
-  ): ESTree.Node[] {
+    node: ESTree.Node,
+    callback: (node: ESTree.Node) => void
+  ): void {
     const split = InlinedRequire.split(node);
     if (split !== null) {
       this.tracer.walk(split.virtualDeclaration);
@@ -208,10 +212,10 @@ export class SourceFile {
         this.tracer.walk(split.rebuildExpression);
       }
 
-      return [
-        split.virtualDeclaration,
-        ...(split.rebuildExpression ? [split.rebuildExpression] : [])
-      ];
+      callback(split.virtualDeclaration);
+      if (split.rebuildExpression) {
+        callback(split.rebuildExpression);
+      }
     }
 
     this.tracer.walk(node);
@@ -225,7 +229,7 @@ export class SourceFile {
       this.inTryStatement = false;
     }
 
-    return [node];
+    callback(node);
   }
 }
 

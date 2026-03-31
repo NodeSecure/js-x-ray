@@ -189,15 +189,14 @@ export class VariableTracer extends EventEmitter {
     });
 
     if (identifierOrMemberExpr.includes(".")) {
-      const exprs = [...getSubMemberExpressionSegments(identifierOrMemberExpr)]
-        .filter((expr) => !this.#traced.has(expr));
-
-      for (const expr of exprs) {
-        this.trace(expr, {
-          followConsecutiveAssignment: true,
-          name,
-          moduleName
-        });
+      for (const expr of getSubMemberExpressionSegments(identifierOrMemberExpr)) {
+        if (!this.#traced.has(expr)) {
+          this.trace(expr, {
+            followConsecutiveAssignment: true,
+            name,
+            moduleName
+          });
+        }
       }
     }
 

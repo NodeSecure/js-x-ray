@@ -37,9 +37,10 @@ export function getCallExpressionIdentifier(
   }
   if (node.callee.type === "MemberExpression") {
     const memberObject = node.callee.object;
-    const lastId = [
-      ...getMemberExpressionIdentifier(node.callee, { externalIdentifierLookup })
-    ].join(".");
+    let lastId = "";
+    for (const part of getMemberExpressionIdentifier(node.callee, { externalIdentifierLookup })) {
+      lastId = lastId === "" ? part : `${lastId}.${part}`;
+    }
 
     return resolveCallExpression && memberObject.type === "CallExpression" ?
       getCallExpressionIdentifier(memberObject) + `.${lastId}` :
