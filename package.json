@@ -4,7 +4,7 @@
     "build": "tsc -b",
     "lint": "eslint workspaces",
     "test": "npm run test --ws --if-present",
-    "check": "npm run lint && npm run test-only",
+    "check": "npm run lint && npm run test",
     "ci:publish": "changeset publish",
     "ci:version": "changeset version",
     "clean": "clear-ts-build"
