@@ -143,6 +143,7 @@ type WarningName =
   | "data-exfiltration"
   | "sql-injection"
   | "monkey-patch"
+  | "prototype-pollution"
   | OptionalWarningName;
 
 interface Warning<T = WarningName> {
@@ -230,6 +231,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [data-exfiltration](https://github.com/NodeSecure/js-x-ray/blob/master/docs/data-exfiltration.md) | No | Potential unauthorized transfer of sensitive data |
 | [sql-injection](https://github.com/NodeSecure/js-x-ray/blob/master/docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
+| [prototype-pollution](https://github.com/NodeSecure/js-x-ray/blob/master/docs/prototype-pollution.md) | No | Detected use of `__proto__` to pollute object prototypes |
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
 
 #### Information Severity
