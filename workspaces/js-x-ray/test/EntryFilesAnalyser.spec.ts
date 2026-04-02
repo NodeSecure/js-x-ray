@@ -397,4 +397,19 @@ describe("EntryFilesAnalyser", () => {
       await Array.fromAsync(generator);
     });
   });
+
+  it("should return the number of files detected and the number of internal dependencies", async(t) => {
+    const entryFilesAnalyser = new EntryFilesAnalyser();
+    const entryUrl = new URL("entry.js", kFixtureURL);
+    const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
+
+    const generator = entryFilesAnalyser.analyse([
+      entryUrl,
+      deepEntryUrl
+    ]);
+    // we need to yield all reports to have the stats
+    await Array.fromAsync(generator);
+    assert.equal(entryFilesAnalyser.stats.numberOfFilesProcessed, 6);
+    assert.equal(entryFilesAnalyser.stats.numberOfImportsDetected, 4);
+  });
 });
