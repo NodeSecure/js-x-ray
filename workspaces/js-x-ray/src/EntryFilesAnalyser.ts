@@ -81,6 +81,11 @@ export class EntryFilesAnalyser {
   allowedExtensions: Set<string>;
   dependencies: DiGraph<VertexDefinition<VertexBody>>;
   ignoreENOENT: boolean;
+  stats = {
+    numberOfImportsDetected: 0,
+    numberOfFilesProcessed: 0
+  };
+  uniqueImports = new Set<string>();
 
   constructor(
     options: EntryFilesAnalyserOptions = {}
@@ -118,6 +123,9 @@ export class EntryFilesAnalyser {
     options: EntryFilesRuntimeOptions = {}
   ): AsyncGenerator<ReportOnEntryFile> {
     this.dependencies = new DiGraph();
+    this.stats.numberOfImportsDetected = 0;
+    this.stats.numberOfFilesProcessed = 0;
+    this.uniqueImports.clear();
     this.#depPathCache.clear();
 
     const generators: AsyncGenerator<ReportOnEntryFile>[] = [];
@@ -141,6 +149,7 @@ export class EntryFilesAnalyser {
     if (generators.length > 0) {
       yield* combineAsyncIterators(...generators);
     }
+    this.stats.numberOfImportsDetected = this.uniqueImports.size;
   }
 
   #normalizeAndCleanEntryFile(
@@ -188,7 +197,6 @@ export class EntryFilesAnalyser {
     if (file.includes("d.ts")) {
       return;
     }
-
     this.dependencies.addVertex({
       id: relativeFile,
       adjacentTo: [],
@@ -221,8 +229,8 @@ export class EntryFilesAnalyser {
         }
       }
     );
+    this.stats.numberOfFilesProcessed++;
     yield { file: relativeFile, ...report };
-
     if (!report.ok) {
       return;
     }
@@ -238,6 +246,7 @@ export class EntryFilesAnalyser {
       if (depFile === null) {
         continue;
       }
+      this.uniqueImports.add(depFile);
 
       const depRelativeFile = this.#getRelativeFilePath(depFile);
       if (!this.dependencies.hasVertex(depRelativeFile)) {

@@ -52,6 +52,26 @@ Default files extensions are `.js`, `.cjs`, `.mjs` and `.node`
 
 ## API
 
+### Stats
+
+The `stats` property of the EntryFilesAnalyser instance:
+
+```ts
+stats = {
+    numberOfImportsDetected: 0,
+    numberOfFilesProcessed: 0
+  };
+```
+The stats will provide :
+- the number of unique internal dependencies detected (after resolution)
+- the total number of files processed during the analysis
+
+Note:
+- imports are deduplicated based on their resolved file path, meaning that different import statements pointing to the same file will be counted once.
+- external dependencies are not included in the imports count.
+
+### EntryFilesAnalyser Class
+
 ```ts
 type ReportOnEntryFile = ReportOnFile & {
   file: string;
