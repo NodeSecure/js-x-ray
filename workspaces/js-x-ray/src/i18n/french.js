@@ -23,7 +23,8 @@ const sast_warnings = {
   sql_injection: "Littéraux de gabarit avec expressions interpolées dans les requêtes SQL (SELECT, INSERT, UPDATE, DELETE) sans paramétrisation appropriée, créant des vulnérabilités potentielles d'injection SQL.",
   monkey_patch: "Modification des prototypes natifs ou objets globaux à l'exécution, ce qui introduit des risques de sécurité incluant le détournement de flux, des effets secondaires globaux et la dissimulation potentielle d'activités malveillantes.",
   insecure_random: "Utilisation d'une génération de nombres aléatoires non sécurisée à l'aide de Math.random(). Math.random() n'est pas cryptographiquement sûr et ne doit pas être utilisé pour des opérations sensibles en matière de sécurité.",
-  weak_scrypt: "Utilisation de crypto.scrypt() ou crypto.scryptSync() avec des paramètres non sécurisés tels qu'un sel codé en dur, un sel trop court (moins de 16 octets), ou un paramètre de coût insuffisant (inférieur à 16384). Ces configurations faibles compromettent la sécurité de la dérivation de clé basée sur un mot de passe."
+  weak_scrypt: "Utilisation de crypto.scrypt() ou crypto.scryptSync() avec des paramètres non sécurisés tels qu'un sel codé en dur, un sel trop court (moins de 16 octets), ou un paramètre de coût insuffisant (inférieur à 16384). Ces configurations faibles compromettent la sécurité de la dérivation de clé basée sur un mot de passe.",
+  weak_argon2: "Utilisation de crypto.argon2() ou crypto.argon2Sync() avec des paramètres non sécurisés : utilisation de argon2d ou argon2i au lieu de argon2id, nonce (sel) codé en dur, ou valeurs de memory/passes/parallelism inférieures aux recommandations minimales OWASP. Ces configurations faibles compromettent la sécurité de la dérivation de clé basée sur un mot de passe."
 };
 
 export default {

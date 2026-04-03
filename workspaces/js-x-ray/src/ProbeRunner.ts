@@ -26,6 +26,7 @@ import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 import isRandom from "./probes/isRandom.ts";
 import isPrototypePollution from "./probes/isPrototypePollution.ts";
 import isWeakScrypt from "./probes/isWeakScrypt.ts";
+import isWeakArgon2 from "./probes/isWeakArgon2.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -126,7 +127,8 @@ export class ProbeRunner {
     "synchronous-io": isSyncIO,
     "log-usage": logUsage,
     "insecure-random": isRandom,
-    "weak-scrypt": isWeakScrypt
+    "weak-scrypt": isWeakScrypt,
+    "weak-argon2": isWeakArgon2
   };
 
   constructor(

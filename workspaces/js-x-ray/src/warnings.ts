@@ -13,7 +13,8 @@ export type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
   | "insecure-random"
-  | "weak-scrypt";
+  | "weak-scrypt"
+  | "weak-argon2";
 
 export type WarningName =
   | "parsing-error"
@@ -34,6 +35,7 @@ export type WarningName =
   | "monkey-patch"
   | "insecure-random"
   | "prototype-pollution"
+  | "weak-argon2"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -150,6 +152,11 @@ export const warnings = Object.freeze({
   },
   "weak-scrypt": {
     i18n: "sast_warnings.weak_scrypt",
+    severity: "Warning",
+    experimental: true
+  },
+  "weak-argon2": {
+    i18n: "sast_warnings.weak_argon2",
     severity: "Warning",
     experimental: true
   }
