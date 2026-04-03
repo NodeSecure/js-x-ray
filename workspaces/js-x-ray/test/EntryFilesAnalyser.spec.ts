@@ -398,7 +398,7 @@ describe("EntryFilesAnalyser", () => {
     });
   });
 
-  it("should return the number of files detected and the number of internal dependencies", async(t) => {
+  it("should return the number of files detected and the number of internal dependencies", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("entry.js", kFixtureURL);
     const deepEntryUrl = new URL("deps/deepEntry.js", kFixtureURL);
