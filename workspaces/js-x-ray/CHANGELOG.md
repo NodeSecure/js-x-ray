@@ -1,5 +1,19 @@
 # @nodesecure/js-x-ray
 
+## 15.1.0
+
+### Minor Changes
+
+- [#608](https://github.com/NodeSecure/js-x-ray/pull/608) [`fc43d04`](https://github.com/NodeSecure/js-x-ray/commit/fc43d0459af9506049909111d63a7b7e6aa22860) Thanks [@Anne-Flower](https://github.com/Anne-Flower)! - Add stats (numberOfImportsDetected, numberOfFilesProcessed) to EntryFilesAnalyser, including tests and documentation updates.
+
+- [#604](https://github.com/NodeSecure/js-x-ray/pull/604) [`1f3738e`](https://github.com/NodeSecure/js-x-ray/commit/1f3738e3b9ec53efd7340f9734cc557cab8f78f1) Thanks [@fraxken](https://github.com/fraxken)! - Reduce HEAP allocation and GC pressure to optimize execution
+
+- [#597](https://github.com/NodeSecure/js-x-ray/pull/597) [`514b4c1`](https://github.com/NodeSecure/js-x-ray/commit/514b4c163262e78479a8ef893466e5e8f93b1ff6) Thanks [@HoyeongJeon](https://github.com/HoyeongJeon)! - feat(i18n): add Korean language support
+
+### Patch Changes
+
+- [#607](https://github.com/NodeSecure/js-x-ray/pull/607) [`b085fdd`](https://github.com/NodeSecure/js-x-ray/commit/b085fdd3be5ac93de2fe883e666a14aefb556208) Thanks [@fraxken](https://github.com/fraxken)! - Add missing prototype-pollution documentation in README
+
 ## 15.0.0
 
 ### Major Changes
