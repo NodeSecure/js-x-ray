@@ -222,4 +222,88 @@ describe("data-exfiltration probe", () => {
       assert.strictEqual(firstWarning.location?.length, 2);
     });
   });
+
+  describe("sensitive system paths", () => {
+    test("should generate a warning when a sensitive system path is encountered", () => {
+      const sensitivePaths = ["~/.ssh", "~/.aws", "~/.npmrc", "~/.gitconfig", "~/.bashrc"];
+
+      sensitivePaths.forEach((sensitivePath) => {
+        const code = `
+      const path = "${sensitivePath}";
+    `;
+
+        const { warnings: outputWarnings } = new AstAnalyser(
+          {
+            optionalWarnings: true
+          }
+        ).analyse(code);
+
+        const [firstWarning] = outputWarnings;
+        assert.strictEqual(outputWarnings.length, 1);
+        assert.deepEqual(firstWarning.kind, "data-exfiltration");
+        assert.strictEqual(firstWarning.value, sensitivePath);
+        assert.strictEqual(firstWarning.location?.length, 1);
+      });
+    });
+
+    test("should any file or sub directory of the sensitive paths", () => {
+      const code = `
+      const path = "~/.ssh/id_rsa";
+    `;
+
+      const { warnings: outputWarnings } = new AstAnalyser(
+        {
+          optionalWarnings: true
+        }
+      ).analyse(code);
+
+      const [firstWarning] = outputWarnings;
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.deepEqual(firstWarning.kind, "data-exfiltration");
+      assert.strictEqual(firstWarning.value, "~/.ssh/id_rsa");
+      assert.strictEqual(firstWarning.location?.length, 1);
+    });
+
+    test("should generate a warning when a sensitive path and a sensitive methods are encountered", () => {
+      const code = `
+      const path = "~/.ssh";
+      const { getServers } = require("dns");
+
+      const stringify = JSON.stringify;
+
+      stringify(getServers());
+    `;
+
+      const { warnings: outputWarnings } = new AstAnalyser(
+        {
+          optionalWarnings: true
+        }
+      ).analyse(code);
+
+      const [firstWarning] = outputWarnings;
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.deepEqual(firstWarning.kind, "data-exfiltration");
+      assert.strictEqual(firstWarning.value, "~/.ssh, dns.getServers");
+      assert.strictEqual(firstWarning.location?.length, 2);
+    });
+
+    test("should be able to detect multiple sensitive system path that are the same", () => {
+      const code = `
+      const path1 = "~/.ssh";
+      const path2 = "~/.ssh";
+    `;
+
+      const { warnings: outputWarnings } = new AstAnalyser(
+        {
+          optionalWarnings: true
+        }
+      ).analyse(code);
+
+      const [firstWarning] = outputWarnings;
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.deepEqual(firstWarning.kind, "data-exfiltration");
+      assert.strictEqual(firstWarning.value, "~/.ssh");
+      assert.strictEqual(firstWarning.location?.length, 2);
+    });
+  });
 });
