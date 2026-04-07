@@ -23,6 +23,15 @@ Detects serialization of sensitive system information using `JSON.stringify()` c
 In addition to the conservative mode detections, also flags:
 - Any import of `os` or `dns` modules
 
+### Conservative and Aggressive Mode
+Detects sensitive systems paths such as:
+- `~/.ssh`
+- `~/.aws`
+- `~/.npmrc`
+- `~/.gitconfig`
+- `~/.bashrc`
+
+
 ## Examples
 
 ```js
@@ -35,4 +44,11 @@ JSON.stringify(os.userInfo());
 JSON.stringify(os.networkInterfaces());
 JSON.stringify(os.cpus());
 JSON.stringify(dns.getServers());
+
+// Detected in conservative and aggressive mode: Sensitive system paths
+
+import { readFileSync } from "fs";
+
+readFileSync("~/.ssh/id_rsa");
+
 ```

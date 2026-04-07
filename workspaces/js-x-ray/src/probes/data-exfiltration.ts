@@ -3,7 +3,9 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  isLiteral,
+  type Literal
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
@@ -21,9 +23,11 @@ const kSensitiveMethods = [
   "dns.getServers"
 ];
 
+const sensitivePathRegex = /~\/\.(ssh|aws|npmrc|gitconfig|bashrc)(\/[^\s"'`]+)?/;
+
 type DataExfiltrationContextDef = Record<string, SourceArrayLocation[]>;
 
-function validateNode(
+function validateJSONStringify(
   node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
@@ -43,7 +47,27 @@ function validateNode(
   return [true];
 }
 
-function main(
+function validateLiteral(
+  node: ESTree.Node,
+  ctx: ProbeContext
+): [boolean, any?] {
+  if (isLiteral(node) && sensitivePathRegex.test(node.value)) {
+    ctx.setEntryPoint("literal");
+
+    return [true];
+  }
+
+  return [false];
+}
+
+function sensitiveLiteralHandler(
+  node: Literal<string>,
+  ctx: ProbeContext<DataExfiltrationContextDef>
+) {
+  addInContext(node.value, node.loc, ctx);
+}
+
+function sensitiveMethodsHandler(
   node: ESTree.CallExpression,
   ctx: ProbeContext<DataExfiltrationContextDef>
 ) {
@@ -61,13 +85,21 @@ function main(
   const data = sourceFile.tracer.getDataFromIdentifier(id);
   if (kSensitiveMethods.some((method) => data?.identifierOrMemberExpr === method
     && sourceFile.tracer.importedModules.has(method.split(".")[0]))) {
-    const arrayLocation = ctx.context?.[data?.identifierOrMemberExpr!];
-    if (arrayLocation) {
-      arrayLocation.push(toArrayLocation(firstArg.loc ?? rootLocation()));
-    }
-    else {
-      ctx.context![data?.identifierOrMemberExpr!] = [toArrayLocation(firstArg.loc ?? rootLocation())];
-    }
+    addInContext(data?.identifierOrMemberExpr!, firstArg.loc, ctx);
+  }
+}
+
+function addInContext(
+  value: string,
+  loc: ESTree.SourceLocation | null | undefined,
+  ctx: ProbeContext<DataExfiltrationContextDef>
+) {
+  const arrayLocation = ctx.context?.[value];
+  if (arrayLocation) {
+    arrayLocation.push(toArrayLocation(loc ?? rootLocation()));
+  }
+  else {
+    ctx.context![value!] = [toArrayLocation(loc ?? rootLocation())];
   }
 }
 
@@ -121,11 +153,14 @@ function finalize(ctx: ProbeContext<DataExfiltrationContextDef>) {
 
 const dateExifiltration = {
   name: "dataExfiltration",
-  nodeTypes: ["CallExpression"],
-  validateNode,
+  nodeTypes: ["CallExpression", "Literal"],
+  validateNode: [validateJSONStringify, validateLiteral],
   initialize,
   finalize,
-  main,
+  main: {
+    default: sensitiveMethodsHandler,
+    literal: sensitiveLiteralHandler
+  },
   breakOnMatch: false,
   context: {}
 };
