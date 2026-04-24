@@ -29,3 +29,6 @@ const xxx = Function("return this")();
 // xxx is equal to globalThis
 console.log(xxx);
 ```
+
+## References
+- [Defending Against Code Injection Vulnerabilities](https://www.nodejs-security.com/book/code-injection)

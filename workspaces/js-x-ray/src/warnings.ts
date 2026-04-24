@@ -34,6 +34,7 @@ export type WarningName =
   | "monkey-patch"
   | "insecure-random"
   | "prototype-pollution"
+  | "unsafe-vm-context"
   | OptionalWarningName;
 
 export interface Warning<T = WarningName> {
@@ -152,6 +153,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.weak_scrypt",
     severity: "Warning",
     experimental: true
+  },
+  "unsafe-vm-context": {
+    i18n: "sast_warnings.unsafe_vm_context",
+    severity: "Warning",
+    experimental: false
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;
 
