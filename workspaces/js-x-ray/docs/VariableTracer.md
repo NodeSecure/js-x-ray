@@ -296,6 +296,19 @@ tracer.on(VariableTracer.AssignmentEvent, (payload) => {
 });
 ```
 
+### ReturnValueEvent
+
+Emitted when a traced function's return value is assigned.
+
+```js
+tracer.on(VariableTracer.ReturnValueEvent, (payload) => {
+
+  console.log(`${payload.name} assigned to ${payload.id}`);
+  console.log(`Location:`, payload.location);
+});
+```
+
+
 **Payload:** `AssignmentEventPayload`
 
 ### ImportEvent

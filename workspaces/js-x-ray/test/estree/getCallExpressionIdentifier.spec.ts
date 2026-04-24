@@ -32,6 +32,14 @@ describe("estree.getCallExpressionIdentifier", () => {
     assert.strictEqual(nodeIdentifier, null);
   });
 
+  test("given a new Class('...')", () => {
+    const [astNode] = parseScript("new Foo('something');").body;
+    const nodeIdentifier = getCallExpressionIdentifier(
+      getExpressionFromStatement(astNode)
+    );
+    assert.strictEqual(nodeIdentifier, "Foo");
+  });
+
   test("given a JavaScript AssignmentExpression then it must return null", () => {
     const [astNode] = parseScript("foo = 10;").body;
     const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
