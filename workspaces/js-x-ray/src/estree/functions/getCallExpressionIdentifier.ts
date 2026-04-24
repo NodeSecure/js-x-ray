@@ -24,7 +24,7 @@ export function getCallExpressionIdentifier(
   node: ESTree.Node,
   options: GetCallExpressionIdentifierOptions = {}
 ): string | null {
-  if (node.type !== "CallExpression") {
+  if (node.type !== "CallExpression" && node.type !== "NewExpression") {
     return null;
   }
   const {
