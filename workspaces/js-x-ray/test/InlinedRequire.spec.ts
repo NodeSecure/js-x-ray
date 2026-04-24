@@ -6,7 +6,7 @@ import { describe, it, beforeEach } from "node:test";
 import { generate } from "astring";
 
 // Import Internal Dependencies
-import { parseScript } from "./helpers.ts";
+import { parseScript, getExpressionFromStatement } from "./helpers.ts";
 import { InlinedRequire } from "../src/probes/isRequire/InlinedRequire.ts";
 import { VirtualVariableIdentifier } from "../src/VirtualVariableIdentifier.ts";
 
@@ -181,7 +181,3 @@ describe("InlinedRequire", () => {
     });
   });
 });
-
-export function getExpressionFromStatement(node: any) {
-  return node.type === "ExpressionStatement" ? node.expression : null;
-}

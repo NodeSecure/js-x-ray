@@ -502,3 +502,80 @@ test("should get an ImportEvent when an require call is encountered", () => {
     }
   });
 });
+
+test("should get a ReturnValueEvent when a function store a result into a variable", () => {
+  const helpers = createTracer();
+  helpers.tracer.trace("fn", {
+    followReturnValueAssignement: true
+  });
+
+  const returnValueEvents = helpers.getReturnValueArray();
+
+  helpers.walkOnCode(`
+   function fn(something) {
+     return "foo" + something;
+   }
+
+  const fooAndBar = fn(" and bar");
+  const fooAndFoo = fn(" and foo");
+  `);
+
+  const [eventOne, eventTwo] = returnValueEvents;
+
+  assert.strictEqual(returnValueEvents.length, 2);
+  assert.strictEqual(eventOne.id, "fooAndBar");
+  assert.strictEqual(eventOne.name, "fn");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "fn");
+  assert.strictEqual(eventOne.arguments.length, 1);
+  assert.strictEqual(eventOne.arguments[0].type, "Literal");
+  assert.strictEqual(eventOne.arguments[0].value, " and bar");
+  assert(eventOne.location !== null);
+  assert.strictEqual(eventTwo.id, "fooAndFoo");
+  assert.strictEqual(eventTwo.name, "fn");
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "fn");
+  assert.strictEqual(eventTwo.arguments.length, 1);
+  assert.strictEqual(eventTwo.arguments[0].type, "Literal");
+  assert.strictEqual(eventTwo.arguments[0].value, " and foo");
+  assert(eventTwo.location !== null);
+});
+
+test("should get a ReturnValueEvent when a class store a class instance go in a variable", () => {
+  const helpers = createTracer();
+  helpers.tracer.trace("Foo", {
+    followReturnValueAssignement: true,
+    followConsecutiveAssignment: true
+  });
+
+  const returnValueEvents = helpers.getReturnValueArray();
+
+  helpers.walkOnCode(`
+  class Foo {
+    constructor(something) {
+      this.something = something;
+    }
+  };
+
+  const Bar = Foo;
+
+  const fooAndBar = new Foo(" and bar");
+  const fooAndFoo = new Bar(" and foo");
+  `);
+
+  const [eventOne, eventTwo] = returnValueEvents;
+
+  assert.strictEqual(returnValueEvents.length, 2);
+  assert.strictEqual(eventOne.id, "fooAndBar");
+  assert.strictEqual(eventOne.name, "Foo");
+  assert.strictEqual(eventOne.identifierOrMemberExpr, "Foo");
+  assert.strictEqual(eventOne.arguments.length, 1);
+  assert.strictEqual(eventOne.arguments[0].type, "Literal");
+  assert.strictEqual(eventOne.arguments[0].value, " and bar");
+  assert(eventOne.location !== null);
+  assert.strictEqual(eventTwo.id, "fooAndFoo");
+  assert.strictEqual(eventTwo.name, "Foo");
+  assert.strictEqual(eventTwo.identifierOrMemberExpr, "Foo");
+  assert.strictEqual(eventTwo.arguments.length, 1);
+  assert.strictEqual(eventTwo.arguments[0].type, "Literal");
+  assert.strictEqual(eventTwo.arguments[0].value, " and foo");
+  assert(eventTwo.location !== null);
+});

@@ -347,5 +347,6 @@ export class ProbeRunner {
       probe.finalize?.(this.#getProbeContext(probe));
       probe.context = probe[kProbeOriginalContext];
     }
+    this.sourceFile.tracer.removeAllListeners();
   }
 }

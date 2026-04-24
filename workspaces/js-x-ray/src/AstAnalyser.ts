@@ -21,6 +21,7 @@ import {
   PipelineRunner,
   type Pipeline
 } from "./pipelines/index.ts";
+import { Inline } from "./pipelines/inline.ts";
 import { ProbeRunner, type Probe } from "./ProbeRunner.ts";
 import {
   SourceFile,
@@ -163,8 +164,7 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
       collectables = [],
       sensitivity = "conservative"
     } = options;
-
-    this.#pipelineRunner = new PipelineRunner(pipelines);
+    this.#pipelineRunner = new PipelineRunner([...pipelines, new Inline()]);
     this.#collectableSetRegistry = new CollectableSetRegistry(
       collectables ?? []
     );

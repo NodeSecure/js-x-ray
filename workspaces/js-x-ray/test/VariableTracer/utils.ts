@@ -2,7 +2,8 @@
 import {
   VariableTracer,
   type AssignmentEventPayload,
-  type ImportEventPayload
+  type ImportEventPayload,
+  type ReturnValueEventPayload
 } from "../../src/VariableTracer.ts";
 import { walk } from "../../src/walker/index.ts";
 import { parseScript } from "../helpers.ts";
@@ -49,6 +50,12 @@ export function createTracer(
       tracer.on(event, (value: ImportEventPayload) => importEvents.push(value));
 
       return importEvents;
+    },
+    getReturnValueArray(event = VariableTracer.ReturnValueEvent) {
+      const returnValueEvents: ReturnValueEventPayload[] = [];
+      tracer.on(event, (value: ReturnValueEventPayload) => returnValueEvents.push(value));
+
+      return returnValueEvents;
     }
   };
 }

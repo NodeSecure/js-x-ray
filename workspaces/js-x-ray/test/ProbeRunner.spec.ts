@@ -332,14 +332,20 @@ describe("ProbeRunner", () => {
     it("should define context with initialize and dispatch it to all methods", () => {
       const fakeCtx = {};
 
+      const sourceFile = new SourceFile();
+
       const fakeProbe = {
-        initialize: mock.fn(() => fakeCtx),
+        initialize: mock.fn(() => {
+          sourceFile.tracer.on("fake-event", () => {
+            // ignored
+          });
+
+          return fakeCtx;
+        }),
         validateNode: mock.fn((_: ESTree.Node) => [true]),
         main: mock.fn(() => ProbeRunner.Signals.Skip),
         finalize: mock.fn()
       };
-
-      const sourceFile = new SourceFile();
 
       const pr = new ProbeRunner(
         sourceFile,
@@ -383,6 +389,7 @@ describe("ProbeRunner", () => {
       const finalizeArgs = fakeProbe.finalize.mock.calls.at(0)?.arguments;
       assert.ok(finalizeArgs, "finalizeArgs should be defined");
       assertProbeCtx(finalizeArgs[0], expectedContext);
+      assert.strictEqual(sourceFile.tracer.eventNames().length, 0);
     });
 
     it("should define context within the probe and dispatch it to all methods", () => {
