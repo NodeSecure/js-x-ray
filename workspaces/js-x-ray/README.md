@@ -144,6 +144,7 @@ type WarningName =
   | "sql-injection"
   | "monkey-patch"
   | "prototype-pollution"
+  | "unsafe-vm-context"
   | OptionalWarningName;
 
 interface Warning<T = WarningName> {
@@ -233,6 +234,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
 | [prototype-pollution](https://github.com/NodeSecure/js-x-ray/blob/master/docs/prototype-pollution.md) | No | Detected use of `__proto__` to pollute object prototypes |
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
+| [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext |
 
 #### Information Severity
 

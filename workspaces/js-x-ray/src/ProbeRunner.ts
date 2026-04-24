@@ -5,6 +5,7 @@ import assert from "node:assert";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import unsafeVmContext from "./probes/unsafe-vm-context.ts";
 import logUsage from "./probes/log-usage.ts";
 import sqlInjection from "./probes/sql-injection.ts";
 import dataExfiltration from "./probes/data-exfiltration.ts";
@@ -112,6 +113,7 @@ export class ProbeRunner {
     isRegexObject,
     isImportDeclaration,
     isWeakCrypto,
+    unsafeVmContext,
     isBinaryExpression,
     isArrayExpression,
     isUnsafeCommand,
