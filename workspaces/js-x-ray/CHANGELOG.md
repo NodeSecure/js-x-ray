@@ -1,5 +1,13 @@
 # @nodesecure/js-x-ray
 
+## 15.2.0
+
+### Minor Changes
+
+- [#624](https://github.com/NodeSecure/js-x-ray/pull/624) [`bcbe00b`](https://github.com/NodeSecure/js-x-ray/commit/bcbe00b42df4499414ff16181126b6047c9090a6) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): add unsafe vm context warning
+
+- [#615](https://github.com/NodeSecure/js-x-ray/pull/615) [`e3a9ce7`](https://github.com/NodeSecure/js-x-ray/commit/e3a9ce7961c9d2e5b86db7aa53eb58d46c25edcf) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(data-exfiltration): detects sensitive system path
+
 ## 15.1.0
 
 ### Minor Changes
