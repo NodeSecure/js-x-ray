@@ -116,11 +116,17 @@ export interface TracedIdentifierReport {
   assignmentMemory: AssignmentMemory[];
 }
 
-export interface AssignmentEventPayload {
+interface Payload {
   name: string;
   identifierOrMemberExpr: string;
   id: string;
   location: ESTree.SourceLocation | null | undefined;
+}
+
+export interface AssignmentEventPayload extends Payload { }
+
+export interface ReturnValueEventPayload extends Payload {
+  arguments: ESTree.Expression[];
 }
 
 export interface ImportEventPayload {
@@ -137,6 +143,7 @@ export interface LiteralIdentifier {
 export class VariableTracer extends EventEmitter {
   static AssignmentEvent = Symbol("AssignmentEvent");
   static ImportEvent = Symbol("ImportEvent");
+  static ReturnValueEvent = Symbol("ReturnValueEvent");
 
   // PUBLIC PROPERTIES
   literalIdentifiers = new Map<string, LiteralIdentifier>();
@@ -517,6 +524,7 @@ export class VariableTracer extends EventEmitter {
        * const g = eval("this");
        * const g = Function("return this")();
        */
+      case "NewExpression":
       case "CallExpression": {
         const fullIdentifierPath = getCallExpressionIdentifier(childNode);
         if (fullIdentifierPath === null) {
@@ -532,9 +540,20 @@ export class VariableTracer extends EventEmitter {
             type: "ReturnValueAssignment",
             name: id.name
           });
+          const returnValueEventPayload = {
+            name: tracedVariant.name,
+            identifierOrMemberExpr: tracedVariant.identifierOrMemberExpr,
+            id: id.name,
+            location: id.loc,
+            arguments: childNode.arguments
+          };
+          this.emit(VariableTracer.ReturnValueEvent, returnValueEventPayload);
           if (tracedVariant.followConsecutiveAssignment) {
             this.#assignedReturnValueToTraced.set(id.name, tracedFullIdentifierName);
           }
+        }
+        if (childNode.type !== "CallExpression") {
+          break;
         }
         // const id = Function.prototype.call.call(require, require, "http");
         if (this.#neutralCallable.has(identifierName) || isEvilIdentifierPath(fullIdentifierPath)) {
