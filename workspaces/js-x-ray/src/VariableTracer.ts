@@ -534,7 +534,17 @@ export class VariableTracer extends EventEmitter {
         const tracedFullIdentifierName = this.#getTracedName(fullIdentifierPath) ?? fullIdentifierPath;
         const [identifierName] = fullIdentifierPath.split(".");
 
-        const tracedVariant = this.#traced.get(tracedFullIdentifierName);
+        let tracedVariant: Traced | undefined;
+
+        if (this.#traced.has(tracedFullIdentifierName)) {
+          tracedVariant = this.#traced.get(tracedFullIdentifierName);
+        }
+        else {
+          const alternativeMemberExprParts = this.#searchForMemberExprAlternative(tracedFullIdentifierName.split("."));
+          const alternativeMemberExprFullname = alternativeMemberExprParts.join(".");
+          tracedVariant = this.#traced.get(alternativeMemberExprFullname);
+        }
+
         if (tracedVariant?.followReturnValueAssignement) {
           tracedVariant.assignmentMemory.push({
             type: "ReturnValueAssignment",
