@@ -53,10 +53,10 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray#readme",
   "dependencies": {
-    "@typescript-eslint/typescript-estree": "8.59.1",
+    "@typescript-eslint/typescript-estree": "8.59.2",
     "combine-async-iterators": "3.0.0",
     "digraph-js": "2.2.4",
-    "ipaddr.js": "2.3.0",
+    "ipaddr.js": "2.4.0",
     "is-svg": "6.1.0",
     "meriyah": "7.1.0",
     "safe-regex": "^2.1.1"
