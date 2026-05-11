@@ -16,7 +16,7 @@
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/changelog-github": "^0.6.0",
+    "@changesets/changelog-github": "^0.7.0",
     "@changesets/cli": "^2.29.4",
     "@openally/config.eslint": "^2.4.2",
     "@openally/config.typescript": "1.3.0",
