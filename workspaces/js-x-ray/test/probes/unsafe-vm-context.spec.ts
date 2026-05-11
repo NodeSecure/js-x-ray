@@ -253,6 +253,19 @@ runInContext(code);
       assert.strictEqual(outputWarnings.length, 0);
     });
 
+    test("should not conflict with other traced return values", () => {
+      const code = `import pino from "pino";
+                    import vm from "vm";
+                    const logger = pino();
+                    logger.runInContext();
+                    `;
+      const { warnings } = new AstAnalyser({
+        optionalWarnings: true
+      }).analyse(code);
+
+      assert.strictEqual(warnings.length, 0);
+    });
+
     test("should follow consecutive re-assignment of runInContext", () => {
       const code = `
 import vm from "node:vm";

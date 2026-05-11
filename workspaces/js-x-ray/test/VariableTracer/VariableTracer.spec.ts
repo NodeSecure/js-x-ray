@@ -579,3 +579,27 @@ test("should get a ReturnValueEvent when a class store a class instance go in a 
   assert.strictEqual(eventTwo.arguments[0].value, " and foo");
   assert(eventTwo.location !== null);
 });
+
+test("should trace a method call on an aliased return value", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("foo.bar", {
+    followConsecutiveAssignment: true,
+    followReturnValueAssignement: true,
+    moduleName: "foo"
+  });
+  helpers.tracer.trace("x.baz", {
+    followReturnValueAssignement: true
+  });
+  const returnValueEvents = helpers.getReturnValueArray();
+  helpers.walkOnCode(`
+    import { bar } from "foo";
+    const x = bar();
+    const y = x;
+    const result = y.baz();
+  `);
+  assert.strictEqual(returnValueEvents.length, 2);
+  assert.strictEqual(returnValueEvents[0].name, "foo.bar");
+  assert.strictEqual(returnValueEvents[0].id, "x");
+  assert.strictEqual(returnValueEvents[1].name, "x.baz");
+  assert.strictEqual(returnValueEvents[1].id, "result");
+});
