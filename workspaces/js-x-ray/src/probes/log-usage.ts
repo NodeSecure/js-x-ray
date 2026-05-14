@@ -9,7 +9,7 @@ import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocat
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 
 // CONSTANTS
-const kRunInContextTracedFunctions = Symbol("runInContextTracedFunctions");
+const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
 const kPinoLogMethods = ["info", "warn", "error", "fatal", "debug", "trace"];
 
 type LogUsageContextDef = Record<string, SourceArrayLocation[]>;
@@ -21,7 +21,7 @@ function validateNode(
   const identifierOrMemberExpr = ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr;
 
   return [
-    ctx.context![kRunInContextTracedFunctions].has(identifierOrMemberExpr),
+    ctx.context![kLoggerTracedFunctions].has(identifierOrMemberExpr),
     identifierOrMemberExpr];
 }
 
@@ -46,12 +46,58 @@ function initialize(
 
   const pinoLoggerFactoryTracedFunctions = new Set<string>(["pino"]);
 
+  const childLoggerFunctions = new Map<string, string[]>();
+
   sourceFile.tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
     if (!pinoLoggerFactoryTracedFunctions.has(payload.name)) {
       return;
     }
 
-    for (const method of kPinoLogMethods) {
+    let pinoLoggerMethods: string[] = childLoggerFunctions.get(payload.name) ?? [...kPinoLogMethods];
+
+    pino: if (payload.name === "pino") {
+      const pinoContext = payload.arguments[0];
+      if (!pinoContext || pinoContext.type !== "ObjectExpression") {
+        break pino;
+      }
+      let customLevels: ESTree.ObjectLiteralElementLike | undefined;
+      let useOnlyCustomLevels: ESTree.ObjectLiteralElementLike | undefined;
+      for (const objectEl of pinoContext.properties) {
+        if (customLevels && useOnlyCustomLevels) {
+          break;
+        }
+        if (objectEl.type !== "Property"
+          || objectEl.key.type !== "Identifier") {
+          continue;
+        }
+        if (objectEl.key.name === "customLevels") {
+          customLevels = objectEl;
+        }
+
+        if (objectEl.key.name === "useOnlyCustomLevels") {
+          useOnlyCustomLevels = objectEl;
+        }
+      }
+
+      let useOnlyCustomLevelsRaw: string | undefined;
+
+      if (useOnlyCustomLevels?.type === "Property" && useOnlyCustomLevels.value.type === "Literal") {
+        useOnlyCustomLevelsRaw = useOnlyCustomLevels.value.raw;
+      }
+
+      if (useOnlyCustomLevels?.type === "Property" && useOnlyCustomLevels.value.type === "Identifier") {
+        const resolvedIdentifer = sourceFile.tracer.literalIdentifiers.get(useOnlyCustomLevels.value.name);
+        useOnlyCustomLevelsRaw = resolvedIdentifer?.value;
+      }
+
+      if (useOnlyCustomLevelsRaw === "true") {
+        pinoLoggerMethods = [];
+      }
+
+      addLogMethods(customLevels, pinoLoggerMethods);
+    }
+
+    for (const method of pinoLoggerMethods) {
       const infoTracedFunction = `${payload.id}.${method}`;
       logUsages.add(infoTracedFunction);
       sourceFile.tracer.trace(infoTracedFunction, {
@@ -60,14 +106,30 @@ function initialize(
       });
     }
 
-    sourceFile.tracer.trace(`${payload.id}.child`, {
-      followReturnValueAssignement: true
+    const childLogger = `${payload.id}.child`;
+
+    sourceFile.tracer.trace(childLogger, {
+      followReturnValueAssignement: true,
+      moduleName: "pino"
     });
 
-    pinoLoggerFactoryTracedFunctions.add(`${payload.id}.child`);
+    childLoggerFunctions.set(childLogger, pinoLoggerMethods);
+    pinoLoggerFactoryTracedFunctions.add(childLogger);
   });
 
-  ctx.context![kRunInContextTracedFunctions] = logUsages;
+  ctx.context![kLoggerTracedFunctions] = logUsages;
+}
+
+function addLogMethods(customLevels: ESTree.ObjectLiteralElementLike | undefined,
+  loggerMethods: string[]) {
+  if (customLevels?.type !== "Property" || customLevels.value.type !== "ObjectExpression") {
+    return;
+  }
+  customLevels.value.properties.forEach((level) => {
+    if (level.type === "Property" && level.key.type === "Identifier") {
+      loggerMethods.push(level.key.name);
+    }
+  });
 }
 
 function main(

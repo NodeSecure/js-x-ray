@@ -38,6 +38,8 @@ console.debug("...");
 ```js
 import pino from "pino"
 
+// root logger
+
 const logger = pino();
 
 logger.log(process.env);
@@ -46,6 +48,8 @@ logger.warn("...");
 logger.error("...");
 logger.debug("...");
 
+// child logger
+
 const childLogger = logger.child({method: "auth"});
 
 childLogger.log(process.env);
@@ -53,5 +57,31 @@ childLogger.info("...");
 childLogger.warn("...");
 childLogger.error("...");
 childLogger.debug("...");
+
+// root logger with customLevels
+
+const logger = pino({
+  customLevels: {
+    foo: 35,
+    bar: 36
+  }
+});
+
+logger.foo(process.env);
+logger.bar("...");
+
+// child logger with customLevels
+
+const logger = pino({
+  customLevels: {
+    foo: 35,
+    bar: 36
+  }
+});
+
+const childLogger = logger.child({method: "auth"});
+
+childLogger.foo(process.env);
+childLogger.bar("...");
 ```
 
