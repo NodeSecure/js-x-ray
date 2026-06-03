@@ -273,5 +273,233 @@ describe("log-usage probe", () => {
         assert.strictEqual(firstWarning.value, "childLogger3.info");
       });
     });
+
+    describe("custom loggers", () => {
+      it("should emit a warning when a custom level method is called", () => {
+        const code = `import pino from "pino";
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      }
+                    });
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.fatal("hello");
+                    logger.debug("hello");
+                    logger.trace("hello");
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "logger.info, logger.warn, logger.error, " +
+        "logger.fatal, logger.debug, logger.trace, logger.foo, logger.bar"
+        );
+      });
+
+      it("should only trace customLevels methods", () => {
+        const code = `import pino from "pino";
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: true,
+                    });
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.fatal("hello");
+                    logger.debug("hello");
+                    logger.trace("hello");
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
+      });
+
+      it("should resolve useOnlyCustomLevels as an identifier", () => {
+        const code = `import pino from "pino";
+
+                    const useOnlyCustomLevels = true;
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels,
+                    });
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.fatal("hello");
+                    logger.debug("hello");
+                    logger.trace("hello");
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
+      });
+
+      it("should trace default methods as well when useOnlyCustomLevels is false", () => {
+        const code = `import pino from "pino";
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: false,
+                    });
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.fatal("hello");
+                    logger.debug("hello");
+                    logger.trace("hello");
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "logger.info, logger.warn, logger.error, " +
+        "logger.fatal, logger.debug, logger.trace, logger.foo, logger.bar"
+        );
+      });
+
+      it("should not conflict with other pino loggers methods", () => {
+        const code = `import pino from "pino";
+                    const logger1 = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: false
+                    });
+
+                    const logger2 = pino();
+                    logger2.foo("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        assert.strictEqual(warnings.length, 0);
+      });
+
+      it("should have a child logger who inherit the custom levels from its parent logger", () => {
+        const code = `import pino from "pino";
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: true
+                    });
+                    const childLogger = logger.child({component: "database"});
+                    childLogger.foo("hello");
+                    childLogger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "childLogger.foo, childLogger.bar"
+        );
+      });
+
+      it("each child loggers must have their own customLevels", () => {
+        const code = `import pino from "pino";
+                    const logger1 = pino({
+                    customLevels:{
+                      foo: 35,
+                      },
+                    useOnlyCustomLevels: true
+                    });
+                    const logger2 = pino({
+                    customLevels:{
+                      bar: 36,
+                      },
+                    useOnlyCustomLevels: true
+                    });
+                    const childLogger1 = logger1.child({component: "database"});
+                    const childLogger2 = logger2.child({component: "database"});
+                    childLogger1.foo("hello");
+                    childLogger1.bar("hello");
+                    childLogger2.bar("hello");
+                    childLogger2.foo("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "childLogger1.foo, childLogger2.bar"
+        );
+      });
+
+      it("should have a nested child logger who inherit the custom levels from its root parent logger", () => {
+        const code = `import pino from "pino";
+                    const logger = pino({
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: true
+                    });
+                    const childLogger1 = logger.child({component: "database"});
+                    const childLogger1Bis = childLogger1;
+                    const childLogger2 = childLogger1Bis.child({module: "auth"});
+                    childLogger2.foo("hello");
+                    childLogger2.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "childLogger2.foo, childLogger2.bar"
+        );
+      });
+    });
   });
 });
