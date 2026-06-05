@@ -23,6 +23,8 @@ The probe tracks the following [pino](https://github.com/pinojs/pino) logging me
 - `logger.debug()`
 - `logger.trace()`
 
+the probe tracks the following [winston](https://github.com/winstonjs/winston) logging methods
+
 ## Example console
 
 ```js
@@ -85,3 +87,67 @@ childLogger.foo(process.env);
 childLogger.bar("...");
 ```
 
+
+
+## Example winston
+
+```js
+// root loggers
+
+import winston from winston;
+
+winston.info(process.env);
+
+import { createLogger } from winston;
+
+const logger = createLogger();
+
+logger.info(process.env);
+
+// child loggers
+
+
+import winston from winston;
+
+const childLogger = winston.child({ requestId: 451 });
+
+childLogger.info(process.env);
+
+import { createLogger } from winston;
+
+const logger = createLogger();
+
+const childLogger = logger.child({ requestId: 451 });
+
+childLogger.info(process.env);
+
+// root logger with custom levels
+
+import { createLogger } from winston;
+
+const logger = createLogger({
+  levels: {
+    foo: 35,
+    bar: 36
+  }
+});
+
+logger.foo(process.env);
+logger.bar("...");
+
+// child logger with custom levels
+
+import { createLogger } from winston;
+
+const logger = createLogger({
+  levels: {
+    foo: 35,
+    bar: 36
+  }
+});
+
+childLogger = logger.child({ requestId: 451 });
+
+childLogger.foo(process.env);
+childLogger.bar(process.env);
+```
