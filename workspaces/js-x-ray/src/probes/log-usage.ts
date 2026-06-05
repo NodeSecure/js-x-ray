@@ -11,6 +11,20 @@ import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.
 // CONSTANTS
 const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
 const kPinoLogMethods = ["info", "warn", "error", "fatal", "debug", "trace"];
+const kWinstonLogMethods = ["info", "warn", "error", "http", "debug", "verbose", "silly", "log"];
+const kThirdPartyLoggers = [{
+  moduleName: "winston",
+  identifierOrMemberExpr: "winston.createLogger"
+},
+{
+  moduleName: "winston",
+  identifierOrMemberExpr: "winston"
+},
+{
+  moduleName: "pino",
+  identifierOrMemberExpr: "pino"
+}
+];
 
 type LogUsageContextDef = Record<string, SourceArrayLocation[]>;
 
@@ -38,22 +52,125 @@ function initialize(
     });
   }
 
-  sourceFile.tracer.trace("pino", {
+  for (const { moduleName, identifierOrMemberExpr } of kThirdPartyLoggers) {
+    sourceFile.tracer.trace(identifierOrMemberExpr, {
+      followReturnValueAssignement: true,
+      followConsecutiveAssignment: true,
+      moduleName
+    });
+  }
+
+  createWinstonTracerListener(sourceFile.tracer, logUsages);
+  createWinstonCreateLoggerTracerListener(sourceFile.tracer, logUsages);
+  createPinoTracerListener(sourceFile.tracer, logUsages);
+
+  ctx.context![kLoggerTracedFunctions] = logUsages;
+}
+
+function createWinstonTracerListener(tracer: VariableTracer, logUsages: Set<string>) {
+  tracer.trace("winston.child", {
     followReturnValueAssignement: true,
-    followConsecutiveAssignment: true,
-    moduleName: "pino"
+    moduleName: "winston"
   });
 
+  for (const method of kWinstonLogMethods) {
+    const loggerMethod = `winston.${method}`;
+    logUsages.add(loggerMethod);
+    tracer.trace(loggerMethod, {
+      followConsecutiveAssignment: true,
+      moduleName: "winston"
+    });
+  }
+
+  const winstonLoggerFactoryTracedFunctions = new Set<string>(["winston.child"]);
+
+  tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
+    if (!winstonLoggerFactoryTracedFunctions.has(payload.name)) {
+      return;
+    }
+
+    for (const method of kWinstonLogMethods) {
+      const infoTracedFunction = `${payload.id}.${method}`;
+      logUsages.add(infoTracedFunction);
+      tracer.trace(infoTracedFunction, {
+        followConsecutiveAssignment: true,
+        moduleName: "winston"
+      });
+    }
+
+    const childLogger = `${payload.id}.child`;
+
+    tracer.trace(childLogger, {
+      followReturnValueAssignement: true,
+      moduleName: "winston"
+    });
+
+    winstonLoggerFactoryTracedFunctions.add(childLogger);
+  });
+}
+
+function createWinstonCreateLoggerTracerListener(tracer: VariableTracer, logUsages: Set<string>) {
+  const winstonCreateLoggerFactoryTracedFunctions = new Set<string>(["winston.createLogger"]);
+
+  const winstonCreateLoggerChildLoggerFunctions = new Map<string, string[]>();
+
+  tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
+    if (!winstonCreateLoggerFactoryTracedFunctions.has(payload.name)) {
+      return;
+    }
+
+    let winstonLoggerMethods = winstonCreateLoggerChildLoggerFunctions.get(payload.name) ?? [...kWinstonLogMethods];
+
+    winston: if (payload.name === "winston.createLogger") {
+      const winstonContext = payload.arguments[0];
+      if (!winstonContext || winstonContext.type !== "ObjectExpression") {
+        break winston;
+      }
+
+      const levels = winstonContext.properties
+        .find((objEl) => objEl.type === "Property" && objEl.key.type === "Identifier" && objEl.key.name === "levels");
+
+      if (!levels) {
+        break winston;
+      }
+
+      winstonLoggerMethods = [];
+
+      addLogMethods(levels, winstonLoggerMethods);
+    }
+
+    for (const method of winstonLoggerMethods) {
+      const infoTracedFunction = `${payload.id}.${method}`;
+      logUsages.add(infoTracedFunction);
+      tracer.trace(infoTracedFunction, {
+        followConsecutiveAssignment: true,
+        moduleName: "winston"
+      });
+    }
+
+    const childLogger = `${payload.id}.child`;
+
+    tracer.trace(childLogger, {
+      followReturnValueAssignement: true,
+      moduleName: "winston"
+    });
+
+    winstonCreateLoggerChildLoggerFunctions.set(childLogger, winstonLoggerMethods);
+    winstonCreateLoggerFactoryTracedFunctions.add(childLogger);
+  });
+}
+
+function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>) {
   const pinoLoggerFactoryTracedFunctions = new Set<string>(["pino"]);
 
-  const childLoggerFunctions = new Map<string, string[]>();
+  const pinoLoggerChildLoggerFunctions = new Map<string, string[]>();
 
-  sourceFile.tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
+  tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
     if (!pinoLoggerFactoryTracedFunctions.has(payload.name)) {
       return;
     }
 
-    let pinoLoggerMethods: string[] = childLoggerFunctions.get(payload.name) ?? [...kPinoLogMethods];
+    let pinoLoggerMethods: string[] = pinoLoggerChildLoggerFunctions.get(payload.name) ?? [...kPinoLogMethods];
 
     pino: if (payload.name === "pino") {
       const pinoContext = payload.arguments[0];
@@ -86,7 +203,7 @@ function initialize(
       }
 
       if (useOnlyCustomLevels?.type === "Property" && useOnlyCustomLevels.value.type === "Identifier") {
-        const resolvedIdentifer = sourceFile.tracer.literalIdentifiers.get(useOnlyCustomLevels.value.name);
+        const resolvedIdentifer = tracer.literalIdentifiers.get(useOnlyCustomLevels.value.name);
         useOnlyCustomLevelsRaw = resolvedIdentifer?.value;
       }
 
@@ -100,7 +217,7 @@ function initialize(
     for (const method of pinoLoggerMethods) {
       const infoTracedFunction = `${payload.id}.${method}`;
       logUsages.add(infoTracedFunction);
-      sourceFile.tracer.trace(infoTracedFunction, {
+      tracer.trace(infoTracedFunction, {
         followConsecutiveAssignment: true,
         moduleName: "pino"
       });
@@ -108,16 +225,14 @@ function initialize(
 
     const childLogger = `${payload.id}.child`;
 
-    sourceFile.tracer.trace(childLogger, {
+    tracer.trace(childLogger, {
       followReturnValueAssignement: true,
       moduleName: "pino"
     });
 
-    childLoggerFunctions.set(childLogger, pinoLoggerMethods);
+    pinoLoggerChildLoggerFunctions.set(childLogger, pinoLoggerMethods);
     pinoLoggerFactoryTracedFunctions.add(childLogger);
   });
-
-  ctx.context![kLoggerTracedFunctions] = logUsages;
 }
 
 function addLogMethods(customLevels: ESTree.ObjectLiteralElementLike | undefined,

@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+/* eslint-disable max-nested-callbacks */
 // Import Node.js Dependencies
 import assert from "node:assert";
 import { readFileSync, promises as fs } from "node:fs";
@@ -101,7 +103,7 @@ describe("log-usage probe", () => {
       assert.strictEqual(firstWarning.value, "logger.info");
     });
 
-    it("should follow the assignement of a pino logger", () => {
+    it("should follow the assignment of a pino logger", () => {
       const code = `import pino from "pino";
                     const logger = pino();
                     const loggerBis = logger;
@@ -499,6 +501,431 @@ describe("log-usage probe", () => {
         assert.strictEqual(firstWarning.severity, "Information");
         assert.strictEqual(firstWarning.value, "childLogger2.foo, childLogger2.bar"
         );
+      });
+    });
+  });
+  describe("winston", () => {
+    describe("winston logger", () => {
+      it("should detect log usage", () => {
+        const winstonLoggers = [{
+          loggerCreation: `winston.createLogger({
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()]
+                      });`,
+          expectedLogger: "logger"
+        }, {
+          loggerCreation: "winston",
+          expectedLogger: "winston"
+        }];
+        for (const { loggerCreation, expectedLogger } of winstonLoggers) {
+          const code = `const winston = require("winston");
+                    const logger = ${loggerCreation}
+
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.http("hello");
+                    logger.debug("hello");
+                    logger.verbose("hello");
+                    logger.silly("hello");
+                    logger.log({level: "info", message: "hello"});
+                    `;
+          const { warnings } = new AstAnalyser({
+            optionalWarnings: true
+          }).analyse(code);
+
+          const [firstWarning] = warnings;
+
+          assert.strictEqual(firstWarning.kind, "log-usage");
+          assert.strictEqual(firstWarning.severity, "Information");
+          assert.strictEqual(firstWarning.value, `${expectedLogger}.info, ${expectedLogger}.warn, ${expectedLogger}.error, `
+          + `${expectedLogger}.http, ${expectedLogger}.debug, ${expectedLogger}.verbose, `
+          + `${expectedLogger}.silly, ${expectedLogger}.log`
+          );
+        }
+      });
+
+      it("should follow the assignment of winston createLogger", () => {
+        const winstonLoggers = [{
+          loggerCreation: `winston.createLogger({
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()]
+                      });`,
+          expectedLogger: "logger"
+        }, {
+          loggerCreation: "winston",
+          expectedLogger: "winston"
+        }];
+        for (const { loggerCreation, expectedLogger } of winstonLoggers) {
+          const code = `const winston = require("winston");
+                    const logger = ${loggerCreation}
+                    logger.info("hello");
+                    `;
+          const { warnings } = new AstAnalyser({
+            optionalWarnings: true
+          }).analyse(code);
+
+          const [firstWarning] = warnings;
+
+          assert.strictEqual(firstWarning.kind, "log-usage");
+          assert.strictEqual(firstWarning.severity, "Information");
+          assert.strictEqual(firstWarning.value, `${expectedLogger}.info`);
+        }
+      });
+
+      it("should follow the assignment of a winston logger", () => {
+        const winstonLoggers = [{
+          loggerCreation: `winston.createLogger({
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()]
+                      });`,
+          expectedLogger: "logger"
+        }, {
+          loggerCreation: "winston",
+          expectedLogger: "winston"
+        }];
+        for (const { loggerCreation, expectedLogger } of winstonLoggers) {
+          const code = `const winston = require("winston");
+                    const logger = ${loggerCreation}
+                    logger.info("hello");
+                    `;
+          const { warnings } = new AstAnalyser({
+            optionalWarnings: true
+          }).analyse(code);
+
+          const [firstWarning] = warnings;
+
+          assert.strictEqual(firstWarning.kind, "log-usage");
+          assert.strictEqual(firstWarning.severity, "Information");
+          assert.strictEqual(firstWarning.value, `${expectedLogger}.info`);
+        }
+      });
+
+      it("should follow the assignment of a winston logger function", () => {
+        const winstonLoggers = [{
+          loggerCreation: `winston.createLogger({
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()]
+                      });`,
+          expectedLogger: "logger"
+        }, {
+          loggerCreation: "winston",
+          expectedLogger: "winston"
+        }];
+        for (const { loggerCreation, expectedLogger } of winstonLoggers) {
+          const code = `const winston = require("winston");
+                    const logger = ${loggerCreation}
+                    const info = logger.info;
+                    const infoBis = info;
+                    infoBis("hello");
+                    `;
+          const { warnings } = new AstAnalyser({
+            optionalWarnings: true
+          }).analyse(code);
+
+          const [firstWarning] = warnings;
+
+          assert.strictEqual(firstWarning.kind, "log-usage");
+          assert.strictEqual(firstWarning.severity, "Information");
+          assert.strictEqual(firstWarning.value, `${expectedLogger}.info`);
+        }
+      });
+
+      it("should not emit a warning when winston is imported but not used", () => {
+        const code = `const winston = require("winston");
+                  const logger = (() => {
+                    const createLogger = () => ({
+                      info: () => {
+                      }
+                    });
+                    return createLogger();
+                  })();
+                  logger.info("hello");
+                  `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        assert.strictEqual(warnings.length, 0);
+      });
+
+      it("should not conflict with other traced return values", () => {
+        const winstonLoggers = [{
+          loggerCreation: "winston.createLogger();",
+          expectedLogger: "logger"
+        }, {
+          loggerCreation: "winston",
+          expectedLogger: "winston"
+        }];
+        for (const { loggerCreation } of winstonLoggers) {
+          const code = `const winston = require("winston");
+                    const logger = ${loggerCreation};
+                    (new vm.Script(code)).info("hello");
+                    `;
+          const { warnings } = new AstAnalyser({
+            optionalWarnings: true
+          }).analyse(code);
+
+          assert.strictEqual(warnings.length, 0);
+        }
+      });
+
+      describe("logger.child", () => {
+        it("should emit a warning when a one level logger child log something", () => {
+          const winstonLoggers = [`const logger = winston.createLogger({
+                        format: winston.format.json(),
+                        transports: [new winston.transports.Console()]
+                        });
+                      const childLogger = logger.child({module: "auth"});`, `const logger = winston;
+                      const childLogger = logger.child({module: "auth"});`];
+          for (const winstonLogger of winstonLoggers) {
+            const code = `const winston = require("winston");
+                      ${winstonLogger}
+                      childLogger.info("hello");
+                      childLogger.warn("hello");
+                      childLogger.error("hello");
+                      childLogger.http("hello");
+                      childLogger.debug("hello");
+                      childLogger.verbose("hello");
+                      childLogger.silly("hello");
+                      childLogger.log({level: "info", message: "hello"});
+                      `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger.info, childLogger.warn, childLogger.error, childLogger.http,"
+            + " childLogger.debug, childLogger.verbose, childLogger.silly, childLogger.log");
+          }
+        });
+
+        it("should follow the consecutive assignment of the child logger", () => {
+          const winstonLoggers = [`const logger = winston.createLogger({
+                        format: winston.format.json(),
+                        transports: [new winston.transports.Console()]
+                        });
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;`, `const logger = winston;
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;`];
+          for (const winstonLogger of winstonLoggers) {
+            const code = `const winston = require("winston");
+                      ${winstonLogger}
+                      childLoggerBis.info("hello");
+                      `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger.info");
+          }
+        });
+
+        it("should follow the consecutive assignment of the child logger function", () => {
+          const winstonLoggers = [`const logger = winston.createLogger();
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;
+                      const info = childLoggerBis.info;`, `const logger = winston;
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;
+                      const info = childLoggerBis.info;`];
+          for (const winstonLogger of winstonLoggers) {
+            const code = `const winston = require("winston");
+                      ${winstonLogger}
+                      info("hello");
+                      `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger.info");
+          }
+        });
+
+        it("should be able to trace nested child logger", () => {
+          const winstonLoggers = [`const logger = winston.createLogger(undefined);
+                      const childLogger = logger.child({module: "auth"});
+                      const childLogger2 = childLogger.child({ module: "something"});
+                      const childLogger3 = childLogger2.child({ module: "something2"});
+                      const info = childLogger3.info;`, `const logger = winston;
+                      const childLogger = logger.child({module: "auth"});
+                      const childLogger2 = childLogger.child({ module: "something"});
+                      const childLogger3 = childLogger2.child({ module: "something2"});
+                      const info = childLogger3.info;`];
+          for (const winstonLogger of winstonLoggers) {
+            const code = `const winston = require("winston");
+                      ${winstonLogger}
+                      info("hello");
+                      `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger3.info");
+          }
+        });
+
+        it("should follow the assignment of a nested logger", () => {
+          const winstonLoggers = [`const logger = winston.createLogger();
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;
+                      const childLogger2 = childLoggerBis.child({ module: "something"});
+                      const childLogger3 = childLogger2.child({ module: "something2"});
+                      const info = childLogger3.info;`, `const logger = winston;
+                      const childLogger = logger.child({module: "auth"});
+                      const childLoggerBis = childLogger;
+                      const childLogger2 = childLoggerBis.child({ module: "something"});
+                      const childLogger3 = childLogger2.child({ module: "something2"});
+                      const info = childLogger3.info;`];
+          for (const winstonLogger of winstonLoggers) {
+            const code = `const winston = require("winston");
+                      ${winstonLogger}
+                      info("hello");
+                      `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger3.info");
+          }
+        });
+
+        describe("custom loggers", () => {
+          it("should apply custom levels and overide the default levels", () => {
+            const code = `const winston = require("winston");
+                    const logger = winston.createLogger({
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()],
+                      levels: {
+                         foo: 1,
+                         bar: 2
+                        }
+                      });
+
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.error("hello");
+                    logger.http("hello");
+                    logger.debug("hello");
+                    logger.verbose("hello");
+                    logger.silly("hello");
+                    logger.log({level: "info", message: "hello"});
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
+          });
+
+          it("should have a child logger who inherit the custom levels from its parent logger", () => {
+            const code = `import winston from "winston";
+                    const logger = winston.createLogger({
+                    levels:{
+                      foo: 35,
+                      bar: 36
+                      }
+                    });
+                    const childLogger = logger.child({component: "database"});
+                    childLogger.foo("hello");
+                    childLogger.bar("hello");
+                    `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger.foo, childLogger.bar"
+            );
+          });
+
+          it("each child loggers must have their own customLevels", () => {
+            const code = `import winston from "winston";
+                    const logger1 = winston.createLogger({
+                    levels:{
+                      foo: 35,
+                      }
+                    });
+                    const logger2 = winston.createLogger({
+                    levels:{
+                      bar: 36,
+                      }
+                    });
+                    const childLogger1 = logger1.child({component: "database"});
+                    const childLogger2 = logger2.child({component: "database"});
+                    childLogger1.foo("hello");
+                    childLogger1.bar("hello");
+                    childLogger2.bar("hello");
+                    childLogger2.foo("hello");
+                    `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger1.foo, childLogger2.bar"
+            );
+          });
+
+          it("should have a nested child logger who inherit the custom levels from its root parent logger", () => {
+            const code = `import winston from "winston";
+                    const logger = winston.createLogger({
+                    levels:{
+                      foo: 35,
+                      bar: 36
+                      }
+                    });
+                    const childLogger1 = logger.child({component: "database"});
+                    const childLogger1Bis = childLogger1;
+                    const childLogger2 = childLogger1Bis.child({module: "auth"});
+                    childLogger2.foo("hello");
+                    childLogger2.bar("hello");
+                    `;
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "childLogger2.foo, childLogger2.bar"
+            );
+          });
+        });
       });
     });
   });
