@@ -9,6 +9,10 @@ const kReportMarkdownURL = new URL("report.md", import.meta.url);
 
 const results = await benchmark();
 
+const KB = 1_024;
+const MB = 1_024 ** 2;
+const GB = 1_024 ** 3;
+
 const relevantResults = {
   timestamp: new Date().toISOString(),
   runtime: results.context.runtime,
@@ -34,7 +38,7 @@ const relevantResults = {
 writeFileSync(kReportURL, JSON.stringify(relevantResults, null, 2));
 
 // Human-readable snapshot as a Markdown table.
-writeFileSync(kReportMarkdownURL, toMarkdown(relevantResults))
+writeFileSync(kReportMarkdownURL, toMarkdown(relevantResults));
 
 /**
  * mitata reports timings in nanoseconds. Picks the most readable unit.
@@ -57,17 +61,17 @@ function formatDuration(nanoseconds: number): string {
  * heap stats are reported in bytes.
  */
 function formatBytes(bytes: number): string {
-  if (bytes < 1_024) {
+  if (bytes < KB) {
     return `${bytes.toFixed(0)} B`;
   }
-  if (bytes < 1_024 ** 2) {
-    return `${(bytes / 1_024).toFixed(2)} KB`;
+  if (bytes < MB) {
+    return `${(bytes / KB).toFixed(2)} KB`;
   }
-  if (bytes < 1_024 ** 3) {
-    return `${(bytes / 1_024 ** 2).toFixed(2)} MB`;
+  if (bytes < GB) {
+    return `${(bytes / MB).toFixed(2)} MB`;
   }
 
-  return `${(bytes / 1_024 ** 3).toFixed(2)} GB`;
+  return `${(bytes / GB).toFixed(2)} GB`;
 }
 
 function toMarkdown(report: typeof relevantResults): string {
