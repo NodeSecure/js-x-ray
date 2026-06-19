@@ -27,6 +27,7 @@ JS-X-Ray parses JS or TS code into an **Abstract Syntax Tree (AST)** with no ext
 - Flag weak cryptographic usage
   - Deprecated algorithms (MD5, SHA1, MD4, MD2, RIPEMD160)
   - Weak scrypt parameters (insufficient cost, short or hardcoded salt)
+  - Weak bcrypt parameters (low work factor, hardcoded salt)
 - Detect code quality issues
   - Monkey-patching of built-in prototypes
   - Encoded literals (hex, Unicode, base64)
@@ -125,7 +126,8 @@ type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
   | "weak-scrypt"
-  | "unsafe-prehash";
+  | "unsafe-prehash"
+  | "weak-bcrypt";
 
 type WarningName =
   | "parsing-error"
@@ -189,6 +191,7 @@ The following warnings are optional:
 - `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
 - `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
 - `unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
+- `weak-bcrypt` - Detects weak bcrypt parameters (low work factor, hardcoded salt)
 
 ### Internationalization (i18n)
 
@@ -237,6 +240,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [prototype-pollution](https://github.com/NodeSecure/js-x-ray/blob/master/docs/prototype-pollution.md) | No | Detected use of `__proto__` to pollute object prototypes |
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
 | [unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
+| [weak-bcrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-bcrypt.md) ⚠️ | **Yes** | Usage of weak bcrypt parameters (low work factor or hardcoded salt) |
 | [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext and (vm.Script(code,options)).runInContext |
 
 #### Information Severity
