@@ -5,7 +5,6 @@ import { writeFileSync } from "node:fs";
 import { benchmark } from "./bench.ts";
 import { toMarkdown } from "./markdown.ts";
 
-const kReportURL = new URL("report.json", import.meta.url);
 const kReportMarkdownURL = new URL("report.md", import.meta.url);
 
 const results = await benchmark();
@@ -31,8 +30,6 @@ const relevantResults = {
     };
   })
 };
-
-writeFileSync(kReportURL, JSON.stringify(relevantResults, null, 2));
 
 // Human-readable snapshot as a Markdown table.
 writeFileSync(kReportMarkdownURL, toMarkdown(relevantResults));
