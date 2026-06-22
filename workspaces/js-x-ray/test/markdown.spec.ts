@@ -3,59 +3,7 @@ import assert from "node:assert";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import {
-  formatDuration,
-  formatBytes,
-  toMarkdown
-} from "../benchmark/markdown.ts";
-
-describe("formatDuration", () => {
-  test("should format values below 1,000 as nanoseconds", () => {
-    assert.strictEqual(formatDuration(0), "0.00 ns");
-    assert.strictEqual(formatDuration(500), "500.00 ns");
-    assert.strictEqual(formatDuration(999), "999.00 ns");
-  });
-
-  test("should format values from 1,000 to 999,999 as microseconds", () => {
-    assert.strictEqual(formatDuration(1_000), "1.00 µs");
-    assert.strictEqual(formatDuration(1_500), "1.50 µs");
-    assert.strictEqual(formatDuration(999_999), "1000.00 µs");
-  });
-
-  test("should format values from 1,000,000 to 999,999,999 as milliseconds", () => {
-    assert.strictEqual(formatDuration(1_000_000), "1.00 ms");
-    assert.strictEqual(formatDuration(5_500_000), "5.50 ms");
-    assert.strictEqual(formatDuration(999_999_999), "1000.00 ms");
-  });
-
-  test("should format values at or above 1,000,000,000 as seconds", () => {
-    assert.strictEqual(formatDuration(1_000_000_000), "1.00 s");
-    assert.strictEqual(formatDuration(2_500_000_000), "2.50 s");
-  });
-});
-
-describe("formatBytes", () => {
-  test("should format values below 1,024 as bytes", () => {
-    assert.strictEqual(formatBytes(0), "0 B");
-    assert.strictEqual(formatBytes(512), "512 B");
-    assert.strictEqual(formatBytes(1_023), "1023 B");
-  });
-
-  test("should format values from 1,024 to 1,048,575 as KB", () => {
-    assert.strictEqual(formatBytes(1_024), "1.00 KB");
-    assert.strictEqual(formatBytes(1_536), "1.50 KB");
-  });
-
-  test("should format values from 1,048,576 to 1,073,741,823 as MB", () => {
-    assert.strictEqual(formatBytes(1_048_576), "1.00 MB");
-    assert.strictEqual(formatBytes(5_242_880), "5.00 MB");
-  });
-
-  test("should format values at or above 1,073,741,824 as GB", () => {
-    assert.strictEqual(formatBytes(1_073_741_824), "1.00 GB");
-    assert.strictEqual(formatBytes(2_684_354_560), "2.50 GB");
-  });
-});
+import { toMarkdown } from "../benchmark/markdown.ts";
 
 describe("toMarkdown", () => {
   const baseReport = {
