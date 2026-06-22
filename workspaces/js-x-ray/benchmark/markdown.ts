@@ -27,7 +27,7 @@ export interface BenchmarkReport {
 /**
  * mitata reports timings in nanoseconds. Picks the most readable unit.
  */
-export function formatDuration(nanoseconds: number): string {
+function formatDuration(nanoseconds: number): string {
   if (nanoseconds < 1_000) {
     return `${nanoseconds.toFixed(2)} ns`;
   }
@@ -44,7 +44,7 @@ export function formatDuration(nanoseconds: number): string {
 /**
  * heap stats are reported in bytes.
  */
-export function formatBytes(bytes: number): string {
+function formatBytes(bytes: number): string {
   if (bytes < KB) {
     return `${bytes.toFixed(0)} B`;
   }
