@@ -1,5 +1,25 @@
 # @nodesecure/js-x-ray
 
+## 15.2.0
+
+### Minor Changes
+
+- [#638](https://github.com/NodeSecure/js-x-ray/pull/638) [`e63420a`](https://github.com/NodeSecure/js-x-ray/commit/e63420a8e42d54bededae89ee6c51a84c9fbad76) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(log-usage): add support for customLevels for pino
+
+- [#648](https://github.com/NodeSecure/js-x-ray/pull/648) [`be536df`](https://github.com/NodeSecure/js-x-ray/commit/be536df9425774bb282c552f48d0a1c5147be6d7) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(log-usage): add support for winston
+
+- [#632](https://github.com/NodeSecure/js-x-ray/pull/632) [`d7be42c`](https://github.com/NodeSecure/js-x-ray/commit/d7be42c539a6a582ce75009e295c6ceb2e7ad4f2) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(log-usage): trace pino
+
+- [#624](https://github.com/NodeSecure/js-x-ray/pull/624) [`bcbe00b`](https://github.com/NodeSecure/js-x-ray/commit/bcbe00b42df4499414ff16181126b6047c9090a6) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): add unsafe vm context warning
+
+- [#615](https://github.com/NodeSecure/js-x-ray/pull/615) [`e3a9ce7`](https://github.com/NodeSecure/js-x-ray/commit/e3a9ce7961c9d2e5b86db7aa53eb58d46c25edcf) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(data-exfiltration): detects sensitive system path
+
+- [#626](https://github.com/NodeSecure/js-x-ray/pull/626) [`e803246`](https://github.com/NodeSecure/js-x-ray/commit/e803246291278e41a4aebbffa3fca305d60f339d) Thanks [@clemgbld](https://github.com/clemgbld)! - feat(js-x-ray): improve unsafe-vm-context
+
+### Patch Changes
+
+- [#654](https://github.com/NodeSecure/js-x-ray/pull/654) [`ace9d77`](https://github.com/NodeSecure/js-x-ray/commit/ace9d77493cb3703fa6d868658c76a5411b08751) Thanks [@presham](https://github.com/presham)! - Store benchmark results in a readable Markdown table (report.md) instead of raw JSON.
+
 ## 15.1.0
 
 ### Minor Changes
