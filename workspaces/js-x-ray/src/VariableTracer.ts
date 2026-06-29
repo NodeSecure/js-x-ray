@@ -399,6 +399,14 @@ export class VariableTracer extends EventEmitter {
       return;
     }
 
+    // import boo from "crypto";
+    if (node.specifiers[0].type === "ImportDefaultSpecifier") {
+      const importDefaultNode = node.specifiers[0];
+      this.#declareNewAssignment(moduleName, importDefaultNode.local);
+
+      return;
+    }
+
     // import { createHash } from "crypto";
     const importSpecifiers = node.specifiers
       .filter((specifierNode) => specifierNode.type === "ImportSpecifier");
