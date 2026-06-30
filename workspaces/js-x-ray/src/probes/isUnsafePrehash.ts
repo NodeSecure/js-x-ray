@@ -4,8 +4,8 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isCallExpression, isLiteral } from "../estree/types.ts";
-import { getVariableDeclarationIdentifiers } from "../estree/index.ts";
+import { isLiteral, isFunctionNode } from "../estree/types.ts";
+import { getVariableDeclarationIdentifiers, getMemberCallExpression } from "../estree/index.ts";
 import { generateWarning } from "../warnings.ts";
 import {
   VariableTracer,
