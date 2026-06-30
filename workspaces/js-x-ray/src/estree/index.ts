@@ -1,4 +1,5 @@
 export * from "./functions/arrayExpression.ts";
+export * from "./functions/getMemberCallExpression.ts";
 export * from "./functions/concatBinaryExpression.ts";
 export * from "./functions/extractLogicalExpression.ts";
 export * from "./functions/getCallExpressionArguments.ts";
