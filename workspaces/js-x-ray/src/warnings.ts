@@ -13,7 +13,8 @@ export type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
   | "insecure-random"
-  | "weak-scrypt";
+  | "weak-scrypt"
+  | "unsafe-prehash";
 
 export type WarningName =
   | "parsing-error"
@@ -151,6 +152,11 @@ export const warnings = Object.freeze({
   },
   "weak-scrypt": {
     i18n: "sast_warnings.weak_scrypt",
+    severity: "Warning",
+    experimental: true
+  },
+  "unsafe-prehash": {
+    i18n: "sast_warnings.unsafe_prehash",
     severity: "Warning",
     experimental: true
   },

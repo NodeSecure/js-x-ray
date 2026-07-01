@@ -45,6 +45,58 @@ test("it should trace re-assignment from a module import using /promises", () =>
   });
 });
 
+test("it should trace a default import aliased to a different local name", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("crypto.createHash", {
+    followConsecutiveAssignment: true,
+    moduleName: "crypto"
+  });
+  helpers.walkOnCode(`
+    import c from "crypto";
+
+    const h = c.createHash("md5");
+  `);
+
+  const result = helpers.tracer.getDataFromIdentifier("c.createHash");
+
+  assert.deepEqual(result, {
+    assignmentMemory: [
+      {
+        type: "AliasBinding",
+        name: "c"
+      }
+    ],
+    identifierOrMemberExpr: "crypto.createHash",
+    name: "crypto.createHash"
+  });
+});
+
+test("it should trace a namespace import aliased to a different local name", () => {
+  const helpers = createTracer(false);
+  helpers.tracer.trace("crypto.createHash", {
+    followConsecutiveAssignment: true,
+    moduleName: "crypto"
+  });
+  helpers.walkOnCode(`
+    import * as c from "crypto";
+
+    const h = c.createHash("md5");
+  `);
+
+  const result = helpers.tracer.getDataFromIdentifier("c.createHash");
+
+  assert.deepEqual(result, {
+    assignmentMemory: [
+      {
+        type: "AliasBinding",
+        name: "c"
+      }
+    ],
+    identifierOrMemberExpr: "crypto.createHash",
+    name: "crypto.createHash"
+  });
+});
+
 test("it should be able to Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();

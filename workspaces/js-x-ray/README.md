@@ -124,7 +124,8 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
-  | "weak-scrypt";
+  | "weak-scrypt"
+  | "unsafe-prehash";
 
 type WarningName =
   | "parsing-error"
@@ -187,6 +188,7 @@ The following warnings are optional:
 - `synchronous-io` - Detects synchronous I/O operations that could impact performance
 - `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
 - `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
+- `unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
 
 ### Internationalization (i18n)
 
@@ -234,6 +236,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
 | [prototype-pollution](https://github.com/NodeSecure/js-x-ray/blob/master/docs/prototype-pollution.md) | No | Detected use of `__proto__` to pollute object prototypes |
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
+| [unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
 | [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext and (vm.Script(code,options)).runInContext |
 
 #### Information Severity
