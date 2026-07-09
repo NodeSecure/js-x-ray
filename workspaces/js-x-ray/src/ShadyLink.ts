@@ -100,7 +100,8 @@ export class ShadyLink {
       ? hostname.slice(1, -1)
       : hostname;
 
-    if (this.isValidIPAddress(cleanHostname)) {
+    // Keep :: excluded from generic IP validation while still classifying it as a local URL host.
+    if (cleanHostname === "::" || this.isValidIPAddress(cleanHostname)) {
       const result = this.isIpAddressSafe(cleanHostname, {
         collectableSetRegistry,
         file,
@@ -127,6 +128,9 @@ export class ShadyLink {
 
   static isValidIPAddress(input: string): boolean {
     if (input.length > 45 || /\s/.test(input)) {
+      return false;
+    }
+    if (input === "::") {
       return false;
     }
 
