@@ -90,6 +90,12 @@ describe("ShadyLink.isURLSafe()", () => {
         }), { safe: false, isLocalAddress: true });
       });
 
+      it("should return false for IPv6 unspecified address", () => {
+        assert.deepEqual(ShadyLink.isURLSafe("https://[::]/path", {
+          collectableSetRegistry
+        }), { safe: false, isLocalAddress: true });
+      });
+
       it("should return false for IPv4-mapped IPv6 private address", () => {
         assert.deepEqual(ShadyLink.isURLSafe("https://[::ffff:127.0.0.1]/path", {
           collectableSetRegistry
@@ -429,6 +435,7 @@ describe("ShadyLink.isValidIpAddress()", () => {
 
   it("should not be a valid address", () => {
     assert.ok(!ShadyLink.isValidIPAddress("127.0.0.1.1"));
+    assert.ok(!ShadyLink.isValidIPAddress("::"));
   });
 
   // https://github.com/NodeSecure/js-x-ray/issues/474
