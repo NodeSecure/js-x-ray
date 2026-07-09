@@ -46,6 +46,21 @@ export function isTemplateLiteral(
   );
 }
 
+export type FunctionNode =
+  | ESTree.FunctionDeclaration
+  | ESTree.FunctionExpression
+  | ESTree.ArrowFunctionExpression;
+
+export function isFunctionNode(
+  node: unknown
+): node is FunctionNode {
+  return isNode(node) && (
+    node.type === "FunctionDeclaration" ||
+    node.type === "FunctionExpression" ||
+    node.type === "ArrowFunctionExpression"
+  );
+}
+
 export function isCallExpression(
   node: unknown
 ): node is ESTree.CallExpression {
