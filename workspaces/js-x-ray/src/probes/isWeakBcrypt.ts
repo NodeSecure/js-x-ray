@@ -4,12 +4,12 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral } from "../estree/types.ts";
+import { isLiteral, isNumericLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 const kMinRounds = 10;
 
-const kModuleName = "bcrypt";
+const kModuleName = "bcryptjs";
 
 // Maps a traced bcrypt function name to the argument index
 const kTracedFunctionsWithArgIndex = new Map([
@@ -18,14 +18,6 @@ const kTracedFunctionsWithArgIndex = new Map([
   ["genSalt", 0],
   ["genSaltSync", 0]
 ]);
-
-function isNumericLiteral(
-  node: unknown
-): node is ESTree.Literal & { value: number; } {
-  return Boolean(node) &&
-    (node as ESTree.Node).type === "Literal" &&
-    typeof (node as ESTree.Literal).value === "number";
-}
 
 function validateNode(
   _node: ESTree.Node,
