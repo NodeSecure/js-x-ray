@@ -4,7 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral } from "../estree/types.ts";
+import { isLiteral, isNumericLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**
@@ -39,8 +39,7 @@ function extractNumericParam(
     if (
       prop.key.type === "Identifier" &&
       names.includes(prop.key.name) &&
-      prop.value.type === "Literal" &&
-      typeof prop.value.value === "number"
+      isNumericLiteral(prop.value)
     ) {
       return prop.value.value;
     }

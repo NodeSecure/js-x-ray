@@ -28,6 +28,14 @@ export function isLiteral(
     typeof node.value === "string";
 }
 
+export function isNumericLiteral(
+  node: unknown
+): node is Literal<number> {
+  return isNode(node) &&
+    node.type === "Literal" &&
+    typeof (node as ESTree.Literal).value === "number";
+}
+
 export function isTemplateLiteral(
   node: unknown
 ): node is ESTree.TemplateLiteral {

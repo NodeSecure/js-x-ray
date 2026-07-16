@@ -28,6 +28,7 @@ import isRandom from "./probes/isRandom.ts";
 import isPrototypePollution from "./probes/isPrototypePollution.ts";
 import isWeakScrypt from "./probes/isWeakScrypt.ts";
 import isUnsafePrehash from "./probes/isUnsafePrehash.ts";
+import isWeakBcrypt from "./probes/isWeakBcrypt.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -130,7 +131,8 @@ export class ProbeRunner {
     "log-usage": logUsage,
     "insecure-random": isRandom,
     "weak-scrypt": isWeakScrypt,
-    "unsafe-prehash": isUnsafePrehash
+    "unsafe-prehash": isUnsafePrehash,
+    "weak-bcrypt": isWeakBcrypt
   };
 
   constructor(
