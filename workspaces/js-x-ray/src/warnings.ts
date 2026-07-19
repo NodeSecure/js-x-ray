@@ -15,7 +15,8 @@ export type OptionalWarningName =
   | "insecure-random"
   | "weak-scrypt"
   | "unsafe-prehash"
-  | "weak-bcrypt";
+  | "weak-bcrypt"
+  | "password-shucking";
 
 export type WarningName =
   | "parsing-error"
@@ -163,6 +164,11 @@ export const warnings = Object.freeze({
   },
   "weak-bcrypt": {
     i18n: "sast_warnings.weak_bcrypt",
+    severity: "Warning",
+    experimental: true
+  },
+  "password-shucking": {
+    i18n: "sast_warnings.password_shucking",
     severity: "Warning",
     experimental: true
   },

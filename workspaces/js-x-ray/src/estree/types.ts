@@ -75,6 +75,18 @@ export function isCallExpression(
   return isNode(node) && node.type === "CallExpression";
 }
 
+export function isIdentifier(
+  node: unknown
+): node is ESTree.Identifier {
+  return isNode(node) && node.type === "Identifier";
+}
+
+export function isMemberExpression(
+  node: unknown
+): node is ESTree.MemberExpression {
+  return isNode(node) && node.type === "MemberExpression";
+}
+
 export interface DefaultOptions {
   externalIdentifierLookup?(name: string): string | null;
 }
