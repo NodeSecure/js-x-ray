@@ -7,6 +7,7 @@ import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
+import { isIdentifier } from "../estree/index.ts";
 
 // CONSTANTS
 const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
@@ -128,7 +129,7 @@ function createWinstonCreateLoggerTracerListener(tracer: VariableTracer, logUsag
       }
 
       const levels = winstonContext.properties
-        .find((objEl) => objEl.type === "Property" && objEl.key.type === "Identifier" && objEl.key.name === "levels");
+        .find((objEl) => objEl.type === "Property" && isIdentifier(objEl.key) && objEl.key.name === "levels");
 
       if (!levels) {
         break winston;
@@ -202,7 +203,7 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
         useOnlyCustomLevelsRaw = useOnlyCustomLevels.value.raw;
       }
 
-      if (useOnlyCustomLevels?.type === "Property" && useOnlyCustomLevels.value.type === "Identifier") {
+      if (useOnlyCustomLevels?.type === "Property" && isIdentifier(useOnlyCustomLevels.value)) {
         const resolvedIdentifer = tracer.literalIdentifiers.get(useOnlyCustomLevels.value.name);
         useOnlyCustomLevelsRaw = resolvedIdentifer?.value;
       }
@@ -241,7 +242,7 @@ function addLogMethods(customLevels: ESTree.ObjectLiteralElementLike | undefined
     return;
   }
   customLevels.value.properties.forEach((level) => {
-    if (level.type === "Property" && level.key.type === "Identifier") {
+    if (level.type === "Property" && isIdentifier(level.key)) {
       loggerMethods.push(level.key.name);
     }
   });

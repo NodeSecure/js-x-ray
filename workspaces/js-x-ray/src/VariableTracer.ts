@@ -11,7 +11,8 @@ import {
   getCallExpressionIdentifier,
   getMemberExpressionIdentifier,
   getVariableDeclarationIdentifiers,
-  isLiteral,
+  isCallExpression,
+  isStringLiteral,
   toLiteral
 } from "./estree/index.ts";
 import {
@@ -427,7 +428,7 @@ export class VariableTracer extends EventEmitter {
     id: ESTree.Identifier | ESTree.ObjectPattern
   ): void {
     const moduleNameLiteral = node.arguments
-      .find((argumentNode) => isLiteral(argumentNode)
+      .find((argumentNode) => isStringLiteral(argumentNode)
         && this.#traced.has(stripNodePrefix(argumentNode.value))) as ESTree.Literal | undefined;
     if (!moduleNameLiteral) {
       return;
@@ -645,7 +646,7 @@ export class VariableTracer extends EventEmitter {
           }
         }
 
-        if (childNode.object.type === "CallExpression") {
+        if (isCallExpression(childNode.object)) {
           this.#walkVariableDeclaratorInitialization(variableDeclaratorNode, childNode.object);
         }
         break;

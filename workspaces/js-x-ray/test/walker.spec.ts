@@ -7,6 +7,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { walk } from "../src/walker/index.ts";
+import { isIdentifier } from "../src/estree/index.ts";
 
 describe("walk", () => {
   it("walks a malformed node", () => {
@@ -193,7 +194,7 @@ describe("walk", () => {
           });
         }
 
-        if (node.type === "Identifier") {
+        if (isIdentifier(node)) {
           identifiers.push(node.name);
         }
       }
@@ -245,7 +246,7 @@ describe("walk", () => {
 
       walk(ast, {
         [phase](this: any, node: ESTree.Node) {
-          if (node.type === "Identifier" && node.name === "b") {
+          if (isIdentifier(node) && node.name === "b") {
             this.replace(forty_two);
           }
         }
@@ -270,7 +271,7 @@ describe("walk", () => {
 
     const node = walk(ast, {
       enter(node) {
-        if (node.type === "Identifier" && node.name === "answer") {
+        if (isIdentifier(node) && node.name === "answer") {
           this.replace(forty_two);
         }
       }
@@ -316,7 +317,7 @@ describe("walk", () => {
 
       walk(ast, {
         [phase](this: any, node: ESTree.Node) {
-          if (node.type === "Identifier" && node.name === "b") {
+          if (isIdentifier(node) && node.name === "b") {
             this.remove();
           }
         }

@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { VirtualVariableIdentifier } from "./VirtualVariableIdentifier.ts";
+import { isCallExpression, isMemberExpression } from "./estree/index.ts";
 
 export interface SplitResult {
   /**
@@ -91,7 +92,7 @@ export class Inlined {
       return replacement;
     }
 
-    if (node.type === "CallExpression") {
+    if (isCallExpression(node)) {
       const callee = Inlined.#cloneAndReplace(
         node.callee,
         target,
@@ -109,7 +110,7 @@ export class Inlined {
       };
     }
 
-    if (node.type === "MemberExpression") {
+    if (isMemberExpression(node)) {
       return {
         ...node,
         object: Inlined.#cloneAndReplace(

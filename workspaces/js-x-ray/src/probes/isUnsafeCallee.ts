@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { getCallExpressionIdentifier } from "../estree/index.ts";
+import { getCallExpressionIdentifier, isCallExpression } from "../estree/index.ts";
 import { CALL_EXPRESSION_IDENTIFIER } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -50,7 +50,7 @@ function isFunctionCallee(
   node: ESTree.CallExpression,
   identifier: null | string | undefined
 ): boolean {
-  return identifier === "Function" && node.callee.type === "CallExpression";
+  return identifier === "Function" && isCallExpression(node.callee);
 }
 
 function isEvalCallee(

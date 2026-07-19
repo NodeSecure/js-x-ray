@@ -11,7 +11,7 @@ import {
   getCallExpressionIdentifier
 } from "../../estree/index.ts";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { isLiteral } from "../../estree/types.ts";
+import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.ts";
 
@@ -106,7 +106,7 @@ function main(
 
     // require("http")
     case "Literal":
-      if (isLiteral(arg)) {
+      if (isStringLiteral(arg)) {
         sourceFile.addDependency(arg.value, node.loc);
       }
       break;

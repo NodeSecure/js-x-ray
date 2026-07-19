@@ -4,7 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral, isNumericLiteral } from "../estree/types.ts";
+import { isIdentifier, isStringLiteral, isNumericLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 const kMinRounds = 10;
@@ -69,7 +69,7 @@ function main(
       );
     }
   }
-  else if (arg?.type === "Identifier") {
+  else if (isIdentifier(arg)) {
     const literal = tracer.literalIdentifiers.get(arg.name);
     const numValue = Number(literal?.value);
     if (!Number.isNaN(numValue) && numValue < kMinRounds) {
@@ -81,7 +81,7 @@ function main(
       );
     }
   }
-  else if (isLiteral(arg)) {
+  else if (isStringLiteral(arg)) {
     sourceFile.warnings.push(
       generateWarning("weak-bcrypt", {
         value: "hardcoded-salt",

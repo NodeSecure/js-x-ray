@@ -5,6 +5,9 @@ import type { ESTree } from "meriyah";
 import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.ts";
 import {
   type DefaultOptions,
+  isCallExpression,
+  isIdentifier,
+  isMemberExpression,
   noop
 } from "../types.ts";
 
@@ -32,17 +35,17 @@ export function getCallExpressionIdentifier(
     resolveCallExpression = true
   } = options;
 
-  if (node.callee.type === "Identifier") {
+  if (isIdentifier(node.callee)) {
     return node.callee.name;
   }
-  if (node.callee.type === "MemberExpression") {
+  if (isMemberExpression(node.callee)) {
     const memberObject = node.callee.object;
     let lastId = "";
     for (const part of getMemberExpressionIdentifier(node.callee, { externalIdentifierLookup })) {
       lastId = lastId === "" ? part : `${lastId}.${part}`;
     }
 
-    return resolveCallExpression && memberObject.type === "CallExpression" ?
+    return resolveCallExpression && isCallExpression(memberObject) ?
       getCallExpressionIdentifier(memberObject) + `.${lastId}` :
       lastId;
   }

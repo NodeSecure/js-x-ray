@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getMemberExpressionIdentifier } from "../estree/index.ts";
+import { getMemberExpressionIdentifier, isMemberExpression } from "../estree/index.ts";
 import { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -13,7 +13,7 @@ function validateNode(
     return [true, "literal"];
   }
 
-  if (node.type === "MemberExpression") {
+  if (isMemberExpression(node)) {
     const parts = [...getMemberExpressionIdentifier(node)];
 
     if (parts.at(-1) === "__proto__") {

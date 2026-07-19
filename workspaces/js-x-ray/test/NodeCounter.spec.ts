@@ -8,7 +8,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { NodeCounter } from "../src/NodeCounter.ts";
 import { JsSourceParser } from "../src/index.ts";
-import { isNode } from "../src/estree/types.ts";
+import { isIdentifier } from "../src/estree/types.ts";
 import { walkEnter } from "../src/walker/index.ts";
 
 describe("NodeCounter", () => {
@@ -72,7 +72,7 @@ describe("NodeCounter", () => {
     const nc = new NodeCounter<ESTree.FunctionExpression>(
       "FunctionExpression",
       {
-        filter: (node) => isNode(node.id) && node.id.type === "Identifier"
+        filter: (node) => isIdentifier(node.id)
       }
     );
     assert.equal(nc.type, "FunctionExpression");

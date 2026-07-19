@@ -7,7 +7,7 @@ import {
 } from "./getMemberExpressionIdentifier.ts";
 import {
   isCallExpression,
-  isLiteral,
+  isStringLiteral,
   isNode,
   noop,
   type DefaultOptions
@@ -106,7 +106,7 @@ export function joinArrayExpression(
   }
   if (
     id !== "join" ||
-    !isLiteral(node.arguments[0])
+    !isStringLiteral(node.arguments[0])
   ) {
     return null;
   }

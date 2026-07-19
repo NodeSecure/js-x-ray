@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { isCallExpression } from "../types.ts";
+import { isCallExpression, isIdentifier, isMemberExpression } from "../types.ts";
 
 export type MemberCallExpression = ESTree.CallExpression & { callee: ESTree.MemberExpression; };
 
@@ -12,9 +12,9 @@ export function getMemberCallExpression(
 ): MemberCallExpression | null {
   if (
     isCallExpression(node) &&
-    node.callee.type === "MemberExpression" &&
+    isMemberExpression(node.callee) &&
     !node.callee.computed &&
-    node.callee.property.type === "Identifier" &&
+    isIdentifier(node.callee.property) &&
     node.callee.property.name === methodName
   ) {
     return node as MemberCallExpression;
