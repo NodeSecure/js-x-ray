@@ -127,7 +127,8 @@ type OptionalWarningName =
   | "log-usage"
   | "weak-scrypt"
   | "unsafe-prehash"
-  | "weak-bcrypt";
+  | "weak-bcrypt"
+  | "password-shucking";
 
 type WarningName =
   | "parsing-error"
@@ -192,6 +193,7 @@ The following warnings are optional:
 - `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
 - `unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
 - `weak-bcrypt` - Detects weak bcrypt parameters (low work factor, hardcoded salt)
+- `password-shucking` - Detects password pre-hashing with a plain hash function fed into bcrypt
 
 ### Internationalization (i18n)
 
@@ -241,6 +243,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
 | [unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
 | [weak-bcrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-bcrypt.md) ⚠️ | **Yes** | Usage of weak bcrypt parameters (low work factor or hardcoded salt) |
+| [password-shucking](https://github.com/NodeSecure/js-x-ray/blob/master/docs/password-shucking.md) ⚠️ | **Yes** | Password pre-hashed with a plain hash function |
 | [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext and (vm.Script(code,options)).runInContext |
 
 #### Information Severity

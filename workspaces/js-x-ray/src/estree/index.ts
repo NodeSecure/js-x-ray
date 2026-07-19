@@ -5,6 +5,7 @@ export * from "./functions/extractLogicalExpression.ts";
 export * from "./functions/getCallExpressionArguments.ts";
 export * from "./functions/getCallExpressionIdentifier.ts";
 export * from "./functions/getMemberExpressionIdentifier.ts";
+export * from "./functions/getParamNames.ts";
 export * from "./functions/getVariableDeclarationIdentifiers.ts";
 export * from "./functions/toLiteral.ts";
 export * from "./types.ts";

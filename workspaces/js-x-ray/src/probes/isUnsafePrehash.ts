@@ -4,8 +4,8 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral, isFunctionNode } from "../estree/types.ts";
-import { getVariableDeclarationIdentifiers, getMemberCallExpression } from "../estree/index.ts";
+import { isLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../estree/types.ts";
+import { getParamNames, getMemberCallExpression } from "../estree/index.ts";
 import { generateWarning } from "../warnings.ts";
 import {
   VariableTracer,
@@ -75,20 +75,6 @@ function resolveDigestEncodingArguments(
   return null;
 }
 
-function getParamNames(
-  params: ESTree.Node[]
-): string[] {
-  const names: string[] = [];
-
-  for (const param of params) {
-    for (const { assignmentId } of getVariableDeclarationIdentifiers(param)) {
-      names.push(assignmentId.name);
-    }
-  }
-
-  return names;
-}
-
 function isSafeEncodingArg(
   node: ESTree.Node | undefined,
   literalIdentifiers: Map<string, LiteralIdentifier>
@@ -97,7 +83,7 @@ function isSafeEncodingArg(
     return kSafeDigestEncodings.has(node.value);
   }
 
-  if (node?.type === "Identifier") {
+  if (isIdentifier(node)) {
     const literal = literalIdentifiers.get(node.name);
 
     return literal !== undefined && kSafeDigestEncodings.has(literal.value);
@@ -202,15 +188,15 @@ function bcryptHashCall(
   const hashArgument = bcryptNode.arguments.at(0);
 
   let isUnsafe: boolean;
-  if (hashArgument?.type === "Identifier") {
+  if (isIdentifier(hashArgument)) {
     const isAmbiguous = getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.name);
     const isDigestVariable = getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.name);
 
     isUnsafe = !isAmbiguous && isDigestVariable;
   }
   else if (
-    hashArgument?.type === "CallExpression" &&
-    hashArgument.callee.type === "Identifier" &&
+    isCallExpression(hashArgument) &&
+    isIdentifier(hashArgument.callee) &&
     !getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.callee.name) &&
     getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.callee.name)
   ) {
