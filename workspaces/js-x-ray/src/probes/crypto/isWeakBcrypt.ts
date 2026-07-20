@@ -2,10 +2,10 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isIdentifier, isStringLiteral, isNumericLiteral } from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
+import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../../contants.ts";
+import { isStringLiteral, isNumericLiteral, isIdentifier } from "../../estree/types.ts";
+import { generateWarning } from "../../warnings.ts";
 
 const kMinRounds = 10;
 
@@ -62,7 +62,7 @@ function main(
   if (isNumericLiteral(arg)) {
     if (arg.value < kMinRounds) {
       sourceFile.warnings.push(
-        generateWarning("weak-bcrypt", {
+        generateWarning("crypto.weak-bcrypt", {
           value: "low-work-factor",
           location: node.loc
         })
@@ -74,7 +74,7 @@ function main(
     const numValue = Number(literal?.value);
     if (!Number.isNaN(numValue) && numValue < kMinRounds) {
       sourceFile.warnings.push(
-        generateWarning("weak-bcrypt", {
+        generateWarning("crypto.weak-bcrypt", {
           value: "low-work-factor",
           location: node.loc
         })
@@ -83,7 +83,7 @@ function main(
   }
   else if (isStringLiteral(arg)) {
     sourceFile.warnings.push(
-      generateWarning("weak-bcrypt", {
+      generateWarning("crypto.weak-bcrypt", {
         value: "hardcoded-salt",
         location: node.loc
       })

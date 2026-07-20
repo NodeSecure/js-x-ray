@@ -2,15 +2,15 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../estree/types.ts";
-import { getParamNames, getMemberCallExpression } from "../estree/index.ts";
-import { generateWarning } from "../warnings.ts";
+import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../../contants.ts";
+import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../../estree/types.ts";
+import { getParamNames, getMemberCallExpression } from "../../estree/index.ts";
+import { generateWarning } from "../../warnings.ts";
 import {
   VariableTracer,
   type ReturnValueEventPayload
-} from "../VariableTracer.ts";
+} from "../../VariableTracer.ts";
 
 const kModuleName = "bcryptjs";
 const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
@@ -146,7 +146,7 @@ function bcryptHashCall(
 
   if (isVariableShucking || isShuckingPrehash(hashArgument)) {
     ctx.sourceFile.warnings.push(
-      generateWarning("password-shucking", {
+      generateWarning("crypto.password-shucking", {
         value: null,
         location: bcryptNode.loc
       })

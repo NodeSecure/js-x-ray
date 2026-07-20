@@ -13,10 +13,10 @@ export type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
   | "insecure-random"
-  | "weak-scrypt"
-  | "unsafe-prehash"
-  | "weak-bcrypt"
-  | "password-shucking";
+  | "crypto.weak-scrypt"
+  | "crypto.unsafe-prehash"
+  | "crypto.weak-bcrypt"
+  | "crypto.password-shucking";
 
 export type WarningName =
   | "parsing-error"
@@ -27,7 +27,7 @@ export type WarningName =
   | "suspicious-literal"
   | "suspicious-file"
   | "obfuscated-code"
-  | "weak-crypto"
+  | "crypto.weak-algorithm"
   | "shady-link"
   | "unsafe-command"
   | "unsafe-import"
@@ -97,7 +97,7 @@ export const warnings = Object.freeze({
     severity: "Critical",
     experimental: true
   },
-  "weak-crypto": {
+  "crypto.weak-algorithm": {
     i18n: "sast_warnings.weak_crypto",
     severity: "Information",
     experimental: false
@@ -152,22 +152,22 @@ export const warnings = Object.freeze({
     severity: "Warning",
     experimental: false
   },
-  "weak-scrypt": {
+  "crypto.weak-scrypt": {
     i18n: "sast_warnings.weak_scrypt",
     severity: "Warning",
     experimental: true
   },
-  "unsafe-prehash": {
+  "crypto.unsafe-prehash": {
     i18n: "sast_warnings.unsafe_prehash",
     severity: "Warning",
     experimental: true
   },
-  "weak-bcrypt": {
+  "crypto.weak-bcrypt": {
     i18n: "sast_warnings.weak_bcrypt",
     severity: "Warning",
     experimental: true
   },
-  "password-shucking": {
+  "crypto.password-shucking": {
     i18n: "sast_warnings.password_shucking",
     severity: "Warning",
     experimental: true

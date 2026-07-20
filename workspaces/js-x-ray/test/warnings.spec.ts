@@ -26,14 +26,14 @@ test("Given an encoded-literal kind it should generate a warning with deep locat
 });
 
 test("Given a weak-crypto kind it should generate a warning with value, simple location and experimental flag", () => {
-  const result = generateWarning("weak-crypto", {
+  const result = generateWarning("crypto.weak-algorithm", {
     value: "md5",
     location: rootLocation(),
     file: "hello.js"
   });
 
   assert.deepEqual(result, {
-    kind: "weak-crypto",
+    kind: "crypto.weak-algorithm",
     value: "md5",
     file: "hello.js",
     source: "JS-X-Ray",

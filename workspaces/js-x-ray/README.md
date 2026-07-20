@@ -125,10 +125,10 @@ Alternatively, you can use `EntryFilesAnalyser` directly for multi-file analysis
 type OptionalWarningName =
   | "synchronous-io"
   | "log-usage"
-  | "weak-scrypt"
-  | "unsafe-prehash"
-  | "weak-bcrypt"
-  | "password-shucking";
+  | "crypto.weak-scrypt"
+  | "crypto.unsafe-prehash"
+  | "crypto.weak-bcrypt"
+  | "crypto.password-shucking";
 
 type WarningName =
   | "parsing-error"
@@ -139,7 +139,7 @@ type WarningName =
   | "suspicious-literal"
   | "suspicious-file"
   | "obfuscated-code"
-  | "weak-crypto"
+  | "crypto.weak-algorithm"
   | "shady-link"
   | "unsafe-command"
   | "unsafe-import"
@@ -183,17 +183,22 @@ const scanner = new AstAnalyser({
 
 // Or enable specific optional warnings
 const scannerSpecific = new AstAnalyser({
-  optionalWarnings: ["synchronous-io", "log-usage", "weak-scrypt"]
+  optionalWarnings: ["synchronous-io", "log-usage", "crypto.weak-scrypt"]
+});
+
+// Enable all crypto warnings at once using a glob pattern
+const scannerCrypto = new AstAnalyser({
+  optionalWarnings: ["crypto.*"]
 });
 ```
 
 The following warnings are optional:
 - `synchronous-io` - Detects synchronous I/O operations that could impact performance
 - `log-usage` - Tracks usage of logging functions (console.log, logger.info, etc.)
-- `weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
-- `unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
-- `weak-bcrypt` - Detects weak bcrypt parameters (low work factor, hardcoded salt)
-- `password-shucking` - Detects password pre-hashing with a plain hash function fed into bcrypt
+- `crypto.weak-scrypt` - Detects weak scrypt parameters (low cost, short or hardcoded salt)
+- `crypto.unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
+- `crypto.weak-bcrypt` - Detects weak bcrypt parameters (low work factor, hardcoded salt)
+- `crypto.password-shucking` - Detects password pre-hashing with a plain hash function fed into bcrypt
 
 ### Internationalization (i18n)
 
@@ -232,7 +237,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [unsafe-command](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-command.md) | **Yes** | Suspicious commands detected in `spawn()` or `exec()` |
 | [short-identifiers](https://github.com/NodeSecure/js-x-ray/blob/master/docs/short-identifiers.md) | No | Average identifier length below 1.5 characters (possible obfuscation) |
 | [suspicious-literal](https://github.com/NodeSecure/js-x-ray/blob/master/docs/suspicious-literal.md) | No | Suspicious literal values detected in source code |
-| [weak-crypto](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-crypto.md) | No | Usage of weak cryptographic algorithms (MD5, SHA1, etc.) |
+| [crypto.weak-algorithm](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.weak-algorithm.md) | No | Usage of weak cryptographic algorithms (MD5, SHA1, etc.) |
 | [shady-link](https://github.com/NodeSecure/js-x-ray/blob/master/docs/shady-link.md) | No | Suspicious or potentially malicious URLs detected |
 | [synchronous-io](https://github.com/NodeSecure/js-x-ray/blob/master/docs/synchronous-io.md) ⚠️ | **Yes** | Synchronous I/O operations that may impact performance |
 | [serialize-environment](https://github.com/NodeSecure/js-x-ray/blob/master/docs/serialize-environment.md) | No | Attempts to serialize `process.env` (potential data exfiltration) |
@@ -240,10 +245,10 @@ Click on the warning **name** for detailed documentation and examples.
 | [sql-injection](https://github.com/NodeSecure/js-x-ray/blob/master/docs/sql-injection.md) | No | Potential SQL injection vulnerability detected |
 | [monkey-patch](https://github.com/NodeSecure/js-x-ray/blob/master/docs/monkey-patch.md) | No | Modification of built-in JavaScript prototype properties |
 | [prototype-pollution](https://github.com/NodeSecure/js-x-ray/blob/master/docs/prototype-pollution.md) | No | Detected use of `__proto__` to pollute object prototypes |
-| [weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
-| [unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
-| [weak-bcrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/weak-bcrypt.md) ⚠️ | **Yes** | Usage of weak bcrypt parameters (low work factor or hardcoded salt) |
-| [password-shucking](https://github.com/NodeSecure/js-x-ray/blob/master/docs/password-shucking.md) ⚠️ | **Yes** | Password pre-hashed with a plain hash function |
+| [crypto.weak-scrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.weak-scrypt.md) ⚠️ | **Yes** | Usage of weak scrypt parameters (low cost, short or hardcoded salt) |
+| [crypto.unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
+| [crypto.weak-bcrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.weak-bcrypt.md) ⚠️ | **Yes** | Usage of weak bcrypt parameters (low work factor or hardcoded salt) |
+| [crypto.password-shucking](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.password-shucking.md) ⚠️ | **Yes** | Password pre-hashed with a plain hash function |
 | [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext and (vm.Script(code,options)).runInContext |
 
 #### Information Severity

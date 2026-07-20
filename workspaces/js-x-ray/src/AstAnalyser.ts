@@ -111,7 +111,7 @@ export interface AstAnalyserOptions {
   /**
    * @default false
    */
-  optionalWarnings?: boolean | Iterable<OptionalWarningName>;
+  optionalWarnings?: boolean | Iterable<OptionalWarningName | `${string}.*`>;
   pipelines?: Pipeline[];
   /**
    * @default []
@@ -186,8 +186,19 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
       }
     }
     else {
+      const allOptionalKeys = Object.keys(ProbeRunner.Optionals) as OptionalWarningName[];
       const optionalProbes = Array.from(optionalWarnings ?? [])
-        .flatMap((warning) => ProbeRunner.Optionals[warning] ?? []);
+        .flatMap((warning) => {
+          if (isPattern(warning)) {
+            const prefix = warning.slice(0, -2);
+
+            return allOptionalKeys
+              .filter((key) => key.startsWith(`${prefix}.`))
+              .map((key) => ProbeRunner.Optionals[key]);
+          }
+
+          return ProbeRunner.Optionals[warning] ?? [];
+        });
 
       probes = [...probes, ...optionalProbes];
     }
@@ -494,3 +505,8 @@ function isEvalCallExpr(
     getCallExpressionIdentifier(node, { resolveCallExpression: true }) === "eval"
   );
 }
+
+function isPattern(warning: OptionalWarningName | `${string}.*`): warning is `${string}.*` {
+  return warning.endsWith(".*");
+}
+

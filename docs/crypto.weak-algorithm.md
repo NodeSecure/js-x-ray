@@ -1,8 +1,8 @@
-# Weak crypto
+# Weak crypto algorithm
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| weak-crypto | `Information` | `sast_warnings.weak_crypto` | ❌ | 
+| crypto.weak-algorithm | `Information` | `sast_warnings.weak_crypto` | ❌ | 
 
 ## Introduction
 

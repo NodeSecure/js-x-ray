@@ -2,16 +2,16 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isStringLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../estree/types.ts";
-import { getParamNames, getMemberCallExpression } from "../estree/index.ts";
-import { generateWarning } from "../warnings.ts";
+import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../../contants.ts";
+import { isStringLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
+import { getParamNames, getMemberCallExpression } from "../../estree/index.ts";
+import { generateWarning } from "../../warnings.ts";
 import {
   VariableTracer,
   type LiteralIdentifier,
   type ReturnValueEventPayload
-} from "../VariableTracer.ts";
+} from "../../VariableTracer.ts";
 
 const kModuleName = "bcryptjs";
 const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
@@ -209,7 +209,7 @@ function bcryptHashCall(
 
   if (isUnsafe) {
     sourceFile.warnings.push(
-      generateWarning("unsafe-prehash", {
+      generateWarning("crypto.unsafe-prehash", {
         value: null,
         location: bcryptNode.loc
       })

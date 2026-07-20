@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser } from "../../../src/AstAnalyser.ts";
 
 describe("isWeakBcrypt", () => {
   describe("low-work-factor", () => {
@@ -13,7 +13,7 @@ describe("isWeakBcrypt", () => {
         const hash = bcrypt.hashSync(password, 4);
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -26,7 +26,7 @@ describe("isWeakBcrypt", () => {
         const salt = bcrypt.genSalt(8, (err, salt) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -39,7 +39,7 @@ describe("isWeakBcrypt", () => {
         const salt = bcrypt.genSaltSync(8);
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -52,7 +52,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 4, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -65,7 +65,7 @@ describe("isWeakBcrypt", () => {
         hash(password, 4, (err, h) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -79,7 +79,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, ROUNDS, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -92,11 +92,11 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 9, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "weak-bcrypt");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-bcrypt");
       assert.strictEqual(outputWarnings[0].value, "low-work-factor");
     });
 
@@ -106,7 +106,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 12, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -118,7 +118,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 10, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -132,11 +132,11 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, "$2b$10$N9qo8uLOickgx2ZMRZoMye", (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "weak-bcrypt");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-bcrypt");
       assert.strictEqual(outputWarnings[0].value, "hardcoded-salt");
     });
 
@@ -146,7 +146,7 @@ describe("isWeakBcrypt", () => {
         const hash = bcrypt.hashSync(password, "$2b$10$N9qo8uLOickgx2ZMRZoMye");
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
@@ -161,7 +161,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, rounds, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -174,7 +174,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -186,7 +186,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 4, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -200,7 +200,7 @@ describe("isWeakBcrypt", () => {
         bcrypt.hash(password, 4, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["weak-bcrypt"]
+        optionalWarnings: ["crypto.weak-bcrypt"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);

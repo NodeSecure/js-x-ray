@@ -2,12 +2,12 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
+import type { ProbeContext } from "../../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import {
   isStringLiteral
-} from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
+} from "../../estree/types.ts";
+import { generateWarning } from "../../warnings.ts";
 
 // CONSTANTS
 const kWeakAlgorithms = new Set([
@@ -60,7 +60,7 @@ function main(
 
   if (isStringLiteral(arg) && kWeakAlgorithms.has(arg.value)) {
     const warning = generateWarning(
-      "weak-crypto",
+      "crypto.weak-algorithm",
       { value: arg.value, location: node.loc }
     );
     sourceFile.warnings.push(warning);

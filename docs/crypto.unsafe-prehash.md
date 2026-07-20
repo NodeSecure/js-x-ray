@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| unsafe-prehash | `Warning` | `sast_warnings.unsafe_prehash` | :white_check_mark: |
+| crypto.unsafe-prehash | `Warning` | `sast_warnings.unsafe_prehash` | :white_check_mark: |
 
 ## Introduction
 

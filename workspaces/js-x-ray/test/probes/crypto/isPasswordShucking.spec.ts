@@ -3,9 +3,9 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser } from "../../../src/AstAnalyser.ts";
 
-const kOptions = { optionalWarnings: ["password-shucking"] as const };
+const kOptions = { optionalWarnings: ["crypto.password-shucking"] as const };
 
 describe("isPasswordShucking probe", () => {
   it("should warn regardless of encoding, shuckability is independent of digest encoding", () => {
@@ -19,7 +19,7 @@ describe("isPasswordShucking probe", () => {
       const { warnings } = new AstAnalyser(kOptions).analyse(code);
 
       assert.strictEqual(warnings.length, 1, `Expected warning for encoding: ${encoding || "none"}`);
-      assert.strictEqual(warnings[0].kind, "password-shucking");
+      assert.strictEqual(warnings[0].kind, "crypto.password-shucking");
     }
   });
 
@@ -33,7 +33,7 @@ describe("isPasswordShucking probe", () => {
     const { warnings } = new AstAnalyser(kOptions).analyse(code);
 
     assert.strictEqual(warnings.length, 1);
-    assert.strictEqual(warnings[0].kind, "password-shucking");
+    assert.strictEqual(warnings[0].kind, "crypto.password-shucking");
   });
 
   it("should not warn when createHmac is used, pepper prevents hash enumeration", () => {
@@ -48,7 +48,7 @@ describe("isPasswordShucking probe", () => {
   });
 
   describe("optional warning behavior", () => {
-    it("should not report when password-shucking is not enabled", () => {
+    it("should not report when crypto.password-shucking is not enabled", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';

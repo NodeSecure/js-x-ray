@@ -30,7 +30,7 @@ JS-X-Ray is a sophisticated JavaScript AST (Abstract Syntax Tree) analysis tool 
 - `unsafe-import` - Untraceable require/import statements
 - `unsafe-regex` - ReDoS attack patterns
 - `unsafe-stmt` - Dangerous statements (eval, Function constructor)
-- `weak-crypto` - Weak cryptographic algorithms (MD5, SHA1)
+- `crypto.weak-algorithm` - Weak cryptographic algorithms (MD5, SHA1)
 - `shady-link` - Suspicious URLs/links
 - `data-exfiltration` - Potential data theft patterns
 
