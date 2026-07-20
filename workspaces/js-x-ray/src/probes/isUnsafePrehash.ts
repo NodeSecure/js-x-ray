@@ -20,19 +20,8 @@ const kUnsafeDigestVariables = Symbol("unsafeDigestVariables");
 const kAmbiguousVariableNames = Symbol("ambiguousVariableNames");
 
 interface UnsafePrehashContext {
-  [kUnsafeDigestVariables]?: Set<string>;
-  [kAmbiguousVariableNames]?: Set<string>;
-}
-
-type UnsafePrehashContextSetKey =
-  | typeof kUnsafeDigestVariables
-  | typeof kAmbiguousVariableNames;
-
-function getContextSet(
-  ctx: ProbeContext<UnsafePrehashContext>,
-  key: UnsafePrehashContextSetKey
-): Set<string> {
-  return ctx.context![key]!;
+  [kUnsafeDigestVariables]: Set<string>;
+  [kAmbiguousVariableNames]: Set<string>;
 }
 
 /**
@@ -121,9 +110,9 @@ function validateNode(
 
   if (isFunctionNode(node)) {
     const paramNames = getParamNames(node.params);
-    const unsafeVars = getContextSet(ctx, kUnsafeDigestVariables);
+    const hasUnsafeDigestVar = paramNames.some((name) => ctx.context![kUnsafeDigestVariables].has(name));
 
-    if (paramNames.some((name) => unsafeVars.has(name))) {
+    if (hasUnsafeDigestVar) {
       ctx.setEntryPoint("markAmbiguousParams");
 
       return [true, paramNames];
@@ -165,18 +154,17 @@ function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
 
     const encodingArg = payload.arguments.at(0);
     if (!isSafeEncodingArg(encodingArg, tracer.literalIdentifiers)) {
-      ctx.context![kUnsafeDigestVariables]!.add(payload.id);
+      ctx.context![kUnsafeDigestVariables].add(payload.id);
     }
   });
 }
 
 function markAmbiguousParams(
   _node: ESTree.Node,
-  ctx: ProbeMainContext<UnsafePrehashContext>
+  ctx: ProbeMainContext<UnsafePrehashContext, string[]>
 ) {
-  const ambiguousVariableNames = getContextSet(ctx, kAmbiguousVariableNames);
-  for (const name of ctx.data as string[]) {
-    ambiguousVariableNames.add(name);
+  for (const name of ctx.data) {
+    ctx.context![kAmbiguousVariableNames].add(name);
   }
 }
 
@@ -189,16 +177,16 @@ function bcryptHashCall(
 
   let isUnsafe: boolean;
   if (isIdentifier(hashArgument)) {
-    const isAmbiguous = getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.name);
-    const isDigestVariable = getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.name);
+    const isAmbiguous = ctx.context![kAmbiguousVariableNames].has(hashArgument.name);
+    const isDigestVariable = ctx.context![kUnsafeDigestVariables].has(hashArgument.name);
 
     isUnsafe = !isAmbiguous && isDigestVariable;
   }
   else if (
     isCallExpression(hashArgument) &&
     isIdentifier(hashArgument.callee) &&
-    !getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.callee.name) &&
-    getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.callee.name)
+    !ctx.context![kAmbiguousVariableNames].has(hashArgument.callee.name) &&
+    ctx.context![kUnsafeDigestVariables].has(hashArgument.callee.name)
   ) {
     const encodingArg = hashArgument.arguments.at(0);
     isUnsafe = !isSafeEncodingArg(encodingArg, sourceFile.tracer.literalIdentifiers);
@@ -232,5 +220,5 @@ export default {
   },
   initialize,
   breakOnMatch: false,
-  context: {}
+  context: {} as UnsafePrehashContext
 };

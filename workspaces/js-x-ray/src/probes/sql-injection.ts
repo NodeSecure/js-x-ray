@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { toLiteral } from "../estree/index.ts";
-import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
+import type { ProbeContextDef, ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
@@ -53,11 +53,11 @@ function validateNode(
 
 function main(
   node: ESTree.TemplateLiteral,
-  ctx: ProbeMainContext
+  ctx: ProbeMainContext<ProbeContextDef, string | undefined>
 ) {
   ctx.sourceFile.warnings.push(
     generateWarning("sql-injection", {
-      value: ctx.data,
+      value: ctx.data ?? null,
       location: node.loc
     })
   );

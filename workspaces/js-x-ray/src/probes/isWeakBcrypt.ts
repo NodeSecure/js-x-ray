@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
+import type { ProbeContext, ProbeContextDef, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { isLiteral, isNumericLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
@@ -22,7 +22,7 @@ const kTracedFunctionsWithArgIndex = new Map([
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
-): [boolean, any?] {
+): [boolean, string?] {
   const { tracer } = ctx.sourceFile;
 
   if (!tracer.importedModules.has(kModuleName)) {
@@ -52,11 +52,11 @@ function initialize(ctx: ProbeContext) {
 
 function main(
   node: ESTree.CallExpression,
-  ctx: ProbeMainContext
+  ctx: ProbeMainContext<ProbeContextDef, string>
 ) {
   const { sourceFile } = ctx;
   const { tracer } = sourceFile;
-  const argIndex = kTracedFunctionsWithArgIndex.get(ctx.data as string)!;
+  const argIndex = kTracedFunctionsWithArgIndex.get(ctx.data)!;
   const arg = node.arguments.at(argIndex);
 
   if (isNumericLiteral(arg)) {

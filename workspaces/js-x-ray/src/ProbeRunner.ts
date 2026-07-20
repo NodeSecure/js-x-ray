@@ -45,9 +45,9 @@ const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 export type ProbeReturn = void | null | symbol;
 export type ProbeContextDef = Record<string | symbol, any>;
 
-export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef> = {
-  default: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
-  [handlerName: string]: (node: any, ctx: ProbeMainContext<T>) => ProbeReturn;
+export type NamedMainHandlers<T extends ProbeContextDef = ProbeContextDef, D = any> = {
+  default: (node: any, ctx: ProbeMainContext<T, D>) => ProbeReturn;
+  [handlerName: string]: (node: any, ctx: ProbeMainContext<T, D>) => ProbeReturn;
 };
 
 export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
@@ -55,16 +55,16 @@ export type ProbeContext<T extends ProbeContextDef = ProbeContextDef> = {
   context?: T;
   setEntryPoint: (handlerName: string) => void;
 };
-export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef> = ProbeContext<T> & {
-  data?: any;
+export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef, D = any> = ProbeContext<T> & {
+  data: D;
   signals: typeof ProbeRunner.Signals;
 };
 
-export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef> = (
+export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef, D = any> = (
   node: ESTree.Node, ctx: ProbeContext<T>
-) => [boolean, any?];
+) => [boolean, D?];
 
-export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
+export interface Probe<T extends ProbeContextDef = ProbeContextDef, D = any> {
   name: string;
   /**
    * The ESTree node types this probe handles. When provided, the probe is only
@@ -76,8 +76,8 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
   nodeTypes?: readonly string[];
   initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
   finalize?: (ctx: ProbeContext<T>) => void;
-  validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
-  main: ((node: any, ctx: ProbeMainContext<T>) => ProbeReturn) | NamedMainHandlers<T>;
+  validateNode: ProbeValidationCallback<T, D> | ProbeValidationCallback<T, D>[];
+  main: ((node: any, ctx: ProbeMainContext<T, D>) => ProbeReturn) | NamedMainHandlers<T, D>;
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
   breakGroup?: string;
@@ -127,7 +127,7 @@ export class ProbeRunner {
     isPrototypePollution
   ];
 
-  static Optionals: Record<OptionalWarningName, Probe> = {
+  static Optionals: Record<OptionalWarningName, Probe<any>> = {
     "synchronous-io": isSyncIO,
     "log-usage": logUsage,
     "insecure-random": isRandom,

@@ -19,8 +19,8 @@ const kShuckingVariables = Symbol("shuckingVariables");
 const kAmbiguousVariableNames = Symbol("ambiguousVariableNames");
 
 interface PasswordShuckingContext {
-  [kShuckingVariables]?: Set<string>;
-  [kAmbiguousVariableNames]?: Set<string>;
+  [kShuckingVariables]: Set<string>;
+  [kAmbiguousVariableNames]: Set<string>;
 }
 
 /**
@@ -79,9 +79,9 @@ function validateNode(
 
   if (isFunctionNode(node)) {
     const paramNames = getParamNames(node.params);
-    const shuckingVars = ctx.context![kShuckingVariables]!;
+    const hasShuckingVar = paramNames.some((name) => ctx.context![kShuckingVariables].has(name));
 
-    if (paramNames.some((name) => shuckingVars.has(name))) {
+    if (hasShuckingVar) {
       ctx.setEntryPoint("markAmbiguousParams");
 
       return [true, paramNames];
@@ -119,16 +119,16 @@ function initialize(ctx: ProbeContext<PasswordShuckingContext>) {
       return;
     }
 
-    ctx.context![kShuckingVariables]!.add(payload.id);
+    ctx.context![kShuckingVariables].add(payload.id);
   });
 }
 
 function markAmbiguousParams(
   _node: ESTree.Node,
-  ctx: ProbeMainContext<PasswordShuckingContext>
+  ctx: ProbeMainContext<PasswordShuckingContext, string[]>
 ) {
-  for (const name of ctx.data as string[]) {
-    ctx.context![kAmbiguousVariableNames]!.add(name);
+  for (const name of ctx.data) {
+    ctx.context![kAmbiguousVariableNames].add(name);
   }
 }
 
@@ -137,8 +137,8 @@ function bcryptHashCall(
   ctx: ProbeMainContext<PasswordShuckingContext>
 ) {
   const hashArgument = bcryptNode.arguments.at(0);
-  const ambiguousVars = ctx.context![kAmbiguousVariableNames]!;
-  const shuckingVars = ctx.context![kShuckingVariables]!;
+  const ambiguousVars = ctx.context![kAmbiguousVariableNames];
+  const shuckingVars = ctx.context![kShuckingVariables];
 
   const isVariableShucking = isIdentifier(hashArgument) &&
     !ambiguousVars.has(hashArgument.name) &&
@@ -169,5 +169,5 @@ export default {
   },
   initialize,
   breakOnMatch: false,
-  context: {}
+  context: {} as PasswordShuckingContext
 };

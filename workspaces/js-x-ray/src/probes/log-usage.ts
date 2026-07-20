@@ -249,7 +249,7 @@ function addLogMethods(customLevels: ESTree.ObjectLiteralElementLike | undefined
 
 function main(
   node: ESTree.CallExpression,
-  ctx: ProbeMainContext<LogUsageContextDef>
+  ctx: ProbeMainContext<LogUsageContextDef, string>
 ) {
   const logIdentifer = ctx.data;
   const arrayLocation = ctx.context?.[logIdentifer];
