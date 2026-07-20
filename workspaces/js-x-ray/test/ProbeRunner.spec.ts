@@ -11,6 +11,7 @@ import {
   ProbeRunner
 } from "../src/ProbeRunner.ts";
 import { SourceFile } from "../src/SourceFile.ts";
+import { isCallExpression } from "../src/estree/index.ts";
 
 function assertProbeCtx(ctx: unknown, expected: {
   sourceFile: SourceFile;
@@ -45,7 +46,7 @@ describe("ProbeRunner", () => {
     it("should use provided probes with validate node as func", () => {
       const fakeProbe = [
         {
-          validateNode: (node: ESTree.Node) => [node.type === "CallExpression"],
+          validateNode: (node: ESTree.Node) => [isCallExpression(node)],
           main: mock.fn(),
           teardown: mock.fn()
         }
@@ -74,7 +75,7 @@ describe("ProbeRunner", () => {
 
     it("should fail if main not present", () => {
       const fakeProbe = {
-        validateNode: (node: ESTree.Node) => [node.type === "CallExpression"],
+        validateNode: (node: ESTree.Node) => [isCallExpression(node)],
         teardown: mock.fn()
       };
 

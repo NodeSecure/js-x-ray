@@ -5,7 +5,7 @@ import type { ESTree } from "meriyah";
 import type { ProbeContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
-  isLiteral
+  isStringLiteral
 } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -58,7 +58,7 @@ function main(
   const { sourceFile } = ctx;
   const arg = node.arguments.at(0);
 
-  if (isLiteral(arg) && kWeakAlgorithms.has(arg.value)) {
+  if (isStringLiteral(arg) && kWeakAlgorithms.has(arg.value)) {
     const warning = generateWarning(
       "weak-crypto",
       { value: arg.value, location: node.loc }

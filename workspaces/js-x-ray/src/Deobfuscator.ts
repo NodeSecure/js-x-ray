@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getVariableDeclarationIdentifiers } from "./estree/index.ts";
+import { getVariableDeclarationIdentifiers, isIdentifier } from "./estree/index.ts";
 import { NodeCounter } from "./NodeCounter.ts";
 import {
   extractNode,
@@ -74,7 +74,7 @@ export class Deobfuscator {
     }),
     new NodeCounter<ESTree.MemberExpression>("MemberExpression[computed]"),
     new NodeCounter<ESTree.Property>("Property", {
-      filter: (node) => node.key.type === "Identifier",
+      filter: (node) => isIdentifier(node.key),
       match: (node, nc) => this.#extractCounterIdentifiers(nc, node.key)
     }),
     new NodeCounter<ESTree.UnaryExpression>("UnaryExpression", {
@@ -105,7 +105,7 @@ export class Deobfuscator {
       }
       case "Property":
       case "FunctionDeclaration":
-        if (node.type === "Identifier") {
+        if (isIdentifier(node)) {
           this.identifiers.push({ name: node.name, type });
         }
         break;

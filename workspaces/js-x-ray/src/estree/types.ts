@@ -20,20 +20,25 @@ export function isNode(
   );
 }
 
+export function isStringLiteral(
+  node: unknown
+): node is Literal<string> {
+  return isLiteral(node) &&
+    typeof node.value === "string";
+}
+
 export function isLiteral(
   node: unknown
 ): node is Literal<string> {
   return isNode(node) &&
-    node.type === "Literal" &&
-    typeof node.value === "string";
+    node.type === "Literal";
 }
 
 export function isNumericLiteral(
   node: unknown
 ): node is Literal<number> {
-  return isNode(node) &&
-    node.type === "Literal" &&
-    typeof (node as ESTree.Literal).value === "number";
+  return isLiteral(node) &&
+    typeof (node).value === "number";
 }
 
 export function isTemplateLiteral(

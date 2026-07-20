@@ -14,7 +14,8 @@ import {
 import type { VariableTracer } from "../../VariableTracer.ts";
 import {
   isCallExpression,
-  isLiteral
+  isStringLiteral,
+  isMemberExpression
 } from "../../estree/types.ts";
 import { walkEnter } from "../../walker/index.ts";
 
@@ -62,7 +63,7 @@ export class RequireCallExpressionWalker {
         return;
       }
 
-      const fullName = castedNode.callee.type === "MemberExpression" ?
+      const fullName = isMemberExpression(castedNode.callee) ?
         [...getMemberExpressionIdentifier(castedNode.callee)].join(".") :
         castedNode.callee.name;
       const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
@@ -119,7 +120,7 @@ export class RequireCallExpressionWalker {
   #handleRequireResolve(
     node: ESTree.Node
   ) {
-    if (isLiteral(node)) {
+    if (isStringLiteral(node)) {
       this.dependencies.add(node.value);
     }
   }
@@ -127,7 +128,7 @@ export class RequireCallExpressionWalker {
   #handlePathJoin(
     node: ESTree.CallExpression
   ) {
-    if (!node.arguments.every((arg) => isLiteral(arg))) {
+    if (!node.arguments.every((arg) => isStringLiteral(arg))) {
       return;
     }
 

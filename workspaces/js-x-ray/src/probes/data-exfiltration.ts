@@ -4,7 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import {
   getCallExpressionIdentifier,
-  isLiteral,
+  isStringLiteral,
   type Literal
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
@@ -51,7 +51,7 @@ function validateLiteral(
   node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  if (isLiteral(node) && sensitivePathRegex.test(node.value)) {
+  if (isStringLiteral(node) && sensitivePathRegex.test(node.value)) {
     ctx.setEntryPoint("literal");
 
     return [true];

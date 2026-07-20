@@ -3,10 +3,11 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { Inlined, type SplitResult } from "./Inlined.ts";
+import { isCallExpression, isMemberExpression } from "./estree/index.ts";
 
 export class InlinedNew {
   static split(node: ESTree.Node): SplitResult | null {
-    if (node.type !== "CallExpression" && node.type !== "MemberExpression") {
+    if (!isCallExpression(node) && !isMemberExpression(node)) {
       return null;
     }
     const newExpression = InlinedNew.#findNewCall(node);
@@ -20,13 +21,13 @@ export class InlinedNew {
   static #findNewCall(
     node: ESTree.Node
   ): ESTree.NewExpression | null {
-    if (node.type === "CallExpression") {
+    if (isCallExpression(node)) {
       const callee = node.callee;
 
       return InlinedNew.#findNewCall(callee);
     }
 
-    if (node.type === "MemberExpression") {
+    if (isMemberExpression(node)) {
       return InlinedNew.#findNewCall(node.object);
     }
 

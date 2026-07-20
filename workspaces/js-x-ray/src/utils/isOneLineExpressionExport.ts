@@ -3,7 +3,9 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  isCallExpression,
+  isMemberExpression
 } from "../estree/index.ts";
 
 export function isOneLineExpressionExport(
@@ -41,17 +43,17 @@ function exportAssignmentHasRequireLeave(
     return atLeastOneBranchHasRequireLeave(expr.consequent, expr.alternate);
   }
 
-  if (expr.type === "CallExpression") {
+  if (isCallExpression(expr)) {
     return getCallExpressionIdentifier(expr) === "require";
   }
 
-  if (expr.type === "MemberExpression") {
+  if (isMemberExpression(expr)) {
     let rootMember = expr.object;
-    while (rootMember.type === "MemberExpression") {
+    while (isMemberExpression(rootMember)) {
       rootMember = rootMember.object;
     }
 
-    if (rootMember.type !== "CallExpression") {
+    if (!isCallExpression(rootMember)) {
       return false;
     }
 

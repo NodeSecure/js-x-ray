@@ -4,7 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral, isNumericLiteral } from "../estree/types.ts";
+import { isIdentifier, isStringLiteral, isNumericLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**
@@ -37,7 +37,7 @@ function extractNumericParam(
 ): number | null {
   for (const prop of properties) {
     if (
-      prop.key.type === "Identifier" &&
+      isIdentifier(prop.key) &&
       names.includes(prop.key.name) &&
       isNumericLiteral(prop.value)
     ) {
@@ -127,7 +127,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     }
   }
 
-  if (isLiteral(salt)) {
+  if (isStringLiteral(salt)) {
     if (typeof salt.value === "string" && salt.value.length < 16) {
       sourceFile.warnings.push(
         generateWarning("weak-scrypt", {

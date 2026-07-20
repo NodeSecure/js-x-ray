@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { joinArrayExpression } from "../estree/index.ts";
+import { isCallExpression, joinArrayExpression } from "../estree/index.ts";
 import { walkEnter } from "../walker/index.ts";
 import type { Pipeline } from "./Runner.class.ts";
 
@@ -33,7 +33,7 @@ export class Deobfuscate implements Pipeline {
         return;
       }
 
-      if (node.type === "CallExpression") {
+      if (isCallExpression(node)) {
         this.replaceAndSkip(self.#withCallExpression(node));
       }
     });

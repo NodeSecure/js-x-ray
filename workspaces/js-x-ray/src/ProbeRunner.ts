@@ -36,7 +36,8 @@ import type { SourceFile } from "./SourceFile.ts";
 import type { OptionalWarningName } from "./warnings.ts";
 import {
   getCallExpressionIdentifier,
-  type GetCallExpressionIdentifierOptions
+  type GetCallExpressionIdentifierOptions,
+  isCallExpression
 } from "./estree/index.ts";
 import { CALL_EXPRESSION_DATA, CALL_EXPRESSION_IDENTIFIER } from "./contants.ts";
 
@@ -295,7 +296,7 @@ export class ProbeRunner {
     let tracedIdentifierReport: TracedIdentifierReport | null | undefined;
     let tracedIdentifier: string | null | undefined;
 
-    if (node.type === "CallExpression") {
+    if (isCallExpression(node)) {
       const id = getCallExpressionIdentifier(node, this.#callExprIdentifierOptions);
       if (id !== null) {
         tracedIdentifierReport = this.sourceFile.tracer.getDataFromIdentifier(id);

@@ -3,7 +3,9 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getMemberExpressionIdentifier
+  getMemberExpressionIdentifier,
+  isIdentifier,
+  isMemberExpression
 } from "../estree/index.ts";
 import type {
   ProbeContext,
@@ -36,14 +38,14 @@ function validateJsonStringify(
   }
 
   const firstArg = castedNode.arguments[0];
-  if (firstArg.type === "MemberExpression") {
+  if (isMemberExpression(firstArg)) {
     const memberExprId = [...getMemberExpressionIdentifier(firstArg)].join(".");
     if (memberExprId === "process.env") {
       return [true];
     }
   }
 
-  if (firstArg.type === "Identifier") {
+  if (isIdentifier(firstArg)) {
     const data = tracer.getDataFromIdentifier(firstArg.name);
     if (data !== null) {
       return [true];

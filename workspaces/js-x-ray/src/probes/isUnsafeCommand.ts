@@ -9,7 +9,7 @@ import type {
 } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
-  isLiteral,
+  isStringLiteral,
   isTemplateLiteral
 } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
@@ -54,7 +54,7 @@ function concatArrayArgs(
 
   if (arrExpr && arrExpr.type === "ArrayExpression") {
     arrExpr.elements
-      .filter((element) => isLiteral(element))
+      .filter((element) => isStringLiteral(element))
       .forEach((element) => {
         finalizedCommand += ` ${element.value}`;
       });
@@ -92,7 +92,7 @@ function main(
   const { sourceFile, data: methodName, signals } = ctx;
 
   const commandArg = node.arguments[0];
-  if (!isLiteral(commandArg) && !isTemplateLiteral(commandArg)) {
+  if (!isStringLiteral(commandArg) && !isTemplateLiteral(commandArg)) {
     return null;
   }
 

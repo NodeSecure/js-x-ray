@@ -3,7 +3,10 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  isCallExpression,
+  isIdentifier,
+  isMemberExpression
 } from "../../estree/index.ts";
 import { Inlined, type SplitResult } from "../../Inlined.ts";
 
@@ -12,7 +15,7 @@ export class InlinedRequire {
     node: ESTree.Node
   ): node is ESTree.CallExpression {
     if (
-      node.type === "CallExpression" &&
+      isCallExpression(node) &&
       getCallExpressionIdentifier(node)?.match(/^require..*$/i)
     ) {
       return true;
@@ -43,21 +46,21 @@ export class InlinedRequire {
   static #findRequireCall(
     node: ESTree.CallExpression | ESTree.MemberExpression
   ): ESTree.CallExpression | null {
-    const object = node.type === "MemberExpression"
+    const object = isMemberExpression(node)
       ? node.object
       : node.callee;
 
     if (
-      object.type === "CallExpression" &&
-      object.callee.type === "Identifier" &&
+      isCallExpression(object) &&
+      isIdentifier(object.callee) &&
       object.callee.name === "require"
     ) {
       return object;
     }
 
     if (
-      object.type === "MemberExpression" ||
-      object.type === "CallExpression"
+      isMemberExpression(object) ||
+      isCallExpression(object)
     ) {
       return InlinedRequire.#findRequireCall(object);
     }

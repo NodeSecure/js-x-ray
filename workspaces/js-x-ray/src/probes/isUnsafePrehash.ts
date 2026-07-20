@@ -4,7 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../estree/types.ts";
+import { isStringLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../estree/types.ts";
 import { getParamNames, getMemberCallExpression } from "../estree/index.ts";
 import { generateWarning } from "../warnings.ts";
 import {
@@ -79,7 +79,7 @@ function isSafeEncodingArg(
   node: ESTree.Node | undefined,
   literalIdentifiers: Map<string, LiteralIdentifier>
 ): boolean {
-  if (isLiteral(node)) {
+  if (isStringLiteral(node)) {
     return kSafeDigestEncodings.has(node.value);
   }
 

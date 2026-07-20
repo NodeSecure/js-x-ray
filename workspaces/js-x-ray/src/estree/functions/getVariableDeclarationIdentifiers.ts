@@ -1,6 +1,9 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
 
+// Import Internal Dependencies
+import { isIdentifier } from "../index.ts";
+
 export interface GetVariableDeclarationIdentifiersOptions {
   /**
    * Prefix to add to the variable name.
@@ -68,12 +71,12 @@ export function* getVariableDeclarationIdentifiers(
       }
 
       let assignmentId = node.key;
-      if (node.value.type === "Identifier") {
+      if (isIdentifier(node.value)) {
         assignmentId = node.value;
       }
       else if (
         node.value.type === "AssignmentPattern" &&
-        node.value.left.type === "Identifier"
+        isIdentifier(node.value.left)
       ) {
         assignmentId = node.value.left;
       }
@@ -92,7 +95,7 @@ export function* getVariableDeclarationIdentifiers(
      * const {...foo} = {}
      */
     case "RestElement":
-      if (node.argument.type === "Identifier") {
+      if (isIdentifier(node.argument)) {
         yield {
           name: autoPrefix(node.argument.name, prefix),
           assignmentId: node.argument
@@ -135,7 +138,7 @@ export function* getVariableDeclarationIdentifiers(
      *       ↪ Destructuration + Assignement of a default value
      */
     case "AssignmentPattern":
-      if (node.left.type === "Identifier") {
+      if (isIdentifier(node.left)) {
         yield { name: node.left.name, assignmentId: node.left };
       }
       else {

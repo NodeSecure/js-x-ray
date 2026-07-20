@@ -32,7 +32,7 @@ import {
   isOneLineExpressionExport
 } from "./utils/index.ts";
 import { walkEnter } from "./walker/index.ts";
-import { getCallExpressionIdentifier, isLiteral } from "./estree/index.ts";
+import { getCallExpressionIdentifier, isCallExpression, isStringLiteral } from "./estree/index.ts";
 import {
   generateWarning,
   type OptionalWarningName,
@@ -285,7 +285,7 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
 
           if (
             isEvalCallExpr(probeNode) &&
-            isLiteral(probeNode.arguments[0])
+            isStringLiteral(probeNode.arguments[0])
           ) {
             const evalBody = AstAnalyser.DefaultParser.parse(
               probeNode.arguments[0].value,
@@ -490,7 +490,7 @@ function isEvalCallExpr(
   node: ESTree.Node
 ): node is ESTree.CallExpression {
   return (
-    node.type === "CallExpression" &&
+    isCallExpression(node) &&
     getCallExpressionIdentifier(node, { resolveCallExpression: true }) === "eval"
   );
 }
