@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| weak-bcrypt | `Warning` | `sast_warnings.weak_bcrypt` | :white_check_mark: |
+| crypto.weak-bcrypt | `Warning` | `sast_warnings.weak_bcrypt` | :white_check_mark: |
 
 ## Introduction
 
@@ -41,7 +41,7 @@ bcrypt.hash(password, "$2b$10$N9qo8uLOickgx2ZMRZoMye", (err, hash) => {});
 import { AstAnalyser } from "@nodesecure/js-x-ray";
 
 const { warnings } = new AstAnalyser({
-  optionalWarnings: ["weak-bcrypt"]
+  optionalWarnings: ["crypto.weak-bcrypt"]
 }).analyse(source);
 ```
 

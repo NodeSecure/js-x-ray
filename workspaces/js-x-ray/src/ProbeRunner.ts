@@ -22,14 +22,16 @@ import isSerializeEnv from "./probes/isSerializeEnv.ts";
 import isSyncIO from "./probes/isSyncIO.ts";
 import isUnsafeCallee from "./probes/isUnsafeCallee.ts";
 import isUnsafeCommand from "./probes/isUnsafeCommand.ts";
-import isWeakCrypto from "./probes/isWeakCrypto.ts";
 import isMonkeyPatch from "./probes/isMonkeyPatch.ts";
 import isRandom from "./probes/isRandom.ts";
 import isPrototypePollution from "./probes/isPrototypePollution.ts";
-import isWeakScrypt from "./probes/isWeakScrypt.ts";
-import isUnsafePrehash from "./probes/isUnsafePrehash.ts";
-import isWeakBcrypt from "./probes/isWeakBcrypt.ts";
-import isPasswordShucking from "./probes/isPasswordShucking.ts";
+import {
+  isWeakAlgorithm,
+  isWeakScrypt,
+  isUnsafePrehash,
+  isWeakBcrypt,
+  isPasswordShucking
+} from "./probes/crypto/index.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
 import type { SourceFile } from "./SourceFile.ts";
@@ -116,7 +118,7 @@ export class ProbeRunner {
     isLiteralRegex,
     isRegexObject,
     isImportDeclaration,
-    isWeakCrypto,
+    isWeakAlgorithm,
     unsafeVmContext,
     isBinaryExpression,
     isArrayExpression,
@@ -132,10 +134,10 @@ export class ProbeRunner {
     "synchronous-io": isSyncIO,
     "log-usage": logUsage,
     "insecure-random": isRandom,
-    "weak-scrypt": isWeakScrypt,
-    "unsafe-prehash": isUnsafePrehash,
-    "weak-bcrypt": isWeakBcrypt,
-    "password-shucking": isPasswordShucking
+    "crypto.weak-scrypt": isWeakScrypt,
+    "crypto.unsafe-prehash": isUnsafePrehash,
+    "crypto.weak-bcrypt": isWeakBcrypt,
+    "crypto.password-shucking": isPasswordShucking
   };
 
   constructor(

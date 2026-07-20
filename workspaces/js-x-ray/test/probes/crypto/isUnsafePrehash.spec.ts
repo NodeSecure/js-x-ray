@@ -3,10 +3,10 @@ import assert from "node:assert";
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser } from "../../../src/AstAnalyser.ts";
 
 describe("isUnsafePrehash probe", () => {
-  describe("unsafe-prehash", () => {
+  describe("crypto.unsafe-prehash", () => {
     it("should warn when a raw digest() (no encoding) is passed to bcryptjs.hash", () => {
       const code = `
         import bcrypt from 'bcryptjs';
@@ -14,11 +14,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when a raw digest() (no encoding) is passed to bcryptjs.hashSync", () => {
@@ -28,11 +28,11 @@ describe("isUnsafePrehash probe", () => {
         const hash = bcrypt.hashSync(crypto.createHash('sha256').update(password).digest(), salt);
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when digest() uses an unsafe encoding (binary/latin1)", () => {
@@ -42,11 +42,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest('binary'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn for createHmac digest chains too", () => {
@@ -56,11 +56,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHmac('sha384', pepper).update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when digest().toString() (no encoding) is used", () => {
@@ -70,11 +70,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when digest().toString('binary') is used", () => {
@@ -84,11 +84,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString('binary'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when digest('binary').toString('hex') is used (outer toString is a no-op)", () => {
@@ -98,11 +98,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest('binary').toString('hex'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when bcryptjs is imported as a namespace", () => {
@@ -112,11 +112,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when bcryptjs.hash is imported as a named import", () => {
@@ -126,11 +126,11 @@ describe("isUnsafePrehash probe", () => {
         hash(crypto.createHash('sha256').update(password).digest(), salt, (err, h) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
     it("should warn when digest is reassigned, then called as hash argument", () => {
       const code = `
@@ -140,11 +140,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
   });
 
@@ -157,11 +157,11 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(prehashed, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should warn when an unsafely pre-hashed variable (via toString) is passed to bcryptjs.hashSync", () => {
@@ -172,11 +172,11 @@ describe("isUnsafePrehash probe", () => {
         const hash = bcrypt.hashSync(prehashed, salt);
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
     it("should not warn when a safely pre-hashed variable is passed to bcryptjs.hash", () => {
@@ -187,7 +187,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(prehashed, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -201,7 +201,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(plainValue, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -217,7 +217,7 @@ describe("isUnsafePrehash probe", () => {
         }
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -233,7 +233,7 @@ describe("isUnsafePrehash probe", () => {
         };
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -253,7 +253,7 @@ describe("isUnsafePrehash probe", () => {
         }
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -270,7 +270,7 @@ describe("isUnsafePrehash probe", () => {
         }
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -291,11 +291,11 @@ describe("isUnsafePrehash probe", () => {
         }
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].kind, "unsafe-prehash");
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
   });
 
@@ -307,7 +307,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest('base64'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -320,7 +320,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest('hex'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -335,7 +335,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(prehashed, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -348,7 +348,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString('hex'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -361,7 +361,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest('hex').toString('binary'), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -374,7 +374,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(password, salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -387,7 +387,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -400,7 +400,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -415,7 +415,7 @@ describe("isUnsafePrehash probe", () => {
         bcrypt.hash(crypto.createHash('sha256').update(password).digest(), salt, (err, hash) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -428,7 +428,7 @@ describe("isUnsafePrehash probe", () => {
         bcryptHash(crypto.createHash('sha256').update(password).digest(), salt, (err, h) => {});
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -445,7 +445,7 @@ describe("isUnsafePrehash probe", () => {
         hashPassword(crypto.createHash('sha256').update(password).digest());
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["unsafe-prehash"]
+        optionalWarnings: ["crypto.unsafe-prehash"]
       }).analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
@@ -453,7 +453,7 @@ describe("isUnsafePrehash probe", () => {
   });
 
   describe("optional warning behavior", () => {
-    it("should NOT report warnings when unsafe-prehash is not enabled", () => {
+    it("should NOT report warnings when crypto.unsafe-prehash is not enabled", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';

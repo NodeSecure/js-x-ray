@@ -7,10 +7,10 @@ import {
 import { describe, it } from "node:test";
 
 // Import Internal Dependencies
-import { AstAnalyser } from "../../src/index.ts";
+import { AstAnalyser } from "../../../src/AstAnalyser.ts";
 
 // CONSTANTS
-const kFixtureURL = new URL("fixtures/weakCrypto/", import.meta.url);
+const kFixtureURL = new URL("../fixtures/weakCrypto/", import.meta.url);
 
 describe("isWeakCrypto probe", () => {
   describe("crypto.createHash", () => {
@@ -25,7 +25,7 @@ describe("isWeakCrypto probe", () => {
 
         const [firstWarning] = outputWarnings;
         assert.strictEqual(outputWarnings.length, 1);
-        assert.deepEqual(firstWarning.kind, "weak-crypto");
+        assert.deepEqual(firstWarning.kind, "crypto.weak-algorithm");
         assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
       }
     });
@@ -40,7 +40,7 @@ describe("isWeakCrypto probe", () => {
 
         const [firstWarning] = outputWarnings;
         assert.strictEqual(outputWarnings.length, 1);
-        assert.deepEqual(firstWarning.kind, "weak-crypto");
+        assert.deepEqual(firstWarning.kind, "crypto.weak-algorithm");
         assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
       }
     });
@@ -80,7 +80,7 @@ describe("isWeakCrypto probe", () => {
 
         const [firstWarning] = outputWarnings;
         assert.strictEqual(outputWarnings.length, 1);
-        assert.deepEqual(firstWarning.kind, "weak-crypto");
+        assert.deepEqual(firstWarning.kind, "crypto.weak-algorithm");
         assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
       }
     });
@@ -95,7 +95,7 @@ describe("isWeakCrypto probe", () => {
 
         const [firstWarning] = outputWarnings;
         assert.strictEqual(outputWarnings.length, 1);
-        assert.deepEqual(firstWarning.kind, "weak-crypto");
+        assert.deepEqual(firstWarning.kind, "crypto.weak-algorithm");
         assert.strictEqual(firstWarning.value, fixtureFile.split(".").at(0));
       }
     });

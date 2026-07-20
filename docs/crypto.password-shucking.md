@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| password-shucking | `Warning` | `sast_warnings.password_shucking` | :white_check_mark: |
+| crypto.password-shucking | `Warning` | `sast_warnings.password_shucking` | :white_check_mark: |
 
 ## Introduction
 
@@ -65,11 +65,11 @@ bcrypt.hash(password, salt, callback);
   bcryptHash(crypto.createHash("sha512").update(password).digest(), salt, callback);
   ```
 
-## Relationship to `unsafe-prehash`
+## Relationship to `crypto.unsafe-prehash`
 
 Both probes target `bcryptjs` pre-hashing, but detect different vulnerabilities:
 
-| | `unsafe-prehash` | `password-shucking` |
+| | `crypto.unsafe-prehash` | `crypto.password-shucking` |
 |---|---|---|
 | Trigger | Unsafe encoding (null-byte truncation risk) | Any `createHash` digest (shuckable regardless of encoding) |
 | `digest('hex')` → bcrypt | Not flagged (safe encoding) | Flagged (still shuckable) |

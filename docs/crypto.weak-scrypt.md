@@ -2,7 +2,7 @@
 
 | Code | Severity | i18n | Experimental |
 | --- | --- | --- | :-: |
-| weak-scrypt | `Warning` | `sast_warnings.weak_scrypt` | :x: |
+| crypto.weak-scrypt | `Warning` | `sast_warnings.weak_scrypt` | :white_check_mark: |
 
 ## Introduction
 

@@ -2,10 +2,10 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
-import { isIdentifier, isStringLiteral, isNumericLiteral } from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
+import type { ProbeContext } from "../../ProbeRunner.ts";
+import { CALL_EXPRESSION_DATA } from "../../contants.ts";
+import { isStringLiteral, isNumericLiteral, isIdentifier } from "../../estree/types.ts";
+import { generateWarning } from "../../warnings.ts";
 
 /**
  * OWASP recommended minimum scrypt parameter combinations.
@@ -118,7 +118,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
         )
       ) {
         sourceFile.warnings.push(
-          generateWarning("weak-scrypt", {
+          generateWarning("crypto.weak-scrypt", {
             value: "low-cost",
             location: node.loc
           })
@@ -130,7 +130,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   if (isStringLiteral(salt)) {
     if (typeof salt.value === "string" && salt.value.length < 16) {
       sourceFile.warnings.push(
-        generateWarning("weak-scrypt", {
+        generateWarning("crypto.weak-scrypt", {
           value: "short-salt",
           location: node.loc
         })
@@ -138,7 +138,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     }
     else {
       sourceFile.warnings.push(
-        generateWarning("weak-scrypt", {
+        generateWarning("crypto.weak-scrypt", {
           value: "hardcoded-salt",
           location: node.loc
         })
