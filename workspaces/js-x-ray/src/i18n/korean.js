@@ -11,8 +11,6 @@ export const sast_warnings = {
   obfuscated_code: "코드가 난독화되었을 가능성이 매우 높습니다...",
   weak_crypto: "코드에 취약한 암호화 알고리즘(md5, sha1 등)이 포함되어 있을 수 있습니다.",
   shady_link: "리터럴(문자열)에 의심스러운 확장자를 가진 도메인의 URL이 포함되어 있습니다.",
-  zero_semver: "시맨틱 버전이 0.x로 시작합니다 (불안정한 프로젝트이거나 체계적인 버전 관리가 없음).",
-  empty_package: "패키지 tarball에 package.json 파일만 포함되어 있습니다.",
   unsafe_command: "spawn() 또는 exec()와 같은 의심스러운 child_process 명령이 사용되었습니다.",
   serialize_environment: "코드가 process.env를 직렬화하려고 시도하고 있으며, 이는 환경 변수 유출로 이어질 수 있습니다.",
   synchronous_io: "코드에 동기 I/O 작업이 포함되어 있으며, 이는 이벤트 루프를 차단하고 성능을 저하시킬 수 있습니다.",

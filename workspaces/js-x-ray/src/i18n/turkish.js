@@ -11,8 +11,6 @@ export const sast_warnings = {
   obfuscated_code: "Kodun karartılmış (obfuscated) olma olasılığı çok yüksek...",
   weak_crypto: "Kod muhtemelen zayıf bir kripto algoritması içeriyor (md5, sha1...).",
   shady_link: "Dize (Literal) şüpheli uzantılı bir alan adına giden bir URL içeriyor.",
-  zero_semver: "0.x ile başlayan sürüm (kararsız proje veya ciddi sürümleme yapılmamış).",
-  empty_package: "Paket tarball'u yalnızca bir package.json dosyası içeriyor.",
   unsafe_command: "spawn() veya exec() gibi şüpheli child_process komutlarının kullanımı.",
   serialize_environment: "Kod, ortam değişkenlerinin sızmasına neden olabilecek process.env'yi serileştirmeye çalışıyor.",
   synchronous_io: "Kod, olay döngüsünü (event loop) engelleyebilecek ve performansı düşürebilecek senkronize I/O işlemleri içeriyor.",
