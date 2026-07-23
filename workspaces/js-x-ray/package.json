@@ -12,6 +12,10 @@
       "import": "./dist/warnings.js",
       "types": "./dist/warnings.d.ts"
     },
+    "./i18n/*": {
+      "types": "./dist/i18n/*.d.ts",
+      "import": "./dist/i18n/*.js"
+    },
     "./package.json": "./package.json"
   },
   "engines": {

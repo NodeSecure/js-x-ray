@@ -1,4 +1,4 @@
-const sast_warnings = {
+export const sast_warnings = {
   parsing_error: "An error occured when parsing the JavaScript code with meriyah. It mean that the conversion from string to AST has failed. If you encounter such an error, please open an issue here.",
   unsafe_import: "Unable to follow an import (require, require.resolve) statement/expr.",
   unsafe_regex: "A RegEx as been detected as unsafe and may be used for a ReDoS Attack.",
@@ -21,7 +21,12 @@ const sast_warnings = {
   sql_injection: "Template literals with interpolated expressions in SQL queries (SELECT, INSERT, UPDATE, DELETE) without proper parameterization, creating potential SQL injection vulnerabilities.",
   monkey_patch: "Modification of native prototypes or global objects at runtime, which introduces security risks including flow hijacking, global side effects, and potential concealment of malicious activities.",
   insecure_random: "Usage of insecure random number generation using Math.random(). Math.random() is not cryptographically secure and should not be used for security-sensitive operations.",
-  weak_scrypt: "Usage of crypto.scrypt() or crypto.scryptSync() with insecure parameters such as hardcoded salt, short salt (less than 16 bytes), or insufficient cost parameter (below 16384). These weak configurations compromise the security of password-based key derivation."
+  weak_scrypt: "Usage of crypto.scrypt() or crypto.scryptSync() with insecure parameters such as hardcoded salt, short salt (less than 16 bytes), or insufficient cost parameter (below 16384). These weak configurations compromise the security of password-based key derivation.",
+  prototype_pollution: "Usage of __proto__ to modify an object prototype at runtime, which may override built-in properties and introduce prototype pollution vulnerabilities.",
+  unsafe_prehash: "Usage of bcryptjs with a password pre-hashed using an insecure digest algorithm (md5, sha1, sha256 or sha512). An attacker can bypass bcrypt by cracking the weaker intermediate hash.",
+  weak_bcrypt: "Usage of bcryptjs hashing functions (hash, hashSync, genSalt, genSaltSync) with a work factor below 10, making password hashing susceptible to brute-force attacks.",
+  password_shucking: "Usage of bcryptjs where the password is first hashed with a cryptographic digest (md5, sha1, sha256 or sha512) before being passed to bcrypt, enabling hash shucking attacks that bypass bcrypt protection.",
+  unsafe_vm_context: "Usage of vm.runInContext() or vm.Script.runInContext() where the context object may be influenced by untrusted input, making the sandbox vulnerable."
 };
 
 export default {
