@@ -1,6 +1,6 @@
 {
   "name": "@nodesecure/js-x-ray-ai",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "private": false,
   "exports": "./dist/index.js",
@@ -30,7 +30,7 @@
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/tracer#readme",
   "dependencies": {
     "@google/genai": "^2.2.0",
-    "@nodesecure/js-x-ray": "^15.0.0",
+    "@nodesecure/js-x-ray": "^16.0.0",
     "openai": "^6.4.0"
   }
 }
