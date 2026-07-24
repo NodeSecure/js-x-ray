@@ -1,5 +1,25 @@
 # @nodesecure/js-x-ray
 
+## 16.0.0
+
+### Major Changes
+
+- [#680](https://github.com/NodeSecure/js-x-ray/pull/680) [`6ea9556`](https://github.com/NodeSecure/js-x-ray/commit/6ea95564df0c80920f861b8bcd94ca41302eca97) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - feat(crypto): Enable warnings through a match-all glob pattern and improve folder structure
+
+### Minor Changes
+
+- [#681](https://github.com/NodeSecure/js-x-ray/pull/681) [`af042f1`](https://github.com/NodeSecure/js-x-ray/commit/af042f1cb5ac337c0bb083bee773f3402dc73b93) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - feat(i18n): add missing translations & export them for scanner reuse
+
+- [#673](https://github.com/NodeSecure/js-x-ray/pull/673) [`390f4e3`](https://github.com/NodeSecure/js-x-ray/commit/390f4e331e7b120f2aa767f398e7e54fa2f74b10) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - feat(probe): Detect weak bcrypt usage
+
+- [#677](https://github.com/NodeSecure/js-x-ray/pull/677) [`d95ccc4`](https://github.com/NodeSecure/js-x-ray/commit/d95ccc470e8c9ce84cafdc1cb5898d27a1ce83ef) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor(typing): make the use of estree guards uniform across the project
+
+- [#676](https://github.com/NodeSecure/js-x-ray/pull/676) [`bde3195`](https://github.com/NodeSecure/js-x-ray/commit/bde319564e801c88162760d73f98eda01e836985) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - feat(probe): detect hash shucking from crypto pkg
+
+### Patch Changes
+
+- [#682](https://github.com/NodeSecure/js-x-ray/pull/682) [`b49f6b7`](https://github.com/NodeSecure/js-x-ray/commit/b49f6b79ef267717ae64016a7dfef0f98d45075e) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - fix(i18n): remove sast warning translations related to scanner only
+
 ## 15.2.0
 
 ### Minor Changes
