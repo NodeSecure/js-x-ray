@@ -11,8 +11,6 @@ export const sast_warnings = {
   obfuscated_code: "هناك احتمالية عالية جداً بأن الكود مخفي أو معقد (obfuscated)...",
   weak_crypto: "يحتوي الكود على خوارزمية تشفير ضعيفة (md5, sha1...).",
   shady_link: "تحتوي القيمة النصية على رابط (URL) لنطاق بامتداد مشبوه.",
-  zero_semver: "نسخة (Semantic Version) تبدأ بـ 0.x (مشروع غير مستقر أو بدون إصدارات رسمية).",
-  empty_package: "حزمة tarball تحتوي فقط على ملف package.json.",
   unsafe_command: "استخدام أوامر مشبوهة في child_process مثل spawn() أو exec().",
   serialize_environment: "يحاول الكود إجراء عملية تسلسل (serialize) لـ process.env، مما قد يؤدي إلى تسريب متغيرات البيئة.",
   synchronous_io: "يحتوي الكود على عمليات إدخال/إخراج متزامنة (Synchronous I/O)، مما قد يؤدي إلى حظر (block) حلقة الأحداث (event loop) وتدهور الأداء.",

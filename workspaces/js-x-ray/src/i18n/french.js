@@ -13,8 +13,6 @@ export const sast_warnings = {
   obfuscated_code: "Il y a une très forte probabilité que le code soit obscurci...",
   weak_crypto: "Le code contient probablement un algorithme de chiffrement faiblement sécurisé (md5, sha1...).",
   shady_link: "Un Literal (string) contient une URL vers un domaine avec une extension suspecte.",
-  zero_semver: "Version sémantique commençant par 0.x (projet instable ou sans versionnement sérieux)",
-  empty_package: "L'archive du package ne contient qu'un fichier package.json.",
   unsafe_command: "Utilisation d'une commande child_process suspecte, comme spawn() ou exec()",
   serialize_environment: "Le code tente de sérialiser process.env, ce qui pourrait entraîner une exfiltration des variables d'environnement",
   synchronous_io: "Le code contient des opérations I/O synchrones, ce qui peut bloquer l'event-loop et dégrader les performances.",
