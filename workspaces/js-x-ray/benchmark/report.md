@@ -1,19 +1,19 @@
 # Benchmark Report
 
-- **Timestamp:** 2026-07-19T01:29:03.968Z
+- **Timestamp:** 2026-07-26T01:45:17.718Z
 - **Runtime:** node
-- **CPU:** Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz (~3.34 GHz)
+- **CPU:** AMD EPYC 7763 64-Core Processor (~3.05 GHz)
 
 | Benchmark | min | max | p25 | p50 | p75 | p99 | p999 | avg | samples | heap (avg) | gc (avg) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Small File (jscrush.js - 1.03KB) | 195.23 µs | 1.22 ms | 225.47 µs | 252.37 µs | 338.17 µs | 746.12 µs | 1.06 ms | 299.13 µs | 2326 | 261.21 KB | — |
-| Small File (npm-audit.js - 1.46KB) | 524.91 µs | 2.32 ms | 582.82 µs | 631.82 µs | 857.88 µs | 1.31 ms | 1.63 ms | 722.61 µs | 963 | 515.93 KB | — |
-| Small File (forbes-skimmer.js - 2.15KB) | 1.54 ms | 3.71 ms | 1.64 ms | 1.71 ms | 2.08 ms | 3.29 ms | 3.55 ms | 1.92 ms | 360 | 685.10 KB | — |
-| Small File (rate-map.js - 2.21KB) | 1.29 ms | 4.21 ms | 1.40 ms | 1.48 ms | 1.78 ms | 3.19 ms | 4.13 ms | 1.67 ms | 413 | 708.37 KB | — |
-| Small File (event-stream.js - 3.76KB) | 1.47 ms | 4.85 ms | 1.61 ms | 1.93 ms | 2.08 ms | 3.87 ms | 4.25 ms | 1.95 ms | 352 | 885.82 KB | — |
-| Small File (modrrnize.js - 9.28KB) | 1.06 ms | 3.87 ms | 1.16 ms | 1.28 ms | 1.42 ms | 2.11 ms | 2.79 ms | 1.34 ms | 518 | 753.01 KB | — |
-| Small File (smith.js - 9.28KB) | 1.01 ms | 4.01 ms | 1.11 ms | 1.44 ms | 1.66 ms | 2.89 ms | 3.76 ms | 1.47 ms | 470 | 759.19 KB | — |
-| Medium File (kopiluwak.js - 15.45KB) | 2.17 ms | 7.21 ms | 2.56 ms | 2.71 ms | 3.03 ms | 5.02 ms | 5.85 ms | 2.89 ms | 236 | 1.33 MB | — |
-| Large File (obfuscate.js - 89.57KB) | 79.13 ms | 94.53 ms | 82.46 ms | 86.55 ms | 91.93 ms | 94.41 ms | 94.41 ms | 87.54 ms | 12 | 31.53 MB | 19.61 ms |
-| jscrush.js | 219.56 µs | 2.22 ms | 254.04 µs | 293.19 µs | 407.37 µs | 989.00 µs | 2.04 ms | 354.05 µs | 1957 | 262.08 KB | — |
-| obfuscate.js | 42.48 ms | 51.76 ms | 44.33 ms | 46.20 ms | 46.85 ms | 51.75 ms | 51.75 ms | 46.60 ms | 11 | 20.05 MB | — |
+| Small File (jscrush.js - 1.03KB) | 231.88 µs | 1.18 ms | 266.31 µs | 298.19 µs | 420.77 µs | 741.17 µs | 1.05 ms | 351.41 µs | 1978 | 263.94 KB | — |
+| Small File (npm-audit.js - 1.46KB) | 603.96 µs | 2.02 ms | 655.90 µs | 708.54 µs | 1.01 ms | 1.50 ms | 1.91 ms | 829.23 µs | 839 | 452.19 KB | — |
+| Small File (forbes-skimmer.js - 2.15KB) | 1.78 ms | 4.03 ms | 1.87 ms | 1.95 ms | 2.32 ms | 3.53 ms | 3.99 ms | 2.16 ms | 319 | 694.57 KB | — |
+| Small File (rate-map.js - 2.21KB) | 1.48 ms | 4.11 ms | 1.60 ms | 1.79 ms | 2.01 ms | 3.51 ms | 4.06 ms | 1.90 ms | 364 | 715.91 KB | — |
+| Small File (event-stream.js - 3.76KB) | 1.66 ms | 4.11 ms | 1.77 ms | 2.07 ms | 2.22 ms | 3.83 ms | 4.05 ms | 2.09 ms | 328 | 900.84 KB | — |
+| Small File (modrrnize.js - 9.28KB) | 1.10 ms | 3.12 ms | 1.17 ms | 1.23 ms | 1.45 ms | 2.31 ms | 3.06 ms | 1.34 ms | 519 | 757.19 KB | — |
+| Small File (smith.js - 9.28KB) | 1.10 ms | 3.09 ms | 1.17 ms | 1.23 ms | 1.44 ms | 2.30 ms | 2.96 ms | 1.33 ms | 519 | 751.26 KB | — |
+| Medium File (kopiluwak.js - 15.45KB) | 2.28 ms | 5.96 ms | 2.37 ms | 2.67 ms | 2.79 ms | 5.03 ms | 5.19 ms | 2.72 ms | 252 | 1.33 MB | — |
+| Large File (obfuscate.js - 89.57KB) | 77.22 ms | 89.04 ms | 82.35 ms | 86.43 ms | 87.79 ms | 88.10 ms | 88.10 ms | 84.88 ms | 9 | 31.05 MB | 14.26 ms |
+| jscrush.js | 261.36 µs | 1.33 ms | 295.93 µs | 324.19 µs | 395.13 µs | 752.65 µs | 1.16 ms | 373.82 µs | 1862 | 269.20 KB | — |
+| obfuscate.js | 44.45 ms | 63.43 ms | 45.07 ms | 47.02 ms | 50.24 ms | 59.21 ms | 59.21 ms | 50.57 ms | 10 | 20.20 MB | — |
