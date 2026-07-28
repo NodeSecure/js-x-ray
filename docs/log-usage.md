@@ -50,6 +50,10 @@ logger.warn("...");
 logger.error("...");
 logger.debug("...");
 
+// inline pino()* calls
+
+pino().info("...")
+
 // child logger
 
 const childLogger = logger.child({method: "auth"});
@@ -85,6 +89,15 @@ const childLogger = logger.child({method: "auth"});
 
 childLogger.foo(process.env);
 childLogger.bar("...");
+
+// Not supported at the moment
+import pino from "pino";
+
+const logger = pino();
+
+logger.child({component: "database"}).info("...");
+
+pino().child({component: "database"}).info("...");
 ```
 
 
@@ -150,4 +163,25 @@ childLogger = logger.child({ requestId: 451 });
 
 childLogger.foo(process.env);
 childLogger.bar(process.env);
+
+// inline createLogger()*
+
+createLogger({
+  levels: {
+    foo: 35,
+    bar: 36
+  }
+}).info("...");
+
+import { createLogger } from winston;
+
+// Not supported at the moment
+
+winston.createLogger({}).info("...");
+
+const logger = winston.createLogger({});
+
+logger.child({}).info("...");
+
+winston.createLogger({}).info("...").child({}).info("...");
 ```

@@ -274,6 +274,22 @@ describe("log-usage probe", () => {
         assert.strictEqual(firstWarning.severity, "Information");
         assert.strictEqual(firstWarning.value, "childLogger3.info");
       });
+
+      it("should trace inline pino()* calls", () => {
+        const code = `import pino from "pino";
+                    const logger = pino();
+                    pino().info("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "info");
+      });
     });
 
     describe("custom loggers", () => {
@@ -543,6 +559,21 @@ describe("log-usage probe", () => {
           + `${expectedLogger}.silly, ${expectedLogger}.log`
           );
         }
+      });
+
+      it("should detect inline createLogger()*", () => {
+        const code = `import { createLogger } from "winston";
+                      createLogger().info("hello");
+          `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "info");
       });
 
       it("should follow the assignment of winston createLogger", () => {
