@@ -17,8 +17,7 @@ export class InlinedCallExpression {
     const callExpression = InlinedCallExpression.#findCallExpression({
       node
     });
-    if (!callExpression || callExpression === node
-    ) {
+    if (!callExpression || callExpression === node) {
       return null;
     }
 
