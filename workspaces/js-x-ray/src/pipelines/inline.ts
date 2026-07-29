@@ -4,6 +4,7 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { Pipeline } from "./Runner.class.ts";
 import { InlinedNew } from "../InlinedNew.ts";
+import { InlinedCallExpression } from "../InlinedCallExpression.ts";
 import { walkEnter } from "../walker/index.ts";
 
 export class Inline implements Pipeline {
@@ -17,11 +18,28 @@ export class Inline implements Pipeline {
         return;
       }
 
-      const split = InlinedNew.split(node);
+      const splitNew = InlinedNew.split(node);
 
-      if (split?.rebuildExpression) {
-        hoisted.push(split.virtualDeclaration);
-        this.replaceAndSkip(split.rebuildExpression);
+      if (splitNew?.rebuildExpression) {
+        hoisted.push(splitNew.virtualDeclaration);
+        this.replaceAndSkip(splitNew.rebuildExpression);
+
+        return;
+      }
+
+      const splitCallExpression = InlinedCallExpression.split(node);
+      if (splitCallExpression?.rebuildExpression) {
+        const blockStatement: ESTree.BlockStatement = {
+          type: "BlockStatement",
+          body: [
+            splitCallExpression.virtualDeclaration,
+            {
+              type: "ExpressionStatement",
+              expression: splitCallExpression.rebuildExpression as ESTree.Expression
+            }
+          ]
+        };
+        this.replaceAndSkip(blockStatement);
       }
     });
 

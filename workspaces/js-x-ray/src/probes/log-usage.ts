@@ -267,7 +267,7 @@ function finalize(ctx: ProbeContext<LogUsageContextDef>) {
   if (context && Object.keys(context).length > 0) {
     const warning = generateWarning("log-usage",
       {
-        value: Object.keys(context).map((method) => method.replace(/__virtual_call_\d+__\./, "")).join(", ")
+        value: Object.keys(context).map((method) => method.replace(/__virtual_call_.*\d+__\./, "")).join(", ")
       });
     sourceFile.warnings.push({ ...warning, location: Object.values(context).flat() });
   }
