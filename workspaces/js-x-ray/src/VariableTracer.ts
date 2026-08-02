@@ -148,6 +148,13 @@ export class VariableTracer extends EventEmitter {
 
   // PUBLIC PROPERTIES
   literalIdentifiers = new Map<string, LiteralIdentifier>();
+  /**
+   * Resolves an identifier assigned an object literal back to its ObjectExpression node.
+   * @example
+   * const opts = { useOnlyCustomLevels: true };
+   * pino(opts); // "opts" resolves via objectIdentifiers
+   */
+  objectIdentifiers = new Map<string, ESTree.ObjectExpression>();
   importedModules = new Set<string>();
 
   // PRIVATE PROPERTIES
@@ -494,6 +501,12 @@ export class VariableTracer extends EventEmitter {
        * ^ ObjectExpression
        */
       case "ObjectExpression": {
+        // Only record top-level assignments (`const x = {...}`) so consumers
+        // can resolve "x" back to its object shape, e.g. `pino(x)`.
+        if (childNode === variableDeclaratorNode.init) {
+          this.objectIdentifiers.set(id.name, childNode);
+        }
+
         for (const property of childNode.properties) {
           let node: ESTree.Node | null = null;
           if (property.type === "Property") {

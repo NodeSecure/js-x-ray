@@ -123,7 +123,10 @@ function createWinstonCreateLoggerTracerListener(tracer: VariableTracer, logUsag
     let winstonLoggerMethods = winstonCreateLoggerChildLoggerFunctions.get(payload.name) ?? [...kWinstonLogMethods];
 
     winston: if (payload.name === "winston.createLogger") {
-      const winstonContext = payload.arguments[0];
+      const winstonContextArg = payload.arguments[0];
+      const winstonContext = winstonContextArg && isIdentifier(winstonContextArg) ?
+        tracer.objectIdentifiers.get(winstonContextArg.name) :
+        winstonContextArg;
       if (!winstonContext || winstonContext.type !== "ObjectExpression") {
         break winston;
       }
@@ -174,7 +177,10 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
     let pinoLoggerMethods: string[] = pinoLoggerChildLoggerFunctions.get(payload.name) ?? [...kPinoLogMethods];
 
     pino: if (payload.name === "pino") {
-      const pinoContext = payload.arguments[0];
+      const pinoContextArg = payload.arguments[0];
+      const pinoContext = pinoContextArg && isIdentifier(pinoContextArg) ?
+        tracer.objectIdentifiers.get(pinoContextArg.name) :
+        pinoContextArg;
       if (!pinoContext || pinoContext.type !== "ObjectExpression") {
         break pino;
       }
