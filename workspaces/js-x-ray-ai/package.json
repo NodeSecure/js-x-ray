@@ -31,6 +31,6 @@
   "dependencies": {
     "@google/genai": "^2.2.0",
     "@nodesecure/js-x-ray": "^16.0.0",
-    "openai": "^6.4.0"
+    "openai": "^7.1.0"
   }
 }
