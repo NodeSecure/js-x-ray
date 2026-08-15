@@ -157,6 +157,29 @@ test("it should be able to Trace template literals who has being assigned", () =
   });
 });
 
+test("it should be able to resolve an identifier assigned an object literal", () => {
+  const helpers = createTracer();
+
+  helpers.walkOnCode(`
+    const opts = { useOnlyCustomLevels: true, foo: "bar" };
+  `);
+  assert.ok(helpers.tracer.objectIdentifiers.has("opts"));
+
+  const objectNode = helpers.tracer.objectIdentifiers.get("opts")!;
+  assert.strictEqual(objectNode.type, "ObjectExpression");
+  assert.strictEqual(objectNode.properties.length, 2);
+});
+
+test("it should not resolve a non top-level object literal as an identifier", () => {
+  const helpers = createTracer();
+
+  helpers.walkOnCode(`
+    const opts = { nested: { useOnlyCustomLevels: true } };
+  `);
+  assert.ok(helpers.tracer.objectIdentifiers.has("opts"));
+  assert.strictEqual(helpers.tracer.objectIdentifiers.has("nested"), false);
+});
+
 test("it should be able to Trace a global assignment using a LogicalExpression", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();

@@ -383,6 +383,33 @@ describe("log-usage probe", () => {
         assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
       });
 
+      it("should resolve the whole pino() config object when passed as an identifier", () => {
+        const code = `import pino from "pino";
+
+                    const opts = {
+                    customLevels:{
+                      foo: 35,
+                      bar: 36
+                      },
+                    useOnlyCustomLevels: true,
+                    };
+                    const logger = pino(opts);
+                    logger.info("hello");
+                    logger.warn("hello");
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+        const { warnings } = new AstAnalyser({
+          optionalWarnings: true
+        }).analyse(code);
+
+        const [firstWarning] = warnings;
+
+        assert.strictEqual(firstWarning.kind, "log-usage");
+        assert.strictEqual(firstWarning.severity, "Information");
+        assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
+      });
+
       it("should trace default methods as well when useOnlyCustomLevels is false", () => {
         const code = `import pino from "pino";
                     const logger = pino({
@@ -861,6 +888,35 @@ describe("log-usage probe", () => {
                     logger.verbose("hello");
                     logger.silly("hello");
                     logger.log({level: "info", message: "hello"});
+                    logger.foo("hello");
+                    logger.bar("hello");
+                    `;
+
+            const { warnings } = new AstAnalyser({
+              optionalWarnings: true
+            }).analyse(code);
+
+            const [firstWarning] = warnings;
+
+            assert.strictEqual(firstWarning.kind, "log-usage");
+            assert.strictEqual(firstWarning.severity, "Information");
+            assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
+          });
+
+          it("should resolve the whole winston.createLogger() config object when passed as an identifier", () => {
+            const code = `const winston = require("winston");
+                    const opts = {
+                      format: winston.format.json(),
+                      transports: [new winston.transports.Console()],
+                      levels: {
+                         foo: 1,
+                         bar: 2
+                        }
+                      };
+                    const logger = winston.createLogger(opts);
+
+                    logger.info("hello");
+                    logger.warn("hello");
                     logger.foo("hello");
                     logger.bar("hello");
                     `;
