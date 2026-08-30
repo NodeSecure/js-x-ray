@@ -6,12 +6,13 @@
 
 ## Introduction
 
-Detect usage of **weak Argon2** parameters with the Node.js core `crypto.argon2()` and `crypto.argon2Sync()` functions. This probe checks for:
+Detect usage of **weak Argon2** parameters with the Node.js core `crypto.argon2()` and `crypto.argon2Sync()` functions.
+Checks for:
 
-- **weak-algorithm**: the `argon2d` variant, which is data-dependent and not intended for password hashing.
-- **low-params**: `memory` and `passes` that do not meet [OWASP recommended combinations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id).
-- **short-nonce**: nonce is a hardcoded string literal shorter than 16 characters.
-- **hardcoded-nonce**: nonce is a hardcoded string literal (should be randomly generated).
+- **weak-algorithm: `<variant>`**: the `argon2d` variant, which is data-dependent and not intended for password hashing.
+- **low-params: `memory` | `passes`**: `memory` and `passes` that do not meet [OWASP recommended combinations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id). The reported name is the parameter that has to change.
+- **short-nonce**: nonce is a hardcoded string shorter than 16 characters.
+- **hardcoded-nonce**: nonce is a hardcoded string (should be randomly generated).
 
 > [!NOTE]
 > Argon2 calls the salt a **nonce**, and so does the Node.js API. The warning values follow that
@@ -43,14 +44,25 @@ Argon2i is data-independent and therefore weaker against time-memory trade-off a
 
 `parallelism` is not checked: raising it does not reduce the total memory cost, so it is not a weakness on its own.
 
-Parameters passed as variables are not resolved, and no warning is emitted for them.
+## Resolving values
+
+The algorithm, `memory`, `passes` and `nonce` may be written inline or held in a variable. Identifiers assigned a literal are followed through the `VariableTracer`, so both forms below are reported.
+
+```js
+crypto.argon2("argon2d", options, callback);
+
+const algorithm = "argon2d";
+crypto.argon2(algorithm, options, callback);
+```
+
+Anything that cannot be read statically — a value computed at runtime, a key computed from a variable, an options object spread from elsewhere — is left alone rather than reported on a value that is unknown.
 
 ## Example
 
 ```js
 import crypto from "crypto";
 
-// weak-algorithm: argon2d is not intended for password hashing
+// weak-algorithm: argon2d — not intended for password hashing
 crypto.argon2("argon2d", {
   message: password,
   nonce: crypto.randomBytes(16),
@@ -60,7 +72,7 @@ crypto.argon2("argon2d", {
   passes: 2
 }, (err, tag) => {});
 
-// low-params: 8 KiB is far below the lowest OWASP row (7168 KiB)
+// low-params: memory — 8 KiB is far below the lowest OWASP row (7168 KiB)
 crypto.argon2("argon2id", {
   message: password,
   nonce: crypto.randomBytes(16),
@@ -70,7 +82,7 @@ crypto.argon2("argon2id", {
   passes: 1
 }, (err, tag) => {});
 
-// low-params: argon2i cannot use the passes=2 row
+// low-params: passes — argon2i cannot use the passes=2 row
 crypto.argon2("argon2i", {
   message: password,
   nonce: crypto.randomBytes(16),

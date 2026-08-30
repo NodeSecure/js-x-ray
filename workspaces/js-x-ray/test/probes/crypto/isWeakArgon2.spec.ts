@@ -22,7 +22,19 @@ describe("isWeakArgon2", () => {
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-argon2");
-      assert.strictEqual(outputWarnings[0].value, "weak-algorithm");
+      assert.strictEqual(outputWarnings[0].value, "weak-algorithm: argon2d");
+    });
+
+    it("should warn when the algorithm is an identifier assigned argon2d", () => {
+      const code = `
+        import crypto from 'crypto';
+        const algo = "argon2d";
+        crypto.argon2(algo, { memory: 47104, passes: 1, parallelism: 1 }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "weak-algorithm: argon2d");
     });
   });
 
@@ -35,7 +47,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
     it("should warn with crypto.argon2Sync as well", () => {
@@ -46,7 +58,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
     it("should warn for argon2i with passes=1 regardless of how much memory is allocated", () => {
@@ -57,7 +69,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: passes");
     });
 
     it("should warn for argon2i with passes=2 (OWASP forbids that row for Argon2i)", () => {
@@ -68,7 +80,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: passes");
     });
 
     it("should warn for argon2i with passes=3 when memory is below 12288", () => {
@@ -79,7 +91,20 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
+    });
+
+    it("should warn when parameters are identifiers assigned numeric literals", () => {
+      const code = `
+        import crypto from 'crypto';
+        const memoryCost = 8;
+        const iterations = 1;
+        crypto.argon2("argon2id", { memory: memoryCost, passes: iterations }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
     it("should warn when parameter keys are quoted string literals", () => {
@@ -90,7 +115,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
     it("should warn when parameter keys are computed string literals", () => {
@@ -101,7 +126,7 @@ describe("isWeakArgon2", () => {
       const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
-      assert.strictEqual(outputWarnings[0].value, "low-params");
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
     it("should not warn for argon2i when params meet the passes=3 row (m=12288)", () => {
@@ -159,6 +184,18 @@ describe("isWeakArgon2", () => {
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].value, "hardcoded-nonce");
     });
+
+    it("should warn when nonce is an identifier assigned a string literal", () => {
+      const code = `
+        import crypto from 'crypto';
+        const salt = "0123456789abcdef";
+        crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: salt }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "hardcoded-nonce");
+    });
   });
 
   describe("combined warnings", () => {
@@ -171,7 +208,7 @@ describe("isWeakArgon2", () => {
 
       assert.deepStrictEqual(
         outputWarnings.map((warning) => warning.value).sort(),
-        ["low-params", "short-nonce"]
+        ["low-params: memory", "short-nonce"]
       );
     });
 
@@ -184,7 +221,7 @@ describe("isWeakArgon2", () => {
 
       assert.deepStrictEqual(
         outputWarnings.map((warning) => warning.value).sort(),
-        ["low-params", "weak-algorithm"]
+        ["low-params: memory", "weak-algorithm: argon2d"]
       );
     });
   });
@@ -210,7 +247,7 @@ describe("isWeakArgon2", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when the algorithm is a variable", () => {
+    it("should not warn when the algorithm is an unresolvable identifier", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2(algorithm, { memory: 8, passes: 1 }, (err, tag) => {});
@@ -220,10 +257,20 @@ describe("isWeakArgon2", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when passes is a variable", () => {
+    it("should not warn when passes is an unresolvable identifier", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2("argon2id", { memory: 8, passes: iterations }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
+    });
+
+    it("should not warn when nonce is an unresolvable identifier", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: salt }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 
@@ -263,16 +310,6 @@ describe("isWeakArgon2", () => {
           memory: 19456,
           passes: 2
         }, (err, tag) => {});
-      `;
-      const { warnings: outputWarnings } = analyse(code);
-
-      assert.strictEqual(outputWarnings.length, 0);
-    });
-
-    it("should not warn when nonce is a variable", () => {
-      const code = `
-        import crypto from 'crypto';
-        crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: salt }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 
