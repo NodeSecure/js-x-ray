@@ -19,7 +19,7 @@ Detect usage of **weak Argon2** parameters with the Node.js core `crypto.argon2(
 
 ## Variants
 
-[RFC 9106](https://www.rfc-editor.org/rfc/rfc9106.html#section-4) recommends `argon2id` when in doubt, and describes `argon2d` as suited to applications with no threat from side-channel attacks — which excludes password hashing.
+[RFC 9106 section 1](https://www.rfc-editor.org/rfc/rfc9106.html#section-1) describes `argon2d` as *"suitable for cryptocurrencies and proof-of-work applications with no threats from side-channel timing attacks"*, and `argon2i` as using data-independent memory access *"which is preferred for password hashing and password-based key derivation"*. [Section 4](https://www.rfc-editor.org/rfc/rfc9106.html#section-4) adds that if you do not know the difference between the types, you should choose `argon2id`.
 
 | Variant | Verdict |
 | --- | --- |
