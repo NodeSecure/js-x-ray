@@ -26,7 +26,8 @@ export const sast_warnings = {
   unsafe_prehash: "Utilisation de bcryptjs avec un mot de passe pré-haché par un algorithme non sécurisé (md5, sha1, sha256 ou sha512). Un attaquant peut contourner bcrypt en cassant le hachage intermédiaire plus faible.",
   weak_bcrypt: "Utilisation des fonctions de hachage bcryptjs (hash, hashSync, genSalt, genSaltSync) avec un facteur de travail inférieur à 10, rendant le hachage de mot de passe vulnérable aux attaques par brute force.",
   password_shucking: "Utilisation de bcryptjs où le mot de passe est d'abord haché avec un condensat cryptographique (md5, sha1, sha256 ou sha512) avant d'être passé à bcrypt, permettant des attaques de hash shucking qui contournent la protection bcrypt.",
-  unsafe_vm_context: "Utilisation de vm.runInContext() ou vm.Script.runInContext() où l'objet contexte peut être influencé par des entrées non fiables, rendant la sandbox vulnérable."
+  unsafe_vm_context: "Utilisation de vm.runInContext() ou vm.Script.runInContext() où l'objet contexte peut être influencé par des entrées non fiables, rendant la sandbox vulnérable.",
+  weak_argon2: "Utilisation de crypto.argon2() ou crypto.argon2Sync() avec des paramètres non sécurisés : la variante argon2d, qui n'est pas destinée au hachage de mot de passe, un nonce codé en dur ou trop court (moins de 16 octets), ou des valeurs memory et passes inférieures aux combinaisons recommandées par l'OWASP. Ces configurations faibles compromettent la sécurité du hachage de mot de passe."
 };
 
 export default {

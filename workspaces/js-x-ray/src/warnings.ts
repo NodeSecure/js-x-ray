@@ -16,7 +16,8 @@ export type OptionalWarningName =
   | "crypto.weak-scrypt"
   | "crypto.unsafe-prehash"
   | "crypto.weak-bcrypt"
-  | "crypto.password-shucking";
+  | "crypto.password-shucking"
+  | "crypto.weak-argon2";
 
 export type WarningName =
   | "parsing-error"
@@ -176,6 +177,11 @@ export const warnings = Object.freeze({
     i18n: "sast_warnings.unsafe_vm_context",
     severity: "Warning",
     experimental: false
+  },
+  "crypto.weak-argon2": {
+    i18n: "sast_warnings.weak_argon2",
+    severity: "Warning",
+    experimental: true
   }
 }) satisfies Record<WarningName, Pick<Warning, "experimental" | "i18n" | "severity">>;
 

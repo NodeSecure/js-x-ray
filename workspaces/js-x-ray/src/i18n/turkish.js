@@ -24,7 +24,8 @@ export const sast_warnings = {
   unsafe_prehash: "bcryptjs'in güvensiz bir özet algoritmasıyla (md5, sha1, sha256 veya sha512) önceden hash'lenmiş bir parola ile kullanımı. Saldırgan, daha zayıf ara hash'i kırarak bcrypt'i atlayabilir.",
   weak_bcrypt: "bcryptjs hash işlevlerinin (hash, hashSync, genSalt, genSaltSync) 10'un altında bir iş faktörüyle kullanımı; parola hash'lemeyi kaba kuvvet saldırılarına karşı savunmasız kılar.",
   password_shucking: "bcryptjs'in parolayı bcrypt'e geçirmeden önce bir kriptografik özet (md5, sha1, sha256 veya sha512) ile ön hash'leyen kullanımı; bcrypt korumasını atlayan hash shucking saldırılarına olanak tanır.",
-  unsafe_vm_context: "vm.runInContext() veya vm.Script.runInContext() kullanımı; bağlam nesnesi güvenilmez girdilerden etkilenebilir ve sanal alanı savunmasız kılar."
+  unsafe_vm_context: "vm.runInContext() veya vm.Script.runInContext() kullanımı; bağlam nesnesi güvenilmez girdilerden etkilenebilir ve sanal alanı savunmasız kılar.",
+  weak_argon2: "crypto.argon2() veya crypto.argon2Sync() işlevlerinin güvensiz parametrelerle kullanımı: parola hash'leme için tasarlanmamış argon2d varyantı, koda gömülü veya kısa bir nonce (16 bayttan az) ya da OWASP'ın önerdiği kombinasyonların altında memory ve passes değerleri. Bu zayıf yapılandırmalar parola hash'lemenin güvenliğini tehlikeye atar."
 };
 
 export default {
