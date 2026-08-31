@@ -92,6 +92,12 @@ export function isMemberExpression(
   return isNode(node) && node.type === "MemberExpression";
 }
 
+export function isObjectExpression(
+  node: unknown
+): node is ESTree.ObjectExpression {
+  return isNode(node) && node.type === "ObjectExpression";
+}
+
 export interface DefaultOptions {
   externalIdentifierLookup?(name: string): string | null;
 }

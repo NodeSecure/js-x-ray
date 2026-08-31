@@ -7,7 +7,7 @@ import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
-import { isIdentifier } from "../estree/index.ts";
+import { isIdentifier, isObjectExpression, findPropertyMatch } from "../estree/index.ts";
 
 // CONSTANTS
 const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
@@ -128,8 +128,7 @@ function createWinstonCreateLoggerTracerListener(tracer: VariableTracer, logUsag
         break winston;
       }
 
-      const levels = winstonContext.properties
-        .find((objEl) => objEl.type === "Property" && isIdentifier(objEl.key) && objEl.key.name === "levels");
+      const levels = findPropertyMatch(winstonContext.properties, ["levels"], isObjectExpression);
 
       if (!levels) {
         break winston;
@@ -178,7 +177,7 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
       if (!pinoContext || pinoContext.type !== "ObjectExpression") {
         break pino;
       }
-      let customLevels: ESTree.ObjectLiteralElementLike | undefined;
+      let customLevels: ESTree.ObjectExpression | undefined;
       let useOnlyCustomLevels: ESTree.ObjectLiteralElementLike | undefined;
       for (const objectEl of pinoContext.properties) {
         if (customLevels && useOnlyCustomLevels) {
@@ -188,8 +187,8 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
           || objectEl.key.type !== "Identifier") {
           continue;
         }
-        if (objectEl.key.name === "customLevels") {
-          customLevels = objectEl;
+        if (objectEl.key.name === "customLevels" && isObjectExpression(objectEl.value)) {
+          customLevels = objectEl.value;
         }
 
         if (objectEl.key.name === "useOnlyCustomLevels") {
@@ -236,12 +235,14 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
   });
 }
 
-function addLogMethods(customLevels: ESTree.ObjectLiteralElementLike | undefined,
-  loggerMethods: string[]) {
-  if (customLevels?.type !== "Property" || customLevels.value.type !== "ObjectExpression") {
+function addLogMethods(
+  customLevels: ESTree.ObjectExpression | undefined,
+  loggerMethods: string[]
+) {
+  if (!customLevels) {
     return;
   }
-  customLevels.value.properties.forEach((level) => {
+  customLevels.properties.forEach((level) => {
     if (level.type === "Property" && isIdentifier(level.key)) {
       loggerMethods.push(level.key.name);
     }
