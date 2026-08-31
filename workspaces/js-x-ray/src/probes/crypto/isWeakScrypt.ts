@@ -4,7 +4,8 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../../contants.ts";
-import { isStringLiteral, isNumericLiteral, isIdentifier } from "../../estree/types.ts";
+import { isStringLiteral, isNumericLiteral } from "../../estree/types.ts";
+import { findPropertyMatch } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
 
 /**
@@ -30,23 +31,6 @@ const kDefaultBlockSize = 8;
 const kDefaultParallelization = 1;
 
 const tracedFunctions = new Set(["crypto.scrypt"]);
-
-function extractNumericParam(
-  properties: ESTree.Property[],
-  names: string[]
-): number | null {
-  for (const prop of properties) {
-    if (
-      isIdentifier(prop.key) &&
-      names.includes(prop.key.name) &&
-      isNumericLiteral(prop.value)
-    ) {
-      return prop.value.value;
-    }
-  }
-
-  return null;
-}
 
 function isWeakScryptParams(cost: number, blockSize: number, parallelization: number): boolean {
   if (blockSize < kMinBlockSize) {
@@ -94,16 +78,14 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   const options = node.arguments.at(3);
 
   if (options && options.type === "ObjectExpression") {
-    const properties = options.properties.filter(
-      (prop): prop is ESTree.Property => prop.type === "Property"
-    );
+    const { properties } = options;
 
-    const costValue = extractNumericParam(properties, ["cost", "N"]);
-    const blockSizeValue = extractNumericParam(properties, ["blockSize", "r"]);
-    const parallelizationValue = extractNumericParam(properties, [
+    const costValue = findPropertyMatch(properties, ["cost", "N"], isNumericLiteral)?.value ?? null;
+    const blockSizeValue = findPropertyMatch(properties, ["blockSize", "r"], isNumericLiteral)?.value ?? null;
+    const parallelizationValue = findPropertyMatch(properties, [
       "parallelization",
       "p"
-    ]);
+    ], isNumericLiteral)?.value ?? null;
 
     if (
       costValue !== null ||
