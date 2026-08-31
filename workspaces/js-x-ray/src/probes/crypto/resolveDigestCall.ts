@@ -2,31 +2,26 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getMemberCallExpression, type MemberCallExpression } from "../../estree/index.ts";
+import { getMemberCallExpression } from "../../estree/index.ts";
 
-export interface DigestCallMatch {
-  digestCall: MemberCallExpression;
-  encodingArguments: ESTree.Node[];
-}
-
+/**
+ * digest's own argument takes precedence over toString's whenever digest received one.
+ */
 export function resolveDigestCall(
   hashNode: ESTree.Node | null | undefined
-): DigestCallMatch | null {
+): ESTree.Node[] | null {
   const digestCall = getMemberCallExpression(hashNode, "digest");
   if (digestCall) {
-    return { digestCall, encodingArguments: digestCall.arguments };
+    return digestCall.arguments;
   }
 
   const toStringCall = getMemberCallExpression(hashNode, "toString");
   if (toStringCall) {
     const innerDigestCall = getMemberCallExpression(toStringCall.callee.object, "digest");
     if (innerDigestCall) {
-      return {
-        digestCall: innerDigestCall,
-        encodingArguments: innerDigestCall.arguments.length === 0
-          ? toStringCall.arguments
-          : innerDigestCall.arguments
-      };
+      return innerDigestCall.arguments.length === 0
+        ? toStringCall.arguments
+        : innerDigestCall.arguments;
     }
   }
 

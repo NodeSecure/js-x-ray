@@ -28,8 +28,8 @@ describe("crypto.resolveDigestCall", () => {
     const result = resolveDigestCall(node);
 
     assert.ok(result !== null);
-    assert.strictEqual(result.encodingArguments.length, 1);
-    assert.strictEqual((result.encodingArguments[0] as any).value, "hex");
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual((result[0] as any).value, "hex");
   });
 
   test("resolves .digest().toString(encoding), using toString's arguments when digest has none", () => {
@@ -38,8 +38,8 @@ describe("crypto.resolveDigestCall", () => {
     const result = resolveDigestCall(node);
 
     assert.ok(result !== null);
-    assert.strictEqual(result.encodingArguments.length, 1);
-    assert.strictEqual((result.encodingArguments[0] as any).value, "base64");
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual((result[0] as any).value, "base64");
   });
 
   test("resolves .digest(encoding).toString(), preferring digest's own arguments", () => {
@@ -48,8 +48,8 @@ describe("crypto.resolveDigestCall", () => {
     const result = resolveDigestCall(node);
 
     assert.ok(result !== null);
-    assert.strictEqual(result.encodingArguments.length, 1);
-    assert.strictEqual((result.encodingArguments[0] as any).value, "hex");
+    assert.strictEqual(result.length, 1);
+    assert.strictEqual((result[0] as any).value, "hex");
   });
 
   test("returns null for a .toString() call not wrapping a .digest() call", () => {

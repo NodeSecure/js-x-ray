@@ -66,8 +66,8 @@ function hasUnsafeDigestEncoding(
   hashNode: ESTree.Node | null | undefined,
   literalIdentifiers: Map<string, LiteralIdentifier>
 ): boolean {
-  const encodingArgs = resolveDigestCall(hashNode)?.encodingArguments;
-  if (encodingArgs === undefined) {
+  const encodingArgs = resolveDigestCall(hashNode);
+  if (encodingArgs === null) {
     return false;
   }
 
@@ -133,7 +133,7 @@ function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
       return;
     }
 
-    const encodingArg = resolveDigestCall(payload.node)?.encodingArguments.at(0);
+    const encodingArg = resolveDigestCall(payload.node)?.at(0);
     if (!isSafeEncodingArg(encodingArg, tracer.literalIdentifiers)) {
       ctx.context![kUnsafeDigestVariables]!.add(payload.id);
     }
