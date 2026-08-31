@@ -1,5 +1,17 @@
 # @nodesecure/js-x-ray
 
+## 16.1.0
+
+### Minor Changes
+
+- [#685](https://github.com/NodeSecure/js-x-ray/pull/685) [`19202ec`](https://github.com/NodeSecure/js-x-ray/commit/19202ecc45aaa3cfd72510f2557778ff0d722d59) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: follow CallExpression chain
+
+- [#689](https://github.com/NodeSecure/js-x-ray/pull/689) [`54a7dff`](https://github.com/NodeSecure/js-x-ray/commit/54a7dffd5b4b4afdcb36ab4d3d1f2d3d608d6f98) Thanks [@Edneam](https://github.com/Edneam)! - feat(tracer): resolve identifiers assigned an object literal, so `log-usage` detects `pino()`/`winston.createLogger()` config passed via a variable instead of only inline
+
+### Patch Changes
+
+- [#701](https://github.com/NodeSecure/js-x-ray/pull/701) [`669146a`](https://github.com/NodeSecure/js-x-ray/commit/669146a747fe0da1b7c4aaa485edb1f8e64558e1) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor probes to extract helper functions
+
 ## 16.0.0
 
 ### Major Changes
