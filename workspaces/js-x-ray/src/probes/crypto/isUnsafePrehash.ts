@@ -133,7 +133,7 @@ function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
       return;
     }
 
-    const encodingArg = payload.arguments.at(0);
+    const encodingArg = resolveDigestCall(payload.node)?.encodingArguments.at(0);
     if (!isSafeEncodingArg(encodingArg, tracer.literalIdentifiers)) {
       ctx.context![kUnsafeDigestVariables]!.add(payload.id);
     }

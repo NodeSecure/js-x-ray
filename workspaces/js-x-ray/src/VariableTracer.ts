@@ -128,6 +128,7 @@ export interface AssignmentEventPayload extends Payload { }
 
 export interface ReturnValueEventPayload extends Payload {
   arguments: ESTree.Expression[];
+  node: ESTree.CallExpression | ESTree.NewExpression;
 }
 
 export interface ImportEventPayload {
@@ -566,7 +567,8 @@ export class VariableTracer extends EventEmitter {
             identifierOrMemberExpr: tracedVariant.identifierOrMemberExpr,
             id: id.name,
             location: id.loc,
-            arguments: childNode.arguments
+            arguments: childNode.arguments,
+            node: childNode
           };
           this.emit(VariableTracer.ReturnValueEvent, returnValueEventPayload);
           if (tracedVariant.followConsecutiveAssignment) {
