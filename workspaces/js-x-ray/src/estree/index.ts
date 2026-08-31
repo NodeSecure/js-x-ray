@@ -2,6 +2,7 @@ export * from "./functions/arrayExpression.ts";
 export * from "./functions/getMemberCallExpression.ts";
 export * from "./functions/concatBinaryExpression.ts";
 export * from "./functions/extractLogicalExpression.ts";
+export * from "./functions/findPropertyMatch.ts";
 export * from "./functions/getCallExpressionArguments.ts";
 export * from "./functions/getCallExpressionIdentifier.ts";
 export * from "./functions/getMemberExpressionIdentifier.ts";

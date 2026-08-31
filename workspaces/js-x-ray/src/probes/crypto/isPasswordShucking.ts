@@ -5,12 +5,13 @@ import type { ESTree } from "meriyah";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../../estree/types.ts";
-import { getParamNames, getMemberCallExpression } from "../../estree/index.ts";
+import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
 import {
   VariableTracer,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
+import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";
 const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
@@ -49,20 +50,8 @@ function isCreateHashChain(node: ESTree.Node | null | undefined): boolean {
   return false;
 }
 
-function hasDigestChain(hashNode: ESTree.Node | null | undefined): boolean {
-  if (getMemberCallExpression(hashNode, "digest") !== null) {
-    return true;
-  }
-  const toStringCall = getMemberCallExpression(hashNode, "toString");
-  if (toStringCall) {
-    return getMemberCallExpression(toStringCall.callee.object, "digest") !== null;
-  }
-
-  return false;
-}
-
 function isShuckingPrehash(hashNode: ESTree.Node | null | undefined): boolean {
-  return hasDigestChain(hashNode) && isCreateHashChain(hashNode);
+  return resolveDigestCall(hashNode) !== null && isCreateHashChain(hashNode);
 }
 
 type NodeValidationResult = [false] | [true] | [true, string[]];

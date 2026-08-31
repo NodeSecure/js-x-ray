@@ -179,6 +179,21 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
+    it("should warn when digest('binary').toString('hex') (outer toString is a no-op) is passed through a variable", () => {
+      const code = `
+        import bcrypt from 'bcryptjs';
+        import crypto from 'crypto';
+        const prehashed = crypto.createHash('sha256').update(password).digest('binary').toString('hex');
+        bcrypt.hash(prehashed, salt, (err, hash) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["crypto.unsafe-prehash"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
+    });
+
     it("should not warn when a safely pre-hashed variable is passed to bcryptjs.hash", () => {
       const code = `
         import bcrypt from 'bcryptjs';

@@ -128,6 +128,7 @@ export interface AssignmentEventPayload extends Payload { }
 
 export interface ReturnValueEventPayload extends Payload {
   arguments: ESTree.Expression[];
+  node: ESTree.CallExpression | ESTree.NewExpression;
 }
 
 export interface ImportEventPayload {
@@ -166,6 +167,8 @@ export class VariableTracer extends EventEmitter {
   debug() {
     console.log(this.#traced);
   }
+
+  resolveLiteralIdentifier = (name: string): string | null => this.literalIdentifiers.get(name)?.value ?? null;
 
   enableDefaultTracing() {
     [...kRequirePatterns]
@@ -363,7 +366,7 @@ export class VariableTracer extends EventEmitter {
     const callExprArguments = getCallExpressionArguments(
       node,
       {
-        externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
+        externalIdentifierLookup: this.resolveLiteralIdentifier
       }
     );
     if (callExprArguments === null) {
@@ -577,7 +580,8 @@ export class VariableTracer extends EventEmitter {
             identifierOrMemberExpr: tracedVariant.identifierOrMemberExpr,
             id: id.name,
             location: id.loc,
-            arguments: childNode.arguments
+            arguments: childNode.arguments,
+            node: childNode
           };
           this.emit(VariableTracer.ReturnValueEvent, returnValueEventPayload);
           if (tracedVariant.followConsecutiveAssignment) {
@@ -637,7 +641,7 @@ export class VariableTracer extends EventEmitter {
           ...getMemberExpressionIdentifier(
             childNode,
             {
-              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
+              externalIdentifierLookup: this.resolveLiteralIdentifier
             }
           )
         ];

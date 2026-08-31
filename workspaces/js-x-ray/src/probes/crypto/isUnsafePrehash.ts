@@ -4,14 +4,16 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../../contants.ts";
-import { isStringLiteral, isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
-import { getParamNames, getMemberCallExpression } from "../../estree/index.ts";
+import { isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
+import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
 import {
   VariableTracer,
   type LiteralIdentifier,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
+import { resolveStringValue } from "./resolveStringValue.ts";
+import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";
 const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
@@ -51,52 +53,20 @@ const kDigestChains = [
   "crypto.createHmac.digest.toString"
 ] as const;
 
-/**
- * Resolves both `x.digest(encoding)` and `x.digest().toString(encoding)`
- */
-function resolveDigestEncodingArguments(
-  hashNode: ESTree.Node | null | undefined
-): ESTree.Node[] | null {
-  const digestCall = getMemberCallExpression(hashNode, "digest");
-  if (digestCall) {
-    return digestCall.arguments;
-  }
-
-  const toStringCall = getMemberCallExpression(hashNode, "toString");
-  if (toStringCall) {
-    const innerDigestCall = getMemberCallExpression(toStringCall.callee.object, "digest");
-    if (innerDigestCall) {
-      return innerDigestCall.arguments.length === 0
-        ? toStringCall.arguments
-        : innerDigestCall.arguments;
-    }
-  }
-
-  return null;
-}
-
 function isSafeEncodingArg(
   node: ESTree.Node | undefined,
   literalIdentifiers: Map<string, LiteralIdentifier>
 ): boolean {
-  if (isStringLiteral(node)) {
-    return kSafeDigestEncodings.has(node.value);
-  }
+  const value = resolveStringValue(node, literalIdentifiers);
 
-  if (isIdentifier(node)) {
-    const literal = literalIdentifiers.get(node.name);
-
-    return literal !== undefined && kSafeDigestEncodings.has(literal.value);
-  }
-
-  return false;
+  return value !== null && kSafeDigestEncodings.has(value);
 }
 
 function hasUnsafeDigestEncoding(
   hashNode: ESTree.Node | null | undefined,
   literalIdentifiers: Map<string, LiteralIdentifier>
 ): boolean {
-  const encodingArgs = resolveDigestEncodingArguments(hashNode);
+  const encodingArgs = resolveDigestCall(hashNode);
   if (encodingArgs === null) {
     return false;
   }
@@ -163,7 +133,7 @@ function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
       return;
     }
 
-    const encodingArg = payload.arguments.at(0);
+    const encodingArg = resolveDigestCall(payload.node)?.at(0);
     if (!isSafeEncodingArg(encodingArg, tracer.literalIdentifiers)) {
       ctx.context![kUnsafeDigestVariables]!.add(payload.id);
     }

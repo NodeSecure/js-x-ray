@@ -148,7 +148,7 @@ function validateMemberExpression(
   ctx: ProbeContext
 ): [boolean, any?] {
   const iter = getMemberExpressionIdentifier(node, {
-    externalIdentifierLookup: (name: string) => ctx.sourceFile.tracer.literalIdentifiers.get(name)?.value ?? null
+    externalIdentifierLookup: ctx.sourceFile.tracer.resolveLiteralIdentifier
   });
 
   const rawName = iter.next().value;
