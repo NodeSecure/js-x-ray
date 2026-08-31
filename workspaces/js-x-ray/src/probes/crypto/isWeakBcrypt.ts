@@ -4,8 +4,9 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../../contants.ts";
-import { isStringLiteral, isNumericLiteral, isIdentifier } from "../../estree/types.ts";
+import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
+import { resolveNumericValue } from "./resolveNumericValue.ts";
 
 const kMinRounds = 10;
 
@@ -59,20 +60,10 @@ function main(
   const argIndex = kTracedFunctionsWithArgIndex.get(ctx.data as string)!;
   const arg = node.arguments.at(argIndex);
 
-  if (isNumericLiteral(arg)) {
-    if (arg.value < kMinRounds) {
-      sourceFile.warnings.push(
-        generateWarning("crypto.weak-bcrypt", {
-          value: "low-work-factor",
-          location: node.loc
-        })
-      );
-    }
-  }
-  else if (isIdentifier(arg)) {
-    const literal = tracer.literalIdentifiers.get(arg.name);
-    const numValue = Number(literal?.value);
-    if (!Number.isNaN(numValue) && numValue < kMinRounds) {
+  const numValue = resolveNumericValue(arg, tracer.literalIdentifiers);
+
+  if (numValue !== null) {
+    if (numValue < kMinRounds) {
       sourceFile.warnings.push(
         generateWarning("crypto.weak-bcrypt", {
           value: "low-work-factor",
