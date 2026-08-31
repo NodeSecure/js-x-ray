@@ -160,6 +160,8 @@ export class VariableTracer extends EventEmitter {
     console.log(this.#traced);
   }
 
+  resolveLiteralIdentifier = (name: string): string | null => this.literalIdentifiers.get(name)?.value ?? null;
+
   enableDefaultTracing() {
     [...kRequirePatterns]
       .forEach((pattern) => this.trace(pattern, { followConsecutiveAssignment: true, name: "require" }));
@@ -356,7 +358,7 @@ export class VariableTracer extends EventEmitter {
     const callExprArguments = getCallExpressionArguments(
       node,
       {
-        externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
+        externalIdentifierLookup: this.resolveLiteralIdentifier
       }
     );
     if (callExprArguments === null) {
@@ -624,7 +626,7 @@ export class VariableTracer extends EventEmitter {
           ...getMemberExpressionIdentifier(
             childNode,
             {
-              externalIdentifierLookup: (name) => this.literalIdentifiers.get(name)?.value ?? null
+              externalIdentifierLookup: this.resolveLiteralIdentifier
             }
           )
         ];

@@ -115,7 +115,7 @@ function main(
     case "ArrayExpression": {
       const value = [
         ...arrayExpressionToString(arg, {
-          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name)?.value ?? null
+          externalIdentifierLookup: tracer.resolveLiteralIdentifier
         })
       ]
         .join("")
@@ -143,7 +143,7 @@ function main(
 
       try {
         const iter = concatBinaryExpression(arg, {
-          externalIdentifierLookup: (name) => tracer.literalIdentifiers.get(name)?.value ?? null,
+          externalIdentifierLookup: tracer.resolveLiteralIdentifier,
           stopOnUnsupportedNode: true
         });
 
