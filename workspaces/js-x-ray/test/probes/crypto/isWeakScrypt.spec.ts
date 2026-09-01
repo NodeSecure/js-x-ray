@@ -67,6 +67,20 @@ describe("isWeakScrypt", () => {
       assert.strictEqual(outputWarnings[0].value, "low-cost");
     });
 
+    it("should warn when the cost option key is written as a quoted string literal", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, salt, 64, { "cost": 1024 }, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = new AstAnalyser({
+        optionalWarnings: ["crypto.weak-scrypt"]
+      }).analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
+      assert.strictEqual(outputWarnings[0].value, "low-cost");
+    });
+
     it("should warn when cost option is set without sufficient parallelization (N=16384, default p=1)", () => {
       const code = `
         import crypto from 'crypto';
