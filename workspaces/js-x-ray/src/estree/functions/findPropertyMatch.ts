@@ -5,15 +5,7 @@ import type { ESTree } from "meriyah";
 import { isIdentifier, isStringLiteral } from "../types.ts";
 
 /**
- * Resolve the static name of a property key.
- *
- * A key is statically known when it is written as a plain identifier
- * (`{ cost: 1 }`) or as a string literal, quoted or computed
- * (`{ "cost": 1 }`, `{ ["cost"]: 1 }`) — all three describe the same key.
- *
- * limitation: a computed identifier (e.g. `{ [cost]: 1 }`) uses the *value* of
- * `cost` as the real key instead of the name "cost", so it is only known at
- * runtime. Returning null there avoids matching on the wrong property.
+ * Returns null for a computed identifier (`{ [cost]: 1 }`), whose key is only known at runtime.
  */
 function getPropertyName(prop: ESTree.Property): string | null {
   if (!prop.computed && isIdentifier(prop.key)) {
