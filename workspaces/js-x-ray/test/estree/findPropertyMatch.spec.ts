@@ -99,4 +99,26 @@ describe("estree.findPropertyMatch", () => {
     assert.ok(result !== null);
     assert.strictEqual(result.value, 0);
   });
+
+  test("matches a key written as a quoted string literal", () => {
+    const properties = getProperties("{ 'cost' : 100 }");
+    const result = findPropertyMatch(properties, ["cost"], isNumericLiteral);
+
+    assert.ok(result !== null);
+    assert.strictEqual(result.value, 100);
+  });
+
+  test("matches a computed key holding a string literal", () => {
+    const properties = getProperties(`{ ["cost"]: 100 }`);
+    const result = findPropertyMatch(properties, ["cost"], isNumericLiteral);
+
+    assert.ok(result !== null);
+    assert.strictEqual(result.value, 100);
+  });
+
+  test("returns null when a quoted key does not match any name", () => {
+    const properties = getProperties(`{ "notCost": 100 }`);
+
+    assert.strictEqual(findPropertyMatch(properties, ["cost"], isNumericLiteral), null);
+  });
 });

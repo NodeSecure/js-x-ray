@@ -112,6 +112,27 @@ Will yield three components:
 </details>
 
 <details>
+<summary>findPropertyMatch< T extends ESTree.Node >(properties: ESTree.ObjectExpression["properties"], names: string[], predicate: (value: ESTree.Node) => value is T): T | null</summary>
+
+Returns the value of the first property whose key is in `names` and whose value matches `predicate`, or **null** if there is none.
+
+For example:
+
+```js
+{ cost: 1024, blockSize: 8 }
+```
+
+```ts
+findPropertyMatch(properties, ["cost", "N"], isNumericLiteral);
+```
+
+Will return the `Literal` node for `1024`.
+
+A key matches when its name is statically known. `{ cost: 1 }`, `{ "cost": 1 }`, and `{ ["cost"]: 1 }` will match `"cost"`, but `{ [cost]: 1 }` will not, because the real key is the *value* of `cost` at runtime.
+
+</details>
+
+<details>
 <summary>getCallExpressionArguments(node: ESTree.Node, options?: DefaultOptions): string[] | null</summary>
 
 Returns the literal arguments of a `CallExpression`.
