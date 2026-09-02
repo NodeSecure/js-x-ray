@@ -64,4 +64,14 @@ describe("crypto.resolveStringValue", () => {
 
     assert.strictEqual(resolveStringValue(node, literalIdentifiers), "");
   });
+
+  test("returns null for an identifier tracked back to a template literal", () => {
+    const node = getExpression("foo");
+    const literalIdentifiers = new Map<string, LiteralIdentifier>([
+    /* eslint-disable-next-line no-template-curly-in-string */
+      ["foo", { value: "${0}", type: "TemplateLiteral" }]
+    ]);
+
+    assert.strictEqual(resolveStringValue(node, literalIdentifiers), null);
+  });
 });
