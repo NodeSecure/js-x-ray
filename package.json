@@ -16,13 +16,13 @@
   "author": "GENTILHOMME Thomas <gentilhomme.thomas@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@changesets/changelog-github": "^0.7.0",
-    "@changesets/cli": "^2.29.4",
+    "@changesets/changelog-github": "^1.0.0",
+    "@changesets/cli": "^3.0.1",
     "@openally/config.eslint": "^2.4.2",
     "@openally/config.typescript": "1.3.0",
-    "@types/node": "26.1.1",
-    "c8": "^11.0.0",
+    "@types/node": "26.3.0",
+    "c8": "^12.0.0",
     "iterator-matcher": "^2.1.0",
-    "typescript": "^6.0.2"
+    "typescript": "^7.0.2"
   }
 }
