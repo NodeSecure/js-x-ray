@@ -16,6 +16,7 @@ export function resolveStringValue(
   }
   if (isIdentifier(node)) {
     const literal = literalIdentifiers.get(node.name);
+
     return literal?.type === "Literal" ? literal.value : null;
   }
 

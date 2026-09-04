@@ -3,10 +3,12 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
-import type { VariableTracer } from "../../VariableTracer.ts";
 import { CALL_EXPRESSION_DATA } from "../../contants.ts";
-import { isStringLiteral, isNumericLiteral, isIdentifier } from "../../estree/types.ts";
+import { isNode } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
+import { resolveNumericValue } from "./resolveNumericValue.ts";
+import { resolveStringValue } from "./resolveStringValue.ts";
+import { findPropertyMatch } from "../../estree/index.ts";
 
 /**
  * OWASP recommended Argon2 parameter combinations.
@@ -37,12 +39,6 @@ const kMinNonceLength = 16;
 
 const kTracedFunctions = ["crypto.argon2", "crypto.argon2Sync"];
 
-interface Argon2Params {
-  memory: number | null;
-  passes: number | null;
-  nonce: string | null;
-}
-
 /**
  * Identify which parameter drags the call below the OWASP recommendations,
  * or null when the combination is acceptable.
@@ -62,95 +58,6 @@ function findWeakParam(
   }
 
   return memory < row[0] ? "memory" : null;
-}
-
-/**
- * Resolve the static name of a property key.
- * Returns null for a computed key built from a variable, since its value is
- * only known at runtime.
- */
-function getPropertyName(
-  prop: ESTree.Property
-): string | null {
-  if (!prop.computed && isIdentifier(prop.key)) {
-    return prop.key.name;
-  }
-
-  return isStringLiteral(prop.key) ? prop.key.value : null;
-}
-
-/**
- * Read a string out of a node, following identifiers assigned a string literal.
- * TemplateLiteral assignments are ignored because the tracer stores them with
- * their interpolations replaced by placeholders.
- */
-function resolveString(
-  node: ESTree.Node | undefined,
-  tracer: VariableTracer
-): string | null {
-  if (isStringLiteral(node)) {
-    return node.value;
-  }
-  if (isIdentifier(node)) {
-    const literal = tracer.literalIdentifiers.get(node.name);
-
-    return literal?.type === "Literal" ? literal.value : null;
-  }
-
-  return null;
-}
-
-/**
- * Read a number out of a node, following identifiers assigned a numeric
- * literal. The tracer stores every literal as a string, hence the conversion.
- */
-function resolveNumber(
-  node: ESTree.Node | undefined,
-  tracer: VariableTracer
-): number | null {
-  if (isNumericLiteral(node)) {
-    return node.value;
-  }
-  if (isIdentifier(node)) {
-    const literal = tracer.literalIdentifiers.get(node.name);
-    if (literal?.type !== "Literal") {
-      return null;
-    }
-    const value = Number(literal.value);
-
-    return Number.isNaN(value) ? null : value;
-  }
-
-  return null;
-}
-
-function extractParams(
-  properties: ESTree.ObjectExpression["properties"],
-  tracer: VariableTracer
-): Argon2Params {
-  const params: Argon2Params = { memory: null, passes: null, nonce: null };
-
-  for (const prop of properties) {
-    if (prop.type !== "Property") {
-      continue;
-    }
-
-    switch (getPropertyName(prop)) {
-      case "memory":
-        params.memory = resolveNumber(prop.value, tracer);
-        break;
-      case "passes":
-        params.passes = resolveNumber(prop.value, tracer);
-        break;
-      case "nonce":
-        params.nonce = resolveString(prop.value, tracer);
-        break;
-      default:
-        break;
-    }
-  }
-
-  return params;
 }
 
 function validateNode(
@@ -183,7 +90,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   const { sourceFile } = ctx;
   const { tracer } = sourceFile;
 
-  const algorithm = resolveString(node.arguments.at(0), tracer);
+  const algorithm = resolveStringValue(node.arguments.at(0), tracer.literalIdentifiers);
   if (algorithm === null) {
     return;
   }
@@ -202,7 +109,13 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     return;
   }
 
-  const { memory, passes, nonce } = extractParams(options.properties, tracer);
+  const { properties } = options;
+
+  const memory = resolveNumericValue(findPropertyMatch(properties, ["memory"], isNode), tracer.literalIdentifiers);
+  const passes = resolveNumericValue(findPropertyMatch(properties, ["passes"], isNode), tracer.literalIdentifiers);
+  const nonce = resolveStringValue(findPropertyMatch(properties, ["nonce"], isNode), tracer.literalIdentifiers);
+
+  // const { memory, passes, nonce } = extractParams(options.properties, tracer);
 
   if (memory !== null && passes !== null) {
     const weakParam = findWeakParam(algorithm, memory, passes);
