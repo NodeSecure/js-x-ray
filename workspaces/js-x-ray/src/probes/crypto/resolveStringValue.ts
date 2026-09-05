@@ -4,7 +4,8 @@ import type { LiteralIdentifier } from "../../VariableTracer.ts";
 
 /**
  * @description
- * Resolves a string literal, or an identifier tracked back to a string literal assignment
+ * Resolves a string literal, or an identifier tracked back to a string literal assignment.
+ * If the identifier is tracked back to a template literal, it will return null.
  */
 export function resolveStringValue(
   node: unknown,
@@ -14,7 +15,9 @@ export function resolveStringValue(
     return node.value;
   }
   if (isIdentifier(node)) {
-    return literalIdentifiers.get(node.name)?.value ?? null;
+    const literal = literalIdentifiers.get(node.name);
+
+    return literal?.type === "Literal" ? literal.value : null;
   }
 
   return null;

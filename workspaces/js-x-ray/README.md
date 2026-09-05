@@ -128,7 +128,8 @@ type OptionalWarningName =
   | "crypto.weak-scrypt"
   | "crypto.unsafe-prehash"
   | "crypto.weak-bcrypt"
-  | "crypto.password-shucking";
+  | "crypto.password-shucking"
+  | "crypto.weak-argon2";
 
 type WarningName =
   | "parsing-error"
@@ -199,6 +200,7 @@ The following warnings are optional:
 - `crypto.unsafe-prehash` - Detects password pre-hashing fed into bcrypt without a safe (base64/hex) digest encoding
 - `crypto.weak-bcrypt` - Detects weak bcrypt parameters (low work factor, hardcoded salt)
 - `crypto.password-shucking` - Detects password pre-hashing with a plain hash function fed into bcrypt
+- `crypto.weak-argon2` - Detects weak Argon2 parameters (argon2d variant, low memory/passes, short or hardcoded nonce)
 
 ### Internationalization (i18n)
 
@@ -249,6 +251,7 @@ Click on the warning **name** for detailed documentation and examples.
 | [crypto.unsafe-prehash](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.unsafe-prehash.md) ⚠️ | **Yes** | Password pre-hashed and fed into bcrypt without a safe digest encoding |
 | [crypto.weak-bcrypt](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.weak-bcrypt.md) ⚠️ | **Yes** | Usage of weak bcrypt parameters (low work factor or hardcoded salt) |
 | [crypto.password-shucking](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.password-shucking.md) ⚠️ | **Yes** | Password pre-hashed with a plain hash function |
+| [crypto.weak-argon2](https://github.com/NodeSecure/js-x-ray/blob/master/docs/crypto.weak-argon2.md) ⚠️ | **Yes** | Usage of weak Argon2 parameters (argon2d variant, low memory/passes, short or hardcoded nonce) |
 | [unsafe-vm-context](https://github.com/NodeSecure/js-x-ray/blob/master/docs/unsafe-vm-context.md) ⚠️ | No | Usage of dangerous vm.runInNewContext and (vm.Script(code,options)).runInContext |
 
 #### Information Severity
