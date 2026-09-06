@@ -4,7 +4,7 @@ import type { LiteralIdentifier } from "../../VariableTracer.ts";
 
 /**
  * @description
- * Resolves a string literal, or an identifier tracked back to a string literal assignment.
+ * Resolves a string literal, or an identifier tracked back to a string literal assignment or a template literal.
  * If the identifier is tracked back to a template literal, it will return null.
  */
 export function resolveStringValue(

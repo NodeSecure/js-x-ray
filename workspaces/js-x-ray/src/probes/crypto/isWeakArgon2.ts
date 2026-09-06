@@ -44,7 +44,7 @@ const kTracedFunctions = ["crypto.argon2", "crypto.argon2Sync"];
  * or null when the combination is acceptable.
  */
 function findWeakParam(
-  algorithm: string,
+  algorithm: string | null,
   memory: number,
   passes: number
 ): "memory" | "passes" | null {
@@ -89,51 +89,39 @@ function initialize(ctx: ProbeContext) {
 function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   const { sourceFile } = ctx;
   const { tracer } = sourceFile;
+  const reasons: string[] = [];
 
   const algorithm = resolveStringValue(node.arguments.at(0), tracer.literalIdentifiers);
-  if (algorithm === null) {
-    return;
-  }
 
   if (algorithm === "argon2d") {
-    sourceFile.warnings.push(
-      generateWarning("crypto.weak-argon2", {
-        value: `weak-algorithm: ${algorithm}`,
-        location: node.loc
-      })
-    );
+    reasons.push(`weak-algorithm: ${algorithm}`);
   }
 
   const options = node.arguments.at(1);
-  if (options?.type !== "ObjectExpression") {
-    return;
-  }
 
-  const { properties } = options;
+  if (options?.type === "ObjectExpression") {
+    const { properties } = options;
+    const memory = resolveNumericValue(findPropertyMatch(properties, ["memory"], isNode), tracer.literalIdentifiers);
+    const passes = resolveNumericValue(findPropertyMatch(properties, ["passes"], isNode), tracer.literalIdentifiers);
+    const nonce = resolveStringValue(findPropertyMatch(properties, ["nonce"], isNode), tracer.literalIdentifiers);
 
-  const memory = resolveNumericValue(findPropertyMatch(properties, ["memory"], isNode), tracer.literalIdentifiers);
-  const passes = resolveNumericValue(findPropertyMatch(properties, ["passes"], isNode), tracer.literalIdentifiers);
-  const nonce = resolveStringValue(findPropertyMatch(properties, ["nonce"], isNode), tracer.literalIdentifiers);
+    if (memory !== null && passes !== null) {
+      const weakParam = findWeakParam(algorithm, memory, passes);
 
-  // const { memory, passes, nonce } = extractParams(options.properties, tracer);
+      if (weakParam !== null) {
+        reasons.push(`low-params: ${weakParam}`);
+      }
+    }
 
-  if (memory !== null && passes !== null) {
-    const weakParam = findWeakParam(algorithm, memory, passes);
-
-    if (weakParam !== null) {
-      sourceFile.warnings.push(
-        generateWarning("crypto.weak-argon2", {
-          value: `low-params: ${weakParam}`,
-          location: node.loc
-        })
-      );
+    if (nonce !== null) {
+      reasons.push(nonce.length < kMinNonceLength ? "short-nonce" : "hardcoded-nonce");
     }
   }
 
-  if (nonce !== null) {
+  if (reasons.length > 0) {
     sourceFile.warnings.push(
       generateWarning("crypto.weak-argon2", {
-        value: nonce.length < kMinNonceLength ? "short-nonce" : "hardcoded-nonce",
+        value: reasons.join(", "),
         location: node.loc
       })
     );

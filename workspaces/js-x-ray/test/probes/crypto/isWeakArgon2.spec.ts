@@ -199,30 +199,48 @@ describe("isWeakArgon2", () => {
   });
 
   describe("combined warnings", () => {
-    it("should emit both low-params and short-nonce", () => {
+    it("should report low-params and short-nonce as a single warning", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2("argon2id", { memory: 8, passes: 1, nonce: "salt" }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 
-      assert.deepStrictEqual(
-        outputWarnings.map((warning) => warning.value).sort(),
-        ["low-params: memory", "short-nonce"]
-      );
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory, short-nonce");
     });
 
-    it("should emit both weak-algorithm and low-params", () => {
+    it("should report weak-algorithm and low-params as a single warning", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2("argon2d", { memory: 8, passes: 1 }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 
-      assert.deepStrictEqual(
-        outputWarnings.map((warning) => warning.value).sort(),
-        ["low-params: memory", "weak-algorithm: argon2d"]
-      );
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "weak-algorithm: argon2d, low-params: memory");
+    });
+
+    it("should emit every failing check of a call in one warning", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.argon2("argon2d", { memory: 8, passes: 1, nonce: "salt" }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "weak-algorithm: argon2d, low-params: memory, short-nonce");
+    });
+
+    it("should still report argon2d when the options cannot be read", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.argon2("argon2d", options, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "weak-algorithm: argon2d");
     });
   });
 
@@ -247,10 +265,21 @@ describe("isWeakArgon2", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when the algorithm is an unresolvable identifier", () => {
+    it("should still check the parameters when the algorithm is an unresolvable identifier", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2(algorithm, { memory: 8, passes: 1 }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-params: memory");
+    });
+
+    it("should check the parameters against the general OWASP rows when the algorithm is unresolvable", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.argon2(algorithm, { memory: 47104, passes: 1 }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 

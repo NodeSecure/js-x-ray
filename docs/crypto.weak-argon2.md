@@ -57,6 +57,8 @@ crypto.argon2(algorithm, options, callback);
 
 Anything that cannot be read statically — a value computed at runtime, a key computed from a variable, an options object spread from elsewhere — is left alone rather than reported on a value that is unknown.
 
+An algorithm that cannot be resolved only skips the variant check: `memory`, `passes` and `nonce` are still verified, against the general OWASP rows since the variant is unknown.
+
 ## Example
 
 ```js
