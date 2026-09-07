@@ -114,7 +114,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     }
 
     if (nonce !== null) {
-      reasons.push(nonce.length < kMinNonceLength ? "short-nonce" : "hardcoded-nonce");
+      reasons.push(Buffer.byteLength(nonce) < kMinNonceLength ? "short-nonce" : "hardcoded-nonce");
     }
   }
 

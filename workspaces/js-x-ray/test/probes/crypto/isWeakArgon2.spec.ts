@@ -161,7 +161,7 @@ describe("isWeakArgon2", () => {
   });
 
   describe("short-nonce", () => {
-    it("should warn when nonce is a string literal shorter than 16 chars", () => {
+    it("should warn when nonce is a string literal shorter than 16 bytes", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: "12345678" }, (err, tag) => {});
@@ -174,7 +174,7 @@ describe("isWeakArgon2", () => {
   });
 
   describe("hardcoded-nonce", () => {
-    it("should warn when nonce is a string literal of 16 chars or more", () => {
+    it("should warn when nonce is a string literal of 16 bytes or more", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: "0123456789abcdef" }, (err, tag) => {});
@@ -190,6 +190,17 @@ describe("isWeakArgon2", () => {
         import crypto from 'crypto';
         const salt = "0123456789abcdef";
         crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: salt }, (err, tag) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "hardcoded-nonce");
+    });
+
+    it("should measure the length of nonce in bytes (6 chars but 18 bytes)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.argon2("argon2id", { memory: 47104, passes: 1, nonce: "가나다라마바" }, (err, tag) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 

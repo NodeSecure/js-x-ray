@@ -11,7 +11,7 @@ Checks for:
 
 - **weak-algorithm: `<variant>`**: the `argon2d` variant, which is data-dependent and not intended for password hashing.
 - **low-params: `memory` | `passes`**: `memory` and `passes` that do not meet [OWASP recommended combinations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id). The reported name is the parameter that has to change.
-- **short-nonce**: nonce is a hardcoded string shorter than 16 characters.
+- **short-nonce**: nonce is a hardcoded string shorter than 16 bytes.
 - **hardcoded-nonce**: nonce is a hardcoded string (should be randomly generated).
 
 > [!NOTE]
