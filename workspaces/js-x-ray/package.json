@@ -66,8 +66,8 @@
     "safe-regex": "^2.1.1"
   },
   "devDependencies": {
-    "@nodesecure/i18n": "4.1.0",
-    "@nodesecure/mama": "2.3.1",
+    "@nodesecure/i18n": "4.1.1",
+    "@nodesecure/mama": "2.4.0",
     "@types/pacote": "11.1.8",
     "astring": "1.9.0",
     "mitata": "1.0.34",
