@@ -24,7 +24,8 @@ export const sast_warnings = {
   unsafe_prehash: "استخدام bcryptjs مع كلمة مرور مُجزأة مسبقًا بخوارزمية غير آمنة (md5، sha1، sha256 أو sha512). يمكن للمهاجم تجاوز bcrypt عن طريق كسر التجزئة الوسيطة الأضعف.",
   weak_bcrypt: "استخدام دوال التجزئة bcryptjs (hash، hashSync، genSalt، genSaltSync) بعامل عمل أقل من 10، مما يجعل تجزئة كلمة المرور عرضة لهجمات القوة الغاشمة.",
   password_shucking: "استخدام bcryptjs حيث يتم تجزئة كلمة المرور أولًا بملخص تشفيري (md5، sha1، sha256 أو sha512) قبل تمريرها إلى bcrypt، مما يتيح هجمات hash shucking التي تتجاوز حماية bcrypt.",
-  unsafe_vm_context: "استخدام vm.runInContext() أو vm.Script.runInContext() حيث قد يتأثر كائن السياق بمدخلات غير موثوقة، مما يجعل بيئة الحماية عرضة للخطر."
+  unsafe_vm_context: "استخدام vm.runInContext() أو vm.Script.runInContext() حيث قد يتأثر كائن السياق بمدخلات غير موثوقة، مما يجعل بيئة الحماية عرضة للخطر.",
+  weak_argon2: "استخدام crypto.argon2() أو crypto.argon2Sync() بمعاملات غير آمنة: النسخة argon2d غير المخصصة لتجزئة كلمات المرور، أو nonce مضمّن في الشيفرة أو قصير (أقل من 16 بايت)، أو قيم memory و passes أقل من التركيبات التي توصي بها OWASP. هذه الإعدادات الضعيفة تُضعف أمان تجزئة كلمة المرور."
 };
 
 export default {

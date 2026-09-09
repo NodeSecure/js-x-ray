@@ -24,7 +24,8 @@ export const sast_warnings = {
   unsafe_prehash: "Usage of bcryptjs with a password pre-hashed using an insecure digest algorithm (md5, sha1, sha256 or sha512). An attacker can bypass bcrypt by cracking the weaker intermediate hash.",
   weak_bcrypt: "Usage of bcryptjs hashing functions (hash, hashSync, genSalt, genSaltSync) with a work factor below 10, making password hashing susceptible to brute-force attacks.",
   password_shucking: "Usage of bcryptjs where the password is first hashed with a cryptographic digest (md5, sha1, sha256 or sha512) before being passed to bcrypt, enabling hash shucking attacks that bypass bcrypt protection.",
-  unsafe_vm_context: "Usage of vm.runInContext() or vm.Script.runInContext() where the context object may be influenced by untrusted input, making the sandbox vulnerable."
+  unsafe_vm_context: "Usage of vm.runInContext() or vm.Script.runInContext() where the context object may be influenced by untrusted input, making the sandbox vulnerable.",
+  weak_argon2: "Usage of crypto.argon2() or crypto.argon2Sync() with insecure parameters: the argon2d variant, which is not intended for password hashing, a hardcoded or short nonce (less than 16 bytes), or memory and passes values below the OWASP recommended combinations. These weak configurations compromise the security of password hashing."
 };
 
 export default {

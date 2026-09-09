@@ -24,7 +24,8 @@ export const sast_warnings = {
   unsafe_prehash: "안전하지 않은 다이제스트 알고리즘(md5, sha1, sha256 또는 sha512)으로 사전 해시된 비밀번호와 함께 bcryptjs를 사용하는 경우입니다. 공격자는 더 약한 중간 해시를 크래킹하여 bcrypt를 우회할 수 있습니다.",
   weak_bcrypt: "작업 인수가 10 미만인 bcryptjs 해싱 함수(hash, hashSync, genSalt, genSaltSync)를 사용하는 경우로, 비밀번호 해싱이 무차별 대입 공격에 취약해집니다.",
   password_shucking: "비밀번호를 bcrypt에 전달하기 전에 암호화 다이제스트(md5, sha1, sha256 또는 sha512)로 먼저 해시하는 bcryptjs 사용 패턴으로, bcrypt 보호를 우회하는 해시 셔킹 공격이 가능해집니다.",
-  unsafe_vm_context: "vm.runInContext() 또는 vm.Script.runInContext()를 사용할 때 컨텍스트 객체가 신뢰할 수 없는 입력의 영향을 받아 샌드박스를 취약하게 만듭니다."
+  unsafe_vm_context: "vm.runInContext() 또는 vm.Script.runInContext()를 사용할 때 컨텍스트 객체가 신뢰할 수 없는 입력의 영향을 받아 샌드박스를 취약하게 만듭니다.",
+  weak_argon2: "안전하지 않은 매개변수로 crypto.argon2() 또는 crypto.argon2Sync()가 사용되었습니다. 비밀번호 해싱 용도가 아닌 argon2d 변형, 하드코딩되거나 짧은 nonce(16바이트 미만), 또는 OWASP 권장 조합에 미치지 못하는 memory·passes 값이 이에 해당합니다. 이러한 취약한 설정은 비밀번호 해싱의 보안을 손상시킵니다."
 };
 
 export default {
