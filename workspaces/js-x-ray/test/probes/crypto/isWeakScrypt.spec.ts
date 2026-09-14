@@ -154,17 +154,15 @@ describe("isWeakScrypt", () => {
   });
 
   describe("combined warnings", () => {
-    it("should emit both short-salt and low-cost warnings", () => {
+    it("should report low-cost and short-salt in a single warning", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, "abc", 64, { cost: 1024 }, (err, key) => {});
       `;
       const { warnings: outputWarnings } = analyse(code);
 
-      assert.strictEqual(outputWarnings.length, 2);
-      const values = outputWarnings.map((w) => w.value);
-      assert.ok(values.includes("short-salt"));
-      assert.ok(values.includes("low-cost"));
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].value, "low-cost, short-salt");
     });
   });
 
