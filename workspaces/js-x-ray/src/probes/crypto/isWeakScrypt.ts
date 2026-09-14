@@ -110,7 +110,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   }
 
   if (isStringLiteral(salt)) {
-    if (typeof salt.value === "string" && salt.value.length < 16) {
+    if (typeof salt.value === "string" && Buffer.byteLength(salt.value) < 16) {
       sourceFile.warnings.push(
         generateWarning("crypto.weak-scrypt", {
           value: "short-salt",

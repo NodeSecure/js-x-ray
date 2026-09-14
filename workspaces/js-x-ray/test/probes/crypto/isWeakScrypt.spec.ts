@@ -5,16 +5,20 @@ import { describe, it } from "node:test";
 // Import Internal Dependencies
 import { AstAnalyser } from "../../../src/AstAnalyser.ts";
 
+function analyse(code: string) {
+  return new AstAnalyser({
+    optionalWarnings: ["crypto.weak-scrypt"]
+  }).analyse(code);
+}
+
 describe("isWeakScrypt", () => {
   describe("short-salt", () => {
-    it("should warn when salt is a short string literal (less than 16 chars)", () => {
+    it("should warn when salt is a short string literal (less than 16 bytes)", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, "short", 64, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
@@ -26,9 +30,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, "", 64, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
@@ -37,14 +39,24 @@ describe("isWeakScrypt", () => {
   });
 
   describe("hardcoded-salt", () => {
-    it("should warn when salt is a hardcoded string literal (16 chars or more)", () => {
+    it("should warn when salt is a hardcoded string literal of 16 bytes or more", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, "this-is-a-long-hardcoded-salt", 64, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
+      assert.strictEqual(outputWarnings[0].value, "hardcoded-salt");
+    });
+
+    it("should measure the length of salt in bytes (6 chars but 18 bytes)", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.scrypt(password, "가나다라마바", 64, (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
@@ -58,9 +70,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 1024 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
@@ -72,9 +82,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { "cost": 1024 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].kind, "crypto.weak-scrypt");
@@ -86,9 +94,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 16384 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].value, "low-cost");
@@ -99,9 +105,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { N: 131072, r: 4 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].value, "low-cost");
@@ -112,9 +116,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { N: 8192, p: 9 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 1);
       assert.strictEqual(outputWarnings[0].value, "low-cost");
@@ -125,9 +127,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 16384, parallelization: 5 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
     });
@@ -137,9 +137,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { N: 131072, p: 1, r: 8 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
     });
@@ -149,9 +147,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { N: 8192, p: 10 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
     });
@@ -163,9 +159,7 @@ describe("isWeakScrypt", () => {
         import crypto from 'crypto';
         crypto.scrypt(password, "abc", 64, { cost: 1024 }, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 2);
       const values = outputWarnings.map((w) => w.value);
@@ -181,9 +175,7 @@ describe("isWeakScrypt", () => {
         const salt = crypto.randomBytes(16);
         crypto.scrypt(password, salt, 64, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
     });
@@ -193,9 +185,7 @@ describe("isWeakScrypt", () => {
         const crypto = { scrypt() {} };
         crypto.scrypt(password, "short", 64, (err, key) => {});
       `;
-      const { warnings: outputWarnings } = new AstAnalyser({
-        optionalWarnings: ["crypto.weak-scrypt"]
-      }).analyse(code);
+      const { warnings: outputWarnings } = analyse(code);
 
       assert.strictEqual(outputWarnings.length, 0);
     });
