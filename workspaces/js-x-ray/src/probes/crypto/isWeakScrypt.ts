@@ -76,6 +76,7 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   const { sourceFile } = ctx;
   const salt = node.arguments.at(1);
   const options = node.arguments.at(3);
+  const reasons: string[] = [];
 
   if (options && options.type === "ObjectExpression") {
     const { properties } = options;
@@ -99,33 +100,22 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
           parallelizationValue ?? kDefaultParallelization
         )
       ) {
-        sourceFile.warnings.push(
-          generateWarning("crypto.weak-scrypt", {
-            value: "low-cost",
-            location: node.loc
-          })
-        );
+        reasons.push("low-cost");
       }
     }
   }
 
-  if (isStringLiteral(salt)) {
-    if (typeof salt.value === "string" && salt.value.length < 16) {
-      sourceFile.warnings.push(
-        generateWarning("crypto.weak-scrypt", {
-          value: "short-salt",
-          location: node.loc
-        })
-      );
-    }
-    else {
-      sourceFile.warnings.push(
-        generateWarning("crypto.weak-scrypt", {
-          value: "hardcoded-salt",
-          location: node.loc
-        })
-      );
-    }
+  if (isStringLiteral(salt) && typeof salt.value === "string") {
+    reasons.push(Buffer.byteLength(salt.value) < 16 ? "short-salt" : "hardcoded-salt");
+  }
+
+  if (reasons.length > 0) {
+    sourceFile.warnings.push(
+      generateWarning("crypto.weak-scrypt", {
+        value: reasons.join(", "),
+        location: node.loc
+      })
+    );
   }
 }
 

@@ -9,7 +9,7 @@
 Detect usage of **weak scrypt** parameters with the Node.js core `crypto.scrypt()` function. This probe checks for:
 
 - **low-cost**: scrypt parameters (cost, blockSize, parallelization) that do not meet [OWASP minimum recommendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#scrypt).
-- **short-salt**: salt is a hardcoded string literal shorter than 16 characters.
+- **short-salt**: salt is a hardcoded string literal shorter than 16 bytes.
 - **hardcoded-salt**: salt is a hardcoded string literal (should be randomly generated).
 
 ## Example
