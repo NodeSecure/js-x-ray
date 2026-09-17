@@ -1,5 +1,27 @@
 # @nodesecure/js-x-ray
 
+## 16.1.0
+
+### Minor Changes
+
+- [#685](https://github.com/NodeSecure/js-x-ray/pull/685) [`19202ec`](https://github.com/NodeSecure/js-x-ray/commit/19202ecc45aaa3cfd72510f2557778ff0d722d59) Thanks [@clemgbld](https://github.com/clemgbld)! - feat: follow CallExpression chain
+
+- [#689](https://github.com/NodeSecure/js-x-ray/pull/689) [`54a7dff`](https://github.com/NodeSecure/js-x-ray/commit/54a7dffd5b4b4afdcb36ab4d3d1f2d3d608d6f98) Thanks [@Edneam](https://github.com/Edneam)! - feat(tracer): resolve identifiers assigned an object literal, so `log-usage` detects `pino()`/`winston.createLogger()` config passed via a variable instead of only inline
+
+- [#699](https://github.com/NodeSecure/js-x-ray/pull/699) [`652abd7`](https://github.com/NodeSecure/js-x-ray/commit/652abd7c60b8125147e4e9737cbffd9be0fe8a76) Thanks [@HoyeongJeon](https://github.com/HoyeongJeon)! - Add weak-argon2 detection probe for crypto.argon2() misuse
+
+- [#707](https://github.com/NodeSecure/js-x-ray/pull/707) [`a832844`](https://github.com/NodeSecure/js-x-ray/commit/a8328445ebba5b62722d02b66dfea7cc7da3e95c) Thanks [@HoyeongJeon](https://github.com/HoyeongJeon)! - Measure the scrypt salt length in bytes and report one warning per call with every failing check joined in the value
+
+### Patch Changes
+
+- [#703](https://github.com/NodeSecure/js-x-ray/pull/703) [`eceb98a`](https://github.com/NodeSecure/js-x-ray/commit/eceb98a79be68dea29060c4746876b093f0e6f85) Thanks [@HoyeongJeon](https://github.com/HoyeongJeon)! - match quoted and computed string keys in findPropertyMatch, so `{ "cost": 1 }` and `{ ["cost"]: 1 }` are no longer skipped
+
+- [#708](https://github.com/NodeSecure/js-x-ray/pull/708) [`a0ec458`](https://github.com/NodeSecure/js-x-ray/commit/a0ec4584836596a735f1c3f821d2f33fb04ff13b) Thanks [@VictorMartins3](https://github.com/VictorMartins3)! - resolve `require` specifiers written as a template literal with no expression, so ``require(`http`)`` records the dependency instead of reporting `unsafe-import`
+
+- [#709](https://github.com/NodeSecure/js-x-ray/pull/709) [`515797f`](https://github.com/NodeSecure/js-x-ray/commit/515797f2f79b31b992e835f2c598c7f8ed6f03a4) Thanks [@VictorMartins3](https://github.com/VictorMartins3)! - decode `Buffer.from(payload, "base64")` in require specifiers, so `require(Buffer.from("aHR0cA==", "base64").toString())` records `http` like the `hex` and `atob` forms already do
+
+- [#701](https://github.com/NodeSecure/js-x-ray/pull/701) [`669146a`](https://github.com/NodeSecure/js-x-ray/commit/669146a747fe0da1b7c4aaa485edb1f8e64558e1) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor probes to extract helper functions
+
 ## 16.0.0
 
 ### Major Changes
