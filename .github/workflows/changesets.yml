@@ -47,10 +47,10 @@ jobs:
         uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          version: npm run ci:version
-          commit: "chore: update versions"
-          title: "chore: update versions"
-          publish: npm run ci:publish
+          version-script: npm run ci:version
+          commit-message: "chore: update versions"
+          pr-title: "chore: update versions"
+          publish-script: npm run ci:publish
         env:
           NPM_TOKEN: ""
           NPM_CONFIG_PROVENANCE: true
