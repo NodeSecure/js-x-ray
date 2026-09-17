@@ -341,6 +341,36 @@ describe("isRequire probe", () => {
     assert.ok(dependencies.has("http"));
   });
 
+  it("(require CallExpression): should detect MemberExpression Buffer.from (with base64 encoding)", () => {
+    const str = `
+      require(Buffer.from("aHR0cA==", "base64").toString());
+    `;
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isRequire)
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.warnings().length, 1);
+    const warning = sastAnalysis.getWarning("unsafe-import");
+    assert.strictEqual(warning!.kind, "unsafe-import");
+
+    const dependencies = sastAnalysis.dependencies();
+    assert.strictEqual(dependencies.size, 1);
+    assert.ok(dependencies.has("http"));
+  });
+
+  it("(require CallExpression): should not resolve Buffer.from when the payload is not valid base64", () => {
+    const str = `
+      require(Buffer.from("not base64 at all!", "base64").toString());
+    `;
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isRequire)
+      .execute(ast.body);
+
+    const warning = sastAnalysis.getWarning("unsafe-import");
+    assert.strictEqual(warning!.kind, "unsafe-import");
+    assert.strictEqual(sastAnalysis.dependencies().size, 0);
+  });
+
   it("(require CallExpression): should detect MemberExpression Buffer.from (with ArrayExpression argument)", () => {
     const str = `
       require(Buffer.from([104, 101, 108, 108, 111]).toString());
