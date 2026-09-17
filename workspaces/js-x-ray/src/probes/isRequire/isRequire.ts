@@ -8,7 +8,8 @@ import {
   arrayExpressionToString,
   concatBinaryExpression,
   getCallExpressionArguments,
-  getCallExpressionIdentifier
+  getCallExpressionIdentifier,
+  toLiteral
 } from "../../estree/index.ts";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { isStringLiteral } from "../../estree/types.ts";
@@ -128,6 +129,19 @@ function main(
       }
       else {
         sourceFile.addDependency(value, node.loc);
+      }
+      break;
+    }
+
+    // require(`http`)
+    case "TemplateLiteral": {
+      if (arg.expressions.length === 0) {
+        sourceFile.addDependency(toLiteral(arg), node.loc);
+      }
+      else {
+        sourceFile.warnings.push(
+          generateWarning("unsafe-import", { value: null, location })
+        );
       }
       break;
     }

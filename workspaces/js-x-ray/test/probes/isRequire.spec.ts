@@ -21,6 +21,31 @@ describe("isRequire probe", () => {
     assert.deepEqual(dependencies.size, 0);
   });
 
+  it("should resolve a template literal with no expression like a string literal", () => {
+    const str = `
+      require(\`http\`);
+    `;
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isRequire)
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.warnings().length, 0);
+    assert.ok(sastAnalysis.dependencies().has("http"));
+  });
+
+  it("should warn on a template literal with an expression", () => {
+    const str = `
+      require(\`http\${suffix}\`);
+    `;
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isRequire)
+      .execute(ast.body);
+
+    const warning = sastAnalysis.getWarning("unsafe-import");
+    assert.ok(warning);
+    assert.strictEqual(sastAnalysis.dependencies().size, 0);
+  });
+
   it("should execute probe using require.resolve (detected by the VariableTracer)", () => {
     const str = `
       require.resolve("http");
