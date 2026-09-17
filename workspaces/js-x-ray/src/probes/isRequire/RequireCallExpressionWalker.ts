@@ -5,7 +5,7 @@ import path from "node:path";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { Hex } from "../../utils/index.ts";
+import { Hex, isStringBase64 } from "../../utils/index.ts";
 import {
   arrayExpressionToString,
   getCallExpressionArguments,
@@ -110,10 +110,23 @@ export class RequireCallExpressionWalker {
   #handleBufferFrom(
     node: ESTree.CallExpression
   ) {
-    const [element] = node.arguments;
+    const [element, encoding] = node.arguments;
     if (element.type === "ArrayExpression") {
       const depName = [...arrayExpressionToString(element)].join("").trim();
       this.dependencies.add(depName);
+
+      return;
+    }
+
+    if (
+      isStringLiteral(element) &&
+      isStringLiteral(encoding) &&
+      encoding.value === "base64" &&
+      isStringBase64(element.value, { allowEmpty: false })
+    ) {
+      this.dependencies.add(
+        Buffer.from(element.value, "base64").toString()
+      );
     }
   }
 
