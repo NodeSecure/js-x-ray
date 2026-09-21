@@ -27,7 +27,8 @@ export const sast_warnings = {
   weak_bcrypt: "Utilisation des fonctions de hachage bcryptjs (hash, hashSync, genSalt, genSaltSync) avec un facteur de travail inférieur à 10, rendant le hachage de mot de passe vulnérable aux attaques par brute force.",
   password_shucking: "Utilisation de bcryptjs où le mot de passe est d'abord haché avec un condensat cryptographique (md5, sha1, sha256 ou sha512) avant d'être passé à bcrypt, permettant des attaques de hash shucking qui contournent la protection bcrypt.",
   unsafe_vm_context: "Utilisation de vm.runInContext() ou vm.Script.runInContext() où l'objet contexte peut être influencé par des entrées non fiables, rendant la sandbox vulnérable.",
-  weak_argon2: "Utilisation de crypto.argon2() ou crypto.argon2Sync() avec des paramètres non sécurisés : la variante argon2d, qui n'est pas destinée au hachage de mot de passe, un nonce codé en dur ou trop court (moins de 16 octets), ou des valeurs memory et passes inférieures aux combinaisons recommandées par l'OWASP. Ces configurations faibles compromettent la sécurité du hachage de mot de passe."
+  weak_argon2: "Utilisation de crypto.argon2() ou crypto.argon2Sync() avec des paramètres non sécurisés : la variante argon2d, qui n'est pas destinée au hachage de mot de passe, un nonce codé en dur ou trop court (moins de 16 octets), ou des valeurs memory et passes inférieures aux combinaisons recommandées par l'OWASP. Ces configurations faibles compromettent la sécurité du hachage de mot de passe.",
+  weak_pbkdf2: "Utilisation de crypto.pbkdf2() ou crypto.pbkdf2Sync() avec des paramètres non sécurisés : un nombre d’itérations inférieur au minimum recommandé par l’OWASP (600 000 pour SHA-256, 210 000 pour SHA-512), ou un sel codé en dur ou trop court (moins de 16 octets). Ces configurations faibles compromettent la sécurité de la dérivation de clé basée sur un mot de passe.",
 };
 
 export default {

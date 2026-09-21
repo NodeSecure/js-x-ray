@@ -31,7 +31,8 @@ import {
   isUnsafePrehash,
   isWeakBcrypt,
   isPasswordShucking,
-  isWeakArgon2
+  isWeakArgon2,
+  isWeakPbkdf2
 } from "./probes/crypto/index.ts";
 
 import type { TracedIdentifierReport } from "./VariableTracer.ts";
@@ -139,7 +140,8 @@ export class ProbeRunner {
     "crypto.unsafe-prehash": isUnsafePrehash,
     "crypto.weak-bcrypt": isWeakBcrypt,
     "crypto.password-shucking": isPasswordShucking,
-    "crypto.weak-argon2": isWeakArgon2
+    "crypto.weak-argon2": isWeakArgon2,
+    "crypto.weak-pbkdf2": isWeakPbkdf2
   };
 
   constructor(

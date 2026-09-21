@@ -4,3 +4,4 @@ export { default as isUnsafePrehash } from "./isUnsafePrehash.ts";
 export { default as isWeakBcrypt } from "./isWeakBcrypt.ts";
 export { default as isPasswordShucking } from "./isPasswordShucking.ts";
 export { default as isWeakArgon2 } from "./isWeakArgon2.ts";
+export { default as isWeakPbkdf2 } from "./isWeakPbkdf2.ts";

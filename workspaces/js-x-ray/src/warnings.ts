@@ -17,7 +17,8 @@ export type OptionalWarningName =
   | "crypto.unsafe-prehash"
   | "crypto.weak-bcrypt"
   | "crypto.password-shucking"
-  | "crypto.weak-argon2";
+  | "crypto.weak-argon2"
+  | "crypto.weak-pbkdf2";
 
 export type WarningName =
   | "parsing-error"
@@ -180,6 +181,11 @@ export const warnings = Object.freeze({
   },
   "crypto.weak-argon2": {
     i18n: "sast_warnings.weak_argon2",
+    severity: "Warning",
+    experimental: true
+  },
+  "crypto.weak-pbkdf2": {
+    i18n: "sast_warnings.weak_pbkdf2",
     severity: "Warning",
     experimental: true
   }
