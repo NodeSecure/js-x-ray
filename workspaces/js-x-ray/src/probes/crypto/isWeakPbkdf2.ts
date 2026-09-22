@@ -14,6 +14,7 @@ import { resolveStringValue } from "./resolveStringValue.ts";
  *
  * @see https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2
  */
+const kMinIterationsSha1 = 1_300_000;
 const kMinIterationsSha256 = 600_000;
 const kMinIterationsSha512 = 210_000;
 
@@ -24,11 +25,20 @@ const kTracedFunctions = ["crypto.pbkdf2", "crypto.pbkdf2Sync"];
 
 /**
  * Return the OWASP minimum iteration count for the given digest.
+ * Digest names are matched case-insensitively (Node/OpenSSL accept
+ * "SHA256", "Sha256", ... at runtime).
  * When the digest cannot be resolved statically, fall back to the lowest
  * recommendation so only unambiguously weak counts are reported.
  */
 function minIterationsFor(digest: string | null): number {
-  return digest === "sha256" ? kMinIterationsSha256 : kMinIterationsSha512;
+  switch (digest?.toLowerCase()) {
+    case "sha1":
+      return kMinIterationsSha1;
+    case "sha256":
+      return kMinIterationsSha256;
+    default:
+      return kMinIterationsSha512;
+  }
 }
 
 function validateNode(

@@ -37,6 +37,40 @@ describe("isWeakPbkdf2", () => {
       assert.strictEqual(outputWarnings[0].value, "low-iterations");
     });
 
+    it("should warn when iterations are below the OWASP minimum for sha1", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.pbkdf2(password, salt, 300000, 64, 'sha1', (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-pbkdf2");
+      assert.strictEqual(outputWarnings[0].value, "low-iterations");
+    });
+
+    it("should not warn when iterations meet the OWASP minimum for sha1", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.pbkdf2(password, salt, 1300000, 64, 'sha1', (err, key) => {});
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 0);
+    });
+
+    it("should match digest names case-insensitively", () => {
+      const code = `
+        import crypto from 'crypto';
+        crypto.pbkdf2Sync(password, salt, 250000, 64, 'SHA256');
+      `;
+      const { warnings: outputWarnings } = analyse(code);
+
+      assert.strictEqual(outputWarnings.length, 1);
+      assert.strictEqual(outputWarnings[0].kind, "crypto.weak-pbkdf2");
+      assert.strictEqual(outputWarnings[0].value, "low-iterations");
+    });
+
     it("should resolve the iteration count from a variable", () => {
       const code = `
         import crypto from 'crypto';
