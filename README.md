@@ -100,7 +100,7 @@ The benchmark results are stored in workspaces/js-x-ray/benchmark/report.json. D
 ## Contributors ✨
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-28-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-29-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -145,6 +145,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://reshampokhrel.com.np/"><img src="https://avatars.githubusercontent.com/u/26865520?v=4?s=100" width="100px;" alt="Resham"/><br /><sub><b>Resham</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=presham" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ErwanRaulo"><img src="https://avatars.githubusercontent.com/u/22614778?v=4?s=100" width="100px;" alt="Erwan Raulo"/><br /><sub><b>Erwan Raulo</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=ErwanRaulo" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/VictorMartins3"><img src="https://avatars.githubusercontent.com/u/106573420?v=4?s=100" width="100px;" alt="Victor Martins"/><br /><sub><b>Victor Martins</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=VictorMartins3" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Vinayak19112003"><img src="https://avatars.githubusercontent.com/u/118991845?v=4?s=100" width="100px;" alt="Vinayak Deshmuk"/><br /><sub><b>Vinayak Deshmuk</b></sub></a><br /><a href="https://github.com/NodeSecure/js-x-ray/commits?author=Vinayak19112003" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
