@@ -52,12 +52,33 @@ describe("isImportDeclaration probe", () => {
     assert.ok(sastAnalysis.dependencies().has("bar"));
   });
 
+  it("should detect 1 dependency for an ImportExpression with a template literal", () => {
+    const str = "import(`bar`)";
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isImportDeclaration)
+      .execute(ast.body);
+
+    assert.ok(sastAnalysis.dependencies().has("bar"));
+  });
+
+  it("should not detect a dependency for an ImportExpression with a template literal expression", () => {
+    const str = `
+      import(\`bar\${suffix}\`);
+    `;
+    const ast = parseScript(str);
+    const sastAnalysis = getSastAnalysis(isImportDeclaration)
+      .execute(ast.body);
+
+    assert.strictEqual(sastAnalysis.dependencies().size, 0);
+  });
+
   it("should detect an unsafe import using data:text/javascript and throw a unsafe-import warning", () => {
     const expectedValue = "data:text/javascript;base64,Y29uc29sZS5sb2coJ2hlbGxvIHdvcmxkJyk7Cg==";
 
     const importNodes = [
       `import '${expectedValue}';`,
-      `import('${expectedValue}');`
+      `import('${expectedValue}');`,
+      `import(\`${expectedValue}\`);`
     ];
 
     importNodes.forEach((str) => {
@@ -77,7 +98,8 @@ describe("isImportDeclaration probe", () => {
 
     const importNodes = [
       `import '${expectedValue}';`,
-      `import('${expectedValue}');`
+      `import('${expectedValue}');`,
+      `import(\`${expectedValue}\`);`
     ];
 
     importNodes.forEach((str) => {
