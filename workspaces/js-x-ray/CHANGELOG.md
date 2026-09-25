@@ -1,5 +1,15 @@
 # @nodesecure/js-x-ray
 
+## 16.2.0
+
+### Minor Changes
+
+- [#720](https://github.com/NodeSecure/js-x-ray/pull/720) [`337f3a2`](https://github.com/NodeSecure/js-x-ray/commit/337f3a2bac97cbdb0f2cb23e3b646dbd44811f92) Thanks [@Vinayak19112003](https://github.com/Vinayak19112003)! - Add weak-pbkdf2 detection probe for crypto.pbkdf2() misuse
+
+### Patch Changes
+
+- [#723](https://github.com/NodeSecure/js-x-ray/pull/723) [`5a40c3b`](https://github.com/NodeSecure/js-x-ray/commit/5a40c3bf73249962a09ea32d0fc96e6640ec81b6) Thanks [@tiagovilasboas](https://github.com/tiagovilasboas)! - resolve dynamic `import()` specifiers written as a template literal with no expression, so ``import(`lodash`)`` records the dependency and ``import(`data:text/javascript,...`)`` reports `unsafe-import` like its string literal form
+
 ## 16.1.0
 
 ### Minor Changes
