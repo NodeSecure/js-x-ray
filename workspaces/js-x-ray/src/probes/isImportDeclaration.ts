@@ -2,8 +2,8 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { SourceFile } from "../SourceFile.ts";
-import type { Literal } from "../estree/types.ts";
+import type { ProbeMainContext } from "../ProbeRunner.ts";
+import { isStringLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
 /**
@@ -13,6 +13,7 @@ import { generateWarning } from "../warnings.ts";
  * import * as foo from "bar";
  * import fs from "fs";
  * import "make-promises-safe";
+ * import(`bar`);
  */
 function validateNode(
   node: ESTree.Node
@@ -21,21 +22,32 @@ function validateNode(
     return [false];
   }
 
-  // Note: the source property is the right-side Literal part of the Import
-  return [
-    node.source.type === "Literal" &&
-    typeof node.source.value === "string"
-  ];
+  // Note: the source property is the right-side part of the Import
+  const specifier = getSpecifier(node.source);
+
+  return [specifier !== null, specifier];
+}
+
+function getSpecifier(
+  source: ESTree.Node
+): string | null {
+  if (isStringLiteral(source)) {
+    return source.value;
+  }
+
+  // import(`bar`) is the same specifier as import("bar")
+  if (source.type === "TemplateLiteral" && source.expressions.length === 0) {
+    return source.quasis[0].value.cooked;
+  }
+
+  return null;
 }
 
 function main(
-  node: (
-    | ESTree.ImportDeclaration
-    | ESTree.ImportExpression
-  ) & { source: Literal<string>; },
-  options: { sourceFile: SourceFile; }
+  node: ESTree.ImportDeclaration | ESTree.ImportExpression,
+  ctx: ProbeMainContext
 ) {
-  const { sourceFile } = options;
+  const { sourceFile, data: specifier } = ctx;
 
   if ([
     // Searching for dangerous import "data:text/javascript;..." statement.
@@ -44,14 +56,14 @@ function main(
     // Searching for dangerous import "file:..." statement
     // see: https://en.wikipedia.org/wiki/File_inclusion_vulnerability
     "file:"
-  ].some((suspiciousPath) => node.source.value.startsWith(suspiciousPath))) {
+  ].some((suspiciousPath) => specifier.startsWith(suspiciousPath))) {
     sourceFile.warnings.push(
       generateWarning(
-        "unsafe-import", { value: node.source.value, location: node.loc }
+        "unsafe-import", { value: specifier, location: node.loc }
       )
     );
   }
-  sourceFile.addDependency(node.source.value, node.loc);
+  sourceFile.addDependency(specifier, node.loc);
 }
 
 export default {
