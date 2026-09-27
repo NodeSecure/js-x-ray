@@ -9,9 +9,12 @@ import {
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
-import { generateWarning } from "../warnings.ts";
 import { getTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
+import {
+  collectLocation,
+  pushAggregatedWarning,
+  type AggregatedLocations
+} from "./warningAggregator.ts";
 
 // CONSTANTS
 const kSensitiveModules = new Set(["os", "dns"]);
@@ -25,7 +28,7 @@ const kSensitiveMethods = [
 
 const sensitivePathRegex = /~\/\.(ssh|aws|npmrc|gitconfig|bashrc)(\/[^\s"'`]+)?/;
 
-type DataExfiltrationContextDef = Record<string, SourceArrayLocation[]>;
+type DataExfiltrationContextDef = AggregatedLocations;
 
 function validateJSONStringify(
   node: ESTree.Node,
@@ -64,7 +67,7 @@ function sensitiveLiteralHandler(
   node: Literal<string>,
   ctx: ProbeContext<DataExfiltrationContextDef>
 ) {
-  addInContext(node.value, node.loc, ctx);
+  collectLocation(ctx, node.value, node.loc);
 }
 
 function sensitiveMethodsHandler(
@@ -84,22 +87,8 @@ function sensitiveMethodsHandler(
   }
   const data = sourceFile.tracer.getDataFromIdentifier(id);
   if (kSensitiveMethods.some((method) => data?.identifierOrMemberExpr === method
-    && sourceFile.tracer.importedModules.has(method.split(".")[0]))) {
-    addInContext(data?.identifierOrMemberExpr!, firstArg.loc, ctx);
-  }
-}
-
-function addInContext(
-  value: string,
-  loc: ESTree.SourceLocation | null | undefined,
-  ctx: ProbeContext<DataExfiltrationContextDef>
-) {
-  const arrayLocation = ctx.context?.[value];
-  if (arrayLocation) {
-    arrayLocation.push(toArrayLocation(loc ?? rootLocation()));
-  }
-  else {
-    ctx.context![value!] = [toArrayLocation(loc ?? rootLocation())];
+    && sourceFile.tracer.importedModules.has(moduleNameOf(method)))) {
+    collectLocation(ctx, data!.identifierOrMemberExpr, firstArg.loc);
   }
 }
 
@@ -119,19 +108,15 @@ function initialize(
     moduleName,
     location
   }: ImportEventPayload) => {
+    // Only the import itself is reported, not every later usage.
     if (kSensitiveModules.has(moduleName) && !(moduleName in context!)) {
-      context![moduleName] = [toArrayLocation(location ?? undefined)];
+      collectLocation(ctx, moduleName, location);
     }
   });
 }
 
 function finalize(ctx: ProbeContext<DataExfiltrationContextDef>) {
-  const { sourceFile, context } = ctx;
-  if (context && Object.keys(context).length > 0) {
-    const warning = generateWarning("data-exfiltration",
-      { value: Object.keys(context).join(", ") });
-    sourceFile.warnings.push({ ...warning, location: Object.values(context).flat() });
-  }
+  pushAggregatedWarning(ctx, "data-exfiltration");
 }
 
 const dateExifiltration = {
