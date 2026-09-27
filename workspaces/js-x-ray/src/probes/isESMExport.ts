@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { SourceFile } from "../SourceFile.ts";
-import type { Literal } from "../estree/types.ts";
+import { isStringLiteral, type Literal } from "../estree/types.ts";
 
 /**
  * @description Search for ESM Export
@@ -15,18 +15,12 @@ import type { Literal } from "../estree/types.ts";
 function validateNode(
   node: ESTree.Node
 ): [boolean, any?] {
-  if (
-    node.type !== "ExportNamedDeclaration" &&
-    node.type !== "ExportAllDeclaration"
-  ) {
-    return [false];
-  }
+  const { source } = node as (
+    | ESTree.ExportNamedDeclaration
+    | ESTree.ExportAllDeclaration
+  );
 
-  return [
-    node.source !== null &&
-    node.source.type === "Literal" &&
-    typeof node.source.value === "string"
-  ];
+  return [isStringLiteral(source)];
 }
 
 function main(

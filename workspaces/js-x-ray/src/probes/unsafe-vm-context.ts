@@ -11,13 +11,9 @@ import { getTracedCall, hasImportedModules } from "./tracing.ts";
 const kRunInContextTracedFunctions = Symbol("runInContextTracedFunctions");
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  if (node.type !== "CallExpression") {
-    return [false];
-  }
-
   if (!hasImportedModules(ctx, "vm")) {
     return [false];
   }

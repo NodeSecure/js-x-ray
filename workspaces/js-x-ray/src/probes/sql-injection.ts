@@ -13,25 +13,21 @@ function validateNode(
   node: ESTree.Node,
   { sourceFile: { tracer } }: ProbeContext
 ): [boolean, any?] {
-  if (node.type !== "CallExpression") {
-    return [false];
-  }
+  const { arguments: callArguments } = node as ESTree.CallExpression;
 
-  for (const argNode of node.arguments) {
+  for (const argNode of callArguments) {
     switch (argNode.type) {
       case "Identifier": {
-        if (!tracer.literalIdentifiers.has(argNode.name)) {
-          break;
-        }
-
         const literalIdentifier = tracer.literalIdentifiers.get(argNode.name);
 
-        if (literalIdentifier!.type !== "TemplateLiteral" ||
-          !kSqlInjectionRegex.test(literalIdentifier!.value)) {
+        if (
+          literalIdentifier?.type !== "TemplateLiteral" ||
+          !kSqlInjectionRegex.test(literalIdentifier.value)
+        ) {
           break;
         }
 
-        return [true, tracer.literalIdentifiers.get(argNode.name)?.value];
+        return [true, literalIdentifier.value];
       }
 
       case "TemplateLiteral": {

@@ -18,12 +18,9 @@ import { generateWarning } from "../warnings.ts";
 function validateNode(
   node: ESTree.Node
 ): [boolean, any?] {
-  if (node.type !== "ImportDeclaration" && node.type !== "ImportExpression") {
-    return [false];
-  }
-
   // Note: the source property is the right-side part of the Import
-  const specifier = getSpecifier(node.source);
+  const { source } = node as ESTree.ImportDeclaration | ESTree.ImportExpression;
+  const specifier = getSpecifier(source);
 
   return [specifier !== null, specifier];
 }
