@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { toValue, toRaw } from "../estree/index.ts";
+import { toValue, toRaw } from "../estree/literal.ts";
 import { stringCharDiversity } from "./stringSuspicionScore.ts";
 
 // CONSTANTS
@@ -32,7 +32,18 @@ export function isHex(
 ): boolean {
   const value = toValue(anyValue);
 
-  return typeof value === "string" && /^[0-9A-Fa-f]{4,}$/g.test(value);
+  return typeof value === "string" && /^[0-9A-Fa-f]{4,}$/.test(value);
+}
+
+/**
+ * @description decode an Hexadecimal value to its UTF-8 representation.
+ */
+export function decode(
+  anyValue: ESTree.Literal | string
+): string | null {
+  const value = toValue(anyValue);
+
+  return isHex(value) ? Buffer.from(value, "hex").toString() : null;
 }
 
 /**

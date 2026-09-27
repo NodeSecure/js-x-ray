@@ -49,21 +49,21 @@ function main(
   };
 
   // We are searching for value obfuscated as hex of a minimum length of 4.
-  if (/^[0-9A-Fa-f]{4,}$/.test(node.value)) {
-    const value = Buffer.from(node.value, "hex").toString();
-    sourceFile.deobfuscator.analyzeString(value);
+  const decodedValue = Hex.decode(node.value);
+  if (decodedValue !== null) {
+    sourceFile.deobfuscator.analyzeString(decodedValue);
 
     // If the value we are retrieving is the name of a Node.js dependency,
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
-    if (kNodeDeps.has(value)) {
-      sourceFile.addDependency(value, node.loc);
+    if (kNodeDeps.has(decodedValue)) {
+      sourceFile.addDependency(decodedValue, node.loc);
       sourceFile.warnings.push(
         generateWarning(
           "unsafe-import", { value: null, location }
         )
       );
     }
-    else if (value === "require" || !Hex.isSafe(node.value)) {
+    else if (decodedValue === "require" || !Hex.isSafe(node.value)) {
       sourceFile.addEncodedLiteral(node.value, location);
     }
   }
