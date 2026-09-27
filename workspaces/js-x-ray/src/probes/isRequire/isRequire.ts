@@ -89,6 +89,14 @@ function main(
   }
   const location = node.loc;
 
+  // Every branch below falls back to the same warning when the specifier
+  // cannot be resolved statically.
+  function reportUntraceableSpecifier() {
+    sourceFile.warnings.push(
+      generateWarning("unsafe-import", { value: null, location })
+    );
+  }
+
   switch (arg.type) {
     // const foo = "http"; require(foo);
     case "Identifier":
@@ -99,9 +107,7 @@ function main(
         );
       }
       else {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
       }
       break;
 
@@ -123,9 +129,7 @@ function main(
         .trim();
 
       if (value === "") {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
       }
       else {
         sourceFile.addDependency(value, node.loc);
@@ -139,9 +143,7 @@ function main(
         sourceFile.addDependency(toLiteral(arg), node.loc);
       }
       else {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
       }
       break;
     }
@@ -149,9 +151,7 @@ function main(
     // require("ht" + "tp");
     case "BinaryExpression": {
       if (arg.operator !== "+") {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
         break;
       }
 
@@ -164,9 +164,7 @@ function main(
         sourceFile.addDependency([...iter].join(""), node.loc);
       }
       catch {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
       }
       break;
     }
@@ -178,9 +176,7 @@ function main(
       dependencies.forEach((depName) => sourceFile.addDependency(depName, node.loc, true));
 
       if (triggerWarning) {
-        sourceFile.warnings.push(
-          generateWarning("unsafe-import", { value: null, location })
-        );
+        reportUntraceableSpecifier();
       }
 
       // We skip walking the tree to avoid anymore warnings...
@@ -188,9 +184,7 @@ function main(
     }
 
     default:
-      sourceFile.warnings.push(
-        generateWarning("unsafe-import", { value: null, location })
-      );
+      reportUntraceableSpecifier();
   }
 
   return;
