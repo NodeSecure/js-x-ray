@@ -79,6 +79,22 @@ describe("isSyncIO probe", () => {
     }
   });
 
+  test("it should report the method name when the call is a MemberExpression", () => {
+    const code = `
+    const fs = require("fs");
+    fs.readFileSync("foo.txt");
+  `;
+
+    const { warnings: outputWarnings } = new AstAnalyser({
+      optionalWarnings: true
+    }).analyse(code);
+
+    assert.strictEqual(outputWarnings.length, 1);
+    const [firstWarning] = outputWarnings;
+    assert.strictEqual(firstWarning.kind, "synchronous-io");
+    assert.strictEqual(firstWarning.value, "readFileSync");
+  });
+
   test("it should NOT report a warning for a *Sync identifier traced by another probe", () => {
     const code = `
     const fs = require("fs");

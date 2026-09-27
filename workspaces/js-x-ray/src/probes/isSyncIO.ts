@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.ts";
+import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -49,10 +49,14 @@ function validateNode(
   const data = ctx.context?.[CALL_EXPRESSION_DATA];
   const identifierOrMemberExpr = data?.identifierOrMemberExpr;
 
-  return [
-    identifierOrMemberExpr !== undefined
-    && kSyncIOIdentifierOrMemberExps.has(identifierOrMemberExpr)
-  ];
+  if (
+    identifierOrMemberExpr === undefined
+    || !kSyncIOIdentifierOrMemberExps.has(identifierOrMemberExpr)
+  ) {
+    return [false];
+  }
+
+  return [true, identifierOrMemberExpr];
 }
 
 function initialize(
@@ -70,10 +74,12 @@ function initialize(
 
 function main(
   node: ESTree.CallExpression,
-  ctx: ProbeContext
+  ctx: ProbeMainContext
 ) {
+  const [, methodName] = (ctx.data as string).split(".");
+
   const warning = generateWarning("synchronous-io", {
-    value: node.callee.name,
+    value: methodName,
     location: node.loc
   });
   ctx.sourceFile.warnings.push(warning);
