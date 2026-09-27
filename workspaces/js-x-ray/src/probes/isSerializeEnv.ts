@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getMemberExpressionIdentifier,
+  getMemberExpressionFullName,
   isIdentifier,
   isMemberExpression
 } from "../estree/index.ts";
@@ -39,7 +39,7 @@ function validateJsonStringify(
 
   const firstArg = castedNode.arguments[0];
   if (isMemberExpression(firstArg)) {
-    const memberExprId = [...getMemberExpressionIdentifier(firstArg)].join(".");
+    const memberExprId = getMemberExpressionFullName(firstArg);
     if (memberExprId === "process.env") {
       return [true];
     }
@@ -69,7 +69,7 @@ function validateProcessEnv(
     return [false];
   }
 
-  const memberExprId = [...getMemberExpressionIdentifier(node as ESTree.MemberExpression)].join(".");
+  const memberExprId = getMemberExpressionFullName(node as ESTree.MemberExpression);
   if (memberExprId === "process.env") {
     ctx.setEntryPoint("process.env");
 

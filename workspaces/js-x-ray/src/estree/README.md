@@ -202,6 +202,19 @@ will return `"foo"` then `"bar"`.
 </details>
 
 <details>
+<summary>getMemberExpressionFullName(node: ESTree.MemberExpression, options?: DefaultOptions): string</summary>
+
+Same as `getMemberExpressionIdentifier` but returns the chain already joined with dots.
+
+```js
+foo.bar();
+```
+
+will return `"foo.bar"`.
+
+</details>
+
+<details>
 <summary>getVariableDeclarationIdentifiers(node: any, options?: GetVariableDeclarationIdentifiersOptions): IterableIterator< string ></summary>
 
 Extracts all variable identifiers from a declaration.

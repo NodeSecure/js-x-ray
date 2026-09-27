@@ -9,7 +9,7 @@ import { Hex, isStringBase64 } from "../../utils/index.ts";
 import {
   arrayExpressionToString,
   getCallExpressionArguments,
-  getMemberExpressionIdentifier
+  getMemberExpressionFullName
 } from "../../estree/index.ts";
 import type { VariableTracer } from "../../VariableTracer.ts";
 import {
@@ -52,19 +52,18 @@ export class RequireCallExpressionWalker {
 
       const castedNode = node as ESTree.CallExpression;
       const rootArgument = castedNode.arguments.at(0)!;
-      if (
-        rootArgument.type === "Literal" &&
-        typeof rootArgument.value === "string" &&
-        Hex.isHex(rootArgument.value)
-      ) {
-        self.dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
+      const decodedRootArg = isStringLiteral(rootArgument) ?
+        Hex.decode(rootArgument.value) :
+        null;
+      if (decodedRootArg !== null) {
+        self.dependencies.add(decodedRootArg);
         this.skip();
 
         return;
       }
 
       const fullName = isMemberExpression(castedNode.callee) ?
-        [...getMemberExpressionIdentifier(castedNode.callee)].join(".") :
+        getMemberExpressionFullName(castedNode.callee) :
         castedNode.callee.name;
       const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
       switch (tracedFullName) {

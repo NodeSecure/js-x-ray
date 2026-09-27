@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { isIdentifier } from "../index.ts";
+import { notNullOrUndefined } from "../../utils/notNullOrUndefined.ts";
 
 export interface GetVariableDeclarationIdentifiersOptions {
   /**
@@ -176,10 +177,4 @@ function autoPrefix(
   prefix: string | null = null
 ) {
   return typeof prefix === "string" ? `${prefix}.${name}` : name;
-}
-
-function notNullOrUndefined(
-  value: any
-): value is NonNullable<any> {
-  return value !== null && value !== void 0;
 }
