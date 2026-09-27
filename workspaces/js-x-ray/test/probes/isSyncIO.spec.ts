@@ -79,6 +79,23 @@ describe("isSyncIO probe", () => {
     }
   });
 
+  test("it should NOT report a warning for a *Sync identifier traced by another probe", () => {
+    const code = `
+    const fs = require("fs");
+    const bcrypt = require("bcryptjs");
+    bcrypt.hashSync("password", 12);
+  `;
+
+    const { warnings: outputWarnings } = new AstAnalyser({
+      optionalWarnings: true
+    }).analyse(code);
+
+    const syncIOWarnings = outputWarnings
+      .filter((warning) => warning.kind === "synchronous-io");
+
+    assert.strictEqual(syncIOWarnings.length, 0);
+  });
+
   test("should not have any warning when no optional warning is specified", async() => {
     const fixturesDir = new URL("directCallExpression/", FIXTURE_URL);
     const fixture = readFileSync(new URL("readFileSync.js", fixturesDir), "utf-8");

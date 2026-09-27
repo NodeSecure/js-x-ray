@@ -7,8 +7,7 @@ import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
-const kTracedNodeCoreModules = ["fs", "crypto", "child_process", "zlib"];
-const kSyncIOIdentifierOrMemberExps = [
+const kSyncIOIdentifierOrMemberExps = new Set([
   "crypto.pbkdf2Sync",
   "crypto.scryptSync",
   "crypto.generateKeyPairSync",
@@ -41,24 +40,18 @@ const kSyncIOIdentifierOrMemberExps = [
   "zlib.gunzipSync",
   "zlib.brotliCompressSync",
   "zlib.brotliDecompressSync"
-];
+]);
 
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (
-    !kTracedNodeCoreModules.some((moduleName) => tracer.importedModules.has(moduleName))
-  ) {
-    return [false];
-  }
-
   const data = ctx.context?.[CALL_EXPRESSION_DATA];
+  const identifierOrMemberExpr = data?.identifierOrMemberExpr;
 
   return [
-    data?.identifierOrMemberExpr.endsWith("Sync")
+    identifierOrMemberExpr !== undefined
+    && kSyncIOIdentifierOrMemberExps.has(identifierOrMemberExpr)
   ];
 }
 
