@@ -3,11 +3,14 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
-import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 import { isIdentifier, isObjectExpression, findPropertyMatch } from "../estree/index.ts";
 import { getTracedCall, traceAll } from "./tracing.ts";
+import {
+  collectLocation,
+  pushAggregatedWarning,
+  type AggregatedLocations
+} from "./warningAggregator.ts";
 
 // CONSTANTS
 const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
@@ -27,7 +30,10 @@ const kThirdPartyLoggers = [{
 }
 ];
 
-type LogUsageContextDef = Record<string, SourceArrayLocation[]>;
+// Virtual identifiers are an internal tracer detail, strip them from the report.
+const kVirtualCallPrefix = /__virtual_call_.*\d+__\./;
+
+type LogUsageContextDef = AggregatedLocations;
 
 function validateNode(
   _node: ESTree.Node,
@@ -255,25 +261,13 @@ function main(
   node: ESTree.CallExpression,
   ctx: ProbeMainContext<LogUsageContextDef>
 ) {
-  const logIdentifer = ctx.data;
-  const arrayLocation = ctx.context?.[logIdentifer];
-  if (arrayLocation) {
-    arrayLocation.push(toArrayLocation(node.loc ?? undefined));
-  }
-  else {
-    ctx.context![logIdentifer] = [toArrayLocation(node.loc ?? undefined)];
-  }
+  collectLocation(ctx, ctx.data, node.loc);
 }
 
 function finalize(ctx: ProbeContext<LogUsageContextDef>) {
-  const { sourceFile, context } = ctx;
-  if (context && Object.keys(context).length > 0) {
-    const warning = generateWarning("log-usage",
-      {
-        value: Object.keys(context).map((method) => method.replace(/__virtual_call_.*\d+__\./, "")).join(", ")
-      });
-    sourceFile.warnings.push({ ...warning, location: Object.values(context).flat() });
-  }
+  pushAggregatedWarning(ctx, "log-usage", {
+    formatValue: (method) => method.replace(kVirtualCallPrefix, "")
+  });
 }
 
 export default {
