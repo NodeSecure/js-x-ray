@@ -6,6 +6,7 @@ import type { ProbeContext } from "../../ProbeRunner.ts";
 import { isStringLiteral, isNumericLiteral } from "../../estree/types.ts";
 import { findPropertyMatch } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
+import { classifyHardcodedSecret } from "./classifyHardcodedSecret.ts";
 import {
   hasImportedModules,
   matchTracedCall,
@@ -28,6 +29,9 @@ const kOWASPMinParams: [minCost: number, minParallelization: number][] = [
 ];
 
 const kMinBlockSize = 8;
+
+// Minimum salt length in bytes
+const kMinSaltLength = 16;
 
 // Node.js crypto.scrypt defaults
 const kDefaultCost = 16384;
@@ -99,8 +103,10 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     }
   }
 
-  if (isStringLiteral(salt) && typeof salt.value === "string") {
-    reasons.push(Buffer.byteLength(salt.value) < 16 ? "short-salt" : "hardcoded-salt");
+  if (isStringLiteral(salt)) {
+    reasons.push(
+      classifyHardcodedSecret(salt.value, { name: "salt", minLength: kMinSaltLength })
+    );
   }
 
   if (reasons.length > 0) {

@@ -12,6 +12,7 @@ import {
 } from "../tracing.ts";
 import { resolveNumericValue } from "./resolveNumericValue.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
+import { classifyHardcodedSecret } from "./classifyHardcodedSecret.ts";
 
 /**
  * OWASP recommended minimum PBKDF2 iteration counts.
@@ -22,7 +23,7 @@ const kMinIterationsSha1 = 1_300_000;
 const kMinIterationsSha256 = 600_000;
 const kMinIterationsSha512 = 210_000;
 
-// Minimum salt length in bytes (same threshold as the other crypto probes)
+// Minimum salt length in bytes
 const kMinSaltLength = 16;
 
 const kTracedFunctions = new Set(["crypto.pbkdf2", "crypto.pbkdf2Sync"]);
@@ -77,8 +78,10 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     reasons.push("low-iterations");
   }
 
-  if (isStringLiteral(salt) && typeof salt.value === "string") {
-    reasons.push(Buffer.byteLength(salt.value) < kMinSaltLength ? "short-salt" : "hardcoded-salt");
+  if (isStringLiteral(salt)) {
+    reasons.push(
+      classifyHardcodedSecret(salt.value, { name: "salt", minLength: kMinSaltLength })
+    );
   }
 
   if (reasons.length > 0) {
