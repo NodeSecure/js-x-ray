@@ -6,11 +6,6 @@ import safeRegex from "safe-regex";
 import type { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
-/**
- * @description
- * Report an unsafe-regex warning when the given pattern is vulnerable to ReDoS.
- * We use the safe-regex package to detect whether or not a regex is safe!
- */
 export function reportUnsafeRegex(
   sourceFile: SourceFile,
   pattern: string,
