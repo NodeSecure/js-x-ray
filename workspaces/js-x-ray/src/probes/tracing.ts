@@ -1,3 +1,6 @@
+// Import Third-party Dependencies
+import type { ESTree } from "meriyah";
+
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
 import type {
@@ -91,4 +94,22 @@ export function matchTracedCall(
   return identifierOrMemberExpr !== undefined && names.has(identifierOrMemberExpr) ?
     [true, identifierOrMemberExpr] :
     [false];
+}
+
+/**
+ * Arguments of the CallExpression being walked, when it resolves to the given
+ * traced name and is not called without any argument.
+ */
+export function getTracedCallArguments(
+  ctx: ProbeContext,
+  node: ESTree.Node,
+  name: string
+): ESTree.CallExpression["arguments"] | null {
+  if (getTracedCall(ctx)?.identifierOrMemberExpr !== name) {
+    return null;
+  }
+
+  const { arguments: callArguments } = node as ESTree.CallExpression;
+
+  return callArguments.length === 0 ? null : callArguments;
 }

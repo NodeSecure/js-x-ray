@@ -9,7 +9,7 @@ import {
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { getTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
+import { getTracedCallArguments, moduleNameOf, traceAll } from "./tracing.ts";
 import {
   collectLocation,
   pushAggregatedWarning,
@@ -38,16 +38,7 @@ function validateJSONStringify(
     return [false];
   }
 
-  if (getTracedCall(ctx)?.identifierOrMemberExpr !== "JSON.stringify") {
-    return [false];
-  }
-
-  const castedNode = node as ESTree.CallExpression;
-  if (castedNode.arguments.length === 0) {
-    return [false];
-  }
-
-  return [true];
+  return [getTracedCallArguments(ctx, node, "JSON.stringify") !== null];
 }
 
 function validateLiteral(
