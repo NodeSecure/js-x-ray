@@ -2,27 +2,13 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../../estree/types.ts";
-import { getParamNames } from "../../estree/index.ts";
-import { generateWarning } from "../../warnings.ts";
 import {
-  VariableTracer,
-  type ReturnValueEventPayload
-} from "../../VariableTracer.ts";
-import { hasImportedModules, matchTracedCall, traceAll } from "../tracing.ts";
+  isCallExpression,
+  isIdentifier,
+  isMemberExpression
+} from "../../estree/types.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
-
-const kModuleName = "bcryptjs";
-const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
-
-const kShuckingVariables = Symbol("shuckingVariables");
-const kAmbiguousVariableNames = Symbol("ambiguousVariableNames");
-
-interface PasswordShuckingContext {
-  [kShuckingVariables]?: Set<string>;
-  [kAmbiguousVariableNames]?: Set<string>;
-}
+import { createBcryptPrehashProbe } from "./bcryptPrehashProbe.ts";
 
 /**
  * createHmac is intentionally excluded, HMAC with a pepper is the OWASP-safe pattern.
@@ -32,9 +18,11 @@ const kHashDigestChains = [
   "crypto.createHash.update.digest.toString",
   "crypto.createHash.digest",
   "crypto.createHash.digest.toString"
-] as const;
+];
 
-function isCreateHashChain(node: ESTree.Node | null | undefined): boolean {
+function isCreateHashChain(
+  node: ESTree.Node | null | undefined
+): boolean {
   let current = node;
   while (isCallExpression(current)) {
     const { callee } = current;
@@ -50,104 +38,23 @@ function isCreateHashChain(node: ESTree.Node | null | undefined): boolean {
   return false;
 }
 
-function isShuckingPrehash(hashNode: ESTree.Node | null | undefined): boolean {
+function isShuckingPrehash(
+  hashNode: ESTree.Node | null | undefined
+): boolean {
   return resolveDigestCall(hashNode) !== null && isCreateHashChain(hashNode);
 }
 
-type NodeValidationResult = [false] | [true] | [true, string[]];
-
-function validateNode(
-  node: ESTree.Node,
-  ctx: ProbeContext<PasswordShuckingContext>
-): NodeValidationResult {
-  if (!hasImportedModules(ctx, kModuleName, "crypto")) {
-    return [false];
-  }
-
-  if (isFunctionNode(node)) {
-    const paramNames = getParamNames(node.params);
-    const shuckingVars = ctx.context![kShuckingVariables]!;
-
-    if (paramNames.some((name) => shuckingVars.has(name))) {
-      ctx.setEntryPoint("markAmbiguousParams");
-
-      return [true, paramNames];
-    }
-
-    return [false];
-  }
-
-  const [isMatching] = matchTracedCall(ctx, kTracedFunctions);
-
-  return [isMatching];
-}
-
-function initialize(ctx: ProbeContext<PasswordShuckingContext>) {
-  const { tracer } = ctx.sourceFile;
-
-  ctx.context![kShuckingVariables] = new Set<string>();
-  ctx.context![kAmbiguousVariableNames] = new Set<string>();
-
-  traceAll(tracer, kTracedFunctions, { moduleName: kModuleName });
-  traceAll(tracer, kHashDigestChains, {
-    followReturnValueAssignement: true,
-    moduleName: "crypto"
-  });
-
-  tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
-    if (!(kHashDigestChains as readonly string[]).includes(payload.identifierOrMemberExpr)) {
-      return;
-    }
-
-    ctx.context![kShuckingVariables]!.add(payload.id);
-  });
-}
-
-function markAmbiguousParams(
-  _node: ESTree.Node,
-  ctx: ProbeMainContext<PasswordShuckingContext>
-) {
-  for (const name of ctx.data as string[]) {
-    ctx.context![kAmbiguousVariableNames]!.add(name);
-  }
-}
-
-function bcryptHashCall(
-  bcryptNode: ESTree.CallExpression,
-  ctx: ProbeMainContext<PasswordShuckingContext>
-) {
-  const hashArgument = bcryptNode.arguments.at(0);
-  const ambiguousVars = ctx.context![kAmbiguousVariableNames]!;
-  const shuckingVars = ctx.context![kShuckingVariables]!;
-
-  const isVariableShucking = isIdentifier(hashArgument) &&
-    !ambiguousVars.has(hashArgument.name) &&
-    shuckingVars.has(hashArgument.name);
-
-  if (isVariableShucking || isShuckingPrehash(hashArgument)) {
-    ctx.sourceFile.warnings.push(
-      generateWarning("crypto.password-shucking", {
-        value: null,
-        location: bcryptNode.loc
-      })
-    );
-  }
-}
-
-export default {
+export default createBcryptPrehashProbe({
   name: "isPasswordShucking",
-  nodeTypes: [
-    "CallExpression",
-    "FunctionDeclaration",
-    "FunctionExpression",
-    "ArrowFunctionExpression"
-  ],
-  validateNode,
-  main: {
-    default: bcryptHashCall,
-    markAmbiguousParams
-  },
-  initialize,
-  breakOnMatch: false,
-  context: {}
-};
+  warningKind: "crypto.password-shucking",
+  digestChains: kHashDigestChains,
+  // Any createHash digest handed over to bcrypt is a shucking candidate.
+  shouldFlagReturnValue: () => true,
+  isUnsafeArgument(argument, { isFlaggedIdentifier }) {
+    if (isIdentifier(argument) && isFlaggedIdentifier(argument.name)) {
+      return true;
+    }
+
+    return isShuckingPrehash(argument);
+  }
+});

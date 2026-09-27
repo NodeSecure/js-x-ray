@@ -2,40 +2,11 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
-import { getParamNames } from "../../estree/index.ts";
-import { generateWarning } from "../../warnings.ts";
-import {
-  VariableTracer,
-  type LiteralIdentifier,
-  type ReturnValueEventPayload
-} from "../../VariableTracer.ts";
-import { hasImportedModules, matchTracedCall, traceAll } from "../tracing.ts";
+import { isIdentifier, isCallExpression } from "../../estree/types.ts";
+import type { LiteralIdentifier } from "../../VariableTracer.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
-
-const kModuleName = "bcryptjs";
-const kTracedFunctions = new Set(["bcryptjs.hash", "bcryptjs.hashSync"]);
-
-const kUnsafeDigestVariables = Symbol("unsafeDigestVariables");
-const kAmbiguousVariableNames = Symbol("ambiguousVariableNames");
-
-interface UnsafePrehashContext {
-  [kUnsafeDigestVariables]?: Set<string>;
-  [kAmbiguousVariableNames]?: Set<string>;
-}
-
-type UnsafePrehashContextSetKey =
-  | typeof kUnsafeDigestVariables
-  | typeof kAmbiguousVariableNames;
-
-function getContextSet(
-  ctx: ProbeContext<UnsafePrehashContext>,
-  key: UnsafePrehashContextSetKey
-): Set<string> {
-  return ctx.context![key]!;
-}
+import { createBcryptPrehashProbe } from "./bcryptPrehashProbe.ts";
 
 /**
  * Digest encodings that produce ASCII-only output, avoiding the null-byte truncation issue
@@ -51,7 +22,7 @@ const kDigestChains = [
   "crypto.createHmac.update.digest.toString",
   "crypto.createHmac.digest",
   "crypto.createHmac.digest.toString"
-] as const;
+];
 
 function isSafeEncodingArg(
   node: ESTree.Node | undefined,
@@ -74,122 +45,29 @@ function hasUnsafeDigestEncoding(
   return !isSafeEncodingArg(encodingArgs.at(0), literalIdentifiers);
 }
 
-type NodeValidationResult =
-  [false] |
-  [true] |
-  [true, string[]];
-
-function validateNode(
-  node: ESTree.Node,
-  ctx: ProbeContext<UnsafePrehashContext>
-): NodeValidationResult {
-  if (!hasImportedModules(ctx, kModuleName, "crypto")) {
-    return [false];
-  }
-
-  if (isFunctionNode(node)) {
-    const paramNames = getParamNames(node.params);
-    const unsafeVars = getContextSet(ctx, kUnsafeDigestVariables);
-
-    if (paramNames.some((name) => unsafeVars.has(name))) {
-      ctx.setEntryPoint("markAmbiguousParams");
-
-      return [true, paramNames];
-    }
-
-    return [false];
-  }
-
-  const [isMatching] = matchTracedCall(ctx, kTracedFunctions);
-
-  return [isMatching];
-}
-
-function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
-  const { tracer } = ctx.sourceFile;
-
-  ctx.context![kUnsafeDigestVariables] = new Set<string>();
-  ctx.context![kAmbiguousVariableNames] = new Set<string>();
-
-  traceAll(tracer, kTracedFunctions, { moduleName: kModuleName });
-  traceAll(tracer, kDigestChains, {
-    followReturnValueAssignement: true,
-    moduleName: "crypto"
-  });
-
-  tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
-    if (!(kDigestChains as readonly string[]).includes(payload.identifierOrMemberExpr)) {
-      return;
-    }
-
-    const encodingArg = resolveDigestCall(payload.node)?.at(0);
-    if (!isSafeEncodingArg(encodingArg, tracer.literalIdentifiers)) {
-      ctx.context![kUnsafeDigestVariables]!.add(payload.id);
-    }
-  });
-}
-
-function markAmbiguousParams(
-  _node: ESTree.Node,
-  ctx: ProbeMainContext<UnsafePrehashContext>
-) {
-  const ambiguousVariableNames = getContextSet(ctx, kAmbiguousVariableNames);
-  for (const name of ctx.data as string[]) {
-    ambiguousVariableNames.add(name);
-  }
-}
-
-function bcryptHashCall(
-  bcryptNode: ESTree.CallExpression,
-  ctx: ProbeMainContext<UnsafePrehashContext>
-) {
-  const { sourceFile } = ctx;
-  const hashArgument = bcryptNode.arguments.at(0);
-
-  let isUnsafe: boolean;
-  if (isIdentifier(hashArgument)) {
-    const isAmbiguous = getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.name);
-    const isDigestVariable = getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.name);
-
-    isUnsafe = !isAmbiguous && isDigestVariable;
-  }
-  else if (
-    isCallExpression(hashArgument) &&
-    isIdentifier(hashArgument.callee) &&
-    !getContextSet(ctx, kAmbiguousVariableNames).has(hashArgument.callee.name) &&
-    getContextSet(ctx, kUnsafeDigestVariables).has(hashArgument.callee.name)
-  ) {
-    const encodingArg = hashArgument.arguments.at(0);
-    isUnsafe = !isSafeEncodingArg(encodingArg, sourceFile.tracer.literalIdentifiers);
-  }
-  else {
-    isUnsafe = hasUnsafeDigestEncoding(hashArgument, sourceFile.tracer.literalIdentifiers);
-  }
-
-  if (isUnsafe) {
-    sourceFile.warnings.push(
-      generateWarning("crypto.unsafe-prehash", {
-        value: null,
-        location: bcryptNode.loc
-      })
-    );
-  }
-}
-
-export default {
+export default createBcryptPrehashProbe({
   name: "isUnsafePrehash",
-  nodeTypes: [
-    "CallExpression",
-    "FunctionDeclaration",
-    "FunctionExpression",
-    "ArrowFunctionExpression"
-  ],
-  validateNode,
-  main: {
-    default: bcryptHashCall,
-    markAmbiguousParams
-  },
-  initialize,
-  breakOnMatch: false,
-  context: {}
-};
+  warningKind: "crypto.unsafe-prehash",
+  digestChains: kDigestChains,
+  // Only digests encoded as raw bytes are at risk of null-byte truncation.
+  shouldFlagReturnValue: (payload, tracer) => !isSafeEncodingArg(
+    resolveDigestCall(payload.node)?.at(0),
+    tracer.literalIdentifiers
+  ),
+  isUnsafeArgument(argument, { tracer, isFlaggedIdentifier }) {
+    if (isIdentifier(argument)) {
+      return isFlaggedIdentifier(argument.name);
+    }
+
+    // The digest variable is itself callable, e.g. `hash => hash("hex")`
+    if (
+      isCallExpression(argument) &&
+      isIdentifier(argument.callee) &&
+      isFlaggedIdentifier(argument.callee.name)
+    ) {
+      return !isSafeEncodingArg(argument.arguments.at(0), tracer.literalIdentifiers);
+    }
+
+    return hasUnsafeDigestEncoding(argument, tracer.literalIdentifiers);
+  }
+});
