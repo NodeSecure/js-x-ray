@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { toLiteral } from "../estree/index.ts";
+import { literalToString } from "../estree/index.ts";
 import type {
   ProbeMainContext,
   ProbeContext
@@ -29,20 +29,6 @@ function isUnsafeCommand(
   command: string
 ): boolean {
   return kUnsafeCommands.some((unsafeCommand) => command.includes(unsafeCommand));
-}
-
-function getCommand(commandArg: ESTree.Literal | ESTree.TemplateLiteral): string {
-  let command = "";
-  switch (commandArg.type) {
-    case "Literal":
-      command = commandArg.value as string;
-      break;
-    case "TemplateLiteral":
-      command = toLiteral(commandArg);
-      break;
-  }
-
-  return command;
 }
 
 function concatArrayArgs(
@@ -96,7 +82,7 @@ function main(
     return null;
   }
 
-  let command = getCommand(commandArg);
+  let command = literalToString(commandArg);
 
   // Aggressive mode: warn on any child_process usage
   if (sourceFile.sensitivity === "aggressive") {
