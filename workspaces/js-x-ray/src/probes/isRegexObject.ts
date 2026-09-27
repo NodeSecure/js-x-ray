@@ -1,12 +1,11 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
 import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal, RegExpLiteral } from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
+import { reportUnsafeRegex } from "./unsafeRegex.ts";
 
 /**
  * @description Search for Regex Object constructor.
@@ -46,12 +45,7 @@ function main(
     arg.regex.pattern :
     arg.value;
 
-  // We use the safe-regex package to detect whether or not regex is safe!
-  if (!safeRegex(pattern)) {
-    sourceFile.warnings.push(
-      generateWarning("unsafe-regex", { value: pattern, location: node.loc })
-    );
-  }
+  reportUnsafeRegex(sourceFile, pattern, node.loc);
 }
 
 function isRegexConstructor(
