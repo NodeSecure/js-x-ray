@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import {
-  getMemberExpressionIdentifier
+  getMemberExpressionFullName
 } from "./getMemberExpressionIdentifier.ts";
 import {
   isCallExpression,
@@ -100,10 +100,7 @@ export function joinArrayExpression(
     return null;
   }
 
-  let id = "";
-  for (const part of getMemberExpressionIdentifier(node.callee)) {
-    id = id === "" ? part : `${id}.${part}`;
-  }
+  const id = getMemberExpressionFullName(node.callee);
   if (
     id !== "join" ||
     !isStringLiteral(node.arguments[0])

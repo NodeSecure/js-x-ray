@@ -2,7 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getMemberExpressionIdentifier } from "./getMemberExpressionIdentifier.ts";
+import { getMemberExpressionFullName } from "./getMemberExpressionIdentifier.ts";
 import {
   type DefaultOptions,
   isCallExpression,
@@ -40,10 +40,7 @@ export function getCallExpressionIdentifier(
   }
   if (isMemberExpression(node.callee)) {
     const memberObject = node.callee.object;
-    let lastId = "";
-    for (const part of getMemberExpressionIdentifier(node.callee, { externalIdentifierLookup })) {
-      lastId = lastId === "" ? part : `${lastId}.${part}`;
-    }
+    const lastId = getMemberExpressionFullName(node.callee, { externalIdentifierLookup });
 
     return resolveCallExpression && isCallExpression(memberObject) ?
       getCallExpressionIdentifier(memberObject) + `.${lastId}` :
