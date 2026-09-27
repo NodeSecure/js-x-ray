@@ -6,6 +6,7 @@ import { Hex } from "../../utils/index.ts";
 import { concatBinaryExpression } from "./concatBinaryExpression.ts";
 import {
   type DefaultOptions,
+  isStringLiteral,
   noop
 } from "../types.ts";
 
@@ -55,14 +56,12 @@ export function* getMemberExpressionIdentifier(
 
     // foo.bar[callexpr()]
     case "CallExpression": {
-      const args = node.property.arguments;
-      if (
-        args.length > 0 &&
-        args[0].type === "Literal" &&
-        typeof args[0].value === "string" &&
-        Hex.isHex(args[0].value)
-      ) {
-        yield Buffer.from(args[0].value, "hex").toString();
+      const [firstArgument] = node.property.arguments;
+      const decodedHex = isStringLiteral(firstArgument) ?
+        Hex.decode(firstArgument.value) :
+        null;
+      if (decodedHex !== null) {
+        yield decodedHex;
       }
       break;
     }

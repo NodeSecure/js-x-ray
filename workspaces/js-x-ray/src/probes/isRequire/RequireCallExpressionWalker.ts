@@ -52,12 +52,11 @@ export class RequireCallExpressionWalker {
 
       const castedNode = node as ESTree.CallExpression;
       const rootArgument = castedNode.arguments.at(0)!;
-      if (
-        rootArgument.type === "Literal" &&
-        typeof rootArgument.value === "string" &&
-        Hex.isHex(rootArgument.value)
-      ) {
-        self.dependencies.add(Buffer.from(rootArgument.value, "hex").toString());
+      const decodedRootArg = isStringLiteral(rootArgument) ?
+        Hex.decode(rootArgument.value) :
+        null;
+      if (decodedRootArg !== null) {
+        self.dependencies.add(decodedRootArg);
         this.skip();
 
         return;

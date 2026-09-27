@@ -38,7 +38,7 @@ export function getCallExpressionArguments(
       }
       case "Literal": {
         if (typeof arg.value === "string") {
-          literalsNode.push(hexToString(arg.value));
+          literalsNode.push(Hex.decode(arg.value) ?? arg.value);
         }
 
         break;
@@ -63,8 +63,4 @@ export function getCallExpressionArguments(
   }
 
   return literalsNode.length === 0 ? null : literalsNode;
-}
-
-function hexToString(value: string): string {
-  return Hex.isHex(value) ? Buffer.from(value, "hex").toString() : value;
 }
