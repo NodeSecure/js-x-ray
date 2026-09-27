@@ -3,11 +3,11 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 import { toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 import { isIdentifier, isObjectExpression, findPropertyMatch } from "../estree/index.ts";
+import { getTracedCall, traceAll } from "./tracing.ts";
 
 // CONSTANTS
 const kLoggerTracedFunctions = Symbol("kRunLoggerTracedFunctions");
@@ -33,7 +33,7 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const identifierOrMemberExpr = ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr;
+  const identifierOrMemberExpr = getTracedCall(ctx)?.identifierOrMemberExpr;
 
   return [
     ctx.context![kLoggerTracedFunctions].has(identifierOrMemberExpr),
@@ -47,11 +47,7 @@ function initialize(
 
   const logUsages = new Set(["console.log", "console.info", "console.warn", "console.error", "console.debug"]);
 
-  for (const logUsageMethod of logUsages) {
-    sourceFile.tracer.trace(logUsageMethod, {
-      followConsecutiveAssignment: true
-    });
-  }
+  traceAll(sourceFile.tracer, logUsages);
 
   for (const { moduleName, identifierOrMemberExpr } of kThirdPartyLoggers) {
     sourceFile.tracer.trace(identifierOrMemberExpr, {

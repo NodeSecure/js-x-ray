@@ -3,7 +3,6 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../../estree/types.ts";
 import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
@@ -11,6 +10,7 @@ import {
   VariableTracer,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
+import { hasImportedModules, matchTracedCall, traceAll } from "../tracing.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";
@@ -60,9 +60,7 @@ function validateNode(
   node: ESTree.Node,
   ctx: ProbeContext<PasswordShuckingContext>
 ): NodeValidationResult {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has(kModuleName) || !tracer.importedModules.has("crypto")) {
+  if (!hasImportedModules(ctx, kModuleName, "crypto")) {
     return [false];
   }
 
@@ -79,7 +77,9 @@ function validateNode(
     return [false];
   }
 
-  return [kTracedFunctions.has(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)];
+  const [isMatching] = matchTracedCall(ctx, kTracedFunctions);
+
+  return [isMatching];
 }
 
 function initialize(ctx: ProbeContext<PasswordShuckingContext>) {
@@ -88,20 +88,11 @@ function initialize(ctx: ProbeContext<PasswordShuckingContext>) {
   ctx.context![kShuckingVariables] = new Set<string>();
   ctx.context![kAmbiguousVariableNames] = new Set<string>();
 
-  for (const fn of kTracedFunctions) {
-    tracer.trace(fn, {
-      followConsecutiveAssignment: true,
-      moduleName: kModuleName
-    });
-  }
-
-  for (const chain of kHashDigestChains) {
-    tracer.trace(chain, {
-      followReturnValueAssignement: true,
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAll(tracer, kTracedFunctions, { moduleName: kModuleName });
+  traceAll(tracer, kHashDigestChains, {
+    followReturnValueAssignement: true,
+    moduleName: "crypto"
+  });
 
   tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
     if (!(kHashDigestChains as readonly string[]).includes(payload.identifierOrMemberExpr)) {

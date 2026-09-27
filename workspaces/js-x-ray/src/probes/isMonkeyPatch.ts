@@ -11,6 +11,7 @@ import type {
   ProbeContext
 } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
+import { traceAll } from "./tracing.ts";
 
 // CONSTANTS
 export const JS_TYPES = new Set([
@@ -170,13 +171,7 @@ function validateMemberExpression(
 function initialize(
   ctx: ProbeContext
 ) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const jsType of JS_TYPES) {
-    tracer.trace(jsType, {
-      followConsecutiveAssignment: true
-    });
-  }
+  traceAll(ctx.sourceFile.tracer, JS_TYPES);
 }
 
 function main(

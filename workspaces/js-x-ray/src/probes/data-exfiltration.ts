@@ -9,9 +9,9 @@ import {
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { generateWarning } from "../warnings.ts";
+import { getTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
 
 // CONSTANTS
 const kSensitiveModules = new Set(["os", "dns"]);
@@ -35,7 +35,7 @@ function validateJSONStringify(
     return [false];
   }
 
-  if (ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr !== "JSON.stringify") {
+  if (getTracedCall(ctx)?.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
@@ -108,26 +108,9 @@ function initialize(
 ) {
   const { sourceFile, context } = ctx;
   const { tracer } = sourceFile;
-  tracer
-    .trace("JSON.stringify", {
-      followConsecutiveAssignment: true
-    })
-    .trace("os.userInfo", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("os.networkInterfaces", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("os.cpus", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("dns.getServers", {
-      moduleName: "dns",
-      followConsecutiveAssignment: true
-    });
+
+  traceAll(tracer, ["JSON.stringify"]);
+  traceAll(tracer, kSensitiveMethods, { moduleName: moduleNameOf });
 
   if (sourceFile.sensitivity !== "aggressive") {
     return;

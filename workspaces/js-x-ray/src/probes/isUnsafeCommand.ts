@@ -7,23 +7,23 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
   isStringLiteral,
   isTemplateLiteral
 } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
+import { matchTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
 
 // CONSTANTS
-const kIdentifierOrMemberExps = [
+const kTracedFunctions = new Set([
   "child_process.spawn",
   "child_process.spawnSync",
   "child_process.exec",
   "child_process.execSync"
-];
+]);
 
 function isUnsafeCommand(
   command: string
@@ -63,12 +63,11 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const data = ctx.context?.[CALL_EXPRESSION_DATA];
+  const [isMatching, identifierOrMemberExpr] = matchTracedCall(ctx, kTracedFunctions);
 
-  return data && kIdentifierOrMemberExps.includes(data.name) ? [
-    true,
-    data.name.slice("child_process.".length)
-  ] : [false];
+  return isMatching ?
+    [true, identifierOrMemberExpr!.slice("child_process.".length)] :
+    [false];
 }
 
 function main(
@@ -124,14 +123,7 @@ function main(
 function initialize(
   ctx: ProbeContext
 ) {
-  kIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
-    const moduleName = identifierOrMemberExp.split(".")[0];
-
-    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName
-    });
-  });
+  traceAll(ctx.sourceFile.tracer, kTracedFunctions, { moduleName: moduleNameOf });
 }
 
 export default {

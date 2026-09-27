@@ -3,12 +3,16 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isNode } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import { resolveNumericValue } from "./resolveNumericValue.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
 import { findPropertyMatch } from "../../estree/index.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAll
+} from "../tracing.ts";
 
 /**
  * OWASP recommended Argon2 parameter combinations.
@@ -37,7 +41,7 @@ const kOWASPRowsForArgon2i = kOWASPRows.filter(([, passes]) => passes >= 3);
 // @see https://www.rfc-editor.org/rfc/rfc9106.html#section-3.1
 const kMinNonceLength = 16;
 
-const kTracedFunctions = ["crypto.argon2", "crypto.argon2Sync"];
+const kTracedFunctions = new Set(["crypto.argon2", "crypto.argon2Sync"]);
 
 /**
  * Identify which parameter drags the call below the OWASP recommendations,
@@ -64,26 +68,15 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has("crypto")) {
+  if (!hasImportedModules(ctx, "crypto")) {
     return [false];
   }
 
-  return [
-    kTracedFunctions.includes(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
-  ];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(ctx: ProbeContext) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const identifierOrMemberExpr of kTracedFunctions) {
-    tracer.trace(identifierOrMemberExpr, {
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAll(ctx.sourceFile.tracer, kTracedFunctions, { moduleName: "crypto" });
 }
 
 function main(node: ESTree.CallExpression, ctx: ProbeContext) {

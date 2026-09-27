@@ -3,7 +3,6 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
 import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
@@ -12,6 +11,7 @@ import {
   type LiteralIdentifier,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
+import { hasImportedModules, matchTracedCall, traceAll } from "../tracing.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
@@ -83,9 +83,7 @@ function validateNode(
   node: ESTree.Node,
   ctx: ProbeContext<UnsafePrehashContext>
 ): NodeValidationResult {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has(kModuleName) || !tracer.importedModules.has("crypto")) {
+  if (!hasImportedModules(ctx, kModuleName, "crypto")) {
     return [false];
   }
 
@@ -102,9 +100,9 @@ function validateNode(
     return [false];
   }
 
-  return [
-    kTracedFunctions.has(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
-  ];
+  const [isMatching] = matchTracedCall(ctx, kTracedFunctions);
+
+  return [isMatching];
 }
 
 function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
@@ -113,20 +111,11 @@ function initialize(ctx: ProbeContext<UnsafePrehashContext>) {
   ctx.context![kUnsafeDigestVariables] = new Set<string>();
   ctx.context![kAmbiguousVariableNames] = new Set<string>();
 
-  for (const identifierOrMemberExpr of kTracedFunctions) {
-    tracer.trace(identifierOrMemberExpr, {
-      followConsecutiveAssignment: true,
-      moduleName: kModuleName
-    });
-  }
-
-  for (const chain of kDigestChains) {
-    tracer.trace(chain, {
-      followReturnValueAssignement: true,
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAll(tracer, kTracedFunctions, { moduleName: kModuleName });
+  traceAll(tracer, kDigestChains, {
+    followReturnValueAssignement: true,
+    moduleName: "crypto"
+  });
 
   tracer.on(VariableTracer.ReturnValueEvent, (payload: ReturnValueEventPayload) => {
     if (!(kDigestChains as readonly string[]).includes(payload.identifierOrMemberExpr)) {

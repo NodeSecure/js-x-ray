@@ -4,8 +4,8 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
+import { getTracedCall, hasImportedModules } from "./tracing.ts";
 
 // CONSTANTS
 const kRunInContextTracedFunctions = Symbol("runInContextTracedFunctions");
@@ -18,13 +18,11 @@ function validateNode(
     return [false];
   }
 
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has("vm")) {
+  if (!hasImportedModules(ctx, "vm")) {
     return [false];
   }
 
-  const identifierOrMemberExpr = ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr;
+  const identifierOrMemberExpr = getTracedCall(ctx)?.identifierOrMemberExpr;
 
   if (ctx.context![kRunInContextTracedFunctions]?.has(identifierOrMemberExpr)) {
     ctx.setEntryPoint("script");

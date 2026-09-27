@@ -3,8 +3,8 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
+import { getTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
 
 // CONSTANTS
 const kTracedNodeCoreModules = ["fs", "crypto", "child_process", "zlib"];
@@ -55,23 +55,16 @@ function validateNode(
     return [false];
   }
 
-  const data = ctx.context?.[CALL_EXPRESSION_DATA];
-
   return [
-    data?.identifierOrMemberExpr.endsWith("Sync")
+    getTracedCall(ctx)?.identifierOrMemberExpr.endsWith("Sync") ?? false
   ];
 }
 
 function initialize(
   ctx: ProbeContext
 ) {
-  kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
-    const moduleName = identifierOrMemberExp.split(".")[0];
-
-    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName
-    });
+  traceAll(ctx.sourceFile.tracer, kSyncIOIdentifierOrMemberExps, {
+    moduleName: moduleNameOf
   });
 }
 
