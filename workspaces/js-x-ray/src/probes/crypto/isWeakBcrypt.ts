@@ -4,7 +4,6 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { isStringLiteral } from "../../estree/types.ts";
-import { generateWarning } from "../../warnings.ts";
 import {
   hasImportedModules,
   matchTracedCall,
@@ -54,21 +53,17 @@ function main(
 
   if (numValue !== null) {
     if (numValue < kMinRounds) {
-      sourceFile.warnings.push(
-        generateWarning("crypto.weak-bcrypt", {
-          value: "low-work-factor",
-          location: node.loc
-        })
-      );
+      sourceFile.addWarning("crypto.weak-bcrypt", {
+        value: "low-work-factor",
+        location: node.loc
+      });
     }
   }
   else if (isStringLiteral(arg)) {
-    sourceFile.warnings.push(
-      generateWarning("crypto.weak-bcrypt", {
-        value: "hardcoded-salt",
-        location: node.loc
-      })
-    );
+    sourceFile.addWarning("crypto.weak-bcrypt", {
+      value: "hardcoded-salt",
+      location: node.loc
+    });
   }
 }
 

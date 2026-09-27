@@ -11,7 +11,6 @@ import {
   isStringLiteral,
   isTemplateLiteral
 } from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
 import { matchTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
 
 // CONSTANTS
@@ -96,11 +95,10 @@ function main(
     concatArrayArgs(command, node) :
     command;
 
-  const warning = generateWarning("unsafe-command", {
+  sourceFile.addWarning("unsafe-command", {
     value: reportedCommand,
     location: node.loc
   });
-  sourceFile.warnings.push(warning);
 
   return signals.Skip;
 }

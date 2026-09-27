@@ -13,7 +13,6 @@ import {
 } from "../../estree/index.ts";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
 import { isStringLiteral } from "../../estree/types.ts";
-import { generateWarning } from "../../warnings.ts";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.ts";
 
 function validateNodeRequire(
@@ -92,9 +91,7 @@ function main(
   // Every branch below falls back to the same warning when the specifier
   // cannot be resolved statically.
   function reportUntraceableSpecifier() {
-    sourceFile.warnings.push(
-      generateWarning("unsafe-import", { value: null, location })
-    );
+    sourceFile.addWarning("unsafe-import", { value: null, location });
   }
 
   switch (arg.type) {

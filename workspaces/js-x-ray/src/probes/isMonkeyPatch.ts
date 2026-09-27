@@ -10,7 +10,6 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 import { traceAll } from "./tracing.ts";
 
 // CONSTANTS
@@ -180,9 +179,7 @@ function main(
 ) {
   const { sourceFile, data: prototypeName } = options;
 
-  sourceFile.warnings.push(
-    generateWarning("monkey-patch", { value: prototypeName, location: node.loc })
-  );
+  sourceFile.addWarning("monkey-patch", { value: prototypeName, location: node.loc });
 }
 
 export default {

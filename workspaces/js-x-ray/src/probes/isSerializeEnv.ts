@@ -11,7 +11,6 @@ import type {
   ProbeContext,
   ProbeMainContext
 } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 import { getTracedCallArguments, traceAll } from "./tracing.ts";
 
 /**
@@ -81,11 +80,10 @@ function defaultHandler(
 ) {
   const { sourceFile, signals } = ctx;
 
-  const warning = generateWarning("serialize-environment", {
+  sourceFile.addWarning("serialize-environment", {
     value: "JSON.stringify(process.env)",
     location: node.loc
   });
-  sourceFile.warnings.push(warning);
 
   return signals.Skip;
 }
@@ -101,11 +99,10 @@ function processEnvHandler(
     return null;
   }
 
-  const warning = generateWarning("serialize-environment", {
+  sourceFile.addWarning("serialize-environment", {
     value: "process.env",
     location: node.loc
   });
-  sourceFile.warnings.push(warning);
 
   return signals.Skip;
 }

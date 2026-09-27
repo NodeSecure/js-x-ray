@@ -4,7 +4,6 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeMainContext } from "../ProbeRunner.ts";
 import { isStringLiteral } from "../estree/types.ts";
-import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Search for ESM ImportDeclaration
@@ -54,11 +53,7 @@ function main(
     // see: https://en.wikipedia.org/wiki/File_inclusion_vulnerability
     "file:"
   ].some((suspiciousPath) => specifier.startsWith(suspiciousPath))) {
-    sourceFile.warnings.push(
-      generateWarning(
-        "unsafe-import", { value: specifier, location: node.loc }
-      )
-    );
+    sourceFile.addWarning("unsafe-import", { value: specifier, location: node.loc });
   }
   sourceFile.addDependency(specifier, node.loc);
 }

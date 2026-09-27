@@ -9,7 +9,7 @@ import type {
 } from "../../ProbeRunner.ts";
 import { isFunctionNode } from "../../estree/types.ts";
 import { getParamNames } from "../../estree/index.ts";
-import { generateWarning, type WarningName } from "../../warnings.ts";
+import type { WarningName } from "../../warnings.ts";
 import {
   VariableTracer,
   type ReturnValueEventPayload
@@ -167,12 +167,10 @@ export function createBcryptPrehashProbe(
     };
 
     if (isUnsafeArgument(bcryptNode.arguments.at(0), inspector)) {
-      sourceFile.warnings.push(
-        generateWarning(warningKind, {
-          value: null,
-          location: bcryptNode.loc
-        })
-      );
+      sourceFile.addWarning(warningKind, {
+        value: null,
+        location: bcryptNode.loc
+      });
     }
   }
 

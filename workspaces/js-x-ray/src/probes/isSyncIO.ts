@@ -3,7 +3,6 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 import { getTracedCall, moduleNameOf, traceAll } from "./tracing.ts";
 
 // CONSTANTS
@@ -72,11 +71,10 @@ function main(
   node: ESTree.CallExpression,
   ctx: ProbeContext
 ) {
-  const warning = generateWarning("synchronous-io", {
+  ctx.sourceFile.addWarning("synchronous-io", {
     value: node.callee.name,
     location: node.loc
   });
-  ctx.sourceFile.warnings.push(warning);
 }
 
 export default {

@@ -4,7 +4,6 @@ import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
 import type { SourceFile } from "../SourceFile.ts";
-import { generateWarning } from "../warnings.ts";
 
 /**
  * @description
@@ -20,7 +19,5 @@ export function reportUnsafeRegex(
     return;
   }
 
-  sourceFile.warnings.push(
-    generateWarning("unsafe-regex", { value: pattern, location })
-  );
+  sourceFile.addWarning("unsafe-regex", { value: pattern, location });
 }

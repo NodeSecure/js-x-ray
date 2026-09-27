@@ -4,7 +4,6 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { getMemberExpressionIdentifier, isMemberExpression } from "../estree/index.ts";
 import { SourceFile } from "../SourceFile.ts";
-import { generateWarning } from "../warnings.ts";
 
 function validateNode(
   node: ESTree.Node
@@ -34,12 +33,10 @@ function main(
 ) {
   const { sourceFile, data, signals } = options;
 
-  sourceFile.warnings.push(
-    generateWarning("prototype-pollution", {
-      value: data === "literal" ? "__proto__" : data!,
-      location: node.loc ?? null
-    })
-  );
+  sourceFile.addWarning("prototype-pollution", {
+    value: data === "literal" ? "__proto__" : data!,
+    location: node.loc ?? null
+  });
 
   return data === "literal" ? undefined : signals.Skip;
 }

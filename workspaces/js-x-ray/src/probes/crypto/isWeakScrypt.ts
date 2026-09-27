@@ -5,7 +5,6 @@ import type { ESTree } from "meriyah";
 import type { ProbeContext } from "../../ProbeRunner.ts";
 import { isStringLiteral, isNumericLiteral } from "../../estree/types.ts";
 import { findPropertyMatch } from "../../estree/index.ts";
-import { generateWarning } from "../../warnings.ts";
 import { classifyHardcodedSecret } from "./classifyHardcodedSecret.ts";
 import {
   hasImportedModules,
@@ -110,12 +109,10 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   }
 
   if (reasons.length > 0) {
-    sourceFile.warnings.push(
-      generateWarning("crypto.weak-scrypt", {
-        value: reasons.join(", "),
-        location: node.loc
-      })
-    );
+    sourceFile.addWarning("crypto.weak-scrypt", {
+      value: reasons.join(", "),
+      location: node.loc
+    });
   }
 }
 

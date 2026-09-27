@@ -20,7 +20,9 @@ import {
 } from "./utils/index.ts";
 import {
   generateWarning,
-  type Warning
+  type GenerateWarningOptions,
+  type Warning,
+  type WarningName
 } from "./warnings.ts";
 import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 
@@ -63,6 +65,16 @@ export class SourceFile {
     this.metadata = metadata;
     this.collectablesSetRegistry = collectableRegistry ?? new CollectableSetRegistry([]);
     this.packageName = options?.packageName;
+  }
+
+  /**
+   * Generate a warning and append it to the file report.
+   */
+  addWarning<T extends WarningName>(
+    kind: T,
+    options: GenerateWarningOptions
+  ) {
+    this.warnings.push(generateWarning(kind, options));
   }
 
   addDependency(

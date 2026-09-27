@@ -5,7 +5,6 @@ import type { ESTree } from "meriyah";
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { getCallExpressionIdentifier, isCallExpression } from "../estree/index.ts";
 import { CALL_EXPRESSION_IDENTIFIER } from "../contants.ts";
-import { generateWarning } from "../warnings.ts";
 
 /**
  * @description Detect unsafe statement
@@ -37,11 +36,10 @@ function main(
     return signals.Skip;
   }
 
-  const warning = generateWarning("unsafe-stmt", {
+  sourceFile.addWarning("unsafe-stmt", {
     value: calleeName,
     location: node.loc
   });
-  sourceFile.warnings.push(warning);
 
   return signals.Skip;
 }

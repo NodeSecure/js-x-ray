@@ -6,7 +6,6 @@ import type { ProbeContext } from "../../ProbeRunner.ts";
 import {
   isStringLiteral
 } from "../../estree/types.ts";
-import { generateWarning } from "../../warnings.ts";
 import {
   hasImportedModules,
   matchTracedCall,
@@ -52,11 +51,9 @@ function main(
   const arg = node.arguments.at(0);
 
   if (isStringLiteral(arg) && kWeakAlgorithms.has(arg.value)) {
-    const warning = generateWarning(
-      "crypto.weak-algorithm",
+    sourceFile.addWarning("crypto.weak-algorithm",
       { value: arg.value, location: node.loc }
     );
-    sourceFile.warnings.push(warning);
   }
 }
 

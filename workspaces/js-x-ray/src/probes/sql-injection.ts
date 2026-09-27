@@ -4,7 +4,6 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import { toLiteral } from "../estree/index.ts";
 import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kSqlInjectionRegex = /(select\s+.*\s+from|insert\s+into|delete\s+from|update\s+.*\s+set)/i;
@@ -51,12 +50,10 @@ function main(
   node: ESTree.TemplateLiteral,
   ctx: ProbeMainContext
 ) {
-  ctx.sourceFile.warnings.push(
-    generateWarning("sql-injection", {
-      value: ctx.data,
-      location: node.loc
-    })
-  );
+  ctx.sourceFile.addWarning("sql-injection", {
+    value: ctx.data,
+    location: node.loc
+  });
 }
 
 export default {

@@ -3,7 +3,6 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 import { matchTracedCall, traceAll } from "./tracing.ts";
 
 // CONSTANTS
@@ -28,10 +27,10 @@ function main(
 ) {
   const { sourceFile } = ctx;
 
-  sourceFile.warnings.push(generateWarning("insecure-random", {
+  sourceFile.addWarning("insecure-random", {
     value: null,
     location: node.loc
-  }));
+  });
 }
 
 export default {

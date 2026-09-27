@@ -3,7 +3,6 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
-import { generateWarning } from "../warnings.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 import { getTracedCall, hasImportedModules } from "./tracing.ts";
 
@@ -62,24 +61,20 @@ function runInNewContextHandler(
   node: ESTree.CallExpression,
   ctx: ProbeMainContext
 ) {
-  ctx.sourceFile.warnings.push(
-    generateWarning("unsafe-vm-context", {
-      value: "vm.runInNewContext",
-      location: node.loc
-    })
-  );
+  ctx.sourceFile.addWarning("unsafe-vm-context", {
+    value: "vm.runInNewContext",
+    location: node.loc
+  });
 }
 
 function scriptRunInContextHandler(
   node: ESTree.CallExpression,
   ctx: ProbeMainContext
 ) {
-  ctx.sourceFile.warnings.push(
-    generateWarning("unsafe-vm-context", {
-      value: "(new vm.Script(code, options)).runInContext",
-      location: node.loc
-    })
-  );
+  ctx.sourceFile.addWarning("unsafe-vm-context", {
+    value: "(new vm.Script(code, options)).runInContext",
+    location: node.loc
+  });
 }
 
 export default {

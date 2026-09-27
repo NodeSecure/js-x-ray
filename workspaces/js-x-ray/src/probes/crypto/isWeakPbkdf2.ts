@@ -4,7 +4,6 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
 import { isStringLiteral } from "../../estree/types.ts";
-import { generateWarning } from "../../warnings.ts";
 import {
   hasImportedModules,
   matchTracedCall,
@@ -85,12 +84,10 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
   }
 
   if (reasons.length > 0) {
-    sourceFile.warnings.push(
-      generateWarning("crypto.weak-pbkdf2", {
-        value: reasons.join(", "),
-        location: node.loc
-      })
-    );
+    sourceFile.addWarning("crypto.weak-pbkdf2", {
+      value: reasons.join(", "),
+      location: node.loc
+    });
   }
 }
 

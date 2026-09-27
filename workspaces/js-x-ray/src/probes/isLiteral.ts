@@ -12,7 +12,6 @@ import {
   toArrayLocation,
   Hex
 } from "../utils/index.ts";
-import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
 const kNodeDeps = new Set(builtinModules);
@@ -57,11 +56,7 @@ function main(
     // then we add it to the dependencies list and we throw an unsafe-import at the current location.
     if (kNodeDeps.has(decodedValue)) {
       sourceFile.addDependency(decodedValue, node.loc);
-      sourceFile.warnings.push(
-        generateWarning(
-          "unsafe-import", { value: null, location }
-        )
-      );
+      sourceFile.addWarning("unsafe-import", { value: null, location });
     }
     else if (decodedValue === "require" || !Hex.isSafe(node.value)) {
       sourceFile.addEncodedLiteral(node.value, location);
@@ -80,13 +75,11 @@ function main(
   else if (ShadyLink.isValidIPAddress(node.value)) {
     const result = ShadyLink.isIpAddressSafe(node.value, shadyLinkOptions);
     if (!result.safe) {
-      sourceFile.warnings.push(
-        generateWarning("shady-link", {
-          value: node.value,
-          location,
-          severity: "Information"
-        })
-      );
+      sourceFile.addWarning("shady-link", {
+        value: node.value,
+        location,
+        severity: "Information"
+      });
 
       return;
     }
@@ -96,13 +89,11 @@ function main(
     const result = ShadyLink.isURLSafe(node.value, shadyLinkOptions);
 
     if (!result.safe) {
-      sourceFile.warnings.push(
-        generateWarning("shady-link", {
-          value: node.value,
-          location,
-          severity: result.isLocalAddress ? "Information" : "Warning"
-        })
-      );
+      sourceFile.addWarning("shady-link", {
+        value: node.value,
+        location,
+        severity: result.isLocalAddress ? "Information" : "Warning"
+      });
 
       return;
     }
