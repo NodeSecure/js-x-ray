@@ -81,43 +81,28 @@ function main(
     return null;
   }
 
-  let command = literalToString(commandArg);
+  const command = literalToString(commandArg);
 
-  // Aggressive mode: warn on any child_process usage
-  if (sourceFile.sensitivity === "aggressive") {
-    // Handle spawn/spawnSync array arguments
-    if (methodName === "spawn" || methodName === "spawnSync") {
-      command = concatArrayArgs(command, node);
-    }
-
-    const warning = generateWarning("unsafe-command", {
-      value: command,
-      location: node.loc
-    });
-    sourceFile.warnings.push(warning);
-
-    return signals.Skip;
+  // Aggressive mode warns on any child_process usage, conservative mode only
+  // on the commands we know to be suspicious.
+  if (sourceFile.sensitivity !== "aggressive" && !isUnsafeCommand(command)) {
+    return null;
   }
 
-  // Conservative mode: existing strict validation
-  if (isUnsafeCommand(command)) {
-    // Spawned command arguments are filled into an Array
-    // as second arguments. This is why we should add them
-    // manually to the command string.
-    if (methodName === "spawn" || methodName === "spawnSync") {
-      command = concatArrayArgs(command, node);
-    }
+  // Spawned command arguments are filled into an Array
+  // as second arguments. This is why we should add them
+  // manually to the command string.
+  const reportedCommand = methodName === "spawn" || methodName === "spawnSync" ?
+    concatArrayArgs(command, node) :
+    command;
 
-    const warning = generateWarning("unsafe-command", {
-      value: command,
-      location: node.loc
-    });
-    sourceFile.warnings.push(warning);
+  const warning = generateWarning("unsafe-command", {
+    value: reportedCommand,
+    location: node.loc
+  });
+  sourceFile.warnings.push(warning);
 
-    return signals.Skip;
-  }
-
-  return null;
+  return signals.Skip;
 }
 
 function initialize(
