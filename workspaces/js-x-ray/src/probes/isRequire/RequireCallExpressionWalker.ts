@@ -9,7 +9,7 @@ import { Hex, isStringBase64 } from "../../utils/index.ts";
 import {
   arrayExpressionToString,
   getCallExpressionArguments,
-  getMemberExpressionIdentifier
+  getMemberExpressionFullName
 } from "../../estree/index.ts";
 import type { VariableTracer } from "../../VariableTracer.ts";
 import {
@@ -63,7 +63,7 @@ export class RequireCallExpressionWalker {
       }
 
       const fullName = isMemberExpression(castedNode.callee) ?
-        [...getMemberExpressionIdentifier(castedNode.callee)].join(".") :
+        getMemberExpressionFullName(castedNode.callee) :
         castedNode.callee.name;
       const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
       switch (tracedFullName) {

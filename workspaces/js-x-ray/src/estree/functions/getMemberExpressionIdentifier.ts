@@ -79,3 +79,18 @@ export function* getMemberExpressionIdentifier(
     }
   }
 }
+
+/**
+ * Return the complete identifier of a MemberExpression, joined with dots.
+ */
+export function getMemberExpressionFullName(
+  node: ESTree.MemberExpression,
+  options: DefaultOptions = {}
+): string {
+  let fullName = "";
+  for (const part of getMemberExpressionIdentifier(node, options)) {
+    fullName = fullName === "" ? part : `${fullName}.${part}`;
+  }
+
+  return fullName;
+}
