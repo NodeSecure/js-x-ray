@@ -3,10 +3,15 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isStringLiteral, isNumericLiteral } from "../../estree/types.ts";
 import { findPropertyMatch } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 
 /**
  * OWASP recommended minimum scrypt parameter combinations.
@@ -30,7 +35,7 @@ const kDefaultCost = 16384;
 const kDefaultBlockSize = 8;
 const kDefaultParallelization = 1;
 
-const tracedFunctions = new Set(["crypto.scrypt"]);
+const kTracedFunctions = new Set<ModuleScopedIdentifier>(["crypto.scrypt"]);
 
 function isWeakScryptParams(cost: number, blockSize: number, parallelization: number): boolean {
   if (blockSize < kMinBlockSize) {
@@ -49,27 +54,17 @@ function isWeakScryptParams(cost: number, blockSize: number, parallelization: nu
 
 function validateNode(
   _node: ESTree.Node,
-  ctx: ProbeContext): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has("crypto")) {
+  ctx: ProbeContext
+): [boolean, any?] {
+  if (!hasImportedModules(ctx, "crypto")) {
     return [false];
   }
 
-  return [
-    tracedFunctions.has(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
-  ];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(ctx: ProbeContext) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const identifierOrMemberExpr of tracedFunctions) {
-    tracer.trace(identifierOrMemberExpr, {
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(node: ESTree.CallExpression, ctx: ProbeContext) {

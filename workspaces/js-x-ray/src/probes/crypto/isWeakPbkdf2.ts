@@ -3,9 +3,14 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 import { resolveNumericValue } from "./resolveNumericValue.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
 
@@ -21,7 +26,7 @@ const kMinIterationsSha512 = 210_000;
 // Minimum salt length in bytes (same threshold as the other crypto probes)
 const kMinSaltLength = 16;
 
-const kTracedFunctions = ["crypto.pbkdf2", "crypto.pbkdf2Sync"];
+const kTracedFunctions = new Set<ModuleScopedIdentifier>(["crypto.pbkdf2", "crypto.pbkdf2Sync"]);
 
 /**
  * Return the OWASP minimum iteration count for the given digest.
@@ -45,26 +50,15 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has("crypto")) {
+  if (!hasImportedModules(ctx, "crypto")) {
     return [false];
   }
 
-  return [
-    kTracedFunctions.includes(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
-  ];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(ctx: ProbeContext) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const identifierOrMemberExpr of kTracedFunctions) {
-    tracer.trace(identifierOrMemberExpr, {
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(node: ESTree.CallExpression, ctx: ProbeContext) {

@@ -11,8 +11,8 @@ import type {
   ProbeContext,
   ProbeMainContext
 } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
+import { getTracedCall, traceAll } from "./tracing.ts";
 
 /**
  * @description Detect serialization of process.env which could indicate environment variable exfiltration
@@ -28,7 +28,7 @@ function validateJsonStringify(
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
 
-  if (ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr !== "JSON.stringify") {
+  if (getTracedCall(ctx)?.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
@@ -117,15 +117,7 @@ function processEnvHandler(
 function initialize(
   ctx: ProbeContext
 ) {
-  const { tracer } = ctx.sourceFile;
-
-  tracer
-    .trace("process.env", {
-      followConsecutiveAssignment: true
-    })
-    .trace("JSON.stringify", {
-      followConsecutiveAssignment: true
-    });
+  traceAll(ctx.sourceFile.tracer, ["process.env", "JSON.stringify"]);
 }
 
 export default {

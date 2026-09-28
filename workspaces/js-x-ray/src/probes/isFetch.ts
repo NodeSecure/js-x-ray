@@ -2,31 +2,23 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import { getCallExpressionIdentifier } from "../estree/index.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { matchTracedCall, traceAll } from "./tracing.ts";
+
+// CONSTANTS
+const kTracedFunctions = new Set(["fetch"]);
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-  const id = getCallExpressionIdentifier(node);
-
-  if (id === null) {
-    return [false];
-  }
-
-  const data = tracer.getDataFromIdentifier(id);
-
-  return [data !== null && data.identifierOrMemberExpr === "fetch"];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(
   ctx: ProbeContext
 ) {
-  const { sourceFile } = ctx;
-
-  sourceFile.tracer.trace("fetch", { followConsecutiveAssignment: true });
+  traceAll(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(
@@ -42,5 +34,6 @@ export default {
   validateNode,
   initialize,
   main,
-  breakOnMatch: false
+  breakOnMatch: false,
+  context: {}
 };
