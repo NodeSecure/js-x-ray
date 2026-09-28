@@ -4,25 +4,22 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
 import { generateWarning } from "../warnings.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
+import { matchTracedCall, traceAll } from "./tracing.ts";
+
+// CONSTANTS
+const kTracedFunctions = new Set(["Math.random"]);
 
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  return [
-    ctx.context![CALL_EXPRESSION_DATA]?.name === "Math.random"
-  ];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(
   ctx: ProbeContext
 ) {
-  const { tracer } = ctx.sourceFile;
-
-  tracer.trace("Math.random", {
-    followConsecutiveAssignment: true
-  });
+  traceAll(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(

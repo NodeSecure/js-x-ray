@@ -3,52 +3,43 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 import { resolveNumericValue } from "./resolveNumericValue.ts";
 
 const kMinRounds = 10;
 
 const kModuleName = "bcryptjs";
 
-// Maps a traced bcrypt function name to the argument index
-const kTracedFunctionsWithArgIndex = new Map([
-  ["hash", 1],
-  ["hashSync", 1],
-  ["genSalt", 0],
-  ["genSaltSync", 0]
+// Maps a traced bcrypt function to the index of its work factor argument
+const kWorkFactorArgIndex = new Map<ModuleScopedIdentifier, number>([
+  ["bcryptjs.hash", 1],
+  ["bcryptjs.hashSync", 1],
+  ["bcryptjs.genSalt", 0],
+  ["bcryptjs.genSaltSync", 0]
 ]);
+
+const kTracedFunctions = new Set(kWorkFactorArgIndex.keys());
 
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has(kModuleName)) {
+  if (!hasImportedModules(ctx, kModuleName)) {
     return [false];
   }
 
-  const identifierOrMemberExpr = ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr;
-  if (!identifierOrMemberExpr) {
-    return [false];
-  }
-
-  const [, functionName] = identifierOrMemberExpr.split(".");
-
-  return [kTracedFunctionsWithArgIndex.has(functionName), functionName];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(ctx: ProbeContext) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const functionName of kTracedFunctionsWithArgIndex.keys()) {
-    tracer.trace(`${kModuleName}.${functionName}`, {
-      followConsecutiveAssignment: true,
-      moduleName: kModuleName
-    });
-  }
+  traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(
@@ -57,7 +48,7 @@ function main(
 ) {
   const { sourceFile } = ctx;
   const { tracer } = sourceFile;
-  const argIndex = kTracedFunctionsWithArgIndex.get(ctx.data as string)!;
+  const argIndex = kWorkFactorArgIndex.get(ctx.data as ModuleScopedIdentifier)!;
   const arg = node.arguments.at(argIndex);
 
   const numValue = resolveNumericValue(arg, tracer.literalIdentifiers);

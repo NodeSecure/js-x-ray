@@ -3,11 +3,11 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
+import { matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "./tracing.ts";
 
 // CONSTANTS
-const kSyncIOIdentifierOrMemberExps = new Set([
+const kSyncIOIdentifierOrMemberExps = new Set<ModuleScopedIdentifier>([
   "crypto.pbkdf2Sync",
   "crypto.scryptSync",
   "crypto.generateKeyPairSync",
@@ -46,30 +46,13 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const data = ctx.context?.[CALL_EXPRESSION_DATA];
-  const identifierOrMemberExpr = data?.identifierOrMemberExpr;
-
-  if (
-    identifierOrMemberExpr === undefined
-    || !kSyncIOIdentifierOrMemberExps.has(identifierOrMemberExpr)
-  ) {
-    return [false];
-  }
-
-  return [true, identifierOrMemberExpr];
+  return matchTracedCall(ctx, kSyncIOIdentifierOrMemberExps);
 }
 
 function initialize(
   ctx: ProbeContext
 ) {
-  kSyncIOIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
-    const moduleName = identifierOrMemberExp.split(".")[0];
-
-    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName
-    });
-  });
+  traceAllFromModule(ctx.sourceFile.tracer, kSyncIOIdentifierOrMemberExps);
 }
 
 function main(

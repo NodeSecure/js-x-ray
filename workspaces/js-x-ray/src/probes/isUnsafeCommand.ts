@@ -7,23 +7,24 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import {
   isStringLiteral,
   isTemplateLiteral
 } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
+import { matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "./tracing.ts";
 
 // CONSTANTS
 const kUnsafeCommands = ["csrutil", "uname", "ping", "curl"];
-
-// CONSTANTS
-const kIdentifierOrMemberExps = [
+const kSpawnFunctions = new Set<ModuleScopedIdentifier>([
   "child_process.spawn",
-  "child_process.spawnSync",
+  "child_process.spawnSync"
+]);
+const kTracedFunctions = new Set<ModuleScopedIdentifier>([
+  ...kSpawnFunctions,
   "child_process.exec",
   "child_process.execSync"
-];
+]);
 
 function isUnsafeCommand(
   command: string
@@ -63,19 +64,14 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const data = ctx.context?.[CALL_EXPRESSION_DATA];
-
-  return data && kIdentifierOrMemberExps.includes(data.name) ? [
-    true,
-    data.name.slice("child_process.".length)
-  ] : [false];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function main(
   node: ESTree.CallExpression,
   ctx: ProbeMainContext
 ) {
-  const { sourceFile, data: methodName, signals } = ctx;
+  const { sourceFile, data: tracedFunction, signals } = ctx;
 
   const commandArg = node.arguments[0];
   if (!isStringLiteral(commandArg) && !isTemplateLiteral(commandArg)) {
@@ -87,7 +83,7 @@ function main(
   // Aggressive mode: warn on any child_process usage
   if (sourceFile.sensitivity === "aggressive") {
     // Handle spawn/spawnSync array arguments
-    if (methodName === "spawn" || methodName === "spawnSync") {
+    if (kSpawnFunctions.has(tracedFunction)) {
       command = concatArrayArgs(command, node);
     }
 
@@ -105,7 +101,7 @@ function main(
     // Spawned command arguments are filled into an Array
     // as second arguments. This is why we should add them
     // manually to the command string.
-    if (methodName === "spawn" || methodName === "spawnSync") {
+    if (kSpawnFunctions.has(tracedFunction)) {
       command = concatArrayArgs(command, node);
     }
 
@@ -124,14 +120,7 @@ function main(
 function initialize(
   ctx: ProbeContext
 ) {
-  kIdentifierOrMemberExps.forEach((identifierOrMemberExp) => {
-    const moduleName = identifierOrMemberExp.split(".")[0];
-
-    ctx.sourceFile.tracer.trace(identifierOrMemberExp, {
-      followConsecutiveAssignment: true,
-      moduleName
-    });
-  });
+  traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 export default {

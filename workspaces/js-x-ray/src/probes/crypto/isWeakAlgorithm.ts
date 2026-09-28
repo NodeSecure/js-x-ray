@@ -3,11 +3,16 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../../contants.ts";
 import {
   isStringLiteral
 } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 
 // CONSTANTS
 const kWeakAlgorithms = new Set([
@@ -18,7 +23,7 @@ const kWeakAlgorithms = new Set([
   "md2"
 ]);
 
-const kTracedFunctions = new Set([
+const kTracedFunctions = new Set<ModuleScopedIdentifier>([
   "crypto.createHash",
   "crypto.createHmac"
 ]);
@@ -27,28 +32,17 @@ function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
-
-  if (!tracer.importedModules.has("crypto")) {
+  if (!hasImportedModules(ctx, "crypto")) {
     return [false];
   }
 
-  return [
-    kTracedFunctions.has(ctx.context![CALL_EXPRESSION_DATA]?.identifierOrMemberExpr)
-  ];
+  return matchTracedCall(ctx, kTracedFunctions);
 }
 
 function initialize(
   ctx: ProbeContext
 ) {
-  const { tracer } = ctx.sourceFile;
-
-  for (const identifierOrMemberExpr of kTracedFunctions) {
-    tracer.trace(identifierOrMemberExpr, {
-      followConsecutiveAssignment: true,
-      moduleName: "crypto"
-    });
-  }
+  traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
 function main(

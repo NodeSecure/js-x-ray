@@ -9,14 +9,17 @@ import {
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
-import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { rootLocation, toArrayLocation, type SourceArrayLocation } from "../utils/toArrayLocation.ts";
 import { generateWarning } from "../warnings.ts";
+import {
+  getTracedCall,
+  traceAll,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "./tracing.ts";
 
 // CONSTANTS
-const kSensitiveModules = new Set(["os", "dns"]);
-
-const kSensitiveMethods = [
+const kSensitiveMethods: ModuleScopedIdentifier[] = [
   "os.userInfo",
   "os.networkInterfaces",
   "os.cpus",
@@ -35,7 +38,7 @@ function validateJSONStringify(
     return [false];
   }
 
-  if (ctx.context?.[CALL_EXPRESSION_DATA]?.identifierOrMemberExpr !== "JSON.stringify") {
+  if (getTracedCall(ctx)?.identifierOrMemberExpr !== "JSON.stringify") {
     return [false];
   }
 
@@ -83,8 +86,7 @@ function sensitiveMethodsHandler(
     return;
   }
   const data = sourceFile.tracer.getDataFromIdentifier(id);
-  if (kSensitiveMethods.some((method) => data?.identifierOrMemberExpr === method
-    && sourceFile.tracer.importedModules.has(method.split(".")[0]))) {
+  if (kSensitiveMethods.some((method) => data?.identifierOrMemberExpr === method)) {
     addInContext(data?.identifierOrMemberExpr!, firstArg.loc, ctx);
   }
 }
@@ -108,26 +110,9 @@ function initialize(
 ) {
   const { sourceFile, context } = ctx;
   const { tracer } = sourceFile;
-  tracer
-    .trace("JSON.stringify", {
-      followConsecutiveAssignment: true
-    })
-    .trace("os.userInfo", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("os.networkInterfaces", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("os.cpus", {
-      moduleName: "os",
-      followConsecutiveAssignment: true
-    })
-    .trace("dns.getServers", {
-      moduleName: "dns",
-      followConsecutiveAssignment: true
-    });
+
+  traceAll(tracer, ["JSON.stringify"]);
+  const sensitiveModules = traceAllFromModule(tracer, kSensitiveMethods);
 
   if (sourceFile.sensitivity !== "aggressive") {
     return;
@@ -136,7 +121,7 @@ function initialize(
     moduleName,
     location
   }: ImportEventPayload) => {
-    if (kSensitiveModules.has(moduleName) && !(moduleName in context!)) {
+    if (sensitiveModules.has(moduleName) && !(moduleName in context!)) {
       context![moduleName] = [toArrayLocation(location ?? undefined)];
     }
   });
