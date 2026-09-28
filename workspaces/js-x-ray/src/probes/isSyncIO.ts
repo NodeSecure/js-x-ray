@@ -2,13 +2,12 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
-import type { ProbeContext } from "../ProbeRunner.ts";
+import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { CALL_EXPRESSION_DATA } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
 // CONSTANTS
-const kTracedNodeCoreModules = ["fs", "crypto", "child_process", "zlib"];
-const kSyncIOIdentifierOrMemberExps = [
+const kSyncIOIdentifierOrMemberExps = new Set([
   "crypto.pbkdf2Sync",
   "crypto.scryptSync",
   "crypto.generateKeyPairSync",
@@ -41,25 +40,23 @@ const kSyncIOIdentifierOrMemberExps = [
   "zlib.gunzipSync",
   "zlib.brotliCompressSync",
   "zlib.brotliDecompressSync"
-];
+]);
 
 function validateNode(
   _node: ESTree.Node,
   ctx: ProbeContext
 ): [boolean, any?] {
-  const { tracer } = ctx.sourceFile;
+  const data = ctx.context?.[CALL_EXPRESSION_DATA];
+  const identifierOrMemberExpr = data?.identifierOrMemberExpr;
 
   if (
-    !kTracedNodeCoreModules.some((moduleName) => tracer.importedModules.has(moduleName))
+    identifierOrMemberExpr === undefined
+    || !kSyncIOIdentifierOrMemberExps.has(identifierOrMemberExpr)
   ) {
     return [false];
   }
 
-  const data = ctx.context?.[CALL_EXPRESSION_DATA];
-
-  return [
-    data?.identifierOrMemberExpr.endsWith("Sync")
-  ];
+  return [true, identifierOrMemberExpr];
 }
 
 function initialize(
@@ -77,10 +74,12 @@ function initialize(
 
 function main(
   node: ESTree.CallExpression,
-  ctx: ProbeContext
+  ctx: ProbeMainContext
 ) {
+  const [, methodName] = (ctx.data as string).split(".");
+
   const warning = generateWarning("synchronous-io", {
-    value: node.callee.name,
+    value: methodName,
     location: node.loc
   });
   ctx.sourceFile.warnings.push(warning);
