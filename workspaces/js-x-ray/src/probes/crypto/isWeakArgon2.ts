@@ -7,6 +7,7 @@ import { isNode } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import { resolveNumericValue } from "./resolveNumericValue.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
+import { classifyHardcodedSecret } from "./classifyHardcodedSecret.ts";
 import { findPropertyMatch } from "../../estree/index.ts";
 import {
   hasImportedModules,
@@ -108,7 +109,9 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
     }
 
     if (nonce !== null) {
-      reasons.push(Buffer.byteLength(nonce) < kMinNonceLength ? "short-nonce" : "hardcoded-nonce");
+      reasons.push(
+        classifyHardcodedSecret(nonce, "nonce", kMinNonceLength)
+      );
     }
   }
 
