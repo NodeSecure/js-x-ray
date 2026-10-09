@@ -2,8 +2,9 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
-import type { Literal } from "../estree/types.ts";
+import { isStringLiteral, type Literal } from "../estree/types.ts";
 
 /**
  * @description Search for ESM Export
@@ -13,20 +14,9 @@ import type { Literal } from "../estree/types.ts";
  * export * from "./bar.js";
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.ExportNamedDeclaration | ESTree.ExportAllDeclaration
 ): [boolean, any?] {
-  if (
-    node.type !== "ExportNamedDeclaration" &&
-    node.type !== "ExportAllDeclaration"
-  ) {
-    return [false];
-  }
-
-  return [
-    node.source !== null &&
-    node.source.type === "Literal" &&
-    typeof node.source.value === "string"
-  ];
+  return [isStringLiteral(node.source)];
 }
 
 function main(
@@ -42,10 +32,10 @@ function main(
   );
 }
 
-export default {
+export default defineProbe({
   name: "isESMExport",
   nodeTypes: ["ExportNamedDeclaration", "ExportAllDeclaration"],
   validateNode,
   main,
   breakOnMatch: true
-};
+});

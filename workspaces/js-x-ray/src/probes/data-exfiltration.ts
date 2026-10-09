@@ -9,6 +9,7 @@ import {
 } from "../estree/index.ts";
 import { VariableTracer, type ImportEventPayload } from "../VariableTracer.ts";
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import {
   getTracedCall,
   traceAll,
@@ -34,7 +35,7 @@ const sensitivePathRegex = /~\/\.(ssh|aws|npmrc|gitconfig|bashrc)(\/[^\s"'`]+)?/
 type DataExfiltrationContextDef = AggregatedLocations;
 
 function validateJSONStringify(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.Literal,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (ctx.sourceFile.sensitivity === "aggressive") {
@@ -54,7 +55,7 @@ function validateJSONStringify(
 }
 
 function validateLiteral(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.Literal,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (isStringLiteral(node) && sensitivePathRegex.test(node.value)) {
@@ -121,7 +122,7 @@ function finalize(ctx: ProbeContext<DataExfiltrationContextDef>) {
   pushAggregatedWarning(ctx, "data-exfiltration");
 }
 
-const dateExifiltration = {
+const dateExifiltration = defineProbe({
   name: "dataExfiltration",
   nodeTypes: ["CallExpression", "Literal"],
   validateNode: [validateJSONStringify, validateLiteral],
@@ -133,6 +134,6 @@ const dateExifiltration = {
   },
   breakOnMatch: false,
   context: {}
-};
+});
 
 export default dateExifiltration;

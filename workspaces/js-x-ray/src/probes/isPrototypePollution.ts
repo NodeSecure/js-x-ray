@@ -2,12 +2,13 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { getMemberExpressionIdentifier, isMemberExpression } from "../estree/index.ts";
 import { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Literal | ESTree.MemberExpression
 ): [boolean, string?] {
   if (node.type === "Literal" && node.value === "__proto__") {
     return [true, "literal"];
@@ -44,10 +45,10 @@ function main(
   return data === "literal" ? undefined : signals.Skip;
 }
 
-export default {
+export default defineProbe({
   name: "isPrototypePollution",
   nodeTypes: ["Literal", "MemberExpression"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

@@ -3,13 +3,14 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { matchTracedCall, traceAll } from "./tracing.ts";
 
 // CONSTANTS
 const kTracedFunctions = new Set(["fetch"]);
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   return matchTracedCall(ctx, kTracedFunctions);
@@ -28,7 +29,7 @@ function main(
   sourceFile.flags.add("fetch");
 }
 
-export default {
+export default defineProbe({
   name: "isFetch",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -36,4 +37,4 @@ export default {
   main,
   breakOnMatch: false,
   context: {}
-};
+});

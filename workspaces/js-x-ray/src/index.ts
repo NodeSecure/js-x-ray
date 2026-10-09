@@ -20,6 +20,11 @@ export {
   type TracedIdentifierReport
 } from "./VariableTracer.ts";
 export * from "./utils/toArrayLocation.ts";
+export {
+  defineProbe,
+  type ProbeNodeType,
+  type NodeOfType
+} from "./defineProbe.ts";
 
 export function i18nLocation() {
   return path.join(import.meta.dirname, "i18n");

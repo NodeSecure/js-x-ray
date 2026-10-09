@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -13,10 +14,10 @@ import { generateWarning } from "../warnings.ts";
  * /hello/
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Literal
 ): [boolean, any?] {
   return [
-    node.type === "Literal" && "regex" in node
+    "regex" in node
   ];
 }
 
@@ -34,10 +35,10 @@ function main(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isLiteralRegex",
   nodeTypes: ["Literal"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

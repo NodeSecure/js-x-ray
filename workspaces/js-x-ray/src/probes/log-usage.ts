@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 import { isIdentifier, isObjectExpression, findPropertyMatch } from "../estree/index.ts";
 import { getTracedCall, traceAll } from "./tracing.ts";
@@ -36,7 +37,7 @@ const kVirtualCallPrefix = /__virtual_call_.*\d+__\./;
 type LogUsageContextDef = AggregatedLocations;
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   const identifierOrMemberExpr = getTracedCall(ctx)?.identifierOrMemberExpr;
@@ -270,7 +271,7 @@ function finalize(ctx: ProbeContext<LogUsageContextDef>) {
   });
 }
 
-export default {
+export default defineProbe({
   name: "log-usage",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -279,4 +280,4 @@ export default {
   finalize,
   breakOnMatch: false,
   context: {}
-};
+});

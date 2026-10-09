@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { getCallExpressionIdentifier, isCallExpression } from "../estree/index.ts";
 import { CALL_EXPRESSION_IDENTIFIER } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
@@ -14,7 +15,7 @@ import { generateWarning } from "../warnings.ts";
  * Function("return this")();
  */
 function validateNode(
-  node: ESTree.Node,
+  node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   return isUnsafeCallee(node, ctx);
@@ -64,13 +65,9 @@ function isEvalCallee(
 }
 
 export function isUnsafeCallee(
-  node: ESTree.CallExpression | ESTree.Node,
+  node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, "eval" | "Function" | null] {
-  if (node.type !== "CallExpression") {
-    return [false, null];
-  }
-
   if (isEvalCallee(node)) {
     return [true, "eval"];
   }
@@ -82,11 +79,11 @@ export function isUnsafeCallee(
   return [false, null];
 }
 
-export default {
+export default defineProbe({
   name: "isUnsafeCallee",
   nodeTypes: ["CallExpression"],
   validateNode,
   main,
   breakOnMatch: false,
   context: {}
-};
+});

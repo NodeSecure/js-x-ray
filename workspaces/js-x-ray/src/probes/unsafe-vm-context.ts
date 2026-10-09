@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeMainContext, ProbeContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { generateWarning } from "../warnings.ts";
 import { VariableTracer, type ReturnValueEventPayload } from "../VariableTracer.ts";
 import { getTracedCall, hasImportedModules } from "./tracing.ts";
@@ -11,13 +12,9 @@ import { getTracedCall, hasImportedModules } from "./tracing.ts";
 const kRunInContextTracedFunctions = Symbol("runInContextTracedFunctions");
 
 function validateNode(
-  node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
-  if (node.type !== "CallExpression") {
-    return [false];
-  }
-
   if (!hasImportedModules(ctx, "vm")) {
     return [false];
   }
@@ -86,7 +83,7 @@ function scriptRunInContextHandler(
   );
 }
 
-export default {
+export default defineProbe({
   name: "unsafe-vm-context",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -97,4 +94,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

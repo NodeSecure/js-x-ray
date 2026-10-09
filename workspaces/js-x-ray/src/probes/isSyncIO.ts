@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { generateWarning } from "../warnings.ts";
 import { matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "./tracing.ts";
 
@@ -43,7 +44,7 @@ const kSyncIOIdentifierOrMemberExps = new Set<ModuleScopedIdentifier>([
 ]);
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   return matchTracedCall(ctx, kSyncIOIdentifierOrMemberExps);
@@ -68,7 +69,7 @@ function main(
   ctx.sourceFile.warnings.push(warning);
 }
 
-export default {
+export default defineProbe({
   name: "isSyncIO",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -76,4 +77,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

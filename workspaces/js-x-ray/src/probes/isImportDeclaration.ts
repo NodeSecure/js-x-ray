@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeMainContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { isStringLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -16,12 +17,8 @@ import { generateWarning } from "../warnings.ts";
  * import(`bar`);
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.ImportDeclaration | ESTree.ImportExpression
 ): [boolean, any?] {
-  if (node.type !== "ImportDeclaration" && node.type !== "ImportExpression") {
-    return [false];
-  }
-
   // Note: the source property is the right-side part of the Import
   const specifier = getSpecifier(node.source);
 
@@ -66,11 +63,11 @@ function main(
   sourceFile.addDependency(specifier, node.loc);
 }
 
-export default {
+export default defineProbe({
   name: "isImportDeclaration",
   nodeTypes: ["ImportDeclaration", "ImportExpression"],
   validateNode,
   main,
   breakOnMatch: true,
   breakGroup: "import"
-};
+});

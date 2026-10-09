@@ -7,6 +7,7 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import {
   isStringLiteral,
   isTemplateLiteral
@@ -61,7 +62,7 @@ function concatArrayArgs(
  * exec("csrutil status");
  */
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   return matchTracedCall(ctx, kTracedFunctions);
@@ -123,11 +124,11 @@ function initialize(
   traceAllFromModule(ctx.sourceFile.tracer, kTracedFunctions);
 }
 
-export default {
+export default defineProbe({
   name: "isUnsafeCommand",
   nodeTypes: ["CallExpression"],
   validateNode,
   main,
   initialize,
   context: {}
-};
+});

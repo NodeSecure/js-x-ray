@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal, RegExpLiteral } from "../estree/types.ts";
 import { generateWarning } from "../warnings.ts";
@@ -14,7 +15,7 @@ import { generateWarning } from "../warnings.ts";
  * new RegExp("...");
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.NewExpression
 ): [boolean, any?] {
   return [
     isRegexConstructor(node) && node.arguments.length > 0
@@ -54,19 +55,19 @@ function main(
 }
 
 function isRegexConstructor(
-  node: ESTree.Node
-): node is ESTree.NewExpression {
-  if (node.type !== "NewExpression" || node.callee.type !== "Identifier") {
+  node: ESTree.NewExpression
+): node is ESTree.NewExpression & { callee: ESTree.Identifier; } {
+  if (node.callee.type !== "Identifier") {
     return false;
   }
 
   return node.callee.name === "RegExp";
 }
 
-export default {
+export default defineProbe({
   name: "isRegexObject",
   nodeTypes: ["NewExpression"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

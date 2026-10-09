@@ -2,6 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
 import { extractNode } from "../utils/index.ts";
 
@@ -16,11 +17,9 @@ const kLiteralExtractor = extractNode<ESTree.Literal>("Literal");
  * ["foo", "bar", 1]
  */
 function validateNode(
-  node: ESTree.Node
+  _node: ESTree.ArrayExpression
 ): [boolean, any?] {
-  return [
-    node.type === "ArrayExpression"
-  ];
+  return [true];
 }
 
 function main(
@@ -33,10 +32,10 @@ function main(
   );
 }
 
-export default {
+export default defineProbe({
   name: "isArrayExpression",
   nodeTypes: ["ArrayExpression"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

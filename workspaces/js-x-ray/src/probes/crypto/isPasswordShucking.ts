@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { defineProbe } from "../../defineProbe.ts";
 import { isCallExpression, isFunctionNode, isIdentifier, isMemberExpression } from "../../estree/types.ts";
 import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
@@ -57,7 +58,7 @@ function isShuckingPrehash(hashNode: ESTree.Node | null | undefined): boolean {
 type NodeValidationResult = [false] | [true] | [true, string[]];
 
 function validateNode(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.FunctionDeclaration | ESTree.FunctionExpression | ESTree.ArrowFunctionExpression,
   ctx: ProbeContext<PasswordShuckingContext>
 ): NodeValidationResult {
   if (!hasImportedModules(ctx, kModuleName, "crypto")) {
@@ -133,7 +134,7 @@ function bcryptHashCall(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isPasswordShucking",
   nodeTypes: [
     "CallExpression",
@@ -149,4 +150,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../../ProbeRunner.ts";
+import { defineProbe } from "../../defineProbe.ts";
 import {
   isStringLiteral
 } from "../../estree/types.ts";
@@ -29,7 +30,7 @@ const kTracedFunctions = new Set<ModuleScopedIdentifier>([
 ]);
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (!hasImportedModules(ctx, "crypto")) {
@@ -61,7 +62,7 @@ function main(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isWeakCrypto",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -69,4 +70,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});
