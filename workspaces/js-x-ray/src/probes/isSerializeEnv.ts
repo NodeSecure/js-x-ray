@@ -11,6 +11,7 @@ import type {
   ProbeContext,
   ProbeMainContext
 } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { generateWarning } from "../warnings.ts";
 import { getTracedCall, traceAll } from "./tracing.ts";
 
@@ -23,7 +24,7 @@ import { getTracedCall, traceAll } from "./tracing.ts";
  * JSON.stringify(process[`env`])
  */
 function validateJsonStringify(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.MemberExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
@@ -62,7 +63,7 @@ function validateJsonStringify(
  * const env = process.env
  */
 function validateProcessEnv(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.MemberExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (node.type !== "MemberExpression") {
@@ -120,7 +121,7 @@ function initialize(
   traceAll(ctx.sourceFile.tracer, ["process.env", "JSON.stringify"]);
 }
 
-export default {
+export default defineProbe({
   name: "isSerializeEnv",
   nodeTypes: ["CallExpression", "MemberExpression"],
   validateNode: [validateJsonStringify, validateProcessEnv],
@@ -131,4 +132,4 @@ export default {
   },
   breakOnMatch: false,
   context: {}
-};
+});

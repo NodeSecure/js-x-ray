@@ -2,6 +2,7 @@
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
 
 /**
@@ -12,11 +13,9 @@ import { SourceFile } from "../SourceFile.ts";
  * 5 + 5 + 10
  */
 function validateNode(
-  node: ESTree.Node
+  _node: ESTree.BinaryExpression
 ): [boolean, any?] {
-  return [
-    node.type === "BinaryExpression"
-  ];
+  return [true];
 }
 
 function main(
@@ -66,10 +65,10 @@ function walkBinaryExpression(
   return [currentLevel, hasUnaryExpression];
 }
 
-export default {
+export default defineProbe({
   name: "isBinaryExpression",
   nodeTypes: ["BinaryExpression"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

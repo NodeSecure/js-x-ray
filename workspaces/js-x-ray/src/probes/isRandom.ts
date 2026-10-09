@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { generateWarning } from "../warnings.ts";
 import { matchTracedCall, traceAll } from "./tracing.ts";
 
@@ -10,7 +11,7 @@ import { matchTracedCall, traceAll } from "./tracing.ts";
 const kTracedFunctions = new Set(["Math.random"]);
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   return matchTracedCall(ctx, kTracedFunctions);
@@ -34,7 +35,7 @@ function main(
   }));
 }
 
-export default {
+export default defineProbe({
   name: "isRandom",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -42,4 +43,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

@@ -44,6 +44,7 @@ import {
   isCallExpression
 } from "./estree/index.ts";
 import { CALL_EXPRESSION_DATA, CALL_EXPRESSION_IDENTIFIER } from "./contants.ts";
+import type { NodeOfType, ProbeNodeType } from "./defineProbe.ts";
 
 const kProbeOriginalContext = Symbol.for("ProbeOriginalContext");
 
@@ -65,11 +66,17 @@ export type ProbeMainContext<T extends ProbeContextDef = ProbeContextDef> = Prob
   signals: typeof ProbeRunner.Signals;
 };
 
-export type ProbeValidationCallback<T extends ProbeContextDef = ProbeContextDef> = (
-  node: ESTree.Node, ctx: ProbeContext<T>
+export type ProbeValidationCallback<
+  T extends ProbeContextDef = ProbeContextDef,
+  N extends ESTree.Node = ESTree.Node
+> = (
+  node: N, ctx: ProbeContext<T>
 ) => [boolean, any?];
 
-export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
+export interface Probe<
+  T extends ProbeContextDef = ProbeContextDef,
+  K extends ProbeNodeType = ProbeNodeType
+> {
   name: string;
   /**
    * The ESTree node types this probe handles. When provided, the probe is only
@@ -78,10 +85,10 @@ export interface Probe<T extends ProbeContextDef = ProbeContextDef> {
    *
    * Probes that omit this field remain catch-all: they run on every node
    */
-  nodeTypes?: readonly string[];
+  nodeTypes?: readonly K[];
   initialize?: (ctx: ProbeContext<T>) => void | ProbeContext;
   finalize?: (ctx: ProbeContext<T>) => void;
-  validateNode: ProbeValidationCallback<T> | ProbeValidationCallback<T>[];
+  validateNode: ProbeValidationCallback<T, NodeOfType<K>> | ProbeValidationCallback<T, NodeOfType<K>>[];
   main: ((node: any, ctx: ProbeMainContext<T>) => ProbeReturn) | NamedMainHandlers<T>;
   teardown?: (ctx: ProbeContext<T>) => void;
   breakOnMatch?: boolean;
@@ -97,7 +104,7 @@ export class ProbeRunner {
   #probeValidateFns = new Map<Probe, ProbeValidationCallback[]>();
   #probeCtx = new Map<Probe, ProbeContext>();
   #probeMainCtx = new Map<Probe, ProbeMainContext>();
-  #nodeTypeIndex = new Map<string, Probe[]>();
+  #nodeTypeIndex = new Map<ProbeNodeType, Probe[]>();
   #catchAllProbes: Probe[] = [];
   #callExprIdentifierOptions: GetCallExpressionIdentifierOptions;
 
@@ -230,7 +237,7 @@ export class ProbeRunner {
       (probe) => !probe.nodeTypes || probe.nodeTypes.length === 0
     );
 
-    const allNodeTypes = new Set<string>(
+    const allNodeTypes = new Set<ProbeNodeType>(
       probes.flatMap((probe) => probe.nodeTypes ?? [])
     );
     for (const nodeType of allNodeTypes) {

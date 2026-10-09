@@ -149,35 +149,46 @@ You can also create custom probes to detect specific pattern in the code you are
 
 A probe is a pair of two required functions (`validateNode` and `main`) that will be called on each node of the AST and one optional function (`initialize`) that will be call before walking the AST.It will return a warning if the pattern is detected.
 
+A probe also declares `nodeTypes`: the list of ESTree node types it handles. The runner indexes probes by those types and only dispatches matching nodes, so `validateNode` is never called on irrelevant ones. Wrapping the probe in `defineProbe` makes the `node` argument of `validateNode` narrowed to the matching ESTree types, so the probe body needs no type guard.
+
 Below a basic probe that detect a string assignation to `danger`:
 
 ```ts
-export const customProbes = [
-  {
-    name: "customProbeUnsafeDanger",
-    validateNode: (node) => [
-      node.type === "VariableDeclaration" && node.declarations[0].init.value === "danger"
-    ],
-    main: (node, ctx) => {
-      const { sourceFile, data: calleeName, signals } = ctx;
-      if (node.declarations[0].init.value === "danger") {
-        sourceFile.warnings.push({
-          kind: "unsafe-danger",
-          value: calleeName,
-          location: node.loc,
-          source: "JS-X-Ray Custom Probe",
-          i18n: "sast_warnings.unsafe-danger",
-          severity: "Warning"
-        });
+import { defineProbe } from "@nodesecure/js-x-ray";
 
-        return signals.Skip;
+export const customProbes = [
+  defineProbe({
+    name: "customProbeUnsafeDanger",
+    nodeTypes: ["VariableDeclaration"],
+    validateNode: (node) => {
+      const init = node.declarations.at(0)?.init;
+
+      if (init?.type !== "Literal" || init.value !== "danger") {
+        return [false];
       }
 
-      return null;
+      return [true, init.value];
+    },
+    main: (node, ctx) => {
+      const { sourceFile, data: value, signals } = ctx;
+
+      sourceFile.warnings.push({
+        kind: "unsafe-danger",
+        value,
+        location: node.loc,
+        source: "JS-X-Ray Custom Probe",
+        i18n: "sast_warnings.unsafe-danger",
+        severity: "Warning"
+      });
+
+      return signals.Skip;
     }
-  }
+  })
 ];
 ```
+
+> [!NOTE]
+> `nodeTypes` is optional for backward compatibility: a probe that omits it stays **catch-all** and runs on every node. Declaring it is strongly recommended, both for performance and for the narrowing you get with `defineProbe`.
 
 You can pass an array of probes to the `AstAnalyser` constructor.
 
@@ -212,9 +223,18 @@ Result:
 {
   idsLengthAvg: 0,
   stringScore: 0,
-  warnings: [ { kind: 'unsafe-danger', location: [Array], source: 'JS-X-Ray' } ],
+  warnings: [
+    {
+      kind: 'unsafe-danger',
+      value: 'danger',
+      location: [Object],
+      source: 'JS-X-Ray Custom Probe',
+      i18n: 'sast_warnings.unsafe-danger',
+      severity: 'Warning'
+    }
+  ],
   flags: Set(0) {},
-  isOneLineRequire: false
+  executionTime: 1.52
 }
 ```
 
@@ -227,8 +247,11 @@ For more complex use cases, a probe can define multiple execution paths using **
 You can then control which handler is executed for a given node by calling `setEntryPoint` within your `validateNode` function.
 
 ```ts
-export const advancedProbe = {
+import { defineProbe } from "@nodesecure/js-x-ray";
+
+export const advancedProbe = defineProbe({
   name: "advancedProbeExample",
+  nodeTypes: ["CallExpression"],
   validateNode: (node, { setEntryPoint }) => {
     // If we detect a specific pattern, we can switch to a specific handler
     if (isSpecificPattern(node)) {
@@ -251,7 +274,7 @@ export const advancedProbe = {
       return null;
     }
   }
-};
+});
 ```
 
 > [!IMPORTANT]
@@ -266,10 +289,11 @@ For performance optimization, probes can access precomputed call expression data
 
 **Enable in your probe:**
 ```ts
-import { CALL_EXPRESSION_DATA } from "@nodesecure/js-x-ray";
+import { CALL_EXPRESSION_DATA, defineProbe } from "@nodesecure/js-x-ray";
 
-export const optimizedProbe = {
+export const optimizedProbe = defineProbe({
   name: "optimizedProbe",
+  nodeTypes: ["CallExpression"],
   validateNode: (node, ctx) => {
     // Access precomputed data instead of manual calls
     const data = ctx.context?.[CALL_EXPRESSION_DATA];
@@ -281,7 +305,7 @@ export const optimizedProbe = {
     // Your logic here
   },
   context: {} // Required to enable precomputed data
-};
+});
 ```
 
 The data is automatically injected for `CallExpression` nodes and provides `TracedIdentifierReport` with properties like `identifierOrMemberExpr`, `name`, etc. This optimization is optional but recommended for probes that frequently analyze call expressions.

@@ -10,6 +10,7 @@ import type {
   ProbeMainContext,
   ProbeContext
 } from "../ProbeRunner.ts";
+import { defineProbe } from "../defineProbe.ts";
 import { generateWarning } from "../warnings.ts";
 import { traceAll } from "./tracing.ts";
 
@@ -64,7 +65,7 @@ export const JS_TYPES = new Set([
  * Array.prototype.map = function() {};
  */
 function validateNodeAssignment(
-  node: ESTree.Node,
+  node: ESTree.AssignmentExpression | ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (
@@ -106,7 +107,7 @@ function resolveDefinePropertyIdentifier(
 }
 
 function validateDefineProperty(
-  node: ESTree.Node,
+  node: ESTree.AssignmentExpression | ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (node.type !== "CallExpression") {
@@ -185,7 +186,7 @@ function main(
   );
 }
 
-export default {
+export default defineProbe({
   name: "isMonkeyPatch",
   nodeTypes: ["AssignmentExpression", "CallExpression"],
   validateNode: [
@@ -195,4 +196,4 @@ export default {
   main,
   initialize,
   breakOnMatch: false
-};
+});

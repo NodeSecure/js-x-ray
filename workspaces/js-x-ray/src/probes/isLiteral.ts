@@ -5,6 +5,7 @@ import { builtinModules } from "node:module";
 import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
+import { defineProbe } from "../defineProbe.ts";
 import { ShadyLink } from "../ShadyLink.ts";
 import { SourceFile } from "../SourceFile.ts";
 import type { Literal } from "../estree/types.ts";
@@ -24,10 +25,10 @@ const kEmailRegex = /^[^.\s@:](?:[^\s@:]*[^\s@:.])?@[^.\s@]+(?:\.[^.\s@]+)*$/;
  * "foobar"
  */
 function validateNode(
-  node: ESTree.Node
+  node: ESTree.Literal
 ): [boolean, any?] {
   return [
-    node.type === "Literal" && typeof node.value === "string"
+    typeof node.value === "string"
   ];
 }
 
@@ -111,10 +112,10 @@ function main(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isLiteral",
   nodeTypes: ["Literal"],
   validateNode,
   main,
   breakOnMatch: false
-};
+});

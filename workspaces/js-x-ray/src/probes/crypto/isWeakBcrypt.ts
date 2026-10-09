@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { defineProbe } from "../../defineProbe.ts";
 import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import {
@@ -28,7 +29,7 @@ const kWorkFactorArgIndex = new Map<ModuleScopedIdentifier, number>([
 const kTracedFunctions = new Set(kWorkFactorArgIndex.keys());
 
 function validateNode(
-  _node: ESTree.Node,
+  _node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   if (!hasImportedModules(ctx, kModuleName)) {
@@ -73,7 +74,7 @@ function main(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isWeakBcrypt",
   nodeTypes: ["CallExpression"],
   validateNode,
@@ -81,4 +82,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

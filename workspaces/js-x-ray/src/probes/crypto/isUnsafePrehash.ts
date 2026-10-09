@@ -3,6 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { defineProbe } from "../../defineProbe.ts";
 import { isFunctionNode, isIdentifier, isCallExpression } from "../../estree/types.ts";
 import { getParamNames } from "../../estree/index.ts";
 import { generateWarning } from "../../warnings.ts";
@@ -80,7 +81,7 @@ type NodeValidationResult =
   [true, string[]];
 
 function validateNode(
-  node: ESTree.Node,
+  node: ESTree.CallExpression | ESTree.FunctionDeclaration | ESTree.FunctionExpression | ESTree.ArrowFunctionExpression,
   ctx: ProbeContext<UnsafePrehashContext>
 ): NodeValidationResult {
   if (!hasImportedModules(ctx, kModuleName, "crypto")) {
@@ -175,7 +176,7 @@ function bcryptHashCall(
   }
 }
 
-export default {
+export default defineProbe({
   name: "isUnsafePrehash",
   nodeTypes: [
     "CallExpression",
@@ -191,4 +192,4 @@ export default {
   initialize,
   breakOnMatch: false,
   context: {}
-};
+});

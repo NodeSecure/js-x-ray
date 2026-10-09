@@ -12,12 +12,13 @@ import {
   toLiteral
 } from "../../estree/index.ts";
 import type { ProbeContext, ProbeMainContext } from "../../ProbeRunner.ts";
+import { defineProbe } from "../../defineProbe.ts";
 import { isStringLiteral } from "../../estree/types.ts";
 import { generateWarning } from "../../warnings.ts";
 import { RequireCallExpressionWalker } from "./RequireCallExpressionWalker.ts";
 
 function validateNodeRequire(
-  node: ESTree.Node,
+  node: ESTree.CallExpression,
   ctx: ProbeContext
 ): [boolean, any?] {
   const { tracer } = ctx.sourceFile;
@@ -39,7 +40,7 @@ function validateNodeRequire(
 }
 
 function validateNodeEvalRequire(
-  node: ESTree.Node
+  node: ESTree.CallExpression
 ): [boolean, any?] {
   const id = getCallExpressionIdentifier(node);
 
@@ -47,12 +48,11 @@ function validateNodeEvalRequire(
     return [false];
   }
 
-  const castedNode = node as ESTree.CallExpression;
-  if (castedNode.callee.type !== "CallExpression") {
+  if (node.callee.type !== "CallExpression") {
     return [false];
   }
 
-  const args = getCallExpressionArguments(castedNode.callee);
+  const args = getCallExpressionArguments(node.callee);
   if (args === null) {
     return [false];
   }
@@ -196,7 +196,7 @@ function main(
   return;
 }
 
-export default {
+export default defineProbe({
   name: "isRequire",
   nodeTypes: ["CallExpression"],
   validateNode: [
@@ -207,4 +207,4 @@ export default {
   teardown,
   breakOnMatch: true,
   breakGroup: "import"
-};
+});
