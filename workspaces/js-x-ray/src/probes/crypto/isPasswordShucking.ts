@@ -11,7 +11,12 @@ import {
   VariableTracer,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
-import { hasImportedModules, matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "../tracing.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";
@@ -58,7 +63,11 @@ function isShuckingPrehash(hashNode: ESTree.Node | null | undefined): boolean {
 type NodeValidationResult = [false] | [true] | [true, string[]];
 
 function validateNode(
-  node: ESTree.CallExpression | ESTree.FunctionDeclaration | ESTree.FunctionExpression | ESTree.ArrowFunctionExpression,
+  node:
+    | ESTree.CallExpression
+    | ESTree.FunctionDeclaration
+    | ESTree.FunctionExpression
+    | ESTree.ArrowFunctionExpression,
   ctx: ProbeContext<PasswordShuckingContext>
 ): NodeValidationResult {
   if (!hasImportedModules(ctx, kModuleName, "crypto")) {

@@ -43,7 +43,8 @@ describe("estree.getMemberExpressionIdentifier", () => {
   });
 
   test(`given a MemberExpression with a computed property containing a deep tree of BinaryExpression
-    then it must return all literals parts even the last one which is the concatenation of the BinaryExpr`, () => {
+    then it must return all literals parts even the last one
+    which is the concatenation of the BinaryExpr`, () => {
     const [astNode] = parseScript("foo.bar[\"k\" + \"e\" + \"y\"]").body;
     const iter = getMemberExpressionIdentifier(
       getExpressionFromStatement(astNode)

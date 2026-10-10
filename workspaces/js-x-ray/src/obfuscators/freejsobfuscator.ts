@@ -3,8 +3,10 @@ import {
   type ObfuscatedIdentifier
 } from "../Deobfuscator.ts";
 
-// See: https://github.com/microsoft/TypeScript/issues/61321
-// Remove when TS officially supports RegExp.escape() (
+/*
+ * See: https://github.com/microsoft/TypeScript/issues/61321
+ * Remove when TS officially supports RegExp.escape() (
+ */
 declare global {
   interface RegExpConstructor {
     escape(str: string): string;

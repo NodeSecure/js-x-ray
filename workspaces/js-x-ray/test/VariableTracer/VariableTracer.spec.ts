@@ -97,7 +97,7 @@ test("it should trace a namespace import aliased to a different local name", () 
   });
 });
 
-test("it should be able to Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", () => {
+test("it should Trace a malicious code with Global, BinaryExpr, Assignments and Hexadecimal", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -132,7 +132,7 @@ test("it should be able to Trace a malicious code with Global, BinaryExpr, Assig
   assert.strictEqual(eventTwo.id, "evil");
 });
 
-test("it should be able to Trace a malicious CallExpression by recombining segments of the MemberExpression", () => {
+test("it should Trace a malicious CallExpression by recombining segments of the MemberExpression", () => {
   const helpers = createTracer(true);
   const assignments = helpers.getAssignmentArray();
 
@@ -198,7 +198,7 @@ test("it should be able to Trace a require using Function.prototype.call", () =>
   assert.strictEqual(eventOne.id, "proto");
 });
 
-test("it should be able to Trace an unsafe crypto.createHash using Function.prototype.call reassignment", () => {
+test("it should Trace an unsafe crypto.createHash using Function.prototype.call reassignment", () => {
   const helpers = createTracer(true);
   helpers.tracer.trace("crypto.createHash", { followConsecutiveAssignment: true });
   const assignments = helpers.getAssignmentArray();
@@ -307,7 +307,7 @@ test("it should be able to trace a the return value of a traced function in a ne
     }]);
 });
 
-test("should be able to trace the return value of a traced function when the return value is spreaded", () => {
+test("should trace the return value of a traced function when the return value is spreaded", () => {
   const helpers = createTracer(false);
   helpers.tracer.trace("os.userInfo", {
     followConsecutiveAssignment: true,
@@ -397,7 +397,7 @@ test("should be able to trace the return value of a traced function in a nested 
     }]);
 });
 
-test("should be able to trace the return value of a traced function in an array when the return value is spreaded", () => {
+test("should trace the return value of a traced function in an array when it is spreaded", () => {
   const helpers = createTracer(false);
   helpers.tracer.trace("os.userInfo", {
     followConsecutiveAssignment: true,
@@ -474,7 +474,7 @@ test("should be able to follow re-assignment on multiple consecutive traced retu
   ]);
 });
 
-test("should not be able to follow re-assignment of a traced return value when followConsecutiveAssignment is not on", () => {
+test("should not follow re-assignment of a traced return value without followConsecutiveAssignment", () => {
   const helpers = createTracer(false);
   helpers.tracer.trace("os.userInfo", {
     followReturnValueAssignement: true,

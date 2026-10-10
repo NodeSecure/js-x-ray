@@ -28,7 +28,7 @@ export class TsSourceParser {
   parse(
     source: string,
     options: TSESTreeOptions = {}
-  ): ESTree.Statement[] {
+  ): ESTree.Program["body"] {
     const { body } = parse(source, {
       ...kTypeScriptParsingOptions,
       ...options
@@ -36,9 +36,9 @@ export class TsSourceParser {
 
     /**
      * Not pretty but the types are not compatible and we know
-     * that the body is compatible with ESTree.Statement[]
+     * that the body is compatible with ESTree.Program["body"]
      * since the parser is designed to be compatible with ESTree.
      */
-    return body as unknown as ESTree.Statement[];
+    return body as unknown as ESTree.Program["body"];
   }
 }

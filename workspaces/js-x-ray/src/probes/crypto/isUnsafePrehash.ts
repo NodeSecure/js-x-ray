@@ -12,7 +12,12 @@ import {
   type LiteralIdentifier,
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
-import { hasImportedModules, matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "../tracing.ts";
+import {
+  hasImportedModules,
+  matchTracedCall,
+  traceAllFromModule,
+  type ModuleScopedIdentifier
+} from "../tracing.ts";
 import { resolveStringValue } from "./resolveStringValue.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
@@ -81,7 +86,11 @@ type NodeValidationResult =
   [true, string[]];
 
 function validateNode(
-  node: ESTree.CallExpression | ESTree.FunctionDeclaration | ESTree.FunctionExpression | ESTree.ArrowFunctionExpression,
+  node:
+    | ESTree.CallExpression
+    | ESTree.FunctionDeclaration
+    | ESTree.FunctionExpression
+    | ESTree.ArrowFunctionExpression,
   ctx: ProbeContext<UnsafePrehashContext>
 ): NodeValidationResult {
   if (!hasImportedModules(ctx, kModuleName, "crypto")) {

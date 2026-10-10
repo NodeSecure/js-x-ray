@@ -99,9 +99,11 @@ function main(
 
   // Conservative mode: existing strict validation
   if (isUnsafeCommand(command)) {
-    // Spawned command arguments are filled into an Array
-    // as second arguments. This is why we should add them
-    // manually to the command string.
+    /*
+     * Spawned command arguments are filled into an Array
+     * as second arguments. This is why we should add them
+     * manually to the command string.
+     */
     if (kSpawnFunctions.has(tracedFunction)) {
       command = concatArrayArgs(command, node);
     }

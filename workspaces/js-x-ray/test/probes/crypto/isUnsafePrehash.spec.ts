@@ -67,7 +67,9 @@ describe("isUnsafePrehash probe", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString(), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHash('sha256').update(password).digest().toString(), salt, (err, hash) => {}
+        );
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["crypto.unsafe-prehash"]
@@ -81,7 +83,9 @@ describe("isUnsafePrehash probe", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString('binary'), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHash('sha256').update(password).digest().toString('binary'), salt, (err, hash) => {}
+        );
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["crypto.unsafe-prehash"]
@@ -95,7 +99,11 @@ describe("isUnsafePrehash probe", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHash('sha256').update(password).digest('binary').toString('hex'), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHash('sha256').update(password).digest('binary').toString('hex'),
+          salt,
+          (err, hash) => {}
+        );
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["crypto.unsafe-prehash"]
@@ -164,7 +172,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
-    it("should warn when an unsafely pre-hashed variable (via toString) is passed to bcryptjs.hashSync", () => {
+    it("should warn when an unsafe pre-hashed variable (via toString) is passed to bcryptjs.hashSync", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -179,7 +187,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings[0].kind, "crypto.unsafe-prehash");
     });
 
-    it("should warn when digest('binary').toString('hex') (outer toString is a no-op) is passed through a variable", () => {
+    it("should warn when digest('binary').toString('hex') is passed through a variable", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -222,7 +230,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when an unrelated function parameter shares its name with an unsafe pre-hashed variable", () => {
+    it("should not warn when an unrelated function param collides with an unsafe pre-hashed variable", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -238,7 +246,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when an unrelated arrow function parameter shares its name with an unsafe pre-hashed variable", () => {
+    it("should not warn when an unrelated arrow param collides with an unsafe pre-hashed variable", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -254,7 +262,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when an unrelated destructured parameter shares its name with an unsafe pre-hashed variable", () => {
+    it("should not warn when an unrelated destructured param collides with an unsafe pre-hashed var", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -274,7 +282,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when an unrelated local variable shares its name with an unsafe pre-hashed variable", () => {
+    it("should not warn when an unrelated local variable collides with an unsafe pre-hashed variable", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -291,7 +299,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should still warn for the unsafe declarator itself when its name later collides with an unrelated variable", () => {
+    it("should still warn on the unsafe declarator if its name later collides with another variable", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -360,7 +368,9 @@ describe("isUnsafePrehash probe", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHash('sha256').update(password).digest().toString('hex'), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHash('sha256').update(password).digest().toString('hex'), salt, (err, hash) => {}
+        );
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["crypto.unsafe-prehash"]
@@ -373,7 +383,11 @@ describe("isUnsafePrehash probe", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHash('sha256').update(password).digest('hex').toString('binary'), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHash('sha256').update(password).digest('hex').toString('binary'),
+          salt,
+          (err, hash) => {}
+        );
       `;
       const { warnings: outputWarnings } = new AstAnalyser({
         optionalWarnings: ["crypto.unsafe-prehash"]
@@ -449,7 +463,7 @@ describe("isUnsafePrehash probe", () => {
       assert.strictEqual(outputWarnings.length, 0);
     });
 
-    it("should not warn when an unsafely pre-hashed digest reaches bcrypt through a function parameter", () => {
+    it("should not warn when an unsafe pre-hashed digest reaches bcrypt through a function parameter", () => {
       const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';

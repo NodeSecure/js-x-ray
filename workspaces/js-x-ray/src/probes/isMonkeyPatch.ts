@@ -119,8 +119,10 @@ function validateDefineProperty(
     return [false];
   }
 
-  // TODO: detect aliased prototype target in defineProperty,
-  // e.g. const ap = Array.prototype; Object.defineProperty(ap, ...)
+  /*
+   * TODO: detect aliased prototype target in defineProperty,
+   * e.g. const ap = Array.prototype; Object.defineProperty(ap, ...)
+   */
   const firstArg = node.arguments.at(0);
   if (firstArg?.type !== "MemberExpression") {
     return [false];

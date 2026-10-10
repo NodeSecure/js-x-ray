@@ -10,11 +10,14 @@ import { CollectableSetRegistry } from "./CollectableSetRegistry.ts";
 const kIPv4Regex = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
 const kShadyLinkRegExps = [
   /(http[s]?:\/\/(bit\.ly|ipinfo\.io|httpbin\.org|api\.ipify\.org).*)$/,
+  // eslint-disable-next-line @stylistic/max-len
   /(http[s]?:\/\/.*\.(link|xyz|tk|ml|ga|cf|gq|pw|top|club|mw|bd|ke|am|sbs|date|quest|cd|bid|ws|icu|cam|uno|email|stream))$/
 ];
 
-// List of known URI schemes (IANA registered + common ones)
-// See: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+/*
+ * List of known URI schemes (IANA registered + common ones)
+ * See: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+ */
 const kKnownProtocols = new Set([
   // Web
   "http:", "https:",
@@ -75,21 +78,22 @@ export class ShadyLink {
 
     const { collectableSetRegistry, file, location, metadata } = options;
     const sourceArrayLocation = toArrayLocation(location);
+    const collectableOptions = { file, location: sourceArrayLocation, metadata };
 
-    collectableSetRegistry.add("url", { value: parsedUrl.href, file, location: sourceArrayLocation, metadata });
+    collectableSetRegistry.add("url", { value: parsedUrl.href, ...collectableOptions });
 
     const hostname = parsedUrl.hostname;
 
     // Early check for localhost
     if (hostname === "localhost") {
-      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
+      collectableSetRegistry.add("hostname", { value: hostname, ...collectableOptions });
 
       return { safe: false, isLocalAddress: true };
     }
 
     if (parsedUrl.protocol === "file:") {
       if (hostname) {
-        collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
+        collectableSetRegistry.add("hostname", { value: hostname, ...collectableOptions });
       }
 
       return { safe: true };
@@ -113,7 +117,7 @@ export class ShadyLink {
       }
     }
     else if (hostname) {
-      collectableSetRegistry.add("hostname", { value: hostname, file, location: sourceArrayLocation, metadata });
+      collectableSetRegistry.add("hostname", { value: hostname, ...collectableOptions });
     }
 
     const scheme = parsedUrl.protocol.replace(":", "");

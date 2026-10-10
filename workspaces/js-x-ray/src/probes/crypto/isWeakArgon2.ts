@@ -57,8 +57,10 @@ function findWeakParam(
 ): "memory" | "passes" | null {
   const rows = algorithm === "argon2i" ? kOWASPRowsForArgon2i : kOWASPRows;
 
-  // Rows are sorted by ascending passes, and the memory requirement drops as
-  // passes grow. The last usable row is therefore the cheapest one available.
+  /*
+   * Rows are sorted by ascending passes, and the memory requirement drops as
+   * passes grow. The last usable row is therefore the cheapest one available.
+   */
   const row = rows.findLast(([, minPasses]) => passes >= minPasses);
   if (row === undefined) {
     return "passes";
@@ -97,9 +99,18 @@ function main(node: ESTree.CallExpression, ctx: ProbeContext) {
 
   if (options?.type === "ObjectExpression") {
     const { properties } = options;
-    const memory = resolveNumericValue(findPropertyMatch(properties, ["memory"], isNode), tracer.literalIdentifiers);
-    const passes = resolveNumericValue(findPropertyMatch(properties, ["passes"], isNode), tracer.literalIdentifiers);
-    const nonce = resolveStringValue(findPropertyMatch(properties, ["nonce"], isNode), tracer.literalIdentifiers);
+    const memory = resolveNumericValue(
+      findPropertyMatch(properties, ["memory"], isNode),
+      tracer.literalIdentifiers
+    );
+    const passes = resolveNumericValue(
+      findPropertyMatch(properties, ["passes"], isNode),
+      tracer.literalIdentifiers
+    );
+    const nonce = resolveStringValue(
+      findPropertyMatch(properties, ["nonce"], isNode),
+      tracer.literalIdentifiers
+    );
 
     if (memory !== null && passes !== null) {
       const weakParam = findWeakParam(algorithm, memory, passes);

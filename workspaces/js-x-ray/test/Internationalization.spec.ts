@@ -33,7 +33,10 @@ describe("Internationalization", () => {
     const value = i18n.getTokenSync("sast_warnings.parsing_error");
 
     assert(value !== undefined, "English translations should be defined");
-    assert(typeof value === "string", "English translation for 'sast_warnings.parsing_error' should be a string");
+    assert(
+      typeof value === "string",
+      "English translation for 'sast_warnings.parsing_error' should be a string"
+    );
   });
 
   it("should have French translations", async() => {
@@ -44,7 +47,10 @@ describe("Internationalization", () => {
     const value = i18n.getTokenSync("sast_warnings.parsing_error");
 
     assert(value !== undefined, "French translations should be defined");
-    assert(typeof value === "string", "French translation for 'sast_warnings.parsing_error' should be a string");
+    assert(
+      typeof value === "string",
+      "French translation for 'sast_warnings.parsing_error' should be a string"
+    );
   });
 
   it("should have Korean translations", async() => {
@@ -55,6 +61,9 @@ describe("Internationalization", () => {
     const value = i18n.getTokenSync("sast_warnings.parsing_error");
 
     assert(value !== undefined, "Korean translations should be defined");
-    assert(typeof value === "string", "Korean translation for 'sast_warnings.parsing_error' should be a string");
+    assert(
+      typeof value === "string",
+      "Korean translation for 'sast_warnings.parsing_error' should be a string"
+    );
   });
 });

@@ -83,7 +83,10 @@ describe("log-usage probe", () => {
 
       assert.strictEqual(firstWarning.kind, "log-usage");
       assert.strictEqual(firstWarning.severity, "Information");
-      assert.strictEqual(firstWarning.value, "logger.info, logger.warn, logger.error, logger.fatal, logger.debug, logger.trace");
+      assert.strictEqual(
+        firstWarning.value,
+        "logger.info, logger.warn, logger.error, logger.fatal, logger.debug, logger.trace"
+      );
     });
 
     it("should follow the asssignement of pino", () => {
@@ -519,7 +522,7 @@ describe("log-usage probe", () => {
         );
       });
 
-      it("should have a nested child logger who inherit the custom levels from its root parent logger", () => {
+      it("should have a nested child logger inheriting custom levels from its root parent logger", () => {
         const code = `import pino from "pino";
                     const logger = pino({
                     customLevels:{
@@ -581,9 +584,11 @@ describe("log-usage probe", () => {
 
           assert.strictEqual(firstWarning.kind, "log-usage");
           assert.strictEqual(firstWarning.severity, "Information");
-          assert.strictEqual(firstWarning.value, `${expectedLogger}.info, ${expectedLogger}.warn, ${expectedLogger}.error, `
-          + `${expectedLogger}.http, ${expectedLogger}.debug, ${expectedLogger}.verbose, `
-          + `${expectedLogger}.silly, ${expectedLogger}.log`
+          assert.strictEqual(
+            firstWarning.value,
+            `${expectedLogger}.info, ${expectedLogger}.warn, ${expectedLogger}.error, `
+            + `${expectedLogger}.http, ${expectedLogger}.debug, ${expectedLogger}.verbose, `
+            + `${expectedLogger}.silly, ${expectedLogger}.log`
           );
         }
       });
@@ -756,8 +761,11 @@ describe("log-usage probe", () => {
 
             assert.strictEqual(firstWarning.kind, "log-usage");
             assert.strictEqual(firstWarning.severity, "Information");
-            assert.strictEqual(firstWarning.value, "childLogger.info, childLogger.warn, childLogger.error, childLogger.http,"
-            + " childLogger.debug, childLogger.verbose, childLogger.silly, childLogger.log");
+            assert.strictEqual(
+              firstWarning.value,
+              "childLogger.info, childLogger.warn, childLogger.error, childLogger.http,"
+              + " childLogger.debug, childLogger.verbose, childLogger.silly, childLogger.log"
+            );
           }
         });
 
@@ -903,7 +911,7 @@ describe("log-usage probe", () => {
             assert.strictEqual(firstWarning.value, "logger.foo, logger.bar");
           });
 
-          it("should resolve the whole winston.createLogger() config object when passed as an identifier", () => {
+          it("should resolve the winston.createLogger() config object when passed as an identifier", () => {
             const code = `const winston = require("winston");
                     const opts = {
                       format: winston.format.json(),
@@ -987,7 +995,7 @@ describe("log-usage probe", () => {
             );
           });
 
-          it("should have a nested child logger who inherit the custom levels from its root parent logger", () => {
+          it("should have a nested child logger inheriting custom levels from its root parent logger", () => {
             const code = `import winston from "winston";
                     const logger = winston.createLogger({
                     levels:{
