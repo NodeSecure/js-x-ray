@@ -182,7 +182,7 @@ describe("EntryFilesAnalyser", () => {
     );
   });
 
-  it("should detect recursive dependencies using DiGraph but without rootPath everything is absolute", async() => {
+  it("should detect recursive dependencies using DiGraph (absolute paths without rootPath)", async() => {
     const entryFilesAnalyser = new EntryFilesAnalyser();
     const entryUrl = new URL("recursive/A.js", kFixtureURL);
 

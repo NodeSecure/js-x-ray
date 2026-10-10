@@ -4,7 +4,11 @@ import type { ESTree } from "meriyah";
 // Import Internal Dependencies
 import type { ProbeContext, ProbeMainContext } from "../ProbeRunner.ts";
 import { defineProbe } from "../defineProbe.ts";
-import { getCallExpressionIdentifier, isCallExpression } from "../estree/index.ts";
+import {
+  getCallExpressionIdentifier,
+  isCallExpression,
+  isLiteral
+} from "../estree/index.ts";
 import { CALL_EXPRESSION_IDENTIFIER } from "../contants.ts";
 import { generateWarning } from "../warnings.ts";
 
@@ -32,7 +36,8 @@ function main(
   }
   if (
     calleeName === "Function" &&
-    node.callee.arguments.length > 0 &&
+    isCallExpression(node.callee) &&
+    isLiteral(node.callee.arguments[0]) &&
     node.callee.arguments[0].value === "return this"
   ) {
     return signals.Skip;

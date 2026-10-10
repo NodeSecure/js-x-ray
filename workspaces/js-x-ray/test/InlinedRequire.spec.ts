@@ -66,7 +66,7 @@ describe("InlinedRequire", () => {
       assert.strictEqual(result, null);
     });
 
-    it("should split require('child_process').spawn() into virtual declaration and rebuilt expression", () => {
+    it("should split require('child_process').spawn() into virtual declaration + rebuilt expression", () => {
       const ast = parseScript(`require("child_process").spawn("csrutil", ["disable"]);`);
       const node = getExpressionFromStatement(ast.body[0]);
 
@@ -86,8 +86,10 @@ describe("InlinedRequire", () => {
     });
 
     it("should return null for require('fs').promises.readFile() because callee is MemberExpression", () => {
-      // require("fs").promises.readFile() has callee = require("fs").promises (MemberExpression)
-      // assertNode only matches patterns like require.something() not require().something.method()
+      /*
+       * require("fs").promises.readFile() has callee = require("fs").promises (MemberExpression)
+       * assertNode only matches patterns like require.something() not require().something.method()
+       */
       const ast = parseScript(`require("fs").promises.readFile("./package.json");`);
       const node = getExpressionFromStatement(ast.body[0]);
 
@@ -150,9 +152,11 @@ describe("InlinedRequire", () => {
     });
 
     it("should return rebuildExpression as null when the node is the require call itself", () => {
-      // This tests the edge case where split() receives a node that passes assertNode
-      // but where the root node IS the require call (shouldn't happen in practice
-      // since assertNode checks for require.*, but let's verify the behavior)
+      /*
+       * This tests the edge case where split() receives a node that passes assertNode
+       * but where the root node IS the require call (shouldn't happen in practice
+       * since assertNode checks for require.*, but let's verify the behavior)
+       */
       const ast = parseScript(`require.resolve("fs");`);
       const node = getExpressionFromStatement(ast.body[0]);
 

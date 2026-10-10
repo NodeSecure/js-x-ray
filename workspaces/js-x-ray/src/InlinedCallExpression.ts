@@ -26,12 +26,16 @@ export class InlinedCallExpression {
 
   static #findCallExpression(
     { node, result = null, extraCallCount = 0 }: {
-      node: ESTree.CallExpression | ESTree.MemberExpression;
+      node: ESTree.Expression | ESTree.Super;
       result?: ESTree.Expression | null;
       extraCallCount?: number;
 
     }
   ): ESTree.Expression | null {
+    if (!isCallExpression(node) && !isMemberExpression(node)) {
+      return isCallExpression(result) && extraCallCount > 1 ? result : null;
+    }
+
     const object = isMemberExpression(node)
       ? node.object
       : node.callee;
@@ -44,26 +48,10 @@ export class InlinedCallExpression {
       return null;
     }
 
-    if (isMemberExpression(node)) {
-      return InlinedCallExpression.#findCallExpression({
-        node: object,
-        result: node,
-        extraCallCount
-      });
-    }
-
-    if (isCallExpression(node)) {
-      return InlinedCallExpression.#findCallExpression({
-        node: object,
-        result: node,
-        extraCallCount: extraCallCount + 1
-      });
-    }
-
-    if (isCallExpression(result)) {
-      return extraCallCount > 1 ? result : null;
-    }
-
-    return null;
+    return InlinedCallExpression.#findCallExpression({
+      node: object,
+      result: node,
+      extraCallCount: isCallExpression(node) ? extraCallCount + 1 : extraCallCount
+    });
   }
 }

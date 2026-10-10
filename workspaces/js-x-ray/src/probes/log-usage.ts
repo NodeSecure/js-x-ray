@@ -52,7 +52,9 @@ function initialize(
 ) {
   const { sourceFile } = ctx;
 
-  const logUsages = new Set(["console.log", "console.info", "console.warn", "console.error", "console.debug"]);
+  const logUsages = new Set([
+    "console.log", "console.info", "console.warn", "console.error", "console.debug"
+  ]);
 
   traceAll(sourceFile.tracer, logUsages);
 
@@ -123,7 +125,8 @@ function createWinstonCreateLoggerTracerListener(tracer: VariableTracer, logUsag
       return;
     }
 
-    let winstonLoggerMethods = winstonCreateLoggerChildLoggerFunctions.get(payload.name) ?? [...kWinstonLogMethods];
+    let winstonLoggerMethods = winstonCreateLoggerChildLoggerFunctions.get(payload.name)
+      ?? [...kWinstonLogMethods];
 
     winston: if (payload.name === "winston.createLogger") {
       const winstonContextArg = payload.arguments[0];
@@ -176,7 +179,8 @@ function createPinoTracerListener(tracer: VariableTracer, logUsages: Set<string>
       return;
     }
 
-    let pinoLoggerMethods: string[] = pinoLoggerChildLoggerFunctions.get(payload.name) ?? [...kPinoLogMethods];
+    let pinoLoggerMethods: string[] = pinoLoggerChildLoggerFunctions.get(payload.name)
+      ?? [...kPinoLogMethods];
 
     pino: if (payload.name === "pino") {
       const pinoContextArg = payload.arguments[0];

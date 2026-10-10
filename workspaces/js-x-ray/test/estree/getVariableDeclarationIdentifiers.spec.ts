@@ -42,7 +42,7 @@ describe("estree.getVariableDeclarationIdentifiers", () => {
     assert.deepEqual(idNames, ["a", "b"]);
   });
 
-  test("return the Identifier 'foo' from: RestElement, ArrayPattern, ObjectPattern, AssignmentPattern", () => {
+  test("return Identifier 'foo' from: RestElement, ArrayPattern, ObjectPattern, AssignmentPattern", () => {
     const cases = [
       "const [...foo] = []",
       "const { ...foo } = {}",

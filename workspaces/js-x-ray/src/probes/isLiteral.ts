@@ -54,8 +54,10 @@ function main(
   if (decodedValue !== null) {
     sourceFile.deobfuscator.analyzeString(decodedValue);
 
-    // If the value we are retrieving is the name of a Node.js dependency,
-    // then we add it to the dependencies list and we throw an unsafe-import at the current location.
+    /*
+     * If the value we are retrieving is the name of a Node.js dependency,
+     * then we add it to the dependencies list and we throw an unsafe-import at the current location.
+     */
     if (kNodeDeps.has(decodedValue)) {
       sourceFile.addDependency(decodedValue, node.loc);
       sourceFile.warnings.push(

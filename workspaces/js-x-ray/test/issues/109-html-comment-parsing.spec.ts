@@ -10,7 +10,7 @@ import { AstAnalyser } from "../../src/index.ts";
 const kFixtureURL = new URL("../fixtures/issues/", import.meta.url);
 
 // Regression test for https://github.com/NodeSecure/js-x-ray/issues/109
-test("it should not crash for a JavaScript file containing HTML comments (and removeHTMLComments option enabled)", () => {
+test("it should not crash on a JavaScript file with HTML comments (removeHTMLComments enabled)", () => {
   const htmlComment = readFileSync(new URL("html-comments.js", kFixtureURL), "utf-8");
   new AstAnalyser().analyse(htmlComment, {
     removeHTMLComments: true

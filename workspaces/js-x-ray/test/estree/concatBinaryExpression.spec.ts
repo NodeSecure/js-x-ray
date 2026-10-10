@@ -24,7 +24,7 @@ describe("estree.concatBinaryExpression", () => {
     assert.strictEqual(iterResult.elapsedSteps, 3);
   });
 
-  test("given a BinaryExpression of two ArrayExpression then the iterable must return Array values as string", () => {
+  test("given a BinaryExpression of two ArrayExpressions then it must return Array values as strings", () => {
     const [astNode] = parseScript("['A'] + ['B']").body;
     const iter = concatBinaryExpression(getExpressionFromStatement(astNode));
 

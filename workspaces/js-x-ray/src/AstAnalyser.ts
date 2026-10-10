@@ -277,7 +277,7 @@ export class AstAnalyser extends EventEmitter<AstAnalyserEvents> {
   }
 
   #walkEnter(
-    body: ESTree.Statement[],
+    body: ESTree.Program["body"],
     probeRunner: ProbeRunner
   ) {
     const recursiveWalkEnter = this.#walkEnter.bind(this);
