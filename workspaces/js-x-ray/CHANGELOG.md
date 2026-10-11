@@ -1,5 +1,11 @@
 # @nodesecure/js-x-ray
 
+## 16.3.0
+
+### Minor Changes
+
+- [#733](https://github.com/NodeSecure/js-x-ray/pull/733) [`9a4a0a0`](https://github.com/NodeSecure/js-x-ray/commit/9a4a0a04196a2d3d93754fb73099cbc458d196ab) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor(js-x-ray): type-safe probe declarations via defineProbe
+
 ## 16.2.0
 
 ### Minor Changes
