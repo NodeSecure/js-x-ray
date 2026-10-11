@@ -110,7 +110,7 @@ describe("isRequire probe", () => {
     assert.ok(dependencies.has("http"));
   });
 
-  it("should execute probe on a variable reassignments of require extended (detected by the VariableTracer)", () => {
+  it("should execute probe on extended require variable reassignments (detected by VariableTracer)", () => {
     const str = `
       const g = global.process;
       const r = g.mainModule;
@@ -295,7 +295,7 @@ describe("isRequire probe", () => {
     assert.strictEqual(warning!.kind, "unsafe-import");
   });
 
-  it("should throw an 'unsafe-import' warning for using a BinaryExpression with one or many unresolvable Operands", () => {
+  it("should throw an 'unsafe-import' warning for a BinaryExpression with unresolvable Operands", () => {
     const str = `
       require("foo" + evil());
     `;
@@ -308,7 +308,7 @@ describe("isRequire probe", () => {
     assert.strictEqual(warning!.kind, "unsafe-import");
   });
 
-  it("(require CallExpression): should always throw an 'unsafe-import' warning when using a CallExpression", () => {
+  it("(require CallExpression): should always throw an 'unsafe-import' warning for a CallExpression", () => {
     const str = `
       function evil() {
         return "http";
@@ -396,7 +396,7 @@ describe("isRequire probe", () => {
     assert.strictEqual(sastAnalysis.dependencies().size, 0);
   });
 
-  it("(require CallExpression): should detect MemberExpression Buffer.from (with ArrayExpression argument)", () => {
+  it("(require CallExpression): should detect Buffer.from with an ArrayExpression argument", () => {
     const str = `
       require(Buffer.from([104, 101, 108, 108, 111]).toString());
     `;

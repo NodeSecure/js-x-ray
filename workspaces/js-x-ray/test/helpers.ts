@@ -95,8 +95,9 @@ export function getSastAnalysis(
       return this.sourceFile.warnings;
     },
     dependencies(): Map<string, Dependency> {
-      const dependencySet =
-        collectables.find((collectable) => collectable.type === "dependency") as DefaultCollectableSet<Dependency> | undefined;
+      const dependencySet = collectables.find(
+        (collectable) => collectable.type === "dependency"
+      ) as DefaultCollectableSet<Dependency> | undefined;
 
       if (!dependencySet) {
         return new Map();
@@ -176,7 +177,8 @@ export const customProbes: Probe[] = [
   }
 ];
 
-export const kIncriminedCodeSampleCustomProbe = "const danger = 'danger'; const stream = eval('require')('stream');";
+export const kIncriminedCodeSampleCustomProbe =
+  "const danger = 'danger'; const stream = eval('require')('stream');";
 export const kWarningUnsafeDanger = "unsafe-danger";
 export const kWarningUnsafeImport = "unsafe-import";
 export const kWarningUnsafeStmt = "unsafe-stmt";

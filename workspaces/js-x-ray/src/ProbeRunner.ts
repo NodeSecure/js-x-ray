@@ -216,8 +216,10 @@ export class ProbeRunner {
           throw new Error(`Failed to define original context for probe '${probe.name}'`);
         }
 
-        // Pass a fresh object for initialize so any captured reference reflects
-        // the state at call-time (probe.context is undefined before initialize returns).
+        /*
+         * Pass a fresh object for initialize so any captured reference reflects
+         * the state at call-time (probe.context is undefined before initialize returns).
+         */
         const context = probe.initialize({
           sourceFile: this.sourceFile,
           context: probe.context,

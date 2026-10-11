@@ -168,7 +168,9 @@ export class VariableTracer extends EventEmitter {
     console.log(this.#traced);
   }
 
-  resolveLiteralIdentifier = (name: string): string | null => this.literalIdentifiers.get(name)?.value ?? null;
+  resolveLiteralIdentifier = (name: string): string | null => (
+    this.literalIdentifiers.get(name)?.value ?? null
+  );
 
   enableDefaultTracing() {
     [...kRequirePatterns]
@@ -239,7 +241,8 @@ export class VariableTracer extends EventEmitter {
       const [segment] = identifierOrMemberExpr.split(".");
       if (this.#traced.has(segment)) {
         const tracedIdentifier = this.#traced.get(segment)!;
-        finalIdentifier = `${tracedIdentifier.identifierOrMemberExpr}${identifierOrMemberExpr.slice(segment.length)}`;
+        const memberExprSuffix = identifierOrMemberExpr.slice(segment.length);
+        finalIdentifier = `${tracedIdentifier.identifierOrMemberExpr}${memberExprSuffix}`;
       }
 
       if (!this.#traced.has(finalIdentifier)) {
@@ -282,8 +285,10 @@ export class VariableTracer extends EventEmitter {
   ) {
     const tracedVariant = this.#traced.get(identifierOrMemberExpr);
 
-    // We return if required module has not been imported
-    // It mean the assigment has no relation with the required tracing
+    /*
+     * We return if required module has not been imported
+     * It mean the assigment has no relation with the required tracing
+     */
     if (
       typeof tracedVariant === "undefined" ||
       !this.#isTracedIdentifierImportedAsModule(tracedVariant)
@@ -504,8 +509,10 @@ export class VariableTracer extends EventEmitter {
        * ^ ObjectExpression
        */
       case "ObjectExpression": {
-        // Only record top-level assignments (`const x = {...}`) so consumers
-        // can resolve "x" back to its object shape, e.g. `pino(x)`.
+        /*
+         * Only record top-level assignments (`const x = {...}`) so consumers
+         * can resolve "x" back to its object shape, e.g. `pino(x)`.
+         */
         if (childNode === variableDeclaratorNode.init) {
           this.objectIdentifiers.set(id.name, childNode);
         }
@@ -565,7 +572,9 @@ export class VariableTracer extends EventEmitter {
           tracedVariant = this.#traced.get(tracedFullIdentifierName);
         }
         else {
-          const alternativeMemberExprParts = this.#searchForMemberExprAlternative(tracedFullIdentifierName.split("."));
+          const alternativeMemberExprParts = this.#searchForMemberExprAlternative(
+            tracedFullIdentifierName.split(".")
+          );
           const alternativeMemberExprFullname = alternativeMemberExprParts.join(".");
           tracedVariant = this.#traced.get(alternativeMemberExprFullname);
         }
@@ -599,8 +608,10 @@ export class VariableTracer extends EventEmitter {
         else if (kUnsafeGlobalCallExpression.has(identifierName)) {
           this.#variablesRefToGlobal.add(id.name);
         }
-        // const foo = require("crypto");
-        // const bar = require.call(null, "crypto");
+        /*
+         * const foo = require("crypto");
+         * const bar = require.call(null, "crypto");
+         */
         else if (kRequirePatterns.has(identifierName)) {
           this.#walkRequireCallExpression(childNode, id);
         }

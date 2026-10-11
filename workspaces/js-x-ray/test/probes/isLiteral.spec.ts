@@ -8,7 +8,7 @@ import { getSastAnalysis, parseScript } from "../helpers.ts";
 import { DefaultCollectableSet } from "../../src/CollectableSet.ts";
 
 describe("isLiteral probe", () => {
-  it("should throw an unsafe-import because the hexadecimal string is equal to the core 'http' dependency", (t) => {
+  it("should throw an unsafe-import as the hexadecimal string equals the core 'http' dependency", (t) => {
     const str = "const foo = '68747470'";
     const ast = parseScript(str);
 
@@ -70,7 +70,7 @@ describe("isLiteral probe", () => {
     assert.strictEqual(warning?.value, "68656c6c6f20776f726c64");
   });
 
-  it("should not throw any warnings without hexadecimal value (and should call analyzeLiteral of Analysis class)", (t) => {
+  it("should not throw warnings without hexadecimal value (and should call Analysis.analyzeLiteral)", (t) => {
     const str = "const foo = 'hello world!'";
     const ast = parseScript(str);
 
@@ -215,8 +215,11 @@ describe("isLiteral probe", () => {
     const ipSet = new DefaultCollectableSet("ip");
     const collectables = [ipSet];
     const ast = parseScript(str);
-    const sastAnalysis = getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } })
-      .execute(ast.body);
+    const sastAnalysis = getSastAnalysis(isLiteral, {
+      location: "file.js",
+      collectables,
+      metadata: { spec: "react@19.0.1" }
+    }).execute(ast.body);
     const warning = sastAnalysis.getWarning("shady-link");
     assert.strictEqual(warning?.value, "127.0.0.1");
     assert.strictEqual(warning?.severity, "Information");
@@ -235,7 +238,11 @@ describe("isLiteral probe", () => {
     const collectables = [urlSet, ipSet, hostnameSet];
     const str = "const IPv4URL = 'http://127.0.0.1:80/script'";
     const ast = parseScript(str);
-    getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } }).execute(ast.body);
+    getSastAnalysis(isLiteral, {
+      location: "file.js",
+      collectables,
+      metadata: { spec: "react@19.0.1" }
+    }).execute(ast.body);
     assert.deepEqual(Array.from(urlSet), [{
       value: "http://127.0.0.1/script",
       locations: [{ file: "file.js", location: [[[1, 16], [1, 44]]], metadata: { spec: "react@19.0.1" } }]
@@ -268,8 +275,11 @@ describe("isLiteral probe", () => {
     const collectables = [urlSet, ipSet, hostnameSet];
 
     const ast = parseScript(str);
-    const sastAnalysis =
-      getSastAnalysis(isLiteral, { location: "file.js", collectables, metadata: { spec: "react@19.0.1" } }).execute(ast.body);
+    const sastAnalysis = getSastAnalysis(isLiteral, {
+      location: "file.js",
+      collectables,
+      metadata: { spec: "react@19.0.1" }
+    }).execute(ast.body);
 
     assert.strictEqual(sastAnalysis.warnings().length, 0);
     assert.deepEqual(Array.from(urlSet), [

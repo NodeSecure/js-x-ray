@@ -18,7 +18,7 @@ export interface GetCallExpressionIdentifierOptions extends DefaultOptions {
    * @default true
    * @example
    * require('./file.js')();
-            ^ Second     ^ First
+   *        ^ Second     ^ First
    */
   resolveCallExpression?: boolean;
 }

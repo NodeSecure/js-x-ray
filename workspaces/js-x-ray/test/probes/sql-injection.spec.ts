@@ -131,7 +131,10 @@ describe("sql-injection probe", () => {
 
     assert.strictEqual(outputWarnings.length, 1);
     assert.deepEqual(outputWarnings[0].kind, "sql-injection");
-    assert.strictEqual(outputWarnings[0].value, `SELECT * FROM users\n WHERE userId = $1 and email = \${${0}}`);
+    assert.strictEqual(
+      outputWarnings[0].value,
+      `SELECT * FROM users\n WHERE userId = $1 and email = \${${0}}`
+    );
   });
 
   test(`should detect the sql injection in a
@@ -144,7 +147,10 @@ describe("sql-injection probe", () => {
 
     assert.strictEqual(outputWarnings.length, 1);
     assert.deepEqual(outputWarnings[0].kind, "sql-injection");
-    assert.strictEqual(outputWarnings[0].value, `SELECT * FROM users\n WHERE userId = $1 and email = \${${0}}`);
+    assert.strictEqual(
+      outputWarnings[0].value,
+      `SELECT * FROM users\n WHERE userId = $1 and email = \${${0}}`
+    );
   });
 
   test("should not detect the warning if the template literal does not have any template element", () => {

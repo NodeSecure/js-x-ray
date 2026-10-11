@@ -23,7 +23,7 @@ describe("isPasswordShucking probe", () => {
     }
   });
 
-  it("should warn when a createHash digest with a safe encoding is stored in a variable (unique to this probe)", () => {
+  it("should warn when a safe-encoded createHash digest is stored in a variable (probe-specific)", () => {
     const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
@@ -40,7 +40,9 @@ describe("isPasswordShucking probe", () => {
     const code = `
         import bcrypt from 'bcryptjs';
         import crypto from 'crypto';
-        bcrypt.hash(crypto.createHmac('sha512', pepper).update(password).digest('base64'), salt, (err, hash) => {});
+        bcrypt.hash(
+          crypto.createHmac('sha512', pepper).update(password).digest('base64'), salt, (err, hash) => {}
+        );
       `;
     const { warnings } = new AstAnalyser(kOptions).analyse(code);
 

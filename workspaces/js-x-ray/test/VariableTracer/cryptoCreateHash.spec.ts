@@ -5,7 +5,7 @@ import { test } from "node:test";
 // Import Internal Dependencies
 import { createTracer } from "./utils.ts";
 
-test("it should be able to Trace crypto.createHash when imported with an ESTree ImportNamespaceSpecifier (ESM)", () => {
+test("it should Trace crypto.createHash when imported with an ESTree ImportNamespaceSpecifier (ESM)", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -44,7 +44,7 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
   assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace createHash when required (CommonJS) and destructured with an ESTree ObjectPattern", () => {
+test("it should Trace createHash when required (CommonJS) and destructured with an ObjectPattern", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -86,7 +86,7 @@ test("it should be able to Trace createHash when required (CommonJS) and destruc
   assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace crypto.createHash when imported with an ESTree ImportSpecifier (ESM)", () => {
+test("it should Trace crypto.createHash when imported with an ESTree ImportSpecifier (ESM)", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,
@@ -124,7 +124,7 @@ test("it should be able to Trace crypto.createHash when imported with an ESTree 
   assert.strictEqual(eventTwo.id, "createHashBis");
 });
 
-test("it should be able to Trace crypto.createHash with CommonJS require and with a computed method with a Literal", () => {
+test("it should Trace crypto.createHash with CommonJS require and a computed method with a Literal", () => {
   const helpers = createTracer();
   helpers.tracer.trace("crypto.createHash", {
     followConsecutiveAssignment: true,

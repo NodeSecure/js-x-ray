@@ -74,7 +74,7 @@ describe("crypto.resolveNumericValue", () => {
     assert.strictEqual(resolveNumericValue(node, new Map()), 0);
   });
 
-  test("known limitation: a negative literal is a UnaryExpression, not a Literal, so it resolves to null", () => {
+  test("known limitation: negative literals are UnaryExpression (not Literal) and resolve to null", () => {
     const node = getExpression("-10");
 
     assert.strictEqual(node.type, "UnaryExpression");

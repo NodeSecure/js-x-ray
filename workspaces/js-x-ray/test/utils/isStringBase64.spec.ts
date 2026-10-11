@@ -27,8 +27,10 @@ test("utils.isStringBase64", function isBase64() {
     return `data:${mime};base64,${pngString}`;
   }
 
-  // Random complex mime types taken from:
-  // http://www.freeformatter.com/mime-types-list.html
+  /*
+   * Random complex mime types taken from:
+   * http://www.freeformatter.com/mime-types-list.html
+   */
   assert.equal(isStringBase64(createMimeString("application/vnd.apple.installer+xml"), { allowMime: true }), true);
   assert.equal(isStringBase64(createMimeString("image/svg+xml"), { allowMime: true }), true);
   assert.equal(isStringBase64(createMimeString("application/set-payment-initiation"), { allowMime: true }), true);

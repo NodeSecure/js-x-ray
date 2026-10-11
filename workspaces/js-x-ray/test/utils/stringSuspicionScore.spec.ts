@@ -29,13 +29,13 @@ describe("utils.stringSuspicionScore()", () => {
     }
   });
 
-  it("should return 1 for strings between 45 and 200 characters with no spaces in the first 45 characters", () => {
+  it("should return 1 for strings of 45 to 200 chars with no spaces in the first 45 chars", () => {
     const randomStrWithNoSpaces = randomBytes(25).toString("hex");
 
     assert.strictEqual(stringSuspicionScore(randomStrWithNoSpaces), 1);
   });
 
-  it("should return 0 for strings between 45 and 200 characters with at least one space in the first 45 characters", () => {
+  it("should return 0 for strings of 45 to 200 chars with at least one space in the first 45 chars", () => {
     const randomStrWithSpaces = randomBytes(10).toString("hex") + " -_- " + randomBytes(30).toString("hex");
 
     assert.strictEqual(stringSuspicionScore(randomStrWithSpaces), 0);

@@ -15,7 +15,8 @@ import type { VariableTracer } from "../../VariableTracer.ts";
 import {
   isCallExpression,
   isStringLiteral,
-  isMemberExpression
+  isMemberExpression,
+  isIdentifier
 } from "../../estree/types.ts";
 import { walkEnter } from "../../walker/index.ts";
 
@@ -62,9 +63,14 @@ export class RequireCallExpressionWalker {
         return;
       }
 
-      const fullName = isMemberExpression(castedNode.callee) ?
-        getMemberExpressionFullName(castedNode.callee) :
-        castedNode.callee.name;
+      const { callee } = castedNode;
+      if (!isMemberExpression(callee) && !isIdentifier(callee)) {
+        return;
+      }
+
+      const fullName = isMemberExpression(callee) ?
+        getMemberExpressionFullName(callee) :
+        callee.name;
       const tracedFullName = self.tracer.getDataFromIdentifier(fullName)?.identifierOrMemberExpr ?? fullName;
       switch (tracedFullName) {
         case "atob":

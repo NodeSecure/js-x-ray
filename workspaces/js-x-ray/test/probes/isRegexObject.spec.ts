@@ -28,7 +28,7 @@ describe("isRegexObject probe", () => {
     assert.equal(warning.value, "(a+){10}");
   });
 
-  it("should throw a 'unsafe-regex' warning because the given RegExp Object (with RegExpLiteral) is unsafe", () => {
+  it("should throw a 'unsafe-regex' warning because the RegExp Object (with RegExpLiteral) is unsafe", () => {
     const str = "const foo = new RegExp(/(a+){10}/);";
     const ast = parseScript(str);
     const sastAnalysis = getSastAnalysis(isRegexObject)

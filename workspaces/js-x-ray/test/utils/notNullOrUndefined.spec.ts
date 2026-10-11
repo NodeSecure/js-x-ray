@@ -11,7 +11,7 @@ describe("utils.notNullOrUndefined", () => {
     assert.strictEqual(notNullOrUndefined(void 0), false, "undefined primitive value should return false");
   });
 
-  test("given values (primitive or objects) that are not null or undefined then it must always return true", () => {
+  test("given values (primitive or objects) that are not null or undefined then it must return true", () => {
     const valuesToAssert = ["", 1, true, Symbol("foo"), {}, [], /^xd/g];
     for (const value of valuesToAssert) {
       assert.strictEqual(notNullOrUndefined(value), true);

@@ -14,7 +14,7 @@ describe("estree.getCallExpressionIdentifier", () => {
     assert.strictEqual(nodeIdentifier, "eval");
   });
 
-  test("given a Function(`...`)() Double CallExpression then it must return the Function literal identifier", () => {
+  test("given a Function(`...`)() Double CallExpression then it must return the Function identifier", () => {
     const [astNode] = parseScript("Function(\"return this\")();").body;
     const nodeIdentifier = getCallExpressionIdentifier(getExpressionFromStatement(astNode));
 

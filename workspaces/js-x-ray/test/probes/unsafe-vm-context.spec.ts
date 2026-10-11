@@ -231,7 +231,7 @@ x.runInContext();
       assert.strictEqual(outputWarnings[0].value, "(new vm.Script(code, options)).runInContext");
     });
 
-    test("should not detect runInContext when vm.Script.runInContext is not called but Script instantiated", () => {
+    test("should not detect runInContext when Script is instantiated but runInContext is not called", () => {
       const code = `
 import vm from "node:vm";
 

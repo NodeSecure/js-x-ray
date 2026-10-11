@@ -30,7 +30,7 @@ describe("estree.arrayExpressionToString", () => {
     assert.strictEqual(iterResult.elapsedSteps, 2);
   });
 
-  test("given an ArrayExpression with two Identifiers then the iterable must return value from the Tracer", () => {
+  test("given an ArrayExpression with two Identifiers then the iterable must return Tracer values", () => {
     const literalIdentifiers = new Map<string, string>();
     literalIdentifiers.set("foo", "1");
     literalIdentifiers.set("bar", "2");

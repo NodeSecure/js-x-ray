@@ -287,7 +287,7 @@ describe("isWeakArgon2", () => {
       assert.strictEqual(outputWarnings[0].value, "low-params: memory");
     });
 
-    it("should check the parameters against the general OWASP rows when the algorithm is unresolvable", () => {
+    it("should check parameters against the general OWASP rows when the algorithm is unresolvable", () => {
       const code = `
         import crypto from 'crypto';
         crypto.argon2(algorithm, { memory: 47104, passes: 1 }, (err, tag) => {});

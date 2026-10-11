@@ -79,7 +79,8 @@ export class Deobfuscator {
     }),
     new NodeCounter<ESTree.UnaryExpression>("UnaryExpression", {
       name: "DoubleUnaryExpression",
-      filter: ({ argument }) => argument.type === "UnaryExpression" && argument.argument.type === "ArrayExpression"
+      filter: ({ argument }) => argument.type === "UnaryExpression" &&
+        argument.argument.type === "ArrayExpression"
     }),
     new NodeCounter<ESTree.VariableDeclarator>("VariableDeclarator", {
       match: (node, nc) => this.#extractCounterIdentifiers(nc, node.id)
@@ -233,10 +234,12 @@ export class Deobfuscator {
     if (obfuscatorio.verify(this, counters)) {
       return "obfuscator.io";
     }
-    // if ((identifierLength > (kMinimumIdsCount * 3) && this.hasPrefixedIdentifiers)
-    //     && (oneTimeOccurence <= 3 || this.encodedArrayValue > 0)) {
-    //     return "unknown";
-    // }
+    /*
+     * if ((identifierLength > (kMinimumIdsCount * 3) && this.hasPrefixedIdentifiers)
+     *     && (oneTimeOccurence <= 3 || this.encodedArrayValue > 0)) {
+     *     return "unknown";
+     * }
+     */
 
     return null;
   }

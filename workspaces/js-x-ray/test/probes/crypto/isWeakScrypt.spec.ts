@@ -89,7 +89,7 @@ describe("isWeakScrypt", () => {
       assert.strictEqual(outputWarnings[0].value, "low-cost");
     });
 
-    it("should warn when cost option is set without sufficient parallelization (N=16384, default p=1)", () => {
+    it("should warn when cost is set without sufficient parallelization (N=16384, default p=1)", () => {
       const code = `
         import crypto from 'crypto';
         crypto.scrypt(password, salt, 64, { cost: 16384 }, (err, key) => {});

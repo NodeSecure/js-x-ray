@@ -171,7 +171,7 @@ describe("Deobfuscator", () => {
       ]);
     });
 
-    it("should detect four identifiers (one ClassDeclaration and two MethodDefinition and one FunctionParams)", () => {
+    it("should detect four identifiers (a ClassDeclaration, two MethodDefinition, a FunctionParams)", () => {
       const deobfuscator = new Deobfuscator();
 
       const body = new JsSourceParser().parse(

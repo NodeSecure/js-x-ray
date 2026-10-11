@@ -23,7 +23,7 @@ export type SourceParserSyntaxError = SyntaxError & {
 };
 
 export interface SourceParser {
-  parse(source: string, options: unknown): ESTree.Statement[];
+  parse(source: string, options: unknown): ESTree.Program["body"];
 }
 
 export type StripTypeScriptTypes = (source: string) => string;

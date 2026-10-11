@@ -25,7 +25,7 @@ test("Given an encoded-literal kind it should generate a warning with deep locat
   });
 });
 
-test("Given a weak-crypto kind it should generate a warning with value, simple location and experimental flag", () => {
+test("Given weak-crypto kind it should generate a warning with value, location and experimental flag", () => {
   const result = generateWarning("crypto.weak-algorithm", {
     value: "md5",
     location: rootLocation(),
@@ -46,7 +46,7 @@ test("Given a weak-crypto kind it should generate a warning with value, simple l
   });
 });
 
-test("Given a known warning kind with a custom severity option, it should override the default severity", () => {
+test("Given a known warning kind with a custom severity, it should override the default severity", () => {
   const warningA = generateWarning("parsing-error", {
     value: "test"
   });

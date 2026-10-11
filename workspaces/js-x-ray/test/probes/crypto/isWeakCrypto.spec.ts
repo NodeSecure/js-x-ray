@@ -30,7 +30,7 @@ describe("isWeakCrypto probe", () => {
       }
     });
 
-    it("should detect weak algorithm when called as a member expression (e.g. `crypto.createHash('md5')`)", async() => {
+    it("should detect weak algorithm via member expression (e.g. `crypto.createHash('md5')`)", async() => {
       const fixturesDir = new URL("memberExpression/", kFixtureURL);
       const fixtureFiles = await fs.readdir(fixturesDir);
 
@@ -85,7 +85,7 @@ describe("isWeakCrypto probe", () => {
       }
     });
 
-    it("should detect weak algorithm when called as a member expression (e.g. `crypto.createHmac('md5')`)", async() => {
+    it("should detect weak algorithm via member expression (e.g. `crypto.createHmac('md5')`)", async() => {
       const fixturesDir = new URL("createHmac/memberExpression/", kFixtureURL);
       const fixtureFiles = await fs.readdir(fixturesDir);
 

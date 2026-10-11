@@ -49,7 +49,9 @@ export async function benchmark() {
     const sortedFixtures = [...fixtures].sort((a, b) => a.size - b.size);
 
     const smallFixtures = sortedFixtures.filter((f) => f.size < SMALL_THRESHOLD);
-    const mediumFixtures = sortedFixtures.filter((f) => f.size >= SMALL_THRESHOLD && f.size < LARGE_THRESHOLD);
+    const mediumFixtures = sortedFixtures.filter(
+      (f) => f.size >= SMALL_THRESHOLD && f.size < LARGE_THRESHOLD
+    );
     const largeFixtures = sortedFixtures.filter((f) => f.size >= LARGE_THRESHOLD);
 
     for (const fixture of smallFixtures) {

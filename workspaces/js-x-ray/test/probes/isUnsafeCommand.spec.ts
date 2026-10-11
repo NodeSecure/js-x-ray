@@ -105,8 +105,10 @@ describe("isUnsafeCommand probe", () => {
     });
   });
 
-  // Note: Until we can safely test with actual malware samples,
-  // these tests uses a truncated snippet from a known malicious package.
+  /*
+   * Note: Until we can safely test with actual malware samples,
+   * these tests uses a truncated snippet from a known malicious package.
+   */
 
   it("aog-checker detection", () => {
     // Ref: https://socket.dev/npm/package/aog-checker/files/99.99.99/index.js

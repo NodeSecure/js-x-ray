@@ -137,7 +137,7 @@ describe("AstAnalyser", () => {
       assert.strictEqual(stringScore, 8);
     });
 
-    it("should throw a 'suspicious-file' warning because the file contains to much encoded-literal warnings", () => {
+    it("should throw a 'suspicious-file' warning when the file has too many encoded-literal warnings", () => {
       const suspectString = readFileSync(
         new URL("suspiciousFile.js", kFixtureURL),
         "utf-8"
