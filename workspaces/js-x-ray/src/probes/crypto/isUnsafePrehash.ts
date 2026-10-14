@@ -13,7 +13,7 @@ import {
   type ReturnValueEventPayload
 } from "../../VariableTracer.ts";
 import { hasImportedModules, matchTracedCall, traceAllFromModule, type ModuleScopedIdentifier } from "../tracing.ts";
-import { resolveStringValue } from "./resolveStringValue.ts";
+import { resolveStringValue } from "../resolveStringValue.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";

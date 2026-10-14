@@ -1,6 +1,6 @@
 // Import Internal Dependencies
-import { isNumericLiteral, isIdentifier } from "../../estree/types.ts";
-import type { LiteralIdentifier } from "../../VariableTracer.ts";
+import { isNumericLiteral, isIdentifier } from "../estree/types.ts";
+import type { LiteralIdentifier } from "../VariableTracer.ts";
 
 /**
  * @description

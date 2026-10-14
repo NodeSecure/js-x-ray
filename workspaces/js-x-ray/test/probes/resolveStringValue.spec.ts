@@ -3,12 +3,12 @@ import assert from "node:assert";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { resolveStringValue } from "../../../src/probes/crypto/resolveStringValue.ts";
-import type { LiteralIdentifier } from "../../../src/VariableTracer.ts";
+import { resolveStringValue } from "../../src/probes/resolveStringValue.ts";
+import type { LiteralIdentifier } from "../../src/VariableTracer.ts";
 import {
   parseScript,
   getExpressionFromStatementIf
-} from "../../helpers.ts";
+} from "../helpers.ts";
 
 function getExpression(code: string) {
   const [astNode] = parseScript(code).body;
@@ -16,7 +16,7 @@ function getExpression(code: string) {
   return getExpressionFromStatementIf(astNode);
 }
 
-describe("crypto.resolveStringValue", () => {
+describe("resolveStringValue", () => {
   test("returns the value of a string literal node", () => {
     const node = getExpression("'hello'");
 
