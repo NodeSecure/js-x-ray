@@ -29,8 +29,8 @@
   },
   "homepage": "https://github.com/NodeSecure/js-x-ray/tree/master/workspaces/tracer#readme",
   "dependencies": {
-    "@google/genai": "2.29.1",
+    "@google/genai": "2.30.0",
     "@nodesecure/js-x-ray": "^16.0.0",
-    "openai": "7.33.0"
+    "openai": "7.39.0"
   }
 }
