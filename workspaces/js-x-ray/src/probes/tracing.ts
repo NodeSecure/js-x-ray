@@ -38,6 +38,15 @@ export function traceAll(
 }
 
 /**
+ * The module an identifier is gated behind: "fs.readFileSync" -> "fs"
+ */
+export function moduleNameOf(
+  identifierOrMemberExpr: string
+): string {
+  return identifierOrMemberExpr.split(".")[0];
+}
+
+/**
  * For identifiers gated behind the module they start with: "fs.readFileSync"
  */
 export function traceAllFromModule(
@@ -49,7 +58,7 @@ export function traceAllFromModule(
   const modules = new Set<string>();
 
   for (const identifierOrMemberExpr of identifiers) {
-    const moduleName = identifierOrMemberExpr.split(".")[0];
+    const moduleName = moduleNameOf(identifierOrMemberExpr);
     modules.add(moduleName);
 
     tracer.trace(identifierOrMemberExpr, { ...tracedOptions, moduleName });

@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { describe, test } from "node:test";
 
 // Import Internal Dependencies
-import { resolveNumericValue } from "../../../src/probes/crypto/resolveNumericValue.ts";
+import { resolveNumericValue } from "../../../src/probes/resolvers/resolveNumericValue.ts";
 import type { LiteralIdentifier } from "../../../src/VariableTracer.ts";
 import {
   parseScript,
@@ -16,7 +16,7 @@ function getExpression(code: string) {
   return getExpressionFromStatementIf(astNode);
 }
 
-describe("crypto.resolveNumericValue", () => {
+describe("resolveNumericValue", () => {
   test("returns the value of a numeric literal node", () => {
     const node = getExpression("42");
 

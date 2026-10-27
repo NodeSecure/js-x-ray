@@ -12,7 +12,7 @@ import {
   traceAllFromModule,
   type ModuleScopedIdentifier
 } from "../tracing.ts";
-import { resolveNumericValue } from "./resolveNumericValue.ts";
+import { resolveNumericValue } from "../resolvers/index.ts";
 
 const kMinRounds = 10;
 

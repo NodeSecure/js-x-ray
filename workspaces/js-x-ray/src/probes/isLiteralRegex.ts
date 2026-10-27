@@ -1,11 +1,10 @@
 // Import Third-party Dependencies
 import type { ESTree } from "meriyah";
-import safeRegex from "safe-regex";
 
 // Import Internal Dependencies
 import { defineProbe } from "../defineProbe.ts";
 import { SourceFile } from "../SourceFile.ts";
-import { generateWarning } from "../warnings.ts";
+import { reportUnsafeRegex } from "./unsafeRegex.ts";
 
 /**
  * @description Search for RegExpLiteral AST Node
@@ -25,14 +24,7 @@ function main(
   node: ESTree.RegExpLiteral,
   options: { sourceFile: SourceFile; }
 ) {
-  const { sourceFile } = options;
-
-  // We use the safe-regex package to detect whether or not regex is safe!
-  if (!safeRegex(node.regex.pattern)) {
-    sourceFile.warnings.push(
-      generateWarning("unsafe-regex", { value: node.regex.pattern, location: node.loc })
-    );
-  }
+  reportUnsafeRegex(options.sourceFile, node.regex.pattern, node.loc);
 }
 
 export default defineProbe({
