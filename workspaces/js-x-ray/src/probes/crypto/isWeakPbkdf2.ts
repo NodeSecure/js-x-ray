@@ -12,8 +12,7 @@ import {
   traceAllFromModule,
   type ModuleScopedIdentifier
 } from "../tracing.ts";
-import { resolveNumericValue } from "./resolveNumericValue.ts";
-import { resolveStringValue } from "./resolveStringValue.ts";
+import { resolveNumericValue, resolveStringValue } from "../resolvers/index.ts";
 import { classifyHardcodedSecret } from "./classifyHardcodedSecret.ts";
 
 /**

@@ -18,7 +18,7 @@ import {
   traceAllFromModule,
   type ModuleScopedIdentifier
 } from "../tracing.ts";
-import { resolveStringValue } from "./resolveStringValue.ts";
+import { resolveStringValue } from "../resolvers/index.ts";
 import { resolveDigestCall } from "./resolveDigestCall.ts";
 
 const kModuleName = "bcryptjs";
