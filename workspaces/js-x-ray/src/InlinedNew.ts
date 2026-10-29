@@ -3,7 +3,7 @@ import type { ESTree } from "meriyah";
 
 // Import Internal Dependencies
 import { Inlined, type SplitResult } from "./Inlined.ts";
-import { isCallExpression, isMemberExpression } from "./estree/index.ts";
+import { isCallExpression, isIdentifier, isMemberExpression } from "./estree/index.ts";
 
 export class InlinedNew {
   static split(node: ESTree.Node): SplitResult | null {
@@ -11,7 +11,7 @@ export class InlinedNew {
       return null;
     }
     const newExpression = InlinedNew.#findNewCall(node);
-    if (!newExpression) {
+    if (!newExpression || (isIdentifier(newExpression.callee) && newExpression.callee.name === "Function")) {
       return null;
     }
 

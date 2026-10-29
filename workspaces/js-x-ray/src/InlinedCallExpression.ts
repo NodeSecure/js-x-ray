@@ -44,7 +44,8 @@ export class InlinedCallExpression {
       isCallExpression(object) &&
       isIdentifier(object.callee) && (
         object.callee.name === "require"
-        || object.callee.name === "eval")) {
+        || object.callee.name === "eval"
+        || object.callee.name === "Function")) {
       return null;
     }
 

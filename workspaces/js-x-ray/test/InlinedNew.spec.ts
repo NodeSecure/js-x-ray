@@ -89,6 +89,14 @@ describe("InlinedNew", () => {
     assert.strictEqual(result, null);
   });
 
+  it("should be null for new Function call", () => {
+    const ast = parseScript("new Function(code)();");
+    const node = getExpressionFromStatement(ast.body[0]);
+
+    const result = InlinedNew.split(node);
+    assert.strictEqual(result, null);
+  });
+
   it("should be null for function call", () => {
     const ast = parseScript("foo.bar();");
     const node = getExpressionFromStatement(ast.body[0]);
