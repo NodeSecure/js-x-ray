@@ -1,5 +1,15 @@
 # @nodesecure/js-x-ray
 
+## 16.3.0
+
+### Minor Changes
+
+- [#733](https://github.com/NodeSecure/js-x-ray/pull/733) [`9a4a0a0`](https://github.com/NodeSecure/js-x-ray/commit/9a4a0a04196a2d3d93754fb73099cbc458d196ab) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor(js-x-ray): type-safe probe declarations via defineProbe
+
+### Patch Changes
+
+- [#746](https://github.com/NodeSecure/js-x-ray/pull/746) [`6985516`](https://github.com/NodeSecure/js-x-ray/commit/6985516b3e2b7e521e82833b16263456ff176785) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - fix(js-x-ray): restore unsafe-stmt detection of Function(...)() and new Function(...)()
+
 ## 16.2.0
 
 ### Minor Changes
