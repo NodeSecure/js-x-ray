@@ -17,6 +17,7 @@ import { generateWarning } from "../warnings.ts";
  * @example
  * eval("this");
  * Function("return this")();
+ * new Function("return this")();
  */
 function validateNode(
   node: ESTree.CallExpression,
@@ -36,7 +37,7 @@ function main(
   }
   if (
     calleeName === "Function" &&
-    isCallExpression(node.callee) &&
+    isFunctionConstruction(node.callee) &&
     isLiteral(node.callee.arguments[0]) &&
     node.callee.arguments[0].value === "return this"
   ) {
@@ -56,7 +57,13 @@ function isFunctionCallee(
   node: ESTree.CallExpression,
   identifier: null | string | undefined
 ): boolean {
-  return identifier === "Function" && isCallExpression(node.callee);
+  return identifier === "Function" && isFunctionConstruction(node.callee);
+}
+
+function isFunctionConstruction(
+  callee: ESTree.CallExpression["callee"]
+): callee is ESTree.CallExpression | ESTree.NewExpression {
+  return isCallExpression(callee) || callee.type === "NewExpression";
 }
 
 function isEvalCallee(

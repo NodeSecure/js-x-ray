@@ -121,6 +121,14 @@ describe("InlinedCallExpression", () => {
     assert.strictEqual(result, null);
   });
 
+  it("should be null for Function expression", () => {
+    const ast = parseScript("Function(code)();");
+    const node = getExpressionFromStatement(ast.body[0]);
+
+    const result = InlinedCallExpression.split(node);
+    assert.strictEqual(result, null);
+  });
+
   it("should be able to handle chained operations", () => {
     const ast = parseScript("fn().bar.foo().bar.foo().bar;");
     const node = getExpressionFromStatement(ast.body[0]);

@@ -367,7 +367,9 @@ export class ProbeRunner {
   finalize(): void {
     for (const probe of this.probes) {
       probe.finalize?.(this.#getProbeContext(probe));
-      probe.context = probe[kProbeOriginalContext];
+      if (Object.hasOwn(probe, kProbeOriginalContext)) {
+        probe.context = probe[kProbeOriginalContext];
+      }
     }
     this.sourceFile.tracer.removeAllListeners();
   }

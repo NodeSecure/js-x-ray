@@ -485,5 +485,26 @@ describe("ProbeRunner", () => {
       });
       assert.notStrictEqual(context, fakeCtx);
     });
+
+    it("should keep the context of a probe without initialize when the probe is fully executed", () => {
+      const fakeCtx = {};
+      const fakeProbe: any = {
+        validateNode: mock.fn((_: ESTree.Node) => [true]),
+        main: mock.fn(() => ProbeRunner.Signals.Skip),
+        context: fakeCtx
+      };
+
+      const pr = new ProbeRunner(
+        new SourceFile(),
+        [fakeProbe]
+      );
+      pr.walk({
+        type: "Literal",
+        value: "test"
+      });
+      pr.finalize();
+
+      assert.strictEqual(fakeProbe.context, fakeCtx);
+    });
   });
 });
