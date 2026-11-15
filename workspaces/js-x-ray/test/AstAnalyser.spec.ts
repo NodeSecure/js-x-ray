@@ -1010,7 +1010,6 @@ describe("AstAnalyser", () => {
       const probeNames = new Set(analyser.probes.map((probe) => probe.name));
 
       assert.ok(probeNames.has("isWeakScrypt"));
-      assert.ok(probeNames.has("isUnsafePrehash"));
       assert.ok(probeNames.has("isWeakBcrypt"));
       assert.ok(probeNames.has("isPasswordShucking"));
     });

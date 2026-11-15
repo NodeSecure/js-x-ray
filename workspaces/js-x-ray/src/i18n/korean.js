@@ -21,7 +21,6 @@ export const sast_warnings = {
   insecure_random: "Math.random()을 사용한 안전하지 않은 난수 생성이 감지되었습니다. Math.random()은 암호학적으로 안전하지 않으므로 보안에 민감한 작업에 사용해서는 안 됩니다.",
   weak_scrypt: "하드코딩된 솔트, 짧은 솔트(16바이트 미만), 또는 불충분한 비용 매개변수(16384 미만)와 같은 안전하지 않은 매개변수로 crypto.scrypt() 또는 crypto.scryptSync()가 사용되었습니다. 이러한 취약한 설정은 비밀번호 기반 키 파생의 보안을 손상시킵니다.",
   prototype_pollution: "__proto__를 사용하여 런타임에 객체 프로토타입을 수정하는 행위로, 내장 속성을 덮어쓰고 프로토타입 오염 취약점을 유발할 수 있습니다.",
-  unsafe_prehash: "안전하지 않은 다이제스트 알고리즘(md5, sha1, sha256 또는 sha512)으로 사전 해시된 비밀번호와 함께 bcryptjs를 사용하는 경우입니다. 공격자는 더 약한 중간 해시를 크래킹하여 bcrypt를 우회할 수 있습니다.",
   weak_bcrypt: "작업 인수가 10 미만인 bcryptjs 해싱 함수(hash, hashSync, genSalt, genSaltSync)를 사용하는 경우로, 비밀번호 해싱이 무차별 대입 공격에 취약해집니다.",
   password_shucking: "비밀번호를 bcrypt에 전달하기 전에 암호화 다이제스트(md5, sha1, sha256 또는 sha512)로 먼저 해시하는 bcryptjs 사용 패턴으로, bcrypt 보호를 우회하는 해시 셔킹 공격이 가능해집니다.",
   unsafe_vm_context: "vm.runInContext() 또는 vm.Script.runInContext()를 사용할 때 컨텍스트 객체가 신뢰할 수 없는 입력의 영향을 받아 샌드박스를 취약하게 만듭니다.",
