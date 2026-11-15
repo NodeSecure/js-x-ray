@@ -28,7 +28,6 @@ import isPrototypePollution from "./probes/isPrototypePollution.ts";
 import {
   isWeakAlgorithm,
   isWeakScrypt,
-  isUnsafePrehash,
   isWeakBcrypt,
   isPasswordShucking,
   isWeakArgon2,
@@ -144,7 +143,6 @@ export class ProbeRunner {
     "log-usage": logUsage,
     "insecure-random": isRandom,
     "crypto.weak-scrypt": isWeakScrypt,
-    "crypto.unsafe-prehash": isUnsafePrehash,
     "crypto.weak-bcrypt": isWeakBcrypt,
     "crypto.password-shucking": isPasswordShucking,
     "crypto.weak-argon2": isWeakArgon2,

@@ -64,13 +64,3 @@ bcrypt.hash(password, salt, callback);
   import { hash as bcryptHash } from "bcryptjs";
   bcryptHash(crypto.createHash("sha512").update(password).digest(), salt, callback);
   ```
-
-## Relationship to `crypto.unsafe-prehash`
-
-Both probes target `bcryptjs` pre-hashing, but detect different vulnerabilities:
-
-| | `crypto.unsafe-prehash` | `crypto.password-shucking` |
-|---|---|---|
-| Trigger | Unsafe encoding (null-byte truncation risk) | Any `createHash` digest (shuckable regardless of encoding) |
-| `digest('hex')` → bcrypt | Not flagged (safe encoding) | Flagged (still shuckable) |
-| `createHmac` chains | Flagged (if unsafe encoding) | Not flagged (OWASP-safe pattern) |

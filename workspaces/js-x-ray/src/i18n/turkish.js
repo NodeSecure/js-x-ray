@@ -21,7 +21,6 @@ export const sast_warnings = {
   insecure_random: "Math.random() kullanılarak güvensiz rastgele sayı üretimi. Math.random() kriptografik olarak güvenli değildir ve güvenliğe duyarlı işlemler için kullanılmamalıdır.",
   weak_scrypt: "crypto.scrypt() veya crypto.scryptSync() fonksiyonlarının sabit kodlanmış tuz, kısa tuz (16 bayttan az) veya yetersiz maliyet parametresi (16384'ün altında) gibi güvensiz parametrelerle kullanımı. Bu zayıf yapılandırmalar, parola tabanlı anahtar türetme güvenliğini tehlikeye atar.",
   prototype_pollution: "Çalışma zamanında nesne prototipini değiştirmek için __proto__ kullanımı; yerleşik özellikleri geçersiz kılabilir ve prototip kirliliği açıklarına yol açabilir.",
-  unsafe_prehash: "bcryptjs'in güvensiz bir özet algoritmasıyla (md5, sha1, sha256 veya sha512) önceden hash'lenmiş bir parola ile kullanımı. Saldırgan, daha zayıf ara hash'i kırarak bcrypt'i atlayabilir.",
   weak_bcrypt: "bcryptjs hash işlevlerinin (hash, hashSync, genSalt, genSaltSync) 10'un altında bir iş faktörüyle kullanımı; parola hash'lemeyi kaba kuvvet saldırılarına karşı savunmasız kılar.",
   password_shucking: "bcryptjs'in parolayı bcrypt'e geçirmeden önce bir kriptografik özet (md5, sha1, sha256 veya sha512) ile ön hash'leyen kullanımı; bcrypt korumasını atlayan hash shucking saldırılarına olanak tanır.",
   unsafe_vm_context: "vm.runInContext() veya vm.Script.runInContext() kullanımı; bağlam nesnesi güvenilmez girdilerden etkilenebilir ve sanal alanı savunmasız kılar.",

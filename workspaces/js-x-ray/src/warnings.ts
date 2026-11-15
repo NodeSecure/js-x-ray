@@ -14,7 +14,6 @@ export type OptionalWarningName =
   | "log-usage"
   | "insecure-random"
   | "crypto.weak-scrypt"
-  | "crypto.unsafe-prehash"
   | "crypto.weak-bcrypt"
   | "crypto.password-shucking"
   | "crypto.weak-argon2"
@@ -156,11 +155,6 @@ export const warnings = Object.freeze({
   },
   "crypto.weak-scrypt": {
     i18n: "sast_warnings.weak_scrypt",
-    severity: "Warning",
-    experimental: true
-  },
-  "crypto.unsafe-prehash": {
-    i18n: "sast_warnings.unsafe_prehash",
     severity: "Warning",
     experimental: true
   },
