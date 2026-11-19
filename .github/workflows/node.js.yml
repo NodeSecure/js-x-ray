@@ -36,8 +36,6 @@ jobs:
         run: npm run lint
       - name: Run tests
         run: npm run test
-      - name: Send coverage report to Codecov
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v4.0.0-beta.3
   automerge:
     if: >
       github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]'
