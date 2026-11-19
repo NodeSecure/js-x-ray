@@ -1,5 +1,19 @@
 # @nodesecure/js-x-ray
 
+## 17.0.0
+
+### Major Changes
+
+- [#755](https://github.com/NodeSecure/js-x-ray/pull/755) [`280f394`](https://github.com/NodeSecure/js-x-ray/commit/280f3948696007a9fb5be7f63c00c924f86a5df4) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor(js-x-ray)!: remove the crypto.unsafe-prehash optional warning, neither bcryptjs nor bcrypt (>= 5.0.0) truncates its input at a null byte
+
+### Minor Changes
+
+- [#733](https://github.com/NodeSecure/js-x-ray/pull/733) [`9a4a0a0`](https://github.com/NodeSecure/js-x-ray/commit/9a4a0a04196a2d3d93754fb73099cbc458d196ab) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - refactor(js-x-ray): type-safe probe declarations via defineProbe
+
+### Patch Changes
+
+- [#746](https://github.com/NodeSecure/js-x-ray/pull/746) [`6985516`](https://github.com/NodeSecure/js-x-ray/commit/6985516b3e2b7e521e82833b16263456ff176785) Thanks [@ErwanRaulo](https://github.com/ErwanRaulo)! - fix(js-x-ray): restore unsafe-stmt detection of Function(...)() and new Function(...)()
+
 ## 16.2.0
 
 ### Minor Changes
