@@ -30,6 +30,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: npm install --ignore-scripts
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Verify registry signatures
+        run: npm audit signatures
       - name: Build typescript sources
         run: npm run build
       - name: Run lint
